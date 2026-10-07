@@ -32,5 +32,6 @@ the `start-session` skill.
 
 ## License
 
-Code under MIT, built-in art under CC BY 4.0 (pending confirmation, see
-[decision 0011](docs/decisions/0011-license.md)).
+Code is under the [MIT License](LICENSE). Built-in art and sounds are under
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), credited per asset in
+`plugin/content/CREDITS.md` ([decision 0011](docs/decisions/0011-license.md)).

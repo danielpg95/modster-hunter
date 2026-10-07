@@ -24,4 +24,4 @@ settled questions and avoid making assumptions about open ones.
 | [0008](0008-sprite-pipeline.md) | PNG sprite sheets in, `.sprite.json` at runtime | Proposed (settled by P1-05) |
 | [0009](0009-collection-storage.md) | One `$.store` key per Modster | Accepted |
 | [0010](0010-contributor-tracking.md) | Roadmap + workboard + session handoffs as the tracking system | Accepted |
-| [0011](0011-license.md) | MIT license | Proposed (owner to confirm) |
+| [0011](0011-license.md) | MIT for code, CC BY 4.0 for art | Accepted |
