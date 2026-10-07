@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Roadmap and workboard
+    url: https://github.com/danielpg95/modster-hunter/blob/main/docs/ROADMAP.md
+    about: See the plan and what's claimed before opening an issue.

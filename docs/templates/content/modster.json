@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "modster-id",
+  "name": "Modster Name",
+  "description": "One short, friendly line of personality.",
+  "rarity": null,
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 6
+  }
+}

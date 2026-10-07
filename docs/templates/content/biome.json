@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "biome-id",
+  "name": "Biome Name",
+  "description": "One short line about this place.",
+  "accentColor": "#4caf50",
+  "encounterEverySec": [10, 30],
+  "modsters": [
+    { "id": "common-modster-id", "weight": 60 },
+    { "id": "uncommon-modster-id", "weight": 15 },
+    { "id": "rare-modster-id", "weight": 4 }
+  ]
+}

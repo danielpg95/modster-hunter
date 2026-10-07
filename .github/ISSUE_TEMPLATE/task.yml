@@ -1,0 +1,51 @@
+name: Roadmap task
+description: Propose a new task, or mirror an existing roadmap task for discussion
+title: "PN-NN: "
+labels: ["task"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The roadmap (`docs/ROADMAP.md`) is the source of truth, and claiming happens in `docs/WORKBOARD.md`.
+        Use this issue to discuss a task or propose a new one.
+  - type: input
+    id: task_id
+    attributes:
+      label: Task ID
+      description: Existing ID (e.g. P2-06), or "new" to propose one.
+    validations:
+      required: true
+  - type: dropdown
+    id: phase
+    attributes:
+      label: Phase
+      options:
+        - "0 — Foundations"
+        - "1 — Spike"
+        - "2 — Core loop"
+        - "3 — Collection pane"
+        - "4 — User content"
+        - "5 — Extras and release"
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What exists afterwards that didn't before.
+    validations:
+      required: true
+  - type: textarea
+    id: done_when
+    attributes:
+      label: Done when
+      description: Results someone else can verify.
+      value: |
+        - [ ]
+    validations:
+      required: true
+  - type: input
+    id: depends_on
+    attributes:
+      label: Depends on
+      description: Task IDs, comma separated, or "none".

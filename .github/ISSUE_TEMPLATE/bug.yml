@@ -1,0 +1,44 @@
+name: Bug report
+description: Something in the mod doesn't work as expected
+title: "Bug: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: And what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      value: |
+        1.
+    validations:
+      required: true
+  - type: input
+    id: cc_version
+    attributes:
+      label: Claude Code version
+      description: Output of `claude --version`
+    validations:
+      required: true
+  - type: input
+    id: mod_version
+    attributes:
+      label: Modster Hunter version or commit
+  - type: input
+    id: terminal
+    attributes:
+      label: Terminal and size
+      description: e.g. iTerm2 120×40, Ghostty 80×24, Desktop app
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Debug log lines or screenshot
+      description: Lines mentioning modster-hunter, e.g. "ui.render (AbovePrompt) refused …"
+      render: text

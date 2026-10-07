@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  tracking:
+    name: Tracking and content checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Roadmap, workboard, sessions, decisions
+        run: node tools/check-tracking.mjs
+      - name: JSON files parse
+        run: |
+          find . -name '*.json' -not -path './node_modules/*' -print0 \
+            | xargs -0 -n1 node -e 'JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"))'
+
+  # P0-04 adds: typecheck, `claude plugin validate ./plugin --strict`, `claude plugin test ./plugin`.

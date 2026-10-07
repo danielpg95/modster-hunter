@@ -1,0 +1,42 @@
+name: New Modster or biome idea
+description: Pitch built-in content before drawing it
+title: "Content: "
+labels: ["content"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Pitch first, draw second. Content follows `docs/CONTENT_FORMAT.md`; art must be original (see `.claude/rules/content.md`).
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options: ["Modster", "Biome"]
+    validations:
+      required: true
+  - type: input
+    id: name
+    attributes:
+      label: Name
+      description: Modster names up to 24 characters; biome names up to 32.
+    validations:
+      required: true
+  - type: textarea
+    id: concept
+    attributes:
+      label: Concept
+      description: Look, personality, colors, animation idea, or a biome's theme and roster.
+    validations:
+      required: true
+  - type: input
+    id: biomes
+    attributes:
+      label: Biome(s) and intended tier
+      description: e.g. "whispering-forest, rare"
+  - type: checkboxes
+    id: rights
+    attributes:
+      label: Art rights
+      options:
+        - label: The art will be my own original work, not based on an existing franchise.
+          required: true
