@@ -29,16 +29,16 @@ Goal: anyone can clone the repo, load the (empty) mod, and run the checks.
   - [x] A new contributor can find what to work on and how, from `CLAUDE.md` alone.
   - [x] `node tools/check-tracking.mjs` passes.
 
-#### [ ] P0-02 — Marketplace and plugin skeleton
+#### [x] P0-02 — Marketplace and plugin skeleton
 - **Depends on:** P0-01
 - **Size:** S
 - **Goal:** the repo is installable as a marketplace and the plugin loads.
 - **Done when:**
-  - [ ] `.claude-plugin/marketplace.json` at the repo root lists the plugin at `./plugin`.
-  - [ ] `plugin/.claude-plugin/plugin.json` (name `modster-hunter`, `userConfig` placeholders from CONTENT_FORMAT.md), `plugin/hooks/hooks.json`, `plugin/hooks/register.ts`.
-  - [ ] `register.ts` registers `/modsters`, which replies "Modster Hunter is loaded".
-  - [ ] `claude plugin validate ./plugin --strict` passes.
-  - [ ] `claude --plugin-dir ./plugin` shows `1 mod active · modster-hunter` in `/plugin`.
+  - [x] `.claude-plugin/marketplace.json` at the repo root lists the plugin at `./plugin`.
+  - [x] `plugin/.claude-plugin/plugin.json` (name `modster-hunter`, `userConfig` placeholders from CONTENT_FORMAT.md), `plugin/hooks/hooks.json`, `plugin/hooks/register.ts`.
+  - [x] `register.ts` registers `/modsters`, which replies "Modster Hunter is loaded".
+  - [x] `claude plugin validate ./plugin --strict` passes.
+  - [x] `claude --plugin-dir ./plugin` shows `1 mod active · modster-hunter` in `/plugin`.
 
 #### [ ] P0-03 — TypeScript and test setup
 - **Depends on:** P0-02

@@ -1,0 +1,39 @@
+{
+  "name": "modster-hunter",
+  "displayName": "Modster Hunter",
+  "version": "0.0.1",
+  "description": "Catch Modsters while you wait for Claude.",
+  "author": {
+    "name": "Daniel Pena"
+  },
+  "repository": "https://github.com/danielpg95/modster-hunter",
+  "license": "MIT",
+  "keywords": ["mod", "game"],
+  "userConfig": {
+    "includeBuiltins": {
+      "type": "boolean",
+      "title": "Include built-in content",
+      "description": "Load the biomes and Modsters that ship with the mod",
+      "default": true
+    },
+    "encounterIdleTimeoutSec": {
+      "type": "number",
+      "title": "Encounter idle timeout (seconds)",
+      "description": "Seconds without a throw before a Modster wanders off",
+      "default": 90,
+      "min": 5
+    },
+    "showIdleLine": {
+      "type": "boolean",
+      "title": "Show idle line",
+      "description": "Show the current biome in the band between encounters",
+      "default": true
+    },
+    "sounds": {
+      "type": "boolean",
+      "title": "Sounds",
+      "description": "Play sounds (not available yet)",
+      "default": false
+    }
+  }
+}
