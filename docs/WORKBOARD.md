@@ -15,10 +15,10 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
+| P0-02 | @danielpg95 | in-progress | p0-02-plugin-skeleton | 2026-10-07 | 2026-10-07 | Create .claude-plugin/marketplace.json and plugin/.claude-plugin/plugin.json |
 
 ## Up next
 
 Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
-- **P0-02** — Marketplace and plugin skeleton
