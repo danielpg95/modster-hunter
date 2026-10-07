@@ -1,0 +1,14 @@
+{
+  "name": "modster-hunter",
+  "description": "Catch Modsters while you wait for Claude.",
+  "owner": {
+    "name": "Daniel Pena"
+  },
+  "plugins": [
+    {
+      "name": "modster-hunter",
+      "source": "./plugin",
+      "description": "An idle collecting game that lives in your terminal."
+    }
+  ]
+}
