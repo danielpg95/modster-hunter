@@ -85,13 +85,13 @@ ends with findings written into a decision.
   - [x] Largest sprite that fits the band in an 80×24 terminal and in a 120×40 terminal is measured and written into 0001 as a constraint.
   - [x] Pure function `pixelsToCells(frame) → base64` has unit tests.
 
-#### [ ] P1-03 — Animation with blit
+#### [x] P1-03 — Animation with blit
 - **Depends on:** P1-02
 - **Size:** S
 - **Goal:** loop a 4-frame sprite with `$.ui.blit` at 6–12 fps.
 - **Done when:**
-  - [ ] No flicker; the transcript stays responsive while Claude streams.
-  - [ ] The animation timer stops when the encounter ends and on module reload.
+  - [x] No flicker; the transcript stays responsive while Claude streams.
+  - [x] The animation timer stops when the encounter ends and on module reload.
 
 #### [ ] P1-04 — Image element check (kitty/Ghostty)
 - **Depends on:** P1-02
