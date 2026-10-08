@@ -16,7 +16,7 @@ this file lists only tasks someone has claimed.
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
 | P0-03 | @victor-aguilars | in-progress | p0-03-typescript-tests | 2026-10-07 | 2026-10-07 | Add plugin/tsconfig.json and generate types with /plugin-types |
-| P1-01 | @danielpg95 | in-review | p1-01-band-encounter | 2026-10-08 | 2026-10-08 | Answer the spikes/ vs plugin/ question, then open the PR |
+| P1-01 | @danielpg95 | in-review | p1-01-band-encounter | 2026-10-08 | 2026-10-08 | Open the PR for the spike in spikes/p1-01-band |
 
 ## Up next
 

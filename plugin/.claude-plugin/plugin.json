@@ -8,7 +8,6 @@
   },
   "repository": "https://github.com/danielpg95/modster-hunter",
   "license": "MIT",
-  "types": "./types/index.d.ts",
   "keywords": ["mod", "game"],
   "userConfig": {
     "includeBuiltins": {
