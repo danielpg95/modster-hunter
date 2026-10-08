@@ -76,14 +76,14 @@ ends with findings written into a decision.
   - [x] Typing `1` in an empty prompt and pausing presses the button; typing `1` in a non-empty prompt doesn't.
   - [x] Findings (including `maxRows` seen at common terminal sizes) recorded in the session log.
 
-#### [ ] P1-02 — Half-block sprite renderer
+#### [x] P1-02 — Half-block sprite renderer
 - **Depends on:** P1-01
 - **Size:** M
 - **Goal:** draw a hand-written RGBA sprite in the band as a `Raster` with `▀` cells (decision 0001).
 - **Done when:**
-  - [ ] Transparent pixels show the terminal background in light and dark themes.
-  - [ ] Largest sprite that fits the band in an 80×24 terminal and in a 120×40 terminal is measured and written into 0001 as a constraint.
-  - [ ] Pure function `pixelsToCells(frame) → base64` has unit tests.
+  - [x] Transparent pixels show the terminal background in light and dark themes.
+  - [x] Largest sprite that fits the band in an 80×24 terminal and in a 120×40 terminal is measured and written into 0001 as a constraint.
+  - [x] Pure function `pixelsToCells(frame) → base64` has unit tests.
 
 #### [ ] P1-03 — Animation with blit
 - **Depends on:** P1-02
