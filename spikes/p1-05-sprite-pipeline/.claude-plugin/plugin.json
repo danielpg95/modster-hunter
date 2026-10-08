@@ -1,0 +1,6 @@
+{
+  "name": "modster-hunter",
+  "author": { "name": "Daniel Pena" },
+  "version": "0.0.0",
+  "description": "Spike P1-05: PNG decoding in the mod runtime. Not shipped."
+}

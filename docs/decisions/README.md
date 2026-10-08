@@ -21,7 +21,7 @@ settled questions and avoid making assumptions about open ones.
 | [0005](0005-encounter-lifetime.md) | An encounter lingers after the turn ends, until resolved or idle timeout | Accepted |
 | [0006](0006-biome-selection.md) | One random biome per session | Accepted |
 | [0007](0007-content-model.md) | Weights instead of percentages; built-in and user content merged by id | Accepted |
-| [0008](0008-sprite-pipeline.md) | PNG sprite sheets in, `.sprite.json` at runtime | Proposed (settled by P1-05) |
+| [0008](0008-sprite-pipeline.md) | PNG sprite sheets in, `.sprite.json` at runtime | Accepted (amended by P1-05) |
 | [0009](0009-collection-storage.md) | One `$.store` key per Modster | Accepted |
 | [0010](0010-contributor-tracking.md) | Roadmap + workboard + session handoffs as the tracking system | Accepted |
 | [0011](0011-license.md) | MIT for code, CC BY 4.0 for art | Accepted |

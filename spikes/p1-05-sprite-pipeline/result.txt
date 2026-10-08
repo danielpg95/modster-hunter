@@ -1,0 +1,7 @@
+typeof DecompressionStream: undefined
+typeof Blob: undefined
+typeof Response: undefined
+typeof createImageBitmap: undefined
+png bytes: 92
+decode via native: FAILED Blob is not defined
+decode via vendored: {"width":4,"height":2,"matches":true,"ms":0}
