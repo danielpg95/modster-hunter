@@ -67,14 +67,14 @@ Goal: answer the open technical questions with throwaway code before building
 the real thing. Spike code lives in `spikes/` and is not shipped. Each spike
 ends with findings written into a decision.
 
-#### [ ] P1-01 — Band encounter on turn start
+#### [x] P1-01 — Band encounter on turn start
 - **Depends on:** P0-02
 - **Size:** S
 - **Goal:** a hardcoded colored square appears in the band 3 s after `turn.start`, with a `1: Throw` button.
 - **Done when:**
-  - [ ] It appears only while a turn runs.
-  - [ ] Typing `1` in an empty prompt and pausing presses the button; typing `1` in a non-empty prompt doesn't.
-  - [ ] Findings (including `maxRows` seen at common terminal sizes) recorded in the session log.
+  - [x] It appears only while a turn runs.
+  - [x] Typing `1` in an empty prompt and pausing presses the button; typing `1` in a non-empty prompt doesn't.
+  - [x] Findings (including `maxRows` seen at common terminal sizes) recorded in the session log.
 
 #### [ ] P1-02 — Half-block sprite renderer
 - **Depends on:** P1-01
