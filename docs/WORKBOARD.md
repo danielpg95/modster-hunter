@@ -16,7 +16,6 @@ this file lists only tasks someone has claimed.
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
 | P0-03 | @victor-aguilars | in-progress | p0-03-typescript-tests | 2026-10-07 | 2026-10-07 | Add plugin/tsconfig.json and generate types with /plugin-types |
-| P1-04 | @danielpg95 | in-progress | p1-04-image-element-check | 2026-10-08 | 2026-10-08 | Copy the P1-02 spike and draw the same sprite with `Image` ({ rgba, width, height }) in kitty/Ghostty |
 
 ## Up next
 
