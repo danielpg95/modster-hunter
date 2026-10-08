@@ -93,13 +93,13 @@ ends with findings written into a decision.
   - [x] No flicker; the transcript stays responsive while Claude streams.
   - [x] The animation timer stops when the encounter ends and on module reload.
 
-#### [ ] P1-04 — Image element check (kitty/Ghostty)
+#### [x] P1-04 — Image element check (kitty/Ghostty)
 - **Depends on:** P1-02
 - **Size:** S
 - **Goal:** know whether the optional `Image` path is worth it.
 - **Done when:**
-  - [ ] Same sprite drawn with `Image` (`{ rgba, width, height }`) in kitty or Ghostty, and the fallback `alt` checked in another terminal.
-  - [ ] Recommendation written in the session log (keep for P5 or drop).
+  - [x] Same sprite drawn with `Image` (`{ rgba, width, height }`) in kitty or Ghostty, and the fallback `alt` checked in another terminal.
+  - [x] Recommendation written in the session log (keep for P5 or drop).
 
 #### [ ] P1-05 — Sprite pipeline spike
 - **Depends on:** P0-02
