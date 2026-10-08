@@ -16,10 +16,10 @@ this file lists only tasks someone has claimed.
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
 | P0-03 | @victor-aguilars | in-progress | p0-03-typescript-tests | 2026-10-07 | 2026-10-07 | Add plugin/tsconfig.json and generate types with /plugin-types |
+| P1-05 | @danielpg95 | in-progress | p1-05-sprite-pipeline-spike | 2026-10-08 | 2026-10-08 | Test DecompressionStream, vendored inflate and npm import in the mod runtime |
 
 ## Up next
 
 Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
-- **P1-05** — Sprite pipeline spike
