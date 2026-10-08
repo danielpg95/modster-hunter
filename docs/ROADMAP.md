@@ -67,7 +67,7 @@ Goal: answer the open technical questions with throwaway code before building
 the real thing. Spike code lives in `spikes/` and is not shipped. Each spike
 ends with findings written into a decision.
 
-#### [ ] P1-01 — Band encounter on turn start
+#### [x] P1-01 — Band encounter on turn start
 - **Depends on:** P0-02
 - **Size:** S
 - **Goal:** a hardcoded colored square appears in the band 3 s after `turn.start`, with a `1: Throw` button.
