@@ -262,7 +262,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Goal:** decision 0007 points 2–5: load `~/.claude/modster-hunter/content/`, override by id, disable lists, `includeBuiltins`.
 - **Done when:**
   - [ ] Merge rules unit tested; zero-biome case shows one clear message.
-  - [ ] User PNG sprites decode in the mod and are cached (0008), starting from `spikes/p1-05-sprite-pipeline/lib/inflate.ts` and `lib/png.ts` moved to `plugin/` with unit tests; 1-, 2- and 4-bit palette PNGs decode too (PIL and optimizers write ≤ 16-color palettes that way).
+  - [ ] User PNG sprites decode in the mod and are cached (0015), starting from `spikes/p1-05-sprite-pipeline/lib/inflate.ts` and `lib/png.ts` moved to `plugin/` with unit tests; 1-, 2- and 4-bit palette PNGs decode too (PIL and optimizers write ≤ 16-color palettes that way).
 
 #### [ ] P4-02 — `/modsters reload` and error reporting
 - **Depends on:** P4-01, P3-01

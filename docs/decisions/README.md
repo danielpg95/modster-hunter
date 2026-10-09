@@ -21,10 +21,11 @@ settled questions and avoid making assumptions about open ones.
 | [0005](0005-encounter-lifetime.md) | An encounter lingers after the turn ends, until resolved or idle timeout | Accepted |
 | [0006](0006-biome-selection.md) | One random biome per session | Accepted |
 | [0007](0007-content-model.md) | Weights instead of percentages; built-in and user content merged by id | Accepted |
-| [0008](0008-sprite-pipeline.md) | PNG sprite sheets in, `.sprite.json` at runtime | Accepted (amended by P1-05) |
+| [0008](0008-sprite-pipeline.md) | PNG sprite sheets in, `.sprite.json` at runtime | Superseded by 0015 |
 | [0009](0009-collection-storage.md) | One `$.store` key per Modster | Accepted |
 | [0010](0010-contributor-tracking.md) | Roadmap + workboard + session handoffs as the tracking system | Accepted |
 | [0011](0011-license.md) | MIT for code, CC BY 4.0 for art | Accepted |
 | [0012](0012-sprite-size-and-band-layout.md) | Half-block `Raster` sprites up to 24×12; text-only band when they don't fit | Accepted |
 | [0013](0013-host-calls-in-register.md) | All `$` calls live in `register.ts`; pure modules reach the host through plain ports | Accepted |
 | [0014](0014-encounter-timings.md) | Encounter timings, a work-time spawn countdown, and no throws outside "waiting" | Accepted |
+| [0015](0015-user-png-sprites.md) | User Modsters may use a PNG sheet directly; the mod decodes and caches it | Accepted |

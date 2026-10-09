@@ -86,7 +86,7 @@ See `plugin/tests/register.test.ts` for a full example.
 
 ## Sprites
 
-`tools/sprite.mjs` turns art into the `.sprite.json` the mod reads (decision 0008):
+`tools/sprite.mjs` turns art into the `.sprite.json` the mod reads (decisions 0008, 0015):
 
 ```bash
 npm run sprite -- plugin/content/modsters/<id>/sprite.png --frames 4   # PNG sheet, frames side by side
