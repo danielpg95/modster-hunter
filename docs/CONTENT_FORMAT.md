@@ -5,8 +5,25 @@ between the game, the built-in content, user content, the editor and the
 content skills. Rules come from decisions [0004](decisions/0004-attempts-and-catch-rate.md),
 [0007](decisions/0007-content-model.md) and [0008](decisions/0008-sprite-pipeline.md).
 
-> **Status:** schema version `1`, draft until P2-01 implements the validator.
-> Changing a field after P2-01 needs a new decision and a `schemaVersion` bump.
+> **Status:** schema version `1`, implemented by the validator in
+> `plugin/hooks/content/` (P2-01). Changing a field now needs a new decision
+> and a `schemaVersion` bump.
+
+## Validation
+
+The validator never throws. For each file it returns a list of issues, each
+with the file, the field (e.g. `modsters[2].weight`) and the problem.
+
+- **Errors** skip the file. The exception is a biome entry naming a Modster
+  that doesn't exist: only that entry is dropped, and the biome only if no
+  entries are left.
+- **Warnings** are reported, but the file still loads. Only the "should"
+  rules below are warnings: an opaque palette index 0, and alpha other than
+  `00` or `ff`.
+- **Unknown fields are errors**, so typos like `"wieght"` are caught. The
+  format is closed; a new field needs a decision.
+- Every bound in the tables below is inclusive. `null` is accepted only where
+  a table says so.
 
 ## Folder layout
 
