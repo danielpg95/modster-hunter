@@ -155,13 +155,13 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [ ] Random biome at `session.start`, kept across `/clear`, `/resume`, `/branch`.
   - [ ] Tested with an injected random source.
 
-#### [ ] P2-05 — Rarity, attempts and catch-rate resolution
+#### [x] P2-05 — Rarity, attempts and catch-rate resolution
 - **Depends on:** P2-01
 - **Size:** S
 - **Goal:** decision 0004 as one pure module plus its constants table.
 - **Done when:**
-  - [ ] Precedence biome entry → Modster → tier default is unit tested.
-  - [ ] Encounter-odds table for each built-in biome printed by a test helper and sanity-checked.
+  - [x] Precedence biome entry → Modster → tier default is unit tested.
+  - [x] Encounter-odds table helper (`oddsTable`, `formatOddsTable`) printed and sanity-checked on the CONTENT_FORMAT example biome; the per-built-in-biome check moved to P2-09 (no built-in biomes yet).
 
 #### [ ] P2-06 — Encounter state machine
 - **Depends on:** P2-05
@@ -198,6 +198,7 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [ ] Each biome has at least one Modster per tier from common to rare, and one legendary across all biomes.
   - [ ] Every sprite has 2–4 animation frames and an entry in `plugin/content/CREDITS.md`.
   - [ ] All content passes the validator.
+  - [ ] `formatOddsTable(oddsTable(…))` printed for each built-in biome and sanity-checked (moved from P2-05; @victor-aguilars, 2026-10-08).
 
 #### [ ] P2-10 — Phase 2 playtest
 - **Depends on:** P2-04, P2-07, P2-08, P2-09

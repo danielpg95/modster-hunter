@@ -1,5 +1,17 @@
 // Tunable numbers, in one place. Each group names the decision or doc it comes from.
 
+/**
+ * Rarity tiers, decision 0004 point 1, checked in this order. A Modster whose
+ * share of its biome's total weight is at least `minPercent` gets the tier;
+ * the defaults apply unless the biome entry or the Modster overrides them.
+ */
+export const TIERS = [
+  { tier: 'common', minPercent: 20, maxAttempts: 3, catchRate: 0.5 },
+  { tier: 'uncommon', minPercent: 5, maxAttempts: 3, catchRate: 0.35 },
+  { tier: 'rare', minPercent: 1, maxAttempts: 4, catchRate: 0.2 },
+  { tier: 'legendary', minPercent: 0, maxAttempts: 5, catchRate: 0.08 },
+] as const
+
 /** Content file bounds: docs/CONTENT_FORMAT.md (schema version 1), decisions 0004, 0007 and 0012. */
 export const CONTENT = {
   schemaVersion: 1,
