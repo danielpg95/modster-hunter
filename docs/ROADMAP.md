@@ -109,12 +109,12 @@ ends with findings written into a decision.
   - [x] Tested: `DecompressionStream` available in the mod runtime? A vendored inflate in a relative `.ts` import? An npm import?
   - [x] Decision 0008 is Accepted, amended, or superseded with the findings.
 
-#### [ ] P1-06 — Spike review
+#### [x] P1-06 — Spike review
 - **Depends on:** P1-01, P1-02, P1-03, P1-04, P1-05
 - **Size:** S
 - **Goal:** decide the sprite size limits and band layout for phase 2.
 - **Done when:**
-  - [ ] Phase review written; `spikes/` code that will be reused is noted, the rest marked for deletion.
+  - [x] Phase review written; `spikes/` code that will be reused is noted, the rest marked for deletion.
 
 ---
 
@@ -123,7 +123,7 @@ ends with findings written into a decision.
 Goal: a complete, fun encounter loop with starter content. No customization yet.
 
 #### [ ] P2-01 — Content schema, types and validator
-- **Depends on:** P1-06
+- **Depends on:** P0-03, P1-06
 - **Size:** M
 - **Goal:** the types and validation for `biome.json`, `modster.json` and `.sprite.json` from CONTENT_FORMAT.md.
 - **Done when:**
@@ -136,6 +136,7 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
 - **Goal:** `tools/sprite.mjs <sheet.png> --frames N` writes a valid `.sprite.json` (decision 0008).
 - **Done when:**
   - [ ] Handles transparency, palettes > 64 colors (error with a hint), and GIF input if 0008 says so.
+  - [ ] Frames outside the 0012 bounds (width 8–24, height 8–12, even) fail with a hint.
   - [ ] Output passes the P2-01 validator.
 
 #### [ ] P2-03 — Content loader (built-in only)
@@ -176,9 +177,10 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
 - **Size:** M
 - **Goal:** draw the state machine in the band: appear animation, Modster name and tier, attempts left, `1: Throw`, wobble, caught/fled card.
 - **Done when:**
-  - [ ] Never exceeds `maxRows`; compact text-only mode below the measured minimum.
+  - [ ] Full and compact layouts per 0012; never exceeds `maxRows` (render tests at `maxRows` 0, 1, 2, 5, 6, 7).
   - [ ] Idle line between encounters shows the current biome (or nothing, per a setting).
   - [ ] Render tests on the terminal surface for each state.
+  - [ ] Starts from `spikes/p1-02-half-block/lib/pixels-to-cells.ts` (+ tests) and the timer and blit helpers in `spikes/p1-03-blit-animation/` (`lib/animation.ts`, skip-if-blit-in-flight); `spikes/` is deleted in this PR, except `spikes/p1-05-sprite-pipeline/lib/` if P4-01 hasn't moved it yet.
 
 #### [ ] P2-08 — Collection storage
 - **Depends on:** P2-06
@@ -259,6 +261,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Goal:** decision 0007 points 2–5: load `~/.claude/modster-hunter/content/`, override by id, disable lists, `includeBuiltins`.
 - **Done when:**
   - [ ] Merge rules unit tested; zero-biome case shows one clear message.
+  - [ ] User PNG sprites decode in the mod and are cached (0008), starting from `spikes/p1-05-sprite-pipeline/lib/inflate.ts` and `lib/png.ts` moved to `plugin/` with unit tests; 1-, 2- and 4-bit palette PNGs decode too (PIL and optimizers write ≤ 16-color palettes that way).
 
 #### [ ] P4-02 — `/modsters reload` and error reporting
 - **Depends on:** P4-01, P3-01
@@ -314,13 +317,6 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Goal:** fun stats ("caught during 42 turns", longest streak, first legendary) shown as toasts on milestones.
 - **Done when:**
   - [ ] Milestones never interrupt typing (toasts only).
-
-#### [ ] P5-04 — Optional Image renderer
-- **Depends on:** P1-04, P2-07
-- **Size:** S
-- **Goal:** use `Image` in kitty/Ghostty if P1-04 recommended it.
-- **Done when:**
-  - [ ] Behind a setting; falls back to `Raster` cleanly.
 
 #### [ ] P5-05 — Light skill catch experiment
 - **Depends on:** P2-10

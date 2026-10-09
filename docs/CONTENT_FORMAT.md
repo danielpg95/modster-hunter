@@ -107,8 +107,8 @@ content/
 ```json
 {
   "schemaVersion": 1,
-  "width": 24,
-  "height": 24,
+  "width": 16,
+  "height": 12,
   "palette": ["#00000000", "#2e7d32ff", "#a5d6a7ff"],
   "shinyPalette": ["#00000000", "#6a1b9aff", "#ce93d8ff"],
   "frames": [
@@ -119,7 +119,7 @@ content/
 
 | Field | Rules |
 | --- | --- |
-| `width`, `height` | 8–48 each; `height` even (two pixels per cell). Final limits set by P1-02 |
+| `width`, `height` | `width` 8–24; `height` 8–12 and even (two pixels per cell). See [0012](decisions/0012-sprite-size-and-band-layout.md) |
 | `palette` | 1–64 colors, `#rrggbbaa`. Index 0 should be fully transparent |
 | `shinyPalette` | Optional; same length as `palette` (P5-01) |
 | `frames` | 1–8 frames, each exactly `width × height` bytes after base64 decoding; every byte < palette length |

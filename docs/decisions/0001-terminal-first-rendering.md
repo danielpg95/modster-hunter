@@ -1,6 +1,6 @@
 # 0001 — Terminal first; sprites drawn as half-block `Raster` cells
 
-- **Status:** Accepted
+- **Status:** Superseded by 0012
 - **Date:** 2026-10-07
 - **Decided by:** @danielpg95
 
