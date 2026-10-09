@@ -4,3 +4,4 @@ export type { Biome, BiomeModsterEntry, ContentIssue, Modster, Rarity, Sprite, V
 export { validateBiome } from './validate-biome'
 export { validateModster } from './validate-modster'
 export { validateSprite } from './validate-sprite'
+export { loadContent, type ContentReader, type ContentRegistry, type LoadedBiome, type LoadedModster } from './load-content'

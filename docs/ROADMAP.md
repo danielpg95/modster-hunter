@@ -139,13 +139,13 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [ ] Frames outside the 0012 bounds (width 8–24, height 8–12, even) fail with a hint.
   - [ ] Output passes the P2-01 validator.
 
-#### [ ] P2-03 — Content loader (built-in only)
+#### [x] P2-03 — Content loader (built-in only)
 - **Depends on:** P2-01
 - **Size:** M
 - **Goal:** load `plugin/content/` at `session.start` via `$.fs`, validated, into an in-memory registry.
 - **Done when:**
-  - [ ] Invalid files are skipped and listed, never crash the mod.
-  - [ ] Loading stays under the 10 s hook budget for 50 Modsters (measured).
+  - [x] Invalid files are skipped and listed, never crash the mod.
+  - [x] Loading stays under the 10 s hook budget for 50 Modsters (measured).
 
 #### [ ] P2-04 — Biome selection per session
 - **Depends on:** P2-03
@@ -155,13 +155,13 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [ ] Random biome at `session.start`, kept across `/clear`, `/resume`, `/branch`.
   - [ ] Tested with an injected random source.
 
-#### [ ] P2-05 — Rarity, attempts and catch-rate resolution
+#### [x] P2-05 — Rarity, attempts and catch-rate resolution
 - **Depends on:** P2-01
 - **Size:** S
 - **Goal:** decision 0004 as one pure module plus its constants table.
 - **Done when:**
-  - [ ] Precedence biome entry → Modster → tier default is unit tested.
-  - [ ] Encounter-odds table for each built-in biome printed by a test helper and sanity-checked.
+  - [x] Precedence biome entry → Modster → tier default is unit tested.
+  - [x] Encounter-odds table helper (`oddsTable`, `formatOddsTable`) printed and sanity-checked on the CONTENT_FORMAT example biome; the per-built-in-biome check moved to P2-09 (no built-in biomes yet).
 
 #### [ ] P2-06 — Encounter state machine
 - **Depends on:** P2-05
@@ -185,7 +185,7 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
 #### [ ] P2-08 — Collection storage
 - **Depends on:** P2-06
 - **Size:** S
-- **Goal:** decision 0009.
+- **Goal:** decision 0009, over a store port built in `register.ts` (decision 0013).
 - **Done when:**
   - [ ] Catch writes `caught:<id>` with re-read-before-write; stats counters written.
   - [ ] Tested with `mock.store`, including a simulated second session writing in between.
@@ -198,6 +198,7 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [ ] Each biome has at least one Modster per tier from common to rare, and one legendary across all biomes.
   - [ ] Every sprite has 2–4 animation frames and an entry in `plugin/content/CREDITS.md`.
   - [ ] All content passes the validator.
+  - [ ] `formatOddsTable(oddsTable(…))` printed for each built-in biome and sanity-checked (moved from P2-05; @victor-aguilars, 2026-10-08).
 
 #### [ ] P2-10 — Phase 2 playtest
 - **Depends on:** P2-04, P2-07, P2-08, P2-09
