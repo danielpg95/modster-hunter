@@ -15,7 +15,6 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P2-05 | @victor-aguilars | in-progress | p2-05-catch-odds | 2026-10-08 | 2026-10-08 | Add the 0004 tier table to constants.ts and plugin/hooks/game/ resolver with tests |
 
 ## Up next
 
@@ -25,3 +24,4 @@ list when you finish a task.
 - **P0-04** — Continuous integration
 - **P2-02** — Sprite converter tool
 - **P2-03** — Content loader (built-in only)
+- **P2-06** — Encounter state machine
