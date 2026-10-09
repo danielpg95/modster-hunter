@@ -208,6 +208,22 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [ ] At least 2 people played ≥ 1 hour of real work each; feedback in the phase review.
   - [ ] Tier defaults in 0004 tuned (amend via a new decision if numbers change).
 
+#### [ ] P2-11 — Background agents count as work time
+- **Depends on:** P2-07
+- **Size:** S
+- **Goal:** decision 0016 (once accepted): the spawn countdown also runs while background subagents work.
+- **Done when:**
+  - [ ] `classic.SubagentStart` / `classic.SubagentStop` feed the encounter machine; overlapping turns and agents count once.
+  - [ ] Tested with a fake clock, including a lost stop event that can't keep the countdown running forever.
+
+#### [ ] P2-12 — Encounter in an opt-in side pane
+- **Depends on:** P2-07
+- **Size:** M
+- **Goal:** decision 0015 points 2 and 4 (once accepted): a command opens a pane that shows the live encounter and biome; it docks on the right in wide fullscreen terminals.
+- **Done when:**
+  - [ ] The pane never opens by itself; the band keeps working beside it; one Throw per encounter from either place.
+  - [ ] Render tests for docked and inline placement and each encounter phase; command name agreed with P3-01.
+
 ---
 
 ## Phase 3 — Collection pane
@@ -332,6 +348,14 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Goal:** draw sprites as `Svg` when `e.surface` is `desktop`.
 - **Done when:**
   - [ ] Band and pane work in the Desktop app's Code tab.
+
+#### [ ] P5-08 — Display settings
+- **Depends on:** P2-12
+- **Size:** M
+- **Goal:** decision 0015 point 3 (once accepted): a `userConfig` option picks where the game shows: band, pane, spinner teaser, status line, in any combination.
+- **Done when:**
+  - [ ] Each place draws from the same encounter machine; turning the band off never leaves a Throw unreachable.
+  - [ ] Option documented in CONTENT_FORMAT.md's `userConfig` table; tested for every place on and off.
 
 #### [ ] P5-07 — Release v1.0
 - **Depends on:** P4-05

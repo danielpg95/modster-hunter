@@ -28,3 +28,5 @@ settled questions and avoid making assumptions about open ones.
 | [0012](0012-sprite-size-and-band-layout.md) | Half-block `Raster` sprites up to 24×12; text-only band when they don't fit | Accepted |
 | [0013](0013-host-calls-in-register.md) | All `$` calls live in `register.ts`; pure modules reach the host through plain ports | Accepted |
 | [0014](0014-encounter-timings.md) | Encounter timings, a work-time spawn countdown, and no throws outside "waiting" | Accepted |
+| [0015](0015-encounter-display-places.md) | Encounters can also be shown in an opt-in side pane; where the game shows becomes configurable | Proposed (settled by @danielpg95) |
+| [0016](0016-background-agents-count-as-work.md) | Background subagents count as work time for the spawn countdown | Proposed (settled by @danielpg95) |
