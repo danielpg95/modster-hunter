@@ -9,7 +9,9 @@ that roadmap task is done.
   lag (the Homebrew cask was at 2.1.285 on 2026-10-07); update with
   `claude update` or `npm i -g @anthropic-ai/claude-code@latest`. Older builds
   load mods only with `CLAUDE_CODE_ENABLE_FUNCTION_HOOKS=1`.
-- Node.js 20+ for the repo tools in `tools/`.
+- Node.js **22.18+** for the repo tools in `tools/` (`tools/sprite.mjs` loads the mod's
+  TypeScript with Node's built-in type stripping). With nvm: `nvm install 22`.
+  `tools/check-tracking.mjs` alone also runs on Node 20.
 - A terminal at least 100 columns wide for comfortable testing. Also test at 80×24.
 
 ## Everyday loop
@@ -78,6 +80,24 @@ on('command.register', ($, e) => ({ value: { command: e.name } }))  // { value }
 ```
 
 See `plugin/tests/register.test.ts` for a full example.
+
+## Sprites
+
+`tools/sprite.mjs` turns art into the `.sprite.json` the mod reads (decision 0008):
+
+```bash
+npm run sprite -- plugin/content/modsters/<id>/sprite.png --frames 4   # PNG sheet, frames side by side
+npm run sprite -- path/to/idle.gif                                      # animated GIF, one frame per GIF frame
+```
+
+It writes `<name>.sprite.json` next to the input (or `--out <file>`), and fails
+with a hint when frames are outside 8–24 × 8–12 (even), the sheet doesn't split
+into equal frames, or the art has more than 63 colors. Any PNG works (pngjs);
+alpha is snapped to transparent below 128 and opaque from 128. The conversion is
+`spriteFromSheet` in `plugin/hooks/content/`, the same code the mod will use for
+user PNGs (P4-01). Never hand-edit the output.
+
+`npm run test:tools` runs the tool's tests (`tools/*.test.mjs`, Node's test runner).
 
 ## Things that are easy to get wrong
 
