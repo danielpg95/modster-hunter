@@ -130,14 +130,14 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [x] Validator returns a list of readable errors (file, field, problem), never throws.
   - [x] Unit tests cover every rule in CONTENT_FORMAT.md, including weight and bound checks.
 
-#### [ ] P2-02 — Sprite converter tool
+#### [x] P2-02 — Sprite converter tool
 - **Depends on:** P1-05, P2-01
 - **Size:** M
 - **Goal:** `tools/sprite.mjs <sheet.png> --frames N` writes a valid `.sprite.json` (decision 0008).
 - **Done when:**
-  - [ ] Handles transparency, palettes > 64 colors (error with a hint), and GIF input if 0008 says so.
-  - [ ] Frames outside the 0012 bounds (width 8–24, height 8–12, even) fail with a hint.
-  - [ ] Output passes the P2-01 validator.
+  - [x] Handles transparency, palettes > 64 colors (error with a hint), and GIF input if 0008 says so.
+  - [x] Frames outside the 0012 bounds (width 8–24, height 8–12, even) fail with a hint.
+  - [x] Output passes the P2-01 validator.
 
 #### [ ] P2-03 — Content loader (built-in only)
 - **Depends on:** P2-01
