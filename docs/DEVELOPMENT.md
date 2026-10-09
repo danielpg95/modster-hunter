@@ -66,6 +66,8 @@ Run from the repo root (`npm install` first):
 | `npm run typecheck` | `tsc -p plugin --noEmit` (needs the generated types) |
 | `npm test` | `claude plugin test ./plugin` |
 | `npm run validate` | `claude plugin validate ./plugin --strict` |
+| `npm run sprite -- <file>` | `tools/sprite.mjs`, see [Sprites](#sprites) (Node 22.18+) |
+| `npm run test:tools` | The tools' tests, `tools/*.test.mjs` (Node 22.18+) |
 
 ## Tests
 
@@ -98,6 +100,26 @@ alpha is snapped to transparent below 128 and opaque from 128. The conversion is
 user PNGs (P4-01). Never hand-edit the output.
 
 `npm run test:tools` runs the tool's tests (`tools/*.test.mjs`, Node's test runner).
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every PR and on pushes to `main`:
+
+| Job | Steps |
+| --- | --- |
+| Tracking and content checks | `node tools/check-tracking.mjs`; every `*.json` file parses |
+| Plugin validate and tests | Installs Claude Code (pinned in `CLAUDE_CODE_VERSION`), then `claude plugin validate ./plugin --strict` and `claude plugin test ./plugin` |
+| Tools tests | Node 22, `npm ci`, then `npm run test:tools` (the sprite converter) |
+
+Neither `claude plugin` command needs a login or network access, so CI runs
+them as they are.
+
+**Skipped in CI: `npm run typecheck`.** `tsc` needs the generated types in
+`plugin/.claude-plugin/types/`, and only an interactive session writes them
+(see [Types](#types)); CI can't start one. Run `npm run typecheck` locally
+before pushing; CI won't catch type errors.
+
+When you upgrade Claude Code for development, bump `CLAUDE_CODE_VERSION` in the
+workflow in the same PR.
 
 ## Things that are easy to get wrong
 
