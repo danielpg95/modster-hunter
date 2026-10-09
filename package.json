@@ -2,6 +2,7 @@
   "name": "modster-hunter-repo",
   "private": true,
   "description": "Repo tooling for the Modster Hunter mod. The mod itself is in plugin/.",
+  "type": "module",
   "engines": {
     "node": ">=22.18"
   },
