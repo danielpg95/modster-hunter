@@ -19,4 +19,5 @@ description: Add a new built-in biome to Modster Hunter — theme, biome.json, M
 5. **Background (optional):** a single-frame sprite converted like a Modster's,
    kept subtle so the Modster stays readable.
 6. **Credit** any art in `plugin/content/CREDITS.md`.
-7. **Validate** with the content check and `claude plugin test ./plugin`.
+7. **Validate** with `npm run check:content` (prints every biome's odds table)
+   and `claude plugin test ./plugin`.

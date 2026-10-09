@@ -12,8 +12,8 @@ user-facing skill in `plugin/skills/`, phase 4.)
 ## Steps
 
 1. **Agree on the design with the user before drawing:** name, one-line
-   personality, color scheme (≤ 16 colors), size (default 24×24 px, see the
-   limits in CONTENT_FORMAT.md), 2–4 frame idle animation idea, which biome(s),
+   personality, color scheme (≤ 16 colors), size (width 8–24, height 8–12 and
+   even, decision 0012), 2–4 frame idle animation idea, which biome(s),
    intended tier. Check `plugin/content/modsters/` so the id and look are new.
 2. **Create the folder** `plugin/content/modsters/<id>/`.
 3. **Make the sprite sheet** `sprite.png`: frames side by side, equal size,
@@ -28,6 +28,7 @@ user-facing skill in `plugin/skills/`, phase 4.)
 6. **Add it to a biome:** an entry with a `weight` in that biome's `biome.json`.
    Show the user the biome's resulting odds table (percent per Modster).
 7. **Credit it** in `plugin/content/CREDITS.md`.
-8. **Validate:** the content check (from P2-01) and `claude plugin test ./plugin`.
+8. **Validate:** `npm run check:content` (prints the biome's odds table) and
+   `claude plugin test ./plugin`.
 9. **Preview** in `claude --plugin-dir ./plugin` if possible, and adjust colors
    that read poorly on a dark or light background.

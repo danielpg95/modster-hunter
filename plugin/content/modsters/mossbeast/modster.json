@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "mossbeast",
+  "name": "Mossbeast",
+  "description": "A fuzzy loaf of moss. Mostly naps. Sometimes blinks.",
+  "rarity": null,
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 3
+  }
+}

@@ -60,3 +60,5 @@ jobs:
       - run: npm ci
       - name: npm run test:tools
         run: npm run test:tools
+      - name: npm run check:content
+        run: npm run check:content

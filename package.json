@@ -12,7 +12,8 @@
     "test": "claude plugin test ./plugin",
     "validate": "claude plugin validate ./plugin --strict",
     "sprite": "node tools/sprite.mjs",
-    "test:tools": "node --test tools/*.test.mjs"
+    "test:tools": "node --test tools/*.test.mjs",
+    "check:content": "node tools/check-content.mjs"
   },
   "devDependencies": {
     "omggif": "^1.0.10",
