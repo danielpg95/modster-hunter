@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "acornsprite",
+  "name": "Acornsprite",
+  "description": "Shy and quick. Its tiny leaf-wings buzz like a bee.",
+  "rarity": null,
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 8
+  }
+}

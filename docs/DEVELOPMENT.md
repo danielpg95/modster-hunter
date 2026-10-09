@@ -68,6 +68,7 @@ Run from the repo root (`npm install` first):
 | `npm run validate` | `claude plugin validate ./plugin --strict` |
 | `npm run sprite -- <file>` | `tools/sprite.mjs`, see [Sprites](#sprites) (Node 22.18+) |
 | `npm run test:tools` | The tools' tests, `tools/*.test.mjs` (Node 22.18+) |
+| `npm run check:content` | Loads `plugin/content/` with the mod's loader, prints each biome's odds table, fails on any issue (Node 22.18+) |
 
 ## Tests
 
@@ -108,7 +109,7 @@ user PNGs (P4-01). Never hand-edit the output.
 | --- | --- |
 | Tracking and content checks | `node tools/check-tracking.mjs`; every `*.json` file parses |
 | Plugin validate and tests | Installs Claude Code (pinned in `CLAUDE_CODE_VERSION`), then `claude plugin validate ./plugin --strict` and `claude plugin test ./plugin` |
-| Tools tests | Node 22, `npm ci`, then `npm run test:tools` (the sprite converter) |
+| Tools tests | Node 22, `npm ci`, then `npm run test:tools` (the sprite converter) and `npm run check:content` (built-in content) |
 
 Neither `claude plugin` command needs a login or network access, so CI runs
 them as they are.

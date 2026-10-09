@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "whispering-forest",
+  "name": "Whispering Forest",
+  "description": "Tall pines, soft moss, something rustling.",
+  "accentColor": "#4caf50",
+  "encounterEverySec": [10, 30],
+  "modsters": [
+    { "id": "sproutling", "weight": 120 },
+    { "id": "mossbeast", "weight": 25 },
+    { "id": "acornsprite", "weight": 6 },
+    { "id": "elderbark", "weight": 1 }
+  ]
+}

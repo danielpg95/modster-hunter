@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "elderbark",
+  "name": "Elderbark",
+  "description": "Older than the forest. Its amber eyes have seen every season.",
+  "rarity": null,
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 2
+  }
+}

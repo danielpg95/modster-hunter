@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "sproutling",
+  "name": "Sproutling",
+  "description": "A seed that learned to walk. Very proud of it.",
+  "rarity": null,
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 6
+  }
+}
