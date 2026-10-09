@@ -208,14 +208,14 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [ ] At least 2 people played ≥ 1 hour of real work each; feedback in the phase review.
   - [ ] Tier defaults in 0004 tuned (amend via a new decision if numbers change).
 
-#### [ ] P2-12 — Encounter pane
+#### [x] P2-12 — Encounter pane
 - **Depends on:** P2-07
 - **Size:** M
 - **Goal:** decision 0015 (Proposed; merge the work only once it's accepted): `/modsters hunt` opens a pane with the live encounter, and the band steps aside while it shows.
 - **Done when:**
-  - [ ] The pane draws the biome and every encounter phase at the sprite's normal size; Throw works from it.
-  - [ ] The band draws nothing while the pane is open, placed and shown, and takes the encounter back when it isn't.
-  - [ ] The mod never opens the pane by itself; render tests cover the pane and the band stepping aside.
+  - [x] The pane draws the biome and every encounter phase at the sprite's normal size; Throw works from it.
+  - [x] The band draws nothing while the pane is open, placed and shown, and takes the encounter back when it isn't.
+  - [x] The mod never opens the pane by itself; render tests cover the pane and the band stepping aside.
 
 ---
 
