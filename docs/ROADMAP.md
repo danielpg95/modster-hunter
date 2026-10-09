@@ -40,15 +40,15 @@ Goal: anyone can clone the repo, load the (empty) mod, and run the checks.
   - [x] `claude plugin validate ./plugin --strict` passes.
   - [x] `claude --plugin-dir ./plugin` shows `1 mod active · modster-hunter` in `/plugin`.
 
-#### [ ] P0-03 — TypeScript and test setup
+#### [x] P0-03 — TypeScript and test setup
 - **Depends on:** P0-02
 - **Size:** S
 - **Goal:** strict typechecking against the official mod types, and one passing test.
 - **Done when:**
-  - [ ] `plugin/tsconfig.json` mirrors the official mods' settings (strict, `noUncheckedIndexedAccess`, `moduleResolution: bundler`).
-  - [ ] Types come from `/plugin-types` output, with instructions in `docs/DEVELOPMENT.md` for regenerating them.
-  - [ ] `plugin/tests/register.test.ts` tests the `/modsters` reply and passes with `claude plugin test ./plugin`.
-  - [ ] `package.json` scripts: `check` (tracking), `typecheck`, `test`, `validate`.
+  - [x] `plugin/tsconfig.json` mirrors the official mods' settings (strict, `noUncheckedIndexedAccess`, `moduleResolution: bundler`).
+  - [x] Types come from `/plugin-types` output, with instructions in `docs/DEVELOPMENT.md` for regenerating them.
+  - [x] `plugin/tests/register.test.ts` tests the `/modsters` reply and passes with `claude plugin test ./plugin`.
+  - [x] `package.json` scripts: `check` (tracking), `typecheck`, `test`, `validate`.
 
 #### [ ] P0-04 — Continuous integration
 - **Depends on:** P0-03
