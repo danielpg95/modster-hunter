@@ -1,7 +1,0 @@
-{
-  "name": "modster-hunter",
-  "author": { "name": "Daniel Pena" },
-  "version": "0.0.0",
-  "description": "Spike P1-02: half-block sprite renderer. Not shipped.",
-  "types": "./types/index.d.ts"
-}

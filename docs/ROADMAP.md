@@ -172,15 +172,15 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [x] Spawn timing uses the biome's `encounterEverySec` range; only one encounter at a time.
   - [x] Idle timeout and "new turn resets idle timer" are tested.
 
-#### [ ] P2-07 — Band encounter UI
+#### [x] P2-07 — Band encounter UI
 - **Depends on:** P2-06, P1-06
 - **Size:** M
 - **Goal:** draw the state machine in the band: appear animation, Modster name and tier, attempts left, `1: Throw`, wobble, caught/fled card.
 - **Done when:**
-  - [ ] Full and compact layouts per 0012; never exceeds `maxRows` (render tests at `maxRows` 0, 1, 2, 5, 6, 7).
-  - [ ] Idle line between encounters shows the current biome (or nothing, per a setting).
-  - [ ] Render tests on the terminal surface for each state.
-  - [ ] Starts from `spikes/p1-02-half-block/lib/pixels-to-cells.ts` (+ tests) and the timer and blit helpers in `spikes/p1-03-blit-animation/` (`lib/animation.ts`, skip-if-blit-in-flight); `spikes/` is deleted in this PR, except `spikes/p1-05-sprite-pipeline/lib/` if P4-01 hasn't moved it yet.
+  - [x] Full and compact layouts per 0012; never exceeds `maxRows` (render tests at `maxRows` 0, 1, 2, 5, 6, 7).
+  - [x] Idle line between encounters shows the current biome (or nothing, per a setting).
+  - [x] Render tests on the terminal surface for each state.
+  - [x] Starts from `spikes/p1-02-half-block/lib/pixels-to-cells.ts` (+ tests) and the timer and blit helpers in `spikes/p1-03-blit-animation/` (`lib/animation.ts`, skip-if-blit-in-flight); `spikes/` is deleted in this PR, except `spikes/p1-05-sprite-pipeline/lib/` if P4-01 hasn't moved it yet.
 
 #### [ ] P2-08 — Collection storage
 - **Depends on:** P2-06

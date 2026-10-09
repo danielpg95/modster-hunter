@@ -19,6 +19,14 @@ export const ENCOUNTER = {
   resultMs: 4000,
 } as const
 
+/** Band layout, decision 0012: the full layout needs sprite + gap + text block in the band's width. */
+export const BAND = {
+  gapColumns: 2,
+  textColumns: 24,
+  /** How often the encounter machine is stepped (timers resolve to within this) */
+  tickMs: 250,
+} as const
+
 /** Content file bounds: docs/CONTENT_FORMAT.md (schema version 1), decisions 0004, 0007 and 0012. */
 export const CONTENT = {
   schemaVersion: 1,
