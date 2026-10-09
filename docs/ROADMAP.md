@@ -163,14 +163,14 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [x] Precedence biome entry → Modster → tier default is unit tested.
   - [x] Encounter-odds table helper (`oddsTable`, `formatOddsTable`) printed and sanity-checked on the CONTENT_FORMAT example biome; the per-built-in-biome check moved to P2-09 (no built-in biomes yet).
 
-#### [ ] P2-06 — Encounter state machine
+#### [x] P2-06 — Encounter state machine
 - **Depends on:** P2-05
 - **Size:** L
 - **Goal:** decision 0005 as a pure state machine driven by events (turn start/end, throw, tick).
 - **Done when:**
-  - [ ] Every transition in 0005 has a test using a fake clock.
-  - [ ] Spawn timing uses the biome's `encounterEverySec` range; only one encounter at a time.
-  - [ ] Idle timeout and "new turn resets idle timer" are tested.
+  - [x] Every transition in 0005 has a test using a fake clock.
+  - [x] Spawn timing uses the biome's `encounterEverySec` range; only one encounter at a time.
+  - [x] Idle timeout and "new turn resets idle timer" are tested.
 
 #### [ ] P2-07 — Band encounter UI
 - **Depends on:** P2-06, P1-06

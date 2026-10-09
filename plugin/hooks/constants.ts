@@ -12,6 +12,13 @@ export const TIERS = [
   { tier: 'legendary', minPercent: 0, maxAttempts: 5, catchRate: 0.08 },
 ] as const
 
+/** Encounter phase lengths, decision 0014. The idle timeout is the `encounterIdleTimeoutSec` user option. */
+export const ENCOUNTER = {
+  appearingMs: 1000,
+  throwingMs: 1500,
+  resultMs: 4000,
+} as const
+
 /** Content file bounds: docs/CONTENT_FORMAT.md (schema version 1), decisions 0004, 0007 and 0012. */
 export const CONTENT = {
   schemaVersion: 1,
