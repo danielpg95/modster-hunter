@@ -21,4 +21,29 @@ jobs:
           find . -name '*.json' -not -path './node_modules/*' -print0 \
             | xargs -0 -n1 node -e 'JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"))'
 
-  # P0-04 adds: typecheck, `claude plugin validate ./plugin --strict`, `claude plugin test ./plugin`.
+  plugin:
+    name: Plugin validate and tests
+    runs-on: ubuntu-latest
+    env:
+      # Pinned so a CLI release can't change results under a PR; bump with the
+      # version the team develops on (docs/DEVELOPMENT.md). Mods need 2.1.287+.
+      CLAUDE_CODE_VERSION: 2.1.295
+      # Neither command needs a login or the network; keep the CLI quiet
+      DISABLE_AUTOUPDATER: 1
+      CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Claude Code
+        run: |
+          npm install -g "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}"
+          claude --version
+      - name: claude plugin validate ./plugin --strict
+        run: claude plugin validate ./plugin --strict
+      - name: claude plugin test ./plugin
+        run: claude plugin test ./plugin
+      # No typecheck here: the types tsc needs are written only when an
+      # interactive session loads the mod (docs/DEVELOPMENT.md "Types").
+      # Run `npm run typecheck` locally before pushing.
