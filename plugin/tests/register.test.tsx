@@ -138,7 +138,39 @@ describe('register', () => {
     expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeUndefined()
     await ui.unmount()
   })
+
+  test('a catch is saved to the collection on top of what another session saved (0009)', async ($, on) => {
+    // The store, answered from a map the test can read back. mock.store keeps its map to itself,
+    // and the test engine has no $.store, so this stands in for it with the same get/set/keys.
+    // Another Claude Code session already caught 5 Sproutlings in another biome.
+    const store: Record<string, unknown> = {
+      'caught:sproutling': { v: 1, count: 5, shinyCount: 0, firstCaughtAt: 1, lastCaughtAt: 2, bestTier: 'rare', biomes: { 'tidepool-shallows': 5 } },
+    }
+    on('store.get', ($, e) => ({ value: structuredClone(store[e.key]) }))
+    on('store.set', ($, e) => {
+      store[e.key] = structuredClone(e.value)
+      return { value: undefined }
+    })
+    const { ui, clock } = await startBand($, on)
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(4_000 + BAND_TICK)
+    await ui.press({ key: 'throw' })
+    await clock.advance(1_500 + BAND_TICK)
+
+    // What the mod wrote, read back through the same in-memory store
+    expect(store['caught:sproutling']).toMatchObject({
+      v: 1,
+      count: 6,
+      bestTier: 'rare',
+      biomes: { 'tidepool-shallows': 5, 'whispering-forest': 1 },
+    })
+    const statsKey = Object.keys(store).find((key) => key.startsWith('stats:'))
+    expect(statsKey).toBeDefined()
+    expect(store[statsKey ?? '']).toMatchObject({ turns: 1, encounters: 1, catches: 1, flees: 0 })
+    await ui.unmount()
+  })
 })
+
 
 const BAND_TICK = 250
 const BAND_PROPS = { hasSurvey: false, isWorking: true, maxRows: 7, bodyColumns: 120 }

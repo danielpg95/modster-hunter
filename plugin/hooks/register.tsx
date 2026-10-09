@@ -10,6 +10,7 @@ import {
   type EncounterState,
 } from './game'
 import { bandView, spriteCells, type BandEncounter, type BandLine } from './render'
+import { recordEncounterEvents, recordStat, type StorePort } from './store'
 
 // Rebuilt at every session start; cheap, so it isn't kept in $.state (ARCHITECTURE.md)
 let content: ContentRegistry | undefined
@@ -22,6 +23,11 @@ let biomeId: string | undefined
 let machine: EncounterState | undefined
 let machineContext: EncounterContext | undefined
 let tickTimer: Timer | undefined
+
+// Collection and stats (decision 0009). Writes run one after another so this
+// session never races itself; each one re-reads its key first.
+let sessionId = 'unknown'
+let pendingWrites: Promise<void> = Promise.resolve()
 
 // Sprite animation: the mounted Raster is repainted in place with $.ui.blit (0012)
 const SPRITE_KEY = 'sprite'
@@ -38,6 +44,7 @@ export const register: Register = (on, options) => {
 
   on('session.start', async ($, e, next) => {
     content = await loadBuiltInContent($)
+    sessionId = await $.session.id().catch(() => 'unknown')
     // Keep the biome if session.start ever repeats in this process; pick only when there's none yet
     if (biomeId === undefined || !content.biomes.has(biomeId)) biomeId = pickBiome(content.biomes.keys(), Math.random)
     startMachine($, idleTimeoutSec)
@@ -48,6 +55,8 @@ export const register: Register = (on, options) => {
 
   on('turn.start', async ($, e, next) => {
     await advanceMachine($, 'turnStart')
+    const at = await $.clock.now()
+    queueWrite($, (store) => recordStat(store, sessionId, { kind: 'turn', at }))
     return next(e)
   })
 
@@ -56,8 +65,10 @@ export const register: Register = (on, options) => {
     return next(e)
   })
 
-  on('session.end', ($, e, next) => {
+  on('session.end', async ($, e, next) => {
     stopTimers()
+    // Let queued writes land, within the 1.5 s session.end budget (ARCHITECTURE.md)
+    await Promise.race([pendingWrites, $.clock.sleep(1000)])
     return next(e)
   })
 
@@ -192,6 +203,21 @@ async function advanceMachine($: EngineInterface, type: EncounterInput['type']):
   if (step.state === machine) return
   machine = step.state
   $.ui.invalidate('ui.render')
+  const where = { sessionId, biomeId: machineContext.biome.id }
+  if (step.events.length > 0) queueWrite($, (store) => recordEncounterEvents(store, where, step.events, now))
+}
+
+/** Runs a store write after the ones before it; a failure is logged, never thrown at the game. */
+function queueWrite($: EngineInterface, write: (store: StorePort) => Promise<void>): void {
+  const store: StorePort = {
+    get: (key) => $.store.get(key),
+    set: (key, value) => $.store.set(key, value),
+  }
+  pendingWrites = pendingWrites
+    .then(() => write(store))
+    .catch((error: unknown) => {
+      $.ui.log(`store write failed: ${error instanceof Error ? error.message : String(error)}`, { to: 'debug' })
+    })
 }
 
 /** Loops the sprite's frames at its fps, skipping a tick while the last blit is in flight (P1-03). */
