@@ -147,13 +147,13 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [x] Invalid files are skipped and listed, never crash the mod.
   - [x] Loading stays under the 10 s hook budget for 50 Modsters (measured).
 
-#### [ ] P2-04 — Biome selection per session
+#### [x] P2-04 — Biome selection per session
 - **Depends on:** P2-03
 - **Size:** S
 - **Goal:** decision 0006.
 - **Done when:**
-  - [ ] Random biome at `session.start`, kept across `/clear`, `/resume`, `/branch`.
-  - [ ] Tested with an injected random source.
+  - [x] Random biome at `session.start`, kept across `/clear`, `/resume`, `/branch`.
+  - [x] Tested with an injected random source.
 
 #### [x] P2-05 — Rarity, attempts and catch-rate resolution
 - **Depends on:** P2-01

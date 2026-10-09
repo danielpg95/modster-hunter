@@ -1,3 +1,5 @@
 export { formatOddsTable, oddsTable, type OddsRow } from './odds-table'
+export { pickBiome } from './pick-biome'
+export type { RandomSource } from './random-source'
 export { rarityTier } from './rarity-tier'
 export { resolveCatchOdds, type CatchOdds } from './resolve-catch-odds'
