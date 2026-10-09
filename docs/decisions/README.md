@@ -27,3 +27,4 @@ settled questions and avoid making assumptions about open ones.
 | [0011](0011-license.md) | MIT for code, CC BY 4.0 for art | Accepted |
 | [0012](0012-sprite-size-and-band-layout.md) | Half-block `Raster` sprites up to 24×12; text-only band when they don't fit | Accepted |
 | [0013](0013-host-calls-in-register.md) | All `$` calls live in `register.ts`; pure modules reach the host through plain ports | Accepted |
+| [0014](0014-encounter-timings.md) | Encounter timings, a work-time spawn countdown, and no throws outside "waiting" | Accepted |
