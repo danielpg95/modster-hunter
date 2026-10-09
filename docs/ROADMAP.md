@@ -122,13 +122,13 @@ ends with findings written into a decision.
 
 Goal: a complete, fun encounter loop with starter content. No customization yet.
 
-#### [ ] P2-01 — Content schema, types and validator
+#### [x] P2-01 — Content schema, types and validator
 - **Depends on:** P0-03, P1-06
 - **Size:** M
 - **Goal:** the types and validation for `biome.json`, `modster.json` and `.sprite.json` from CONTENT_FORMAT.md.
 - **Done when:**
-  - [ ] Validator returns a list of readable errors (file, field, problem), never throws.
-  - [ ] Unit tests cover every rule in CONTENT_FORMAT.md, including weight and bound checks.
+  - [x] Validator returns a list of readable errors (file, field, problem), never throws.
+  - [x] Unit tests cover every rule in CONTENT_FORMAT.md, including weight and bound checks.
 
 #### [ ] P2-02 — Sprite converter tool
 - **Depends on:** P1-05, P2-01
