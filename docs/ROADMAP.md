@@ -211,7 +211,7 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
 #### [x] P2-12 — Encounter pane
 - **Depends on:** P2-07
 - **Size:** M
-- **Goal:** decision 0015 (Proposed; merge the work only once it's accepted): `/modsters hunt` opens a pane with the live encounter, and the band steps aside while it shows.
+- **Goal:** decision 0015 (accepted 2026-10-09): `/modsters hunt` opens a pane with the live encounter, and the band steps aside while it shows.
 - **Done when:**
   - [x] The pane draws the biome and every encounter phase at the sprite's normal size; Throw works from it.
   - [x] The band draws nothing while the pane is open, placed and shown, and takes the encounter back when it isn't.

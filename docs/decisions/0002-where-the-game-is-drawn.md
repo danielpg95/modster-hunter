@@ -1,6 +1,6 @@
 # 0002 — Encounters in the band above the prompt, collection in a pane
 
-- **Status:** Accepted
+- **Status:** Accepted, amended by 0015 (encounters may also show in an opt-in pane)
 - **Date:** 2026-10-07
 - **Decided by:** @danielpg95
 
