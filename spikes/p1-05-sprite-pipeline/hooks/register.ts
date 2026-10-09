@@ -9,6 +9,12 @@ const nativeInflate: Inflate = async (zlib) => {
   return new Uint8Array(await new Response(stream).arrayBuffer())
 }
 
+function fnv(bytes: number[]): number {
+  let h = 0x811c9dc5
+  for (const b of bytes) h = Math.imul(h ^ b, 0x01000193) >>> 0
+  return h
+}
+
 async function probe(name: string, run: () => Promise<unknown>): Promise<string> {
   try {
     return `${name}: ${JSON.stringify(await run())}`
@@ -44,6 +50,29 @@ export const register: Register = (on) => {
         }),
       )
     }
+
+    lines.push(`typeof Uint8Array.fromBase64: ${typeof Uint8Array.fromBase64}`)
+    const cases = JSON.parse(await $.fs.read(`${root}/fixtures/cases.json`)) as {
+      file: string
+      width?: number
+      height?: number
+      hash?: number
+      expectError?: boolean
+    }[]
+    for (const c of cases) {
+      lines.push(
+        await probe(c.file, async () => {
+          const t0 = Date.now()
+          const { base64 } = await $.fs.read(`${root}/fixtures/${c.file}`, { as: 'bytes' })
+          const t1 = Date.now()
+          const d = await decodePng(Uint8Array.fromBase64(base64), inflate)
+          const t2 = Date.now()
+          const ok = d.width === c.width && d.height === c.height && fnv(d.rgba) === c.hash
+          return { ok, expectError: c.expectError ?? false, readMs: t1 - t0, decodeMs: t2 - t1 }
+        }),
+      )
+    }
+    lines.push(await probe('too-big.png (4.6 MiB) read', () => $.fs.read(`${root}/fixtures/too-big.png`, { as: 'bytes' }).then(() => 'read OK')))
 
     await $.fs.write(`${root}/result.txt`, lines.join('\n') + '\n')
     return next(e)

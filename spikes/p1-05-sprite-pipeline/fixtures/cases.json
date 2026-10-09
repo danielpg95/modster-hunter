@@ -1,0 +1,91 @@
+[
+ {
+  "file": "sheet-rgba.png",
+  "width": 288,
+  "height": 24,
+  "hash": 834485773,
+  "bytes": 1430,
+  "filters": [
+   0,
+   1,
+   2,
+   4
+  ]
+ },
+ {
+  "file": "sheet-rgb.png",
+  "width": 288,
+  "height": 24,
+  "hash": 662004917,
+  "bytes": 1317,
+  "filters": [
+   0,
+   1,
+   2,
+   4
+  ]
+ },
+ {
+  "file": "sheet-palette.png",
+  "width": 288,
+  "height": 24,
+  "hash": 2150275453,
+  "bytes": 1087,
+  "filters": [
+   0
+  ]
+ },
+ {
+  "file": "sheet-palette-trns.png",
+  "width": 288,
+  "height": 24,
+  "hash": 2168112181,
+  "bytes": 1056,
+  "filters": [
+   0
+  ]
+ },
+ {
+  "file": "sheet-all-filters.png",
+  "width": 288,
+  "height": 24,
+  "hash": 834485773,
+  "bytes": 3485,
+  "filters": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ]
+ },
+ {
+  "file": "sheet-palette-4bit.png",
+  "expectError": true
+ },
+ {
+  "file": "big-noise.png",
+  "width": 900,
+  "height": 900,
+  "hash": 707915488,
+  "bytes": 3245288,
+  "filters": [
+   0,
+   1,
+   2,
+   4
+  ]
+ },
+ {
+  "file": "big-smooth.png",
+  "width": 2048,
+  "height": 2048,
+  "hash": 2232819141,
+  "bytes": 22089,
+  "filters": [
+   1,
+   2,
+   4
+  ]
+ }
+]

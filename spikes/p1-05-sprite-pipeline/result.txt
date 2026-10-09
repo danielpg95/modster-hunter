@@ -5,3 +5,13 @@ typeof createImageBitmap: undefined
 png bytes: 92
 decode via native: FAILED Blob is not defined
 decode via vendored: {"width":4,"height":2,"matches":true,"ms":0}
+typeof Uint8Array.fromBase64: function
+sheet-rgba.png: {"ok":true,"expectError":false,"readMs":0,"decodeMs":7}
+sheet-rgb.png: {"ok":true,"expectError":false,"readMs":0,"decodeMs":3}
+sheet-palette.png: {"ok":true,"expectError":false,"readMs":0,"decodeMs":1}
+sheet-palette-trns.png: {"ok":true,"expectError":false,"readMs":0,"decodeMs":1}
+sheet-all-filters.png: {"ok":true,"expectError":false,"readMs":0,"decodeMs":2}
+sheet-palette-4bit.png: FAILED png: only 8-bit, non-interlaced
+big-noise.png: {"ok":true,"expectError":false,"readMs":2,"decodeMs":259}
+big-smooth.png: {"ok":true,"expectError":false,"readMs":6,"decodeMs":812}
+too-big.png (4.6 MiB) read: FAILED modster-hunter: $.fs.read: /Users/danielpena/code/modster-hunter/.claude/worktrees/claim-p1-05/spikes/p1-05-sprite-pipeline/fixtures/too-big.png refused: the file is over the 4194304-byte limit
