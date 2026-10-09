@@ -15,14 +15,14 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P2-05 | @victor-aguilars | in-progress | p2-05-catch-odds | 2026-10-08 | 2026-10-08 | Add the 0004 tier table to constants.ts and plugin/hooks/game/ resolver with tests |
+| P2-02 | @victor-aguilars | in-progress | p2-02-sprite-converter | 2026-10-08 | 2026-10-08 | Add spriteFromSheet in plugin/hooks/content/ and tools/sprite.mjs |
+| P0-04 | @victor-aguilars | in-progress | p0-04-ci | 2026-10-08 | 2026-10-08 | Add validate and test jobs to .github/workflows/ci.yml |
 
 ## Up next
 
 Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
-- **P0-04** — Continuous integration
-- **P2-02** — Sprite converter tool
 - **P2-04** — Biome selection per session
+- **P2-06** — Encounter state machine
 - **P4-01** — User content folder and merge
