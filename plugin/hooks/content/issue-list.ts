@@ -3,8 +3,12 @@ import type { ContentIssue, Validation } from './types'
 /** Collects the issues for one file while a validator walks it. */
 export class IssueList {
   readonly items: ContentIssue[] = []
+  readonly file: string
 
-  constructor(readonly file: string) {}
+  // A plain field, not a parameter property: tools/ load this file with Node's type stripping, which has no parameter properties
+  constructor(file: string) {
+    this.file = file
+  }
 
   error(field: string, problem: string): void {
     this.items.push({ severity: 'error', file: this.file, field, problem })

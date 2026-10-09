@@ -47,3 +47,16 @@ jobs:
       # No typecheck here: the types tsc needs are written only when an
       # interactive session loads the mod (docs/DEVELOPMENT.md "Types").
       # Run `npm run typecheck` locally before pushing.
+
+  tools:
+    name: Tools tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          # tools/ load the mod's TypeScript with Node's type stripping (22.18+)
+          node-version: 22
+      - run: npm ci
+      - name: npm run test:tools
+        run: npm run test:tools

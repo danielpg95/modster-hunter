@@ -2,13 +2,21 @@
   "name": "modster-hunter-repo",
   "private": true,
   "description": "Repo tooling for the Modster Hunter mod. The mod itself is in plugin/.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
   "scripts": {
     "check": "node tools/check-tracking.mjs",
     "typecheck": "tsc -p plugin --noEmit",
     "test": "claude plugin test ./plugin",
-    "validate": "claude plugin validate ./plugin --strict"
+    "validate": "claude plugin validate ./plugin --strict",
+    "sprite": "node tools/sprite.mjs",
+    "test:tools": "node --test tools/*.test.mjs"
   },
   "devDependencies": {
+    "omggif": "^1.0.10",
+    "pngjs": "^7.0.0",
     "typescript": "~7.0.2"
   }
 }

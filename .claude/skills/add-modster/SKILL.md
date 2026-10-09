@@ -20,8 +20,8 @@ user-facing skill in `plugin/skills/`, phase 4.)
    transparent background, strong dark outline. If you draw it programmatically,
    write the drawing script to the scratchpad, not the repo. Look at the result
    (open the PNG, enlarged) before continuing.
-4. **Convert:** `node tools/sprite.mjs plugin/content/modsters/<id>/sprite.png --frames N`
-   *(available from P2-02)*. Never hand-edit the output.
+4. **Convert:** `npm run sprite -- plugin/content/modsters/<id>/sprite.png --frames N`
+   (Node 22.18+). Never hand-edit the output.
 5. **Write `modster.json`** from `docs/templates/content/modster.json`. Leave
    `rarity`, `maxAttempts`, `catchRate` as `null` unless the user asks for an
    override (decision 0004).

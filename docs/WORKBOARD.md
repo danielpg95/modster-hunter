@@ -15,7 +15,6 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P2-02 | @victor-aguilars | in-progress | p2-02-sprite-converter | 2026-10-08 | 2026-10-08 | Add spriteFromSheet in plugin/hooks/content/ and tools/sprite.mjs |
 | P0-04 | @victor-aguilars | in-review | p0-04-ci | 2026-10-08 | 2026-10-08 | @danielpg95: require the "Plugin validate and tests" check on main, then tick the last item |
 
 ## Up next
@@ -25,4 +24,5 @@ list when you finish a task.
 
 - **P2-04** — Biome selection per session
 - **P2-06** — Encounter state machine
+- **P2-09** — Starter content
 - **P4-01** — User content folder and merge
