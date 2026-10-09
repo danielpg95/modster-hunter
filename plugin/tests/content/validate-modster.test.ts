@@ -36,7 +36,8 @@ const INVALID: [string, (modster: Modster) => void, string][] = [
   ['fps of 0 is an error', (m) => (sprite(m).fps = 0), 'sprite.fps'],
   ['fps over 12 is an error', (m) => (sprite(m).fps = 13), 'sprite.fps'],
   ['an unknown top-level field is an error', (m) => (m.weight = 60), 'weight'],
-  ['an unknown sprite field is an error', (m) => (sprite(m).frames = 4), 'sprite.frames'],
+  ['an unknown sprite field is an error', (m) => (sprite(m).loop = true), 'sprite.loop'],
+  ['frames with a .sprite.json is an error', (m) => (sprite(m).frames = 4), 'sprite.frames'],
 ]
 
 describe('validateModster', () => {
@@ -78,6 +79,34 @@ describe('validateModster', () => {
       const found = issuesAt(result, field)
       expect(found.length).toBe(1)
       expect(found[0]?.severity).toBe('error')
+    })
+  }
+
+  test('user content may name a PNG sheet with its frame count (decision 0016)', () => {
+    const modster = validModster()
+    modster.sprite = { file: 'sprite.png', frames: 4, fps: 6 }
+    const result = validateModster(modster, { ...where, allowPng: true })
+    expect(result.ok).toBe(true)
+    expect(result.issues).toEqual([])
+  })
+
+  // [behavior, the sprite object in user content, field that must get an error]
+  const INVALID_USER_SPRITES: [string, Record<string, unknown>, string][] = [
+    ['a PNG sheet without frames is an error', { file: 'sprite.png' }, 'sprite.frames'],
+    ['a PNG sheet with 0 frames is an error', { file: 'sprite.png', frames: 0 }, 'sprite.frames'],
+    ['a PNG sheet with 9 frames is an error', { file: 'sprite.png', frames: 9 }, 'sprite.frames'],
+    ['a PNG sheet with fractional frames is an error', { file: 'sprite.png', frames: 2.5 }, 'sprite.frames'],
+    ['frames with a .sprite.json in user content is an error', { file: 'sprite.sprite.json', frames: 2 }, 'sprite.frames'],
+    ['a GIF in user content is an error', { file: 'sprite.gif', frames: 2 }, 'sprite.file'],
+    ['a PNG in another folder is an error', { file: 'art/sprite.png', frames: 2 }, 'sprite.file'],
+  ]
+  for (const [behavior, spriteValue, field] of INVALID_USER_SPRITES) {
+    test(behavior, () => {
+      const modster = validModster()
+      modster.sprite = spriteValue
+      const result = validateModster(modster, { ...where, allowPng: true })
+      expect(result.ok).toBe(false)
+      expect(issuesAt(result, field).length).toBe(1)
     })
   }
 

@@ -1,6 +1,6 @@
 # 0008 — PNG sprite sheets in, `.sprite.json` at runtime
 
-- **Status:** Accepted, amended by P1-05 (the runtime inflates PNGs with a vendored inflate)
+- **Status:** Superseded by 0016
 - **Date:** 2026-10-07 (amended 2026-10-08)
 - **Decided by:** @danielpg95 (proposed by Claude; amendment from spike P1-05 confirmed 2026-10-08)
 

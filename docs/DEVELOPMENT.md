@@ -86,7 +86,7 @@ See `plugin/tests/register.test.ts` for a full example.
 
 ## Sprites
 
-`tools/sprite.mjs` turns art into the `.sprite.json` the mod reads (decision 0008):
+`tools/sprite.mjs` turns art into the `.sprite.json` the mod reads (decisions 0008, 0016):
 
 ```bash
 npm run sprite -- plugin/content/modsters/<id>/sprite.png --frames 4   # PNG sheet, frames side by side
@@ -97,8 +97,8 @@ It writes `<name>.sprite.json` next to the input (or `--out <file>`), and fails
 with a hint when frames are outside 8–24 × 8–12 (even), the sheet doesn't split
 into equal frames, or the art has more than 63 colors. Any PNG works (pngjs);
 alpha is snapped to transparent below 128 and opaque from 128. The conversion is
-`spriteFromSheet` in `plugin/hooks/content/`, the same code the mod will use for
-user PNGs (P4-01). Never hand-edit the output.
+`spriteFromSheet` in `plugin/hooks/content/`, the same code the mod uses for
+user PNGs (`spriteFromPng`, decision 0016). Never hand-edit the output.
 
 `npm run test:tools` runs the tool's tests (`tools/*.test.mjs`, Node's test runner).
 ## Continuous integration

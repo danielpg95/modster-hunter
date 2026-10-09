@@ -31,7 +31,8 @@ export interface Modster {
   maxAttempts?: number | null
   catchRate?: number | null
   shinyChance?: number | null
-  sprite: { file: string; fps?: number }
+  /** `file` is a `.png` only in user content, and then `frames` is set (decision 0016) */
+  sprite: { file: string; frames?: number; fps?: number }
 }
 
 export interface Sprite {
@@ -43,6 +44,13 @@ export interface Sprite {
   shinyPalette?: string[]
   /** base64 of width × height palette indexes, one byte each, row by row */
   frames: string[]
+}
+
+/** User `settings.json` (user folder only). */
+export interface UserSettings {
+  schemaVersion: 1
+  disabledBiomes?: string[]
+  disabledModsters?: string[]
 }
 
 /**

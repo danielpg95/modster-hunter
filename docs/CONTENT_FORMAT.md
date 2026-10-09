@@ -3,7 +3,7 @@
 How biomes, Modsters and sprites are described on disk. This is the contract
 between the game, the built-in content, user content, the editor and the
 content skills. Rules come from decisions [0004](decisions/0004-attempts-and-catch-rate.md),
-[0007](decisions/0007-content-model.md) and [0008](decisions/0008-sprite-pipeline.md).
+[0007](decisions/0007-content-model.md) and [0016](decisions/0016-user-png-sprites.md).
 
 > **Status:** schema version `1`, implemented by the validator in
 > `plugin/hooks/content/` (P2-01). Changing a field now needs a new decision
@@ -42,7 +42,7 @@ content/
     └── <modster-id>/
         ├── modster.json
         ├── sprite.png              # source sheet (built-in: required; user: optional)
-        └── sprite.sprite.json      # runtime sprite
+        └── sprite.sprite.json      # runtime sprite (user: optional when sprite.file is the PNG)
 ```
 
 ## IDs
@@ -116,7 +116,8 @@ content/
 | `maxAttempts` | no | Integer 1–10, or `null` for the tier default |
 | `catchRate` | no | 0.01–1.0, or `null` for the tier default |
 | `shinyChance` | no | 0–1, or `null` for the default (P5-01) |
-| `sprite.file` | yes | A `.sprite.json` in this folder |
+| `sprite.file` | yes | A `.sprite.json` in this folder. User content may name a `.png` sheet instead (decision 0016) |
+| `sprite.frames` | with a `.png` | Integer 1–8: how many frames sit side by side in the sheet. Required with a `.png`, an error with a `.sprite.json` |
 | `sprite.fps` | no | 1–12. Default 6 |
 
 ## `.sprite.json`
@@ -143,6 +144,17 @@ content/
 
 Alpha is either `00` (transparent) or `ff` (opaque); anything in between is
 rounded at conversion time, because terminal cells can't blend.
+
+## User PNG sheets
+
+A user Modster can name its PNG sheet in `sprite.file` (with `sprite.frames`)
+instead of a `.sprite.json`. The mod converts it on load, with the same rules
+as `tools/sprite.mjs`, and caches the result in
+`~/.claude/modster-hunter/cache/sprites/` (decision 0016).
+
+- Supported: non-interlaced RGB or RGBA at 8 bits, and palette PNGs at 1, 2, 4
+  or 8 bits. For any other PNG, convert it with `tools/sprite.mjs`.
+- Each frame must fit the `.sprite.json` bounds above; at most 63 opaque colors.
 
 ## User `settings.json` (user folder only)
 

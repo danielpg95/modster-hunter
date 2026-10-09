@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { formatIssue, loadContent } from '../../hooks/content'
+import { formatIssue, loadContent, type SheetLoader, type Sprite } from '../../hooks/content'
 import { memoryReader } from '../fixtures/memory-reader'
 import { validBiome } from '../fixtures/valid-biome'
 import { validModster } from '../fixtures/valid-modster'
@@ -19,6 +19,14 @@ function forest(): Record<string, string | Error> {
   }
   return files
 }
+
+/** The forest, with sproutling's sprite a 2-frame PNG sheet */
+function pngForest(): Record<string, string | Error> {
+  const files = forest()
+  files[`${ROOT}/modsters/sproutling/modster.json`] = JSON.stringify({ ...validModster(), sprite: { file: 'sprite.png', frames: 2 } })
+  return files
+}
+const sprite = validSprite() as unknown as Sprite
 
 const lines = (issues: Parameters<typeof formatIssue>[0][]): string[] => issues.map(formatIssue)
 
@@ -158,5 +166,39 @@ describe('loadContent', () => {
     const reversed = { ...reader, listFolders: async (path: string) => (await reader.listFolders(path)).reverse() }
     const content = await loadContent(reversed, ROOT)
     expect([...content.modsters.keys()]).toEqual(['mossbeast', 'pinewraith', 'sproutling'])
+  })
+
+  test('with a sheet loader (user content, 0016), a Modster naming a PNG gets its sprite from the sheet loader', async () => {
+    const asked: unknown[] = []
+    const sheets: SheetLoader = async (sheet) => {
+      asked.push(sheet)
+      return { ok: true, value: sprite, issues: [] }
+    }
+    const content = await loadContent(memoryReader(pngForest()), ROOT, { label: '~/c/', sheets })
+    expect(content.modsters.get('sproutling')?.sprite).toEqual(sprite)
+    expect(asked).toEqual([{ path: `${ROOT}/modsters/sproutling/sprite.png`, file: '~/c/modsters/sproutling/sprite.png', modsterId: 'sproutling', frames: 2 }])
+  })
+
+  test('without a sheet loader (built-in content), a PNG sprite is an error', async () => {
+    const content = await loadContent(memoryReader(pngForest()), ROOT)
+    expect(content.modsters.has('sproutling')).toBe(false)
+    expect(content.issues[0]?.field).toBe('sprite.file')
+  })
+
+  test('a missing, unreadable or undecodable sheet skips the Modster with the reason', async () => {
+    const failure = { severity: 'error' as const, file: 'x', field: '', problem: 'is not a PNG' }
+    const cases: [SheetLoader, string][] = [
+      [async () => undefined, 'modsters/sproutling/sprite.png is missing'],
+      [async () => Promise.reject(new Error('EACCES')), 'modsters/sproutling/sprite.png could not be read: EACCES'],
+      [async () => ({ ok: false, issues: [failure] }), 'x is not a PNG'],
+    ]
+    for (const [sheets, first] of cases) {
+      const content = await loadContent(memoryReader(pngForest()), ROOT, { sheets })
+      expect(content.modsters.has('sproutling')).toBe(false)
+      expect(lines(content.issues).slice(0, 2)).toEqual([
+        first,
+        'modsters/sproutling/modster.json: sprite.file points to a sprite that didn\'t load: modsters/sproutling/sprite.png',
+      ])
+    }
   })
 })

@@ -33,6 +33,8 @@ export const CONTENT = {
   idPattern: /^[a-z][a-z0-9-]{1,31}$/,
   /** A file name with no folder part, ending in `.sprite.json` (CONTENT_FORMAT "in this folder"). */
   spriteFilePattern: /^[^/\\]+\.sprite\.json$/,
+  /** A PNG sheet in the Modster's folder; user content only (decision 0016). */
+  pngFilePattern: /^[^/\\]+\.png$/,
   rgbColorPattern: /^#[0-9a-fA-F]{6}$/,
   rgbaColorPattern: /^#[0-9a-fA-F]{8}$/,
   descriptionMaxChars: 120,
@@ -69,4 +71,11 @@ export const CONTENT = {
     framesMin: 1,
     framesMax: 8,
   },
+} as const
+
+/** Where user content and the decoded-PNG cache live, under the home folder (decisions 0007, 0016). */
+export const USER_CONTENT = {
+  contentFolder: '.claude/modster-hunter/content',
+  spriteCacheFolder: '.claude/modster-hunter/cache/sprites',
+  spriteCacheVersion: 1,
 } as const
