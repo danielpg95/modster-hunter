@@ -182,13 +182,13 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [x] Render tests on the terminal surface for each state.
   - [x] Starts from `spikes/p1-02-half-block/lib/pixels-to-cells.ts` (+ tests) and the timer and blit helpers in `spikes/p1-03-blit-animation/` (`lib/animation.ts`, skip-if-blit-in-flight); `spikes/` is deleted in this PR, except `spikes/p1-05-sprite-pipeline/lib/` if P4-01 hasn't moved it yet.
 
-#### [ ] P2-08 — Collection storage
+#### [x] P2-08 — Collection storage
 - **Depends on:** P2-06
 - **Size:** S
 - **Goal:** decision 0009, over a store port built in `register.ts` (decision 0013).
 - **Done when:**
-  - [ ] Catch writes `caught:<id>` with re-read-before-write; stats counters written.
-  - [ ] Tested with `mock.store`, including a simulated second session writing in between.
+  - [x] Catch writes `caught:<id>` with re-read-before-write; stats counters written.
+  - [x] Tested with an in-memory store (`mock.store` can't be read back from a test), including a simulated second session writing in between.
 
 #### [ ] P2-09 — Starter content
 - **Depends on:** P2-02
