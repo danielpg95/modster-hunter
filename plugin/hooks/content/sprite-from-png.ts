@@ -7,7 +7,7 @@ import type { Sprite, Validation } from './types'
 const CONVERTER_HINT = 'convert it with tools/sprite.mjs, which reads every PNG'
 
 /**
- * Turns a user's PNG sheet into a sprite (decision 0015): decodes it, then
+ * Turns a user's PNG sheet into a sprite (decision 0016): decodes it, then
  * splits it like `tools/sprite.mjs` does. A sheet bigger than `frames` frames
  * at the largest sprite size is refused before decoding. Never throws.
  */

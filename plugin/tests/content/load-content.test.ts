@@ -168,7 +168,7 @@ describe('loadContent', () => {
     expect([...content.modsters.keys()]).toEqual(['mossbeast', 'pinewraith', 'sproutling'])
   })
 
-  test('with a sheet loader (user content, 0015), a Modster naming a PNG gets its sprite from the sheet loader', async () => {
+  test('with a sheet loader (user content, 0016), a Modster naming a PNG gets its sprite from the sheet loader', async () => {
     const asked: unknown[] = []
     const sheets: SheetLoader = async (sheet) => {
       asked.push(sheet)

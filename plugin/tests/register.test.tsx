@@ -60,7 +60,7 @@ describe('register', () => {
     expect(result.text).toBe(`Modster Hunter is loaded · ${message}`)
   })
 
-  test('user content loads from ~/.claude/modster-hunter/content, PNG sprites included (0007, 0015)', { options: { includeBuiltins: false } }, async ($, on) => {
+  test('user content loads from ~/.claude/modster-hunter/content, PNG sprites included (0007, 0016)', { options: { includeBuiltins: false } }, async ($, on) => {
     on('session.start', ($, e) => ({ cwd: e.cwd }))
     on('command.register', ($, e) => ({ value: { command: e.name } }))
     const user = userPngMeadow()

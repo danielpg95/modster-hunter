@@ -1,4 +1,4 @@
-// PNG → RGBA decoder, pure TS with no dependencies (decision 0015).
+// PNG → RGBA decoder, pure TS with no dependencies (decision 0016).
 // Part of Modster Hunter, MIT license. Started from the P1-05 spike.
 
 import { inflate } from './inflate'

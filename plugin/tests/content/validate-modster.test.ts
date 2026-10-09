@@ -82,7 +82,7 @@ describe('validateModster', () => {
     })
   }
 
-  test('user content may name a PNG sheet with its frame count (decision 0015)', () => {
+  test('user content may name a PNG sheet with its frame count (decision 0016)', () => {
     const modster = validModster()
     modster.sprite = { file: 'sprite.png', frames: 4, fps: 6 }
     const result = validateModster(modster, { ...where, allowPng: true })

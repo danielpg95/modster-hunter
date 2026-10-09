@@ -13,7 +13,7 @@ export interface ContentReader {
 }
 
 /**
- * Turns a Modster's PNG sheet into a sprite (decision 0015): undefined when
+ * Turns a Modster's PNG sheet into a sprite (decision 0016): undefined when
  * the PNG doesn't exist. May reject when it can't be read.
  */
 export type SheetLoader = (sheet: { path: string; file: string; modsterId: string; frames: number }) => Promise<Validation<Sprite> | undefined>

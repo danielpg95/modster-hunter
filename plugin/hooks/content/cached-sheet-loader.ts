@@ -23,7 +23,7 @@ interface Source {
 
 /**
  * Loads PNG sheets through a cache in `cacheFolder`, one `<modster-id>.sprite.json`
- * each (decision 0015 point 7). The cache is used only when the PNG's size,
+ * each (decision 0016 point 7). The cache is used only when the PNG's size,
  * mtime and frame count match and its sprite still validates. A cache that
  * can't be read or written is ignored: the PNG is decoded instead.
  */

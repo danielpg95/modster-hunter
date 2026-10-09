@@ -1,4 +1,4 @@
-// zlib inflate (RFC 1950/1951), pure TS with no dependencies (decision 0015).
+// zlib inflate (RFC 1950/1951), pure TS with no dependencies (decision 0016).
 // Part of Modster Hunter, MIT license. Started from the P1-05 spike.
 
 const LEN_BASE = [3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258]

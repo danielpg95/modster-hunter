@@ -7,6 +7,7 @@ import {
   noBiomesMessage,
   type ContentReader,
   type ContentRegistry,
+  type LoadedModster,
   type SheetFiles,
 } from './content'
 import {
@@ -40,14 +41,19 @@ let pendingWrites: Promise<void> = Promise.resolve()
 // How issues and messages name the user's content folder (decision 0007)
 const USER_FOLDER_LABEL = `~/${USER_CONTENT.contentFolder}/`
 
-// Sprite animation: the mounted Raster is repainted in place with $.ui.blit (0012)
+// Sprite animation: each mounted Raster is repainted in place with $.ui.blit (0012).
+// The band and the encounter pane (0015) are "sites"; each frame is blitted to every
+// site drawing the sprite right now.
 const SPRITE_KEY = 'sprite'
 const cellsByModster = new Map<string, string[]>()
+const spriteSites = new Set<string>() // requestIds
 let frameTimer: Timer | undefined
-let frameRequestId: string | undefined
-let frameModsterId: string | undefined
+let frameModster: LoadedModster | undefined
 let frameIndex = 0
 let isBlitting = false
+
+// The opt-in encounter pane (decision 0015), opened with `/modsters hunt`
+const PANE_ID = 'modster-hunt'
 
 export const register: Register = (on, options) => {
   const idleTimeoutSec = typeof options.encounterIdleTimeoutSec === 'number' ? options.encounterIdleTimeoutSec : 90
@@ -85,9 +91,15 @@ export const register: Register = (on, options) => {
     return next(e)
   })
 
-  on('ui.render', { component: 'AbovePrompt' }, ($, e, next) => {
+  on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     // A survey owns the band while it's up
     if (e.props.hasSurvey) return next(e)
+    // While the encounter pane is on screen the band steps aside, so the same
+    // encounter isn't drawn twice (0015)
+    if (await isPaneShown($)) {
+      removeSite(e.requestId)
+      return next(e)
+    }
     const encounter = machine?.encounter
     const modster = encounter && content?.modsters.get(encounter.modsterId)
     const biome = biomeId === undefined ? undefined : content?.biomes.get(biomeId)?.biome
@@ -115,7 +127,7 @@ export const register: Register = (on, options) => {
       ...(biome ? { biome: biome.accentColor ? { name: biome.name, accentColor: biome.accentColor } : { name: biome.name } } : {}),
     })
 
-    if (view.kind !== 'full') stopFrames()
+    if (view.kind !== 'full') removeSite(e.requestId)
     if (view.kind === 'none') return next(e)
 
     const { Box, Text, Button } = $.ui.resolve(e)
@@ -154,12 +166,8 @@ export const register: Register = (on, options) => {
     // terminal (canDrawSprite); the check narrows the surface so Raster resolves
     if (e.surface !== 'terminal') return next(e)
     const { Raster } = $.ui.resolve(e)
-    const cells = modster ? cellsFor(modster.modster.id, modster.sprite) : []
-    if (modster && frameModsterId !== modster.modster.id) frameIndex = 0
-    frameRequestId = e.requestId
-    if (modster && cells.length > 1 && (!frameTimer || frameModsterId !== modster.modster.id)) {
-      startFrames($, modster.modster.id, cells, modster.modster.sprite.fps ?? 6)
-    }
+    const cells = modster ? cellsFor(modster) : []
+    if (modster) addSite($, e.requestId, modster)
     return (
       <Box flexDirection="row" columnGap={BAND.gapColumns}>
         <Raster key={SPRITE_KEY} columns={view.spriteColumns} rows={view.spriteRows} cells={cells[frameIndex] ?? cells[0] ?? ''} />
@@ -168,8 +176,124 @@ export const register: Register = (on, options) => {
     )
   })
 
-  on('command.run', { command: 'modsters' }, async () => {
-    // Until the pane (P3-01), the command says where you are
+  // The same encounter in a pane the person opens (0015). It docks beside the
+  // transcript in fullscreen from 110 columns, else sits inline above the prompt.
+  on('ui.render', { component: 'Pane' }, ($, e, next) => {
+    if (e.requestId !== PANE_ID) return next(e)
+    const { Box, Text, Button } = $.ui.resolve(e)
+    const encounter = machine?.encounter
+    const modster = encounter && content?.modsters.get(encounter.modsterId)
+    const biome = biomeId === undefined ? undefined : content?.biomes.get(biomeId)?.biome
+    const rows = Math.max(0, e.props.scroll.bodyRows - 2) // header and a blank line
+    const columns = e.props.bodyColumns
+
+    const header = (
+      <Box key="header" flexDirection="row">
+        <Text bold {...(biome?.accentColor ? { color: biome.accentColor } : {})}>
+          {biome ? biome.name : 'No biome'}
+        </Text>
+        <Text dimColor>{machine?.turnRunning ? ' · Claude is working' : ' · waiting for work'}</Text>
+      </Box>
+    )
+    if (!encounter || !modster) {
+      removeSite(e.requestId)
+      return (
+        <Box flexDirection="column">
+          {header}
+          <Text key="gap"> </Text>
+          <Text key="idle" dimColor>
+            Listening for Modsters… they appear while Claude works.
+          </Text>
+        </Box>
+      )
+    }
+
+    // The sprite's normal size, as in the band: 2x looked far too big in a real terminal (0015)
+    const fits = () => Math.ceil(modster.sprite.height / 2) <= rows && modster.sprite.width + BAND.gapColumns + BAND.textColumns <= columns
+    const view = bandView({
+      maxRows: rows,
+      columns,
+      canDrawSprite: e.surface === 'terminal' && fits(),
+      showIdleLine: false,
+      encounter: {
+        phase: encounter.phase,
+        name: modster.modster.name,
+        tier: encounter.tier,
+        attemptsLeft: encounter.attemptsLeft,
+        spriteWidth: modster.sprite.width,
+        spriteHeight: modster.sprite.height,
+        ...(encounter.outcome ? { outcome: encounter.outcome } : {}),
+        ...(encounter.fledBecause ? { fledBecause: encounter.fledBecause } : {}),
+      },
+    })
+    const line = (segments: BandLine, index: number) => (
+      <Box key={`line-${index}`} flexDirection="row">
+        {segments.map((segment, at) =>
+          'button' in segment ? (
+            <Button
+              key="throw"
+              label="Throw"
+              hotkey="1"
+              onPress={() => {
+                void advanceMachine($, 'throw')
+              }}
+            />
+          ) : (
+            <Text
+              key={`text-${at}`}
+              wrap="truncate"
+              {...(segment.bold ? { bold: true } : {})}
+              {...(segment.dim ? { dimColor: true } : {})}
+              {...(segment.color ? { color: segment.color } : {})}
+            >
+              {segment.text}
+            </Text>
+          ),
+        )}
+      </Box>
+    )
+    if (view.kind !== 'full' || e.surface !== 'terminal') {
+      removeSite(e.requestId)
+      const lines = view.kind === 'compact' ? view.lines : []
+      return (
+        <Box flexDirection="column">
+          {header}
+          {lines.map(line)}
+        </Box>
+      )
+    }
+    const { Raster } = $.ui.resolve(e)
+    const cells = cellsFor(modster)
+    addSite($, e.requestId, modster)
+    return (
+      <Box flexDirection="column">
+        {header}
+        <Text key="gap"> </Text>
+        <Box key="encounter" flexDirection="row" columnGap={BAND.gapColumns}>
+          <Raster key={SPRITE_KEY} columns={view.spriteColumns} rows={view.spriteRows} cells={cells[frameIndex] ?? cells[0] ?? ''} />
+          <Box flexDirection="column">{view.lines.map(line)}</Box>
+        </Box>
+      </Box>
+    )
+  })
+
+  // When the pane closes, the band takes the encounter back (0015)
+  on('ui.close', async ($, e, next) => {
+    const result = await next(e)
+    $.ui.invalidate('ui.render')
+    return result
+  })
+
+  on('command.run', { command: 'modsters' }, async ($, e) => {
+    // `/modsters hunt` opens the encounter pane; the mod never opens it by itself (0002, 0015)
+    const verb = typeof e.args === 'string' ? e.args.trim() : ''
+    if (verb === 'hunt') {
+      const opened = await $.ui.open({ id: PANE_ID, title: 'Modster Hunter' })
+      // The band redraws without the encounter now that the pane shows it
+      $.ui.invalidate('ui.render')
+      return opened.isPlaced ? {} : { text: 'Modster Hunter: the pane is waiting for more room (widen the terminal)' }
+    }
+    // Until the collection pane (P3-01), the command says where you are
     const biome = biomeId === undefined ? undefined : content?.biomes.get(biomeId)?.biome
     return {
       text: biome
@@ -179,11 +303,11 @@ export const register: Register = (on, options) => {
   })
 }
 
-function cellsFor(id: string, sprite: Parameters<typeof spriteCells>[0]): string[] {
-  let cells = cellsByModster.get(id)
+function cellsFor(loaded: LoadedModster): string[] {
+  let cells = cellsByModster.get(loaded.modster.id)
   if (!cells) {
-    cells = spriteCells(sprite)
-    cellsByModster.set(id, cells)
+    cells = spriteCells(loaded.sprite)
+    cellsByModster.set(loaded.modster.id, cells)
   }
   return cells
 }
@@ -237,28 +361,50 @@ function queueWrite($: EngineInterface, write: (store: StorePort) => Promise<voi
     })
 }
 
-/** Loops the sprite's frames at its fps, skipping a tick while the last blit is in flight (P1-03). */
-function startFrames($: EngineInterface, modsterId: string, cells: string[], fps: number): void {
-  frameTimer?.cancel()
-  frameModsterId = modsterId
-  frameTimer = $.clock.every(Math.max(1, Math.round(1000 / fps)), () => {
-    if (!frameRequestId || isBlitting) return
+/** Notes that `requestId` draws the sprite, and keeps the frame loop running for it. */
+function addSite($: EngineInterface, requestId: string, loaded: LoadedModster): void {
+  spriteSites.add(requestId)
+  if (frameModster?.modster.id !== loaded.modster.id) {
+    frameIndex = 0
+    frameModster = loaded
+    frameTimer?.cancel()
+    frameTimer = undefined
+  }
+  if (frameTimer || loaded.sprite.frames.length < 2) return
+  frameTimer = $.clock.every(Math.max(1, Math.round(1000 / (loaded.modster.sprite.fps ?? 6))), () => {
+    const current = frameModster
+    // Skip a tick while the last blits are in flight (P1-03)
+    if (!current || isBlitting || spriteSites.size === 0) return
     isBlitting = true
-    frameIndex = (frameIndex + 1) % cells.length
-    $.ui
-      .blit({ requestId: frameRequestId, key: SPRITE_KEY, cells: cells[frameIndex] ?? '' })
-      .catch(() => undefined)
-      .finally(() => {
-        isBlitting = false
-      })
+    frameIndex = (frameIndex + 1) % current.sprite.frames.length
+    const blits = [...spriteSites].map((site) =>
+      $.ui.blit({ requestId: site, key: SPRITE_KEY, cells: cellsFor(current)[frameIndex] ?? '' }).catch(() => undefined),
+    )
+    void Promise.all(blits).finally(() => {
+      isBlitting = false
+    })
   })
+}
+
+/** Whether our encounter pane is open, placed and the shown tab. Unknown counts as no. */
+async function isPaneShown($: EngineInterface): Promise<boolean> {
+  try {
+    return (await $.ui.panes()).some((pane) => pane.id === PANE_ID && pane.isShown && pane.isPlaced)
+  } catch {
+    return false
+  }
+}
+
+function removeSite(requestId: string): void {
+  spriteSites.delete(requestId)
+  if (spriteSites.size === 0) stopFrames()
 }
 
 function stopFrames(): void {
   frameTimer?.cancel()
   frameTimer = undefined
-  frameRequestId = undefined
-  frameModsterId = undefined
+  frameModster = undefined
+  spriteSites.clear()
 }
 
 function stopTimers(): void {
@@ -303,7 +449,7 @@ async function homeFolder($: EngineInterface): Promise<string | undefined> {
   return home ? home.replace(/[\\/]+$/, '') : undefined
 }
 
-/** `$.fs` behind the PNG cache: decoded user sheets are written under the cache folder only (decision 0015). */
+/** `$.fs` behind the PNG cache: decoded user sheets are written under the cache folder only (decision 0016). */
 function sheetFiles($: EngineInterface): SheetFiles {
   return {
     async stat(path) {

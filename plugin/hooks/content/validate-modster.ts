@@ -12,7 +12,7 @@ const RARITIES: readonly Rarity[] = ['common', 'uncommon', 'rare', 'legendary']
 /**
  * Checks a parsed `modster.json` against CONTENT_FORMAT.md. `folder` is the
  * name of the folder it was read from, which must equal its `id`. `allowPng`
- * is set for user content, whose sprite may be a PNG sheet (decision 0015).
+ * is set for user content, whose sprite may be a PNG sheet (decision 0016).
  */
 export function validateModster(input: unknown, where: { file: string; folder: string; allowPng?: boolean }): Validation<Modster> {
   const issues = new IssueList(where.file)
@@ -60,7 +60,7 @@ function checkSprite(value: unknown, allowPng: boolean, issues: IssueList): void
     if (file !== undefined && Object.hasOwn(value, 'frames')) issues.error('sprite.frames', 'is only for a .png sheet')
     return
   }
-  // A sheet's frames sit side by side; only the file names how many (decision 0015)
+  // A sheet's frames sit side by side; only the file names how many (decision 0016)
   if (!Object.hasOwn(value, 'frames')) {
     issues.error('sprite.frames', 'is required with a .png sheet: how many frames sit side by side')
     return

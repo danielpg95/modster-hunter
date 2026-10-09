@@ -208,6 +208,15 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [ ] At least 2 people played ≥ 1 hour of real work each; feedback in the phase review.
   - [ ] Tier defaults in 0004 tuned (amend via a new decision if numbers change).
 
+#### [x] P2-12 — Encounter pane
+- **Depends on:** P2-07
+- **Size:** M
+- **Goal:** decision 0015 (Proposed; merge the work only once it's accepted): `/modsters hunt` opens a pane with the live encounter, and the band steps aside while it shows.
+- **Done when:**
+  - [x] The pane draws the biome and every encounter phase at the sprite's normal size; Throw works from it.
+  - [x] The band draws nothing while the pane is open, placed and shown, and takes the encounter back when it isn't.
+  - [x] The mod never opens the pane by itself; render tests cover the pane and the band stepping aside.
+
 ---
 
 ## Phase 3 — Collection pane
@@ -262,7 +271,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Goal:** decision 0007 points 2–5: load `~/.claude/modster-hunter/content/`, override by id, disable lists, `includeBuiltins`.
 - **Done when:**
   - [x] Merge rules unit tested; zero-biome case shows one clear message.
-  - [x] User PNG sprites decode in the mod and are cached (0015), starting from `spikes/p1-05-sprite-pipeline/lib/inflate.ts` and `lib/png.ts` moved to `plugin/` with unit tests; 1-, 2- and 4-bit palette PNGs decode too (PIL and optimizers write ≤ 16-color palettes that way).
+  - [x] User PNG sprites decode in the mod and are cached (0016), starting from `spikes/p1-05-sprite-pipeline/lib/inflate.ts` and `lib/png.ts` moved to `plugin/` with unit tests; 1-, 2- and 4-bit palette PNGs decode too (PIL and optimizers write ≤ 16-color palettes that way).
 
 #### [ ] P4-02 — `/modsters reload` and error reporting
 - **Depends on:** P4-01, P3-01
@@ -284,7 +293,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Size:** M
 - **Goal:** `plugin/skills/create-modster-content/SKILL.md`: users ask Claude to create a biome or Modster (including pixel art), and it writes valid files into the user folder.
 - **Done when:**
-  - [ ] Claude converts PNG/GIF sprites through the converter (or the runtime path from 0015).
+  - [ ] Claude converts PNG/GIF sprites through the converter (or the runtime path from 0016).
   - [ ] Tested end to end by someone who didn't write it.
 
 #### [ ] P4-05 — Phase 4 review

@@ -1,4 +1,4 @@
-# 0015 — User Modsters may use a PNG sheet directly; the mod decodes and caches it
+# 0016 — User Modsters may use a PNG sheet directly; the mod decodes and caches it
 
 - **Status:** Accepted
 - **Date:** 2026-10-09
