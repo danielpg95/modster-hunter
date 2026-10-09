@@ -28,3 +28,4 @@ settled questions and avoid making assumptions about open ones.
 | [0012](0012-sprite-size-and-band-layout.md) | Half-block `Raster` sprites up to 24×12; text-only band when they don't fit | Accepted |
 | [0013](0013-host-calls-in-register.md) | All `$` calls live in `register.ts`; pure modules reach the host through plain ports | Accepted |
 | [0014](0014-encounter-timings.md) | Encounter timings, a work-time spawn countdown, and no throws outside "waiting" | Accepted |
+| [0015](0015-encounter-pane.md) | An opt-in encounter pane, with the band stepping aside while it shows | Proposed (settled by @danielpg95) |
