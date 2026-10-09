@@ -1,0 +1,19 @@
+typeof DecompressionStream: undefined
+typeof Blob: undefined
+typeof Response: undefined
+typeof createImageBitmap: undefined
+typeof Uint8Array.fromBase64: function
+test.png via DecompressionStream: FAILED Blob is not defined
+sheet-rgba.png: {"ok":true,"expectError":false,"readMs":0,"decodeMs":8}
+sheet-rgb.png: {"ok":true,"expectError":false,"readMs":0,"decodeMs":3}
+sheet-palette.png: {"ok":true,"expectError":false,"readMs":0,"decodeMs":1}
+sheet-palette-trns.png: {"ok":true,"expectError":false,"readMs":0,"decodeMs":1}
+sheet-all-filters.png: {"ok":true,"expectError":false,"readMs":0,"decodeMs":2}
+sheet-palette-4bit.png: FAILED png: only 8-bit, non-interlaced
+small-rgba.png: {"ok":true,"expectError":false,"readMs":0,"decodeMs":0}
+small-palette-trns.png: {"ok":true,"expectError":false,"readMs":0,"decodeMs":1}
+big-noise.png: {"ok":true,"expectError":false,"readMs":5,"decodeMs":258}
+big-smooth.png: {"ok":true,"expectError":false,"readMs":6,"decodeMs":772}
+too-big.png read: FAILED modster-hunter: $.fs.read: /Users/danielpena/code/modster-hunter/.claude/worktrees/claim-p1-05/spikes/p1-05-sprite-pipeline/fixtures/too-big.png refused: the file is over the 4194304-byte limit
+band: small-rgba.png 4 frames, 1 ms
+band: small-palette-trns.png 4 frames, 0 ms

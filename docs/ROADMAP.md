@@ -101,13 +101,13 @@ ends with findings written into a decision.
   - [x] Same sprite drawn with `Image` (`{ rgba, width, height }`) in kitty or Ghostty, and the fallback `alt` checked in another terminal.
   - [x] Recommendation written in the session log (keep for P5 or drop).
 
-#### [ ] P1-05 — Sprite pipeline spike
+#### [x] P1-05 — Sprite pipeline spike
 - **Depends on:** P0-02
 - **Size:** M
 - **Goal:** settle decision 0008.
 - **Done when:**
-  - [ ] Tested: `DecompressionStream` available in the mod runtime? A vendored inflate in a relative `.ts` import? An npm import?
-  - [ ] Decision 0008 is Accepted, amended, or superseded with the findings.
+  - [x] Tested: `DecompressionStream` available in the mod runtime? A vendored inflate in a relative `.ts` import? An npm import?
+  - [x] Decision 0008 is Accepted, amended, or superseded with the findings.
 
 #### [ ] P1-06 — Spike review
 - **Depends on:** P1-01, P1-02, P1-03, P1-04, P1-05
