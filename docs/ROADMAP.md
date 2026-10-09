@@ -139,13 +139,13 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [ ] Frames outside the 0012 bounds (width 8–24, height 8–12, even) fail with a hint.
   - [ ] Output passes the P2-01 validator.
 
-#### [ ] P2-03 — Content loader (built-in only)
+#### [x] P2-03 — Content loader (built-in only)
 - **Depends on:** P2-01
 - **Size:** M
 - **Goal:** load `plugin/content/` at `session.start` via `$.fs`, validated, into an in-memory registry.
 - **Done when:**
-  - [ ] Invalid files are skipped and listed, never crash the mod.
-  - [ ] Loading stays under the 10 s hook budget for 50 Modsters (measured).
+  - [x] Invalid files are skipped and listed, never crash the mod.
+  - [x] Loading stays under the 10 s hook budget for 50 Modsters (measured).
 
 #### [ ] P2-04 — Biome selection per session
 - **Depends on:** P2-03

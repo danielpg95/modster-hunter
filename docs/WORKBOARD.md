@@ -15,7 +15,6 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P2-03 | @victor-aguilars | in-progress | p2-03-content-loader | 2026-10-08 | 2026-10-08 | Add loadContent(reader) in plugin/hooks/content/ and a $.fs adapter |
 | P2-05 | @victor-aguilars | in-progress | p2-05-catch-odds | 2026-10-08 | 2026-10-08 | Add the 0004 tier table to constants.ts and plugin/hooks/game/ resolver with tests |
 
 ## Up next
@@ -25,3 +24,5 @@ list when you finish a task.
 
 - **P0-04** — Continuous integration
 - **P2-02** — Sprite converter tool
+- **P2-04** — Biome selection per session
+- **P4-01** — User content folder and merge
