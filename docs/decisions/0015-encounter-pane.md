@@ -1,8 +1,8 @@
 # 0015 — An opt-in encounter pane, with the band stepping aside while it shows
 
-- **Status:** Proposed — settled by @danielpg95 (game design; amends 0002's first point). Discussion: issue #35
-- **Date:** 2026-10-08
-- **Proposed by:** @victor-aguilars, after playing the P2-07 band and a local pane prototype
+- **Status:** Accepted (amends 0002's first point). Discussion: issue #35
+- **Date:** 2026-10-08 (accepted 2026-10-09)
+- **Decided by:** @danielpg95 (proposed by @victor-aguilars, after playing the P2-07 band and a local pane prototype)
 
 ## Context
 
@@ -47,5 +47,5 @@ Two things came out of the prototype:
 - New roadmap task P2-12 implements it.
 - P3-01's `/modsters` pane (collection) and this one are separate panes for
   now; P3-01 may merge them into tabs.
-- If accepted, 0002's first point reads "in the band, or in the encounter pane
+- 0002's first point now reads "in the band, or in the encounter pane
   when the person opens it (0015)".
