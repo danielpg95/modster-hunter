@@ -94,9 +94,7 @@ them as they are.
 **Skipped in CI: `npm run typecheck`.** `tsc` needs the generated types in
 `plugin/.claude-plugin/types/`, and only an interactive session writes them
 (see [Types](#types)); CI can't start one. Run `npm run typecheck` locally
-before pushing. Type errors in hooks still surface in CI as load failures in
-`claude plugin test`, but type-only mistakes (like a wrong field in a test stub)
-don't.
+before pushing; CI won't catch type errors.
 
 When you upgrade Claude Code for development, bump `CLAUDE_CODE_VERSION` in the
 workflow in the same PR.
