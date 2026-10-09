@@ -15,6 +15,7 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
+| P2-07 | @victor-aguilars | in-progress | p2-07-band-ui | 2026-10-08 | 2026-10-08 | Move pixels-to-cells and the blit helpers from spikes/ into plugin/hooks/render/ |
 | P2-09 | @victor-aguilars | in-progress | p2-09-whispering-forest | 2026-10-08 | 2026-10-08 | Design biome 2 (and a 5th Forest Modster) with the user; first slice in review |
 | P0-04 | @victor-aguilars | in-review | p0-04-ci | 2026-10-08 | 2026-10-08 | @danielpg95: require the "Plugin validate and tests" check on main, then tick the last item |
 
@@ -23,6 +24,5 @@ this file lists only tasks someone has claimed.
 Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
-- **P2-07** — Band encounter UI
 - **P2-08** — Collection storage
 - **P4-01** — User content folder and merge
