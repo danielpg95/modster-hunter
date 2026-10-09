@@ -62,7 +62,7 @@ plugin/
 | Data | Where | Why |
 | --- | --- | --- |
 | Content registry, current biome | Module variable | Rebuilt on load; cheap |
-| Current encounter | `$.state` | Survives a module reload during development; reactive redraw |
+| Current encounter (machine state) | Module variable in `register.tsx` | Not persisted (decision 0005); the band redraws via `$.ui.invalidate` when a step changes it, and `/clear` (which resets `$.state`) leaves it alone |
 | Collection, stats | `$.store` | Persists across sessions (decision 0009) |
 | User content | Files in `~/.claude/modster-hunter/content/` | Editable by hand, by the editor and by Claude |
 

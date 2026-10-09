@@ -1,0 +1,163 @@
+import { describe, expect, mock, test } from 'claude-code/testing'
+import type { On } from 'claude-code'
+import { oneModsterForest } from './fixtures/one-modster-forest'
+import { stubContentFs } from './fixtures/stub-content-fs'
+import { validBiome } from './fixtures/valid-biome'
+import { validModster } from './fixtures/valid-modster'
+import { validSprite } from './fixtures/valid-sprite'
+
+/** A content folder with two one-Modster biomes. */
+function twoBiomes(): Record<string, string> {
+  const files: Record<string, string> = {}
+  for (const [biome, name] of [['whispering-forest', 'Whispering Forest'], ['tidepool-shallows', 'Tidepool Shallows']] as const) {
+    const json: Record<string, unknown> = { ...validBiome(), id: biome, name, modsters: [{ id: 'sproutling', weight: 1 }] }
+    delete json.background
+    files[`biomes/${biome}/biome.json`] = JSON.stringify(json)
+  }
+  files['modsters/sproutling/modster.json'] = JSON.stringify(validModster())
+  files['modsters/sproutling/sprite.sprite.json'] = JSON.stringify(validSprite())
+  return files
+}
+
+describe('register', () => {
+  test('registers /modsters on session start', async ($, on) => {
+    const names: string[] = []
+    on('session.start', ($, e) => ({ cwd: e.cwd }))
+    on('command.register', ($, e) => {
+      names.push(e.name)
+      return { value: { command: e.name } }
+    })
+    stubContentFs(on, {})
+
+    await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' } as any)
+
+    expect(names).toEqual(['modsters'])
+  })
+
+  test('with no content, /modsters says there are no biomes yet', async ($, on) => {
+    on('session.start', ($, e) => ({ cwd: e.cwd }))
+    on('command.register', ($, e) => ({ value: { command: e.name } }))
+    stubContentFs(on, {})
+    await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' } as any)
+
+    const result = await $.command.run({ command: 'modsters' } as any)
+    expect(result).toEqual({ text: 'Modster Hunter is loaded · No biomes yet' })
+  })
+
+  test('the biome picked at session start stays after /clear, /resume and /branch', async ($, on) => {
+    on('session.start', ($, e) => ({ cwd: e.cwd }))
+    on('command.register', ($, e) => ({ value: { command: e.name } }))
+    stubContentFs(on, twoBiomes())
+    on('classic.SessionStart', () => ({}))
+    await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' } as any)
+
+    const reply = async () => ((await $.command.run({ command: 'modsters' } as any)) as { text: string }).text
+    const first = await reply()
+    expect(['Whispering Forest', 'Tidepool Shallows'].some((name) => first.endsWith(`You're in ${name}`))).toBe(true)
+
+    for (const source of ['clear', 'resume', 'fork'] as const) {
+      await $.classic.SessionStart({ source })
+      expect(await reply()).toBe(first)
+    }
+  })
+
+  test('a repeated session start in the same process keeps the biome', async ($, on) => {
+    on('session.start', ($, e) => ({ cwd: e.cwd }))
+    on('command.register', ($, e) => ({ value: { command: e.name } }))
+    stubContentFs(on, twoBiomes())
+    const start = () => $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' } as any)
+    const reply = async () => ((await $.command.run({ command: 'modsters' } as any)) as { text: string }).text
+
+    await start()
+    const first = await reply()
+    // 20 restarts: with a fresh pick each time, keeping the same one of two biomes would be a 1 in 2^20 fluke
+    for (let i = 0; i < 20; i++) {
+      await start().catch(() => undefined) // the second register of /modsters throws; the biome is picked before that
+      expect(await reply()).toBe(first)
+    }
+  })
+
+  // The band, drawn on the terminal surface, through every phase (P2-07)
+  test('the band walks a Modster through appearing, waiting, throw, wobble, caught, and back to idle', async ($, on) => {
+    const { ui, clock } = await startBand($, on)
+    expect((await ui.find({ type: 'Text', text: /Whispering Forest/ }))?.type).toBe('Text')
+    expect(await ui.find({ type: 'Raster' })).toBeUndefined()
+
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(3_000 + BAND_TICK)
+    expect(await ui.find({ type: 'Text', text: 'appeared!' })).toBeDefined()
+    expect(await ui.find({ type: 'Raster', key: 'sprite' })).toBeDefined()
+    expect(await ui.find({ type: 'Button', key: 'throw' })).toBeUndefined()
+
+    await clock.advance(1_000)
+    expect(await ui.find({ type: 'Text', text: '3 throws left' })).toBeDefined()
+    expect(await ui.find({ type: 'Button', key: 'throw' })).toBeDefined()
+
+    await ui.press({ key: 'throw' })
+    await clock.advance(BAND_TICK)
+    expect(await ui.find({ type: 'Text', text: 'wobble… wobble…' })).toBeDefined()
+    expect(await ui.find({ type: 'Button', key: 'throw' })).toBeUndefined()
+
+    await clock.advance(1_500)
+    expect(await ui.find({ type: 'Text', text: 'Caught Sproutling!' })).toBeDefined()
+
+    await clock.advance(4_000)
+    expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeDefined()
+    expect(await ui.find({ type: 'Raster' })).toBeUndefined()
+    await ui.unmount()
+  })
+
+  test('an encounter left alone wanders off after the idle timeout', { options: { encounterIdleTimeoutSec: 5 } }, async ($, on) => {
+    const { ui, clock } = await startBand($, on)
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(3_000 + BAND_TICK)
+    await $.turn.complete({ reason: 'answer', answer: 'ok', durationMs: 1 } as any)
+    await clock.advance(5_000)
+    expect(await ui.find({ type: 'Text', text: 'Sproutling wandered off.' })).toBeDefined()
+    await ui.unmount()
+  })
+
+  test('a short band uses the compact layout: no sprite, never more lines than maxRows', async ($, on) => {
+    const { ui, clock } = await startBand($, on)
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(4_000 + BAND_TICK)
+    for (const maxRows of [2, 1]) {
+      await ui.redraw({ ...BAND_PROPS, maxRows } as any)
+      expect(await ui.find({ type: 'Raster' })).toBeUndefined()
+      expect(await ui.find({ type: 'Button', key: 'throw' })).toBeDefined()
+    }
+    await ui.redraw({ ...BAND_PROPS, maxRows: 2 } as any)
+    expect(await ui.find({ type: 'Text', text: 'A wild Sproutling appeared!' })).toBeDefined()
+    await ui.redraw({ ...BAND_PROPS, maxRows: 0 } as any)
+    expect(await ui.find({ type: 'Text', text: /Sproutling/ })).toBeUndefined()
+    await ui.unmount()
+  })
+
+  test('the idle line can be turned off', { options: { showIdleLine: false } }, async ($, on) => {
+    const { ui, clock } = await startBand($, on)
+    expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeUndefined()
+    await ui.unmount()
+  })
+})
+
+const BAND_TICK = 250
+const BAND_PROPS = { hasSurvey: false, isWorking: true, maxRows: 7, bodyColumns: 120 }
+
+/** Starts a session on the one-Modster forest with a fake clock, and mounts the band. */
+async function startBand($: any, on: On) {
+  on('session.start', ($, e) => ({ cwd: e.cwd }))
+  on('command.register', ($, e) => ({ value: { command: e.name } }))
+  stubContentFs(on, oneModsterForest())
+  // What Claude Code itself would answer beneath the mod
+  on('turn.start', ($, e) => ({ turnId: e.turnId }))
+  on('turn.complete', () => ({ text: '' }))
+  on('ui.render', ($, e) => {
+    const { Box } = $.ui.resolve(e)
+    return <Box />
+  })
+  const clock = mock.clock(on)
+  await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' })
+  const ui = await $.ui.mount({ plugin: 'modster-hunter', surface: 'terminal', component: 'AbovePrompt', props: BAND_PROPS })
+  // The band's timers run on the mock clock; advancing it fires them in order
+  return { ui, clock }
+}
