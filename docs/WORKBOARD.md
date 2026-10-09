@@ -16,7 +16,6 @@ this file lists only tasks someone has claimed.
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
 | P0-03 | @victor-aguilars | in-progress | p0-03-typescript-tests | 2026-10-07 | 2026-10-07 | Add plugin/tsconfig.json and generate types with /plugin-types |
-| P1-06 | @danielpg95 | in-progress | p1-06-spike-review | 2026-10-08 | 2026-10-08 | Read the five spike handoffs and decisions, draft the phase 1 review from docs/templates/phase-review.md |
 
 ## Up next
 
