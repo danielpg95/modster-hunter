@@ -36,16 +36,31 @@ def filters_used(path):
 def sheet(frames=12, size=24):
     im = Image.new('RGBA', (frames * size, size), (0, 0, 0, 0))
     px = im.load()
+    r = size * size / 6.4  # radius² of the body; 90 at 24 px
     for f in range(frames):
         cx, cy = f * size + size // 2, size // 2 + (f % 3) - 1
         for y in range(size):
             for x in range(f * size, (f + 1) * size):
                 d = (x - cx) ** 2 + (y - cy) ** 2
-                if d < 90:
-                    px[x, y] = (40 + d * 2, 160 - d, 80 + f * 10, 255)
-                elif d < 110:
+                if d < r:
+                    px[x, y] = (40 + int(d * 180 / r), 160 - int(d * 90 / r), 80 + f * 10, 255)
+                elif d < r * 1.25:
                     px[x, y] = (20, 20, 20, 255)
     return im
+
+
+def palette_with_trns(im, colors):
+    # Index 0 is transparent (as Aseprite exports); opaque pixels quantized into the rest
+    rgb = im.convert('RGB').quantize(colors=colors - 1, method=Image.Quantize.MEDIANCUT)
+    alpha = im.getchannel('A').load()
+    idx = rgb.load()
+    out = Image.new('P', im.size)
+    px = out.load()
+    for y in range(im.height):
+        for x in range(im.width):
+            px[x, y] = 0 if alpha[x, y] < 128 else idx[x, y] + 1
+    out.putpalette([0, 0, 0] + rgb.getpalette()[:(colors - 1) * 3])
+    return out
 
 
 cases = []
@@ -70,7 +85,7 @@ save('sheet-rgba.png', s)
 save('sheet-rgb.png', s.convert('RGB'))
 save('sheet-palette.png', s.quantize(colors=32, method=Image.Quantize.FASTOCTREE))
 # palette with a transparent index (tRNS)
-p = s.convert('RGBA').quantize(colors=32, method=Image.Quantize.FASTOCTREE)
+p = palette_with_trns(s, 32)
 save('sheet-palette-trns.png', p, transparency=0)
 
 def all_filters_png(im, path):
@@ -107,6 +122,11 @@ cases.append({'file': 'sheet-all-filters.png', 'width': rgba.width, 'height': rg
 # 4-bit palette: expected to fail with a readable error
 s.quantize(colors=16, method=Image.Quantize.FASTOCTREE).save(os.path.join(out, 'sheet-palette-4bit.png'), bits=4)
 cases.append({'file': 'sheet-palette-4bit.png', 'expectError': True})
+
+# 12×12 frames (decision 0001 size), for the visual test in the band
+small = sheet(frames=4, size=12)
+save('small-rgba.png', small)
+save('small-palette-trns.png', palette_with_trns(small, 32), transparency=0)
 
 noise = Image.frombytes('RGBA', (900, 900), bytes(rnd.getrandbits(8) for _ in range(900 * 900 * 4)))
 save('big-noise.png', noise)

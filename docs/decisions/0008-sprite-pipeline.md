@@ -2,7 +2,7 @@
 
 - **Status:** Accepted, amended by P1-05 (the runtime inflates PNGs with a vendored inflate)
 - **Date:** 2026-10-07 (amended 2026-10-08)
-- **Decided by:** @danielpg95 (proposed by Claude; amendment from spike P1-05, confirm in its PR)
+- **Decided by:** @danielpg95 (proposed by Claude; amendment from spike P1-05 confirmed 2026-10-08)
 
 ## Context
 
@@ -23,7 +23,7 @@ Tested in Claude Code 2.1.295, each in a real session
 | `DecompressionStream` in the mod runtime? | **No.** `Blob`, `Response` and `createImageBitmap` are also undefined, so no web-API route to inflate. `Uint8Array.fromBase64` exists. |
 | Vendored inflate as a relative `.ts` import? | **Yes.** `lib/inflate.ts` (117 lines) and `lib/png.ts` (63 lines), pure TS, decode exactly (RGBA hash match) in the runtime: RGBA, RGB, 8-bit palette, palette with `tRNS`, and all five row filters. A 12-frame 24×24 sheet takes 1–7 ms. |
 | Large PNGs? | 900×900 noise (3.1 MiB file) decodes in 259 ms; 2048×2048 in 812 ms. A 4.6 MiB file is refused by `$.fs.read` (4 MiB limit). |
-| Unsupported PNGs? | A 4-bit palette PNG (what optimizers like oxipng write) fails with `png: only 8-bit, non-interlaced`. Grayscale and interlaced PNGs are also unsupported. |
+| Unsupported PNGs? | A 4-bit palette PNG fails with `png: only 8-bit, non-interlaced`. Optimizers like oxipng write these, and so does PIL for any palette of 16 colors or fewer. Grayscale and interlaced PNGs are also unsupported. |
 | npm package by name (`from 'pkg'`)? | **No.** The validator refuses it, and at run time the hooks module doesn't load. |
 | npm package by relative path? | **Yes**, for self-contained ESM: both `../vendor/pkg/index.js` and `../node_modules/pkg/index.js` load. A package with its own bare imports would fail the same way. |
 | `import()`? | **No.** The module doesn't load (validator and run time). |
@@ -43,7 +43,8 @@ Tested in Claude Code 2.1.295, each in a real session
    `DecompressionStream`. We write our own rather than vendor an npm package
    (e.g. fflate's ESM build): it's small, typed, and has no bare imports to
    patch. Supported: 8-bit, non-interlaced PNG, color types 2, 3 and 6. Other
-   PNGs get a readable error that points to `tools/sprite.mjs`. Where the cache
+   PNGs get a readable error that points to `tools/sprite.mjs`, which handles
+   every PNG (@danielpg95, 2026-10-08). Where the cache
    lives is left to P2-03 (`$.store` is 4 MiB total).
 5. **Reuse:** the spike's `lib/inflate.ts` and `lib/png.ts` are the starting
    point for P2-02 and the loader; they need unit tests under `plugin/tests/`
