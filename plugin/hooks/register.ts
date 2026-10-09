@@ -1,19 +1,27 @@
 import type { EngineInterface, Register } from 'claude-code'
 import { formatIssue, loadContent, type ContentReader, type ContentRegistry } from './content'
+import { pickBiome } from './game'
 
 // Rebuilt at every session start; cheap, so it isn't kept in $.state (ARCHITECTURE.md)
 let content: ContentRegistry | undefined
+// The session's biome (decision 0006). /clear, /resume and /branch don't start a
+// new process or reload the module, so it survives them as a module variable.
+let biomeId: string | undefined
 
 export const register: Register = (on) => {
   on('session.start', async ($, e, next) => {
     content = await loadBuiltInContent($)
+    // Keep the biome if session.start ever repeats in this process; pick only when there's none yet
+    if (biomeId === undefined || !content.biomes.has(biomeId)) biomeId = pickBiome(content.biomes.keys(), Math.random)
     // Register last: a taken name throws and would skip the rest of this hook
     await $.command.register({ name: 'modsters', description: 'Open your Modster collection' })
     return next(e)
   })
 
   on('command.run', { command: 'modsters' }, async () => {
-    return { text: 'Modster Hunter is loaded' }
+    // Until the pane (P3-01), the command says where you are
+    const biome = biomeId === undefined ? undefined : content?.biomes.get(biomeId)?.biome
+    return { text: biome ? `Modster Hunter is loaded · You're in ${biome.name}` : 'Modster Hunter is loaded · No biomes yet' }
   })
 }
 
