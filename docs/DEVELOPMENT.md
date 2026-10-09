@@ -79,6 +79,28 @@ on('command.register', ($, e) => ({ value: { command: e.name } }))  // { value }
 
 See `plugin/tests/register.test.ts` for a full example.
 
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every PR and on pushes to `main`:
+
+| Job | Steps |
+| --- | --- |
+| Tracking and content checks | `node tools/check-tracking.mjs`; every `*.json` file parses |
+| Plugin validate and tests | Installs Claude Code (pinned in `CLAUDE_CODE_VERSION`), then `claude plugin validate ./plugin --strict` and `claude plugin test ./plugin` |
+
+Neither `claude plugin` command needs a login or network access, so CI runs
+them as they are.
+
+**Skipped in CI: `npm run typecheck`.** `tsc` needs the generated types in
+`plugin/.claude-plugin/types/`, and only an interactive session writes them
+(see [Types](#types)); CI can't start one. Run `npm run typecheck` locally
+before pushing. Type errors in hooks still surface in CI as load failures in
+`claude plugin test`, but type-only mistakes (like a wrong field in a test stub)
+don't.
+
+When you upgrade Claude Code for development, bump `CLAUDE_CODE_VERSION` in the
+workflow in the same PR.
+
 ## Things that are easy to get wrong
 
 - **`focus`, `closeOnEscape`, `holdToasts`, `autoFocus` accept only `true`.**
