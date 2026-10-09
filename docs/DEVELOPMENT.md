@@ -5,7 +5,10 @@ that roadmap task is done.
 
 ## Requirements
 
-- Claude Code **v2.1.287 or later** (`claude --version`).
+- Claude Code **v2.1.287 or later** (`claude --version`). Package managers can
+  lag (the Homebrew cask was at 2.1.285 on 2026-10-07); update with
+  `claude update` or `npm i -g @anthropic-ai/claude-code@latest`. Older builds
+  load mods only with `CLAUDE_CODE_ENABLE_FUNCTION_HOOKS=1`.
 - Node.js 20+ for the repo tools in `tools/`.
 - A terminal at least 100 columns wide for comfortable testing. Also test at 80×24.
 
@@ -19,7 +22,7 @@ claude --plugin-dir ./plugin                  # (from P0-02)
 claude plugin validate ./plugin --strict      # (from P0-02)
 
 # Run the mod's tests
-claude plugin test ./plugin                   # (from P0-03)
+claude plugin test ./plugin                   # (from P0-03; or npm test)
 
 # Check the roadmap/workboard format and list claimable tasks
 node tools/check-tracking.mjs
@@ -32,10 +35,49 @@ nothing shows up. The debug log has the same line.
 
 ## Types
 
-The mod is TypeScript, typed against Claude Code's own declarations. Run
-`/plugin-types` in a Claude Code session to write the declarations for your
-installed version; the copy on GitHub can lag behind. *(P0-03 documents the
-exact path we point `tsconfig.json` at.)*
+The mod is TypeScript, typed against Claude Code's own declarations. They are
+generated, not committed (the folder carries its own `.gitignore`), so a fresh
+clone must write them before `npm run typecheck`:
+
+1. Start an **interactive** session with the mod: `claude --plugin-dir ./plugin`.
+   Loading it writes `plugin/.claude-plugin/types/`, including the
+   `tsconfig.json` that `plugin/tsconfig.json` extends. Exit once it's up.
+   A headless `claude -p` run doesn't write them, and there is no
+   `/plugin-types` command in 2.1.295.
+2. Run `npm install` once (for `tsc`), then `npm run typecheck`.
+
+The declarations match the build that wrote them (first line of
+`claude-code/index.d.ts`). After upgrading Claude Code, start an interactive
+session with the mod again before typechecking.
+
+`plugin/tsconfig.json` repeats the settings the official mods use (`strict`,
+`noUncheckedIndexedAccess`, `moduleResolution: bundler`) so they hold even if the
+generated file changes.
+
+## npm scripts
+
+Run from the repo root (`npm install` first):
+
+| Script | Runs |
+| --- | --- |
+| `npm run check` | `node tools/check-tracking.mjs` |
+| `npm run typecheck` | `tsc -p plugin --noEmit` (needs the generated types) |
+| `npm test` | `claude plugin test ./plugin` |
+| `npm run validate` | `claude plugin validate ./plugin --strict` |
+
+## Tests
+
+Tests live in `plugin/tests/*.test.ts` and import from `claude-code/testing`.
+A test gets `($, on)`: `$` drives events, and `on` registers hooks that run
+*after* the mod and stand in for Claude Code. Anything the mod asks of the host
+must be stubbed, or the hook fails with `no implementation for …`:
+
+```ts
+on('session.start', ($, e) => ({ cwd: e.cwd }))
+on('command.register', ($, e) => ({ value: { command: e.name } }))  // { value } or { deny }
+```
+
+See `plugin/tests/register.test.ts` for a full example.
 
 ## Things that are easy to get wrong
 

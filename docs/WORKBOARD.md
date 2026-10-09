@@ -15,10 +15,12 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P0-03 | @victor-aguilars | in-progress | p0-03-typescript-tests | 2026-10-07 | 2026-10-07 | Add plugin/tsconfig.json and generate types with /plugin-types |
 
 ## Up next
 
 Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
+
+- **P0-04** — Continuous integration
+- **P2-01** — Content schema, types and validator

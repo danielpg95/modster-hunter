@@ -1,0 +1,14 @@
+{
+  "name": "modster-hunter-repo",
+  "private": true,
+  "description": "Repo tooling for the Modster Hunter mod. The mod itself is in plugin/.",
+  "scripts": {
+    "check": "node tools/check-tracking.mjs",
+    "typecheck": "tsc -p plugin --noEmit",
+    "test": "claude plugin test ./plugin",
+    "validate": "claude plugin validate ./plugin --strict"
+  },
+  "devDependencies": {
+    "typescript": "~7.0.2"
+  }
+}
