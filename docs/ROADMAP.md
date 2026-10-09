@@ -50,14 +50,14 @@ Goal: anyone can clone the repo, load the (empty) mod, and run the checks.
   - [x] `plugin/tests/register.test.ts` tests the `/modsters` reply and passes with `claude plugin test ./plugin`.
   - [x] `package.json` scripts: `check` (tracking), `typecheck`, `test`, `validate`.
 
-#### [ ] P0-04 — Continuous integration
+#### [x] P0-04 — Continuous integration
 - **Depends on:** P0-03
 - **Size:** S
 - **Goal:** every PR is checked automatically.
 - **Done when:**
   - [x] `.github/workflows/ci.yml` runs tracking check, JSON content check, `claude plugin validate --strict` and `claude plugin test` (typecheck can't run in CI; see next item).
   - [x] If the Claude Code CLI can't run in CI without auth, document which steps are skipped and why in `docs/DEVELOPMENT.md`. (No auth needed; typecheck is skipped because the types need an interactive session.)
-  - [ ] Branch protection on `main` requires CI (owner action; note it in the session log).
+  - [x] Branch protection on `main` requires CI (owner action; note it in the session log). (Done 2026-10-09: the `protect-main` ruleset requires both CI checks.)
 
 ---
 
