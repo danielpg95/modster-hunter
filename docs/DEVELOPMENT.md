@@ -36,17 +36,19 @@ nothing shows up. The debug log has the same line.
 ## Types
 
 The mod is TypeScript, typed against Claude Code's own declarations. They are
-generated, not committed (`.claude-plugin/types/` is gitignored), so a fresh
+generated, not committed (the folder carries its own `.gitignore`), so a fresh
 clone must write them before `npm run typecheck`:
 
 1. Start an **interactive** session with the mod: `claude --plugin-dir ./plugin`.
-   (`claude -p "/plugin-types"` doesn't work; the command is interactive only.)
-2. Run `/plugin-types`. It writes `plugin/.claude-plugin/types/`, including the
-   `tsconfig.json` that `plugin/tsconfig.json` extends.
-3. Run `npm install` once (for `tsc`), then `npm run typecheck`.
+   Loading it writes `plugin/.claude-plugin/types/`, including the
+   `tsconfig.json` that `plugin/tsconfig.json` extends. Exit once it's up.
+   A headless `claude -p` run doesn't write them, and there is no
+   `/plugin-types` command in 2.1.295.
+2. Run `npm install` once (for `tsc`), then `npm run typecheck`.
 
-Regenerate after every Claude Code upgrade: the declarations match your
-installed build, and the copy on GitHub can lag behind.
+The declarations match the build that wrote them (first line of
+`claude-code/index.d.ts`). After upgrading Claude Code, start an interactive
+session with the mod again before typechecking.
 
 `plugin/tsconfig.json` repeats the settings the official mods use (`strict`,
 `noUncheckedIndexedAccess`, `moduleResolution: bundler`) so they hold even if the
@@ -72,7 +74,7 @@ must be stubbed, or the hook fails with `no implementation for …`:
 
 ```ts
 on('session.start', ($, e) => ({ cwd: e.cwd }))
-on('command.register', () => ({ value: undefined }))  // must return { value } or { deny }
+on('command.register', ($, e) => ({ value: { command: e.name } }))  // { value } or { deny }
 ```
 
 See `plugin/tests/register.test.ts` for a full example.

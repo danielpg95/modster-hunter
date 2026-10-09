@@ -3,6 +3,3 @@ node_modules/
 *.log
 .env
 spikes/**/out/
-
-# Written by Claude Code when it loads a mod (/plugin-types); regenerate locally
-.claude-plugin/types/

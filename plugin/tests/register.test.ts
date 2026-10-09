@@ -6,7 +6,7 @@ describe('/modsters', () => {
     on('session.start', ($, e) => ({ cwd: e.cwd }))
     on('command.register', ($, e) => {
       names.push(e.name)
-      return { value: undefined }
+      return { value: { command: e.name } }
     })
 
     await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' } as any)
