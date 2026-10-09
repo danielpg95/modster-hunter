@@ -15,12 +15,11 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
+| P2-01 | @victor-aguilars | in-progress | p2-01-content-validator | 2026-10-08 | 2026-10-08 | Add content types and validateSprite in plugin/hooks/content/ with tests |
 
 ## Up next
 
 Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
-
 - **P0-04** — Continuous integration
-- **P2-01** — Content schema, types and validator
