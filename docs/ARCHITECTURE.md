@@ -38,7 +38,8 @@ plugin/
 │   ├── content/             # pure: schema types, validate, load through a ContentReader port, merge
 │   ├── game/                # pure: random source, rarity resolver, encounter machine, scheduler
 │   ├── render/              # pure: pixels → Raster cells, band and pane trees from state
-│   └── store/               # pure: collection + stats over a store port, migrations
+│   ├── store/               # pure: collection + stats over a store port, migrations
+│   └── vendor/              # our own dependency-free code kept apart: inflate and PNG decode (0015)
 ├── content/                 # built-in biomes and Modsters (see CONTENT_FORMAT.md)
 ├── skills/                  # user-facing skills shipped with the mod (P4-04)
 ├── tests/                   # *.test.ts mirroring hooks/ paths, run by `claude plugin test`
@@ -65,6 +66,7 @@ plugin/
 | Current encounter (machine state) | Module variable in `register.tsx` | Not persisted (decision 0005); the band redraws via `$.ui.invalidate` when a step changes it, and `/clear` (which resets `$.state`) leaves it alone |
 | Collection, stats | `$.store` | Persists across sessions (decision 0009) |
 | User content | Files in `~/.claude/modster-hunter/content/` | Editable by hand, by the editor and by Claude |
+| Decoded user PNG sprites | Files in `~/.claude/modster-hunter/cache/sprites/` | Keyed by the PNG's size, mtime and frame count; safe to delete (decision 0015) |
 
 ## Budgets to respect
 

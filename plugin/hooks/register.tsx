@@ -1,6 +1,14 @@
 import type { EngineInterface, Register, Timer } from 'claude-code'
-import { BAND } from './constants'
-import { formatIssue, loadContent, type ContentReader, type ContentRegistry } from './content'
+import { BAND, USER_CONTENT } from './constants'
+import {
+  cachedSheetLoader,
+  formatIssue,
+  loadAllContent,
+  noBiomesMessage,
+  type ContentReader,
+  type ContentRegistry,
+  type SheetFiles,
+} from './content'
 import {
   pickBiome,
   startEncounters,
@@ -29,6 +37,9 @@ let tickTimer: Timer | undefined
 let sessionId = 'unknown'
 let pendingWrites: Promise<void> = Promise.resolve()
 
+// How issues and messages name the user's content folder (decision 0007)
+const USER_FOLDER_LABEL = `~/${USER_CONTENT.contentFolder}/`
+
 // Sprite animation: the mounted Raster is repainted in place with $.ui.blit (0012)
 const SPRITE_KEY = 'sprite'
 const cellsByModster = new Map<string, string[]>()
@@ -41,9 +52,11 @@ let isBlitting = false
 export const register: Register = (on, options) => {
   const idleTimeoutSec = typeof options.encounterIdleTimeoutSec === 'number' ? options.encounterIdleTimeoutSec : 90
   const showIdleLine = options.showIdleLine !== false
+  const includeBuiltins = options.includeBuiltins !== false
 
   on('session.start', async ($, e, next) => {
-    content = await loadBuiltInContent($)
+    content = await loadGameContent($, includeBuiltins)
+    if (content.biomes.size === 0) $.ui.toast(`Modster Hunter: ${noBiomesMessage(includeBuiltins, USER_FOLDER_LABEL)}`)
     sessionId = await $.session.id().catch(() => 'unknown')
     // Keep the biome if session.start ever repeats in this process; pick only when there's none yet
     if (biomeId === undefined || !content.biomes.has(biomeId)) biomeId = pickBiome(content.biomes.keys(), Math.random)
@@ -158,7 +171,11 @@ export const register: Register = (on, options) => {
   on('command.run', { command: 'modsters' }, async () => {
     // Until the pane (P3-01), the command says where you are
     const biome = biomeId === undefined ? undefined : content?.biomes.get(biomeId)?.biome
-    return { text: biome ? `Modster Hunter is loaded · You're in ${biome.name}` : 'Modster Hunter is loaded · No biomes yet' }
+    return {
+      text: biome
+        ? `Modster Hunter is loaded · You're in ${biome.name}`
+        : `Modster Hunter is loaded · ${noBiomesMessage(includeBuiltins, USER_FOLDER_LABEL)}`,
+    }
   })
 }
 
@@ -251,17 +268,65 @@ function stopTimers(): void {
 }
 
 /**
- * Loads `plugin/content/` (P2-03; user content joins in P4-01). Problems go to
- * the debug log, not the transcript; the Settings tab will list them (P4-02).
+ * Loads built-in and user content, merged by id (decision 0007). Problems go
+ * to the debug log, not the transcript; the Settings tab will list them (P4-02).
  */
-async function loadBuiltInContent($: EngineInterface): Promise<ContentRegistry> {
+async function loadGameContent($: EngineInterface, includeBuiltins: boolean): Promise<ContentRegistry> {
   const started = performance.now()
-  const registry = await loadContent(fsReader($), `${$.plugin.root}/content`)
+  const home = await homeFolder($)
+  if (home === undefined) $.ui.log('content: no HOME or USERPROFILE, so user content is skipped', { to: 'debug' })
+  const registry = await loadAllContent({
+    reader: fsReader($),
+    builtInRoot: `${$.plugin.root}/content`,
+    includeBuiltins,
+    ...(home === undefined
+      ? {}
+      : {
+          user: {
+            root: `${home}/${USER_CONTENT.contentFolder}`,
+            label: USER_FOLDER_LABEL,
+            sheets: cachedSheetLoader(sheetFiles($), `${home}/${USER_CONTENT.spriteCacheFolder}`),
+          },
+        }),
+  })
   const ms = Math.round(performance.now() - started)
   for (const issue of registry.issues) $.ui.log(formatIssue(issue), { to: 'debug' })
   const summary = `${registry.biomes.size} biomes, ${registry.modsters.size} Modsters, ${registry.issues.length} issues`
   $.ui.log(`content: ${summary} in ${ms} ms`, { to: 'debug' })
   return registry
+}
+
+/** The home folder: HOME, or USERPROFILE on Windows. */
+async function homeFolder($: EngineInterface): Promise<string | undefined> {
+  // No home folder means no user content, never a failed session start
+  const home = (await $.env.get('HOME').catch(() => undefined)) || (await $.env.get('USERPROFILE').catch(() => undefined))
+  return home ? home.replace(/[\\/]+$/, '') : undefined
+}
+
+/** `$.fs` behind the PNG cache: decoded user sheets are written under the cache folder only (decision 0015). */
+function sheetFiles($: EngineInterface): SheetFiles {
+  return {
+    async stat(path) {
+      if (!(await $.fs.exists(path))) return undefined
+      const stat = await $.fs.stat(path)
+      return { size: stat.size, mtimeMs: stat.mtimeMs }
+    },
+    async readBytes(path) {
+      const read = await $.fs.read(path, { as: 'bytes' })
+      if (typeof read === 'string') throw new Error('was read as text')
+      // Uint8Array.fromBase64 isn't in the es2023 lib the types target
+      const binary = atob(read.base64)
+      const bytes = new Uint8Array(binary.length)
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
+      return bytes
+    },
+    async readText(path) {
+      if (!(await $.fs.exists(path))) return undefined
+      const text = await $.fs.read(path)
+      return typeof text === 'string' ? text : undefined
+    },
+    writeText: (path, text) => $.fs.write(path, text),
+  }
 }
 
 /** `$.fs` behind the loader's reader: a missing folder or file is absent, not an error. */

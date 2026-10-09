@@ -1,10 +1,24 @@
 import { describe, expect, mock, test } from 'claude-code/testing'
 import type { On } from 'claude-code'
+import { encodePng } from './fixtures/encode-png'
 import { oneModsterForest } from './fixtures/one-modster-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
 import { validBiome } from './fixtures/valid-biome'
 import { validModster } from './fixtures/valid-modster'
 import { validSprite } from './fixtures/valid-sprite'
+
+/** A user folder (paths under ~/.claude/modster-hunter/) with one biome whose Modster is a 2-frame PNG sheet. */
+function userPngMeadow(): Record<string, string> {
+  const biome = { schemaVersion: 1, id: 'pixel-meadow', name: 'Pixel Meadow', modsters: [{ id: 'blobby', weight: 1 }] }
+  const modster = { ...validModster(), id: 'blobby', name: 'Blobby', sprite: { file: 'sprite.png', frames: 2 } }
+  const samples = Array.from({ length: 16 * 8 }, (_, i) => (i % 5 === 0 ? 1 : 0))
+  const png = encodePng({ width: 16, height: 8, colorType: 3, bitDepth: 1, samples, palette: [0, 0, 0, 46, 125, 50], transparency: [0] })
+  return {
+    'content/biomes/pixel-meadow/biome.json': JSON.stringify(biome),
+    'content/modsters/blobby/modster.json': JSON.stringify(modster),
+    'content/modsters/blobby/sprite.png': btoa(String.fromCharCode(...png)),
+  }
+}
 
 /** A content folder with two one-Modster biomes. */
 function twoBiomes(): Record<string, string> {
@@ -34,14 +48,42 @@ describe('register', () => {
     expect(names).toEqual(['modsters'])
   })
 
-  test('with no content, /modsters says there are no biomes yet', async ($, on) => {
+  test('with no biome to play, one message shows at start and from /modsters', async ($, on) => {
     on('session.start', ($, e) => ({ cwd: e.cwd }))
     on('command.register', ($, e) => ({ value: { command: e.name } }))
-    stubContentFs(on, {})
+    const { toasts } = stubContentFs(on, {})
     await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' } as any)
 
-    const result = await $.command.run({ command: 'modsters' } as any)
-    expect(result).toEqual({ text: 'Modster Hunter is loaded · No biomes yet' })
+    const message = 'No biomes to play: every biome is disabled or failed to load'
+    expect(toasts).toEqual([`Modster Hunter: ${message}`])
+    const result = (await $.command.run({ command: 'modsters' } as any)) as { text: string }
+    expect(result.text).toBe(`Modster Hunter is loaded · ${message}`)
+  })
+
+  test('user content loads from ~/.claude/modster-hunter/content, PNG sprites included (0007, 0015)', { options: { includeBuiltins: false } }, async ($, on) => {
+    on('session.start', ($, e) => ({ cwd: e.cwd }))
+    on('command.register', ($, e) => ({ value: { command: e.name } }))
+    const user = userPngMeadow()
+    // Built-ins are off, so the user's biome is the only one to pick
+    stubContentFs(on, twoBiomes(), user)
+    await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' } as any)
+
+    const result = (await $.command.run({ command: 'modsters' } as any)) as { text: string }
+    expect(result.text).toBe("Modster Hunter is loaded · You're in Pixel Meadow")
+    // The decoded sheet is cached for the next session
+    expect(JSON.parse(user['cache/sprites/blobby.sprite.json'] ?? '{}')).toMatchObject({ v: 1, source: { frames: 2 }, sprite: { width: 8, height: 8 } })
+  })
+
+  test('with built-ins off and no user biome, the message names the user folder', { options: { includeBuiltins: false } }, async ($, on) => {
+    on('session.start', ($, e) => ({ cwd: e.cwd }))
+    on('command.register', ($, e) => ({ value: { command: e.name } }))
+    stubContentFs(on, twoBiomes())
+    await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' } as any)
+
+    const result = (await $.command.run({ command: 'modsters' } as any)) as { text: string }
+    expect(result.text).toBe(
+      'Modster Hunter is loaded · No biomes to play: built-in content is off and no biome in ~/.claude/modster-hunter/content/ loaded',
+    )
   })
 
   test('the biome picked at session start stays after /clear, /resume and /branch', async ($, on) => {
