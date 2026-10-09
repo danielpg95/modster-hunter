@@ -21,20 +21,24 @@ them in the same PR.
 
 The core rule: **game logic never touches `$`.** Everything that decides
 something is a pure function or a pure state machine, tested without a session.
-Thin adapters connect it to Claude Code.
+
+The engine follows `$` only into functions declared in the same file, so every
+`$` call lives in `register.ts` (decision [0013](decisions/0013-host-calls-in-register.md)).
+Modules that need the host take a **port**, a small interface of plain async
+functions (e.g. `ContentReader`), which `register.ts` builds from `$` and tests
+replace with in-memory fakes.
 
 ```
 plugin/
 ├── .claude-plugin/plugin.json
 ├── hooks/
 │   ├── hooks.json
-│   ├── register.ts          # wiring only: on(...) calls that hand events to adapters
+│   ├── register.ts          # wiring: on(...) calls, and the only file that calls $ (builds ports)
 │   ├── constants.ts         # tunables: tier table, timings, limits (one place)
-│   ├── content/             # pure: schema types, validate, merge  | adapter: load via $.fs
+│   ├── content/             # pure: schema types, validate, load through a ContentReader port, merge
 │   ├── game/                # pure: random source, rarity resolver, encounter machine, scheduler
 │   ├── render/              # pure: pixels → Raster cells, band and pane trees from state
-│   ├── store/               # adapter: collection + stats in $.store, migrations
-│   └── adapters/            # the only code besides register.ts that calls $
+│   └── store/               # pure: collection + stats over a store port, migrations
 ├── content/                 # built-in biomes and Modsters (see CONTENT_FORMAT.md)
 ├── skills/                  # user-facing skills shipped with the mod (P4-04)
 ├── tests/                   # *.test.ts mirroring hooks/ paths, run by `claude plugin test`

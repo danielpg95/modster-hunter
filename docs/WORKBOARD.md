@@ -17,11 +17,12 @@ this file lists only tasks someone has claimed.
 | --- | --- | --- | --- | --- | --- | --- |
 | P2-02 | @victor-aguilars | in-progress | p2-02-sprite-converter | 2026-10-08 | 2026-10-08 | Add spriteFromSheet in plugin/hooks/content/ and tools/sprite.mjs |
 | P0-04 | @victor-aguilars | in-progress | p0-04-ci | 2026-10-08 | 2026-10-08 | Add validate and test jobs to .github/workflows/ci.yml |
-| P2-03 | @victor-aguilars | in-progress | p2-03-content-loader | 2026-10-08 | 2026-10-08 | Add loadContent(reader) in plugin/hooks/content/ and a $.fs adapter |
 
 ## Up next
 
 Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
+- **P2-04** — Biome selection per session
 - **P2-06** — Encounter state machine
+- **P4-01** — User content folder and merge

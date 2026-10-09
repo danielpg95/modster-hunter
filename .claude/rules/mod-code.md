@@ -14,7 +14,9 @@ paths:
 - **Layering** (docs/ARCHITECTURE.md):
   - `content/`, `game/`, `render/` are pure: no `$`, no clock, no `Math.random`.
     Time and randomness are passed in.
-  - Only `register.ts` and `adapters/` call `$`. `store/` calls `$.store` only.
+  - Only `register.ts` calls `$`: the engine won't follow `$` across an import
+    (decision 0013). Other modules take a port (plain async functions) that
+    `register.ts` builds from `$`.
 - **One concept per file**, named after its main export in kebab-case
   (`encounter-machine.ts` exports `encounterMachine`/`EncounterMachine`). Folders
   get an `index.ts` re-export when they hold more than one file.

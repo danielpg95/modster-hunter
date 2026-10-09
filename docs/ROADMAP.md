@@ -139,13 +139,13 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [ ] Frames outside the 0012 bounds (width 8–24, height 8–12, even) fail with a hint.
   - [ ] Output passes the P2-01 validator.
 
-#### [ ] P2-03 — Content loader (built-in only)
+#### [x] P2-03 — Content loader (built-in only)
 - **Depends on:** P2-01
 - **Size:** M
 - **Goal:** load `plugin/content/` at `session.start` via `$.fs`, validated, into an in-memory registry.
 - **Done when:**
-  - [ ] Invalid files are skipped and listed, never crash the mod.
-  - [ ] Loading stays under the 10 s hook budget for 50 Modsters (measured).
+  - [x] Invalid files are skipped and listed, never crash the mod.
+  - [x] Loading stays under the 10 s hook budget for 50 Modsters (measured).
 
 #### [ ] P2-04 — Biome selection per session
 - **Depends on:** P2-03
@@ -185,7 +185,7 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
 #### [ ] P2-08 — Collection storage
 - **Depends on:** P2-06
 - **Size:** S
-- **Goal:** decision 0009.
+- **Goal:** decision 0009, over a store port built in `register.ts` (decision 0013).
 - **Done when:**
   - [ ] Catch writes `caught:<id>` with re-read-before-write; stats counters written.
   - [ ] Tested with `mock.store`, including a simulated second session writing in between.
