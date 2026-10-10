@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "twiggle",
+  "name": "Twiggle",
+  "description": "Rolls wherever the wind goes. Peeks out only when it thinks nobody is looking.",
+  "rarity": null,
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 5,
+    "types": ["grass", "ghost"],
+    "category": "Tumbleweed Modster",
+    "heightM": 0.6,
+    "weightKg": 0.3,
+    "entry": "Travelers say each Twiggle is the wish of someone who got lost in the dunes. It rolls on, looking for the way home they never found."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 4
+  }
+}

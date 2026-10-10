@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "hootlet",
+  "name": "Hootlet",
+  "description": "Sleeps all day with one eye open. The open eye is also asleep.",
+  "rarity": null,
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 2,
+    "types": ["grass"],
+    "category": "Owlet Modster",
+    "heightM": 0.3,
+    "weightKg": 0.9,
+    "entry": "Forest Modsters trust it to keep watch at night. It never stays awake, but the trees don't need to know that."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 4
+  }
+}

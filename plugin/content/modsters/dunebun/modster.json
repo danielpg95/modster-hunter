@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "dunebun",
+  "name": "Dunebun",
+  "description": "Hears you coming from three dunes away. Pretends it didn't.",
+  "rarity": null,
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 1,
+    "types": ["ground"],
+    "category": "Sand Hare Modster",
+    "heightM": 0.4,
+    "weightKg": 2.8,
+    "entry": "It naps buried in warm sand with only its ears showing. The ears turn toward every sound, so a hidden Dunebun always knows you're there first."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 4
+  }
+}

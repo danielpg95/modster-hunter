@@ -6,6 +6,7 @@
   "accentColor": "#4caf50",
   "encounterEverySec": [10, 30],
   "modsters": [
+    { "id": "hootlet", "weight": 100 },
     { "id": "sproutling", "weight": 120 },
     { "id": "mossbeast", "weight": 25 },
     { "id": "acornsprite", "weight": 6 },

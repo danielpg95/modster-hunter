@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "serpentide",
+  "name": "Serpentide",
+  "description": "Small now, but sailors still steer around the ripples it makes.",
+  "rarity": null,
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 7,
+    "types": ["water", "dragon"],
+    "category": "Sea Serpent Modster",
+    "heightM": 2.5,
+    "weightKg": 60,
+    "entry": "Fishers say the tides grow a little higher every year it lives. When it is grown, they say, it will carry the whole bay on its back."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 4
+  }
+}

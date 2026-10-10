@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "sunmane",
+  "name": "Sunmane",
+  "description": "It only appears at noon, when the dunes have no shadows to hide in.",
+  "rarity": null,
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 4,
+    "types": ["fire"],
+    "category": "Sun Lion Modster",
+    "heightM": 3.2,
+    "weightKg": 640,
+    "entry": "Old desert tales say it carries the sun up over the dunes each morning. On cloudy days it is said to be sulking."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 8
+  }
+}
