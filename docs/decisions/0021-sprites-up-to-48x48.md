@@ -13,8 +13,9 @@ While making the official roster (P2-09), small creatures worked well at that
 size: Dunebun, Hootlet and Crabbit read clearly. Large or majestic ones didn't.
 A legendary lion, Sunmane, went through five versions at 24×12. Each one read
 as "a dog", because a 12-pixel height leaves about 6 rows for a face. The same
-lion at 32×24 read as a lion, with a flame mane that animates well
-([24×12](0021/sunmane-24x12.png), [32×24](0021/sunmane-32x24.png)). An earlier
+lion at 32×24 read as a lion, with a flame mane that animates well. Drawn
+without a canvas edge cutting the flames, it is 33×30
+([24×12](0021/sunmane-24x12.png), [33×30](0021/sunmane-33x30.png)). An earlier
 attempt (Cragmaw, a large armored beast) failed at 24×12 for the same reason.
 
 @victor-aguilars doesn't want the size to limit what Modsters can be, so this
