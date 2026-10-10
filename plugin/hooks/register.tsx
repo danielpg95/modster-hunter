@@ -73,18 +73,30 @@ export const register: Register = (on, options) => {
   })
 
   on('turn.start', async ($, e, next) => {
-    await advanceMachine($, 'turnStart')
+    await advanceMachine($, { type: 'turnStart' })
     const at = await $.clock.now()
     queueWrite($, (store) => recordStat(store, sessionId, { kind: 'turn', at }))
     return next(e)
   })
 
   on('turn.complete', async ($, e, next) => {
-    await advanceMachine($, 'turnEnd')
+    await advanceMachine($, { type: 'turnEnd' })
+    return next(e)
+  })
+
+  // Background subagents count as work time, so Modsters can appear while you wait on them (0018)
+  on('classic.SubagentStart', async ($, e, next) => {
+    await advanceMachine($, { type: 'agentStart', agentId: e.agent_id })
+    return next(e)
+  })
+
+  on('classic.SubagentStop', async ($, e, next) => {
+    await advanceMachine($, { type: 'agentStop', agentId: e.agent_id })
     return next(e)
   })
 
   on('session.end', async ($, e, next) => {
+    await advanceMachine($, { type: 'sessionEnd' })
     stopTimers()
     // Let queued writes land, within the 1.5 s session.end budget (ARCHITECTURE.md)
     await Promise.race([pendingWrites, $.clock.sleep(1000)])
@@ -141,7 +153,7 @@ export const register: Register = (on, options) => {
               hotkey="1"
               plain
               onPress={() => {
-                void advanceMachine($, 'throw')
+                void advanceMachine($, { type: 'throw' })
               }}
             />
           ) : (
@@ -192,7 +204,7 @@ export const register: Register = (on, options) => {
         <Text bold {...(biome?.accentColor ? { color: biome.accentColor } : {})}>
           {biome ? biome.name : 'No biome'}
         </Text>
-        <Text dimColor>{machine?.turnRunning ? ' · Claude is working' : ' · waiting for work'}</Text>
+        <Text dimColor>{workingLabel(machine)}</Text>
       </Box>
     )
     if (!encounter || !modster) {
@@ -235,7 +247,7 @@ export const register: Register = (on, options) => {
               label="Throw"
               hotkey="1"
               onPress={() => {
-                void advanceMachine($, 'throw')
+                void advanceMachine($, { type: 'throw' })
               }}
             />
           ) : (
@@ -332,15 +344,25 @@ function startMachine($: EngineInterface, idleTimeoutSec: number): void {
   machine = startEncounters(machineContext)
   // Timers start in session.start, never at module top level (mod-code rule)
   tickTimer = $.clock.every(BAND.tickMs, () => {
-    void advanceMachine($, 'tick')
+    void advanceMachine($, { type: 'tick' })
   })
 }
 
+/** The pane header's note on what's running; ticks drop agents past their cap within `BAND.tickMs`. */
+function workingLabel(state: EncounterState | undefined): string {
+  if (state?.turnRunning) return ' · Claude is working'
+  if (state && Object.keys(state.agents).length > 0) return ' · agents are working'
+  return ' · waiting for work'
+}
+
+/** An encounter input before the clock stamps it (distributes over the union, so `agentId` stays). */
+type MachineAction = EncounterInput extends infer I ? (I extends { now: number } ? Omit<I, 'now'> : never) : never
+
 /** Steps the machine at the clock's now and redraws the band when anything changed. */
-async function advanceMachine($: EngineInterface, type: EncounterInput['type']): Promise<void> {
+async function advanceMachine($: EngineInterface, action: MachineAction): Promise<void> {
   if (!machine || !machineContext) return
   const now = await $.clock.now()
-  const step = stepEncounter(machine, { type, now }, machineContext)
+  const step = stepEncounter(machine, { ...action, now } as EncounterInput, machineContext)
   if (step.state === machine) return
   machine = step.state
   $.ui.invalidate('ui.render')

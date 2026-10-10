@@ -1,6 +1,7 @@
 export {
   startEncounters,
   stepEncounter,
+  isWorking,
   workTime,
   type Encounter,
   type EncounterContext,
