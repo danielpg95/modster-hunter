@@ -56,7 +56,7 @@ Chosen: 1a, 2a, 3a.
    | `showInBand` | boolean | `true` | Draw the game in the band above the prompt |
    | `encounterPane` | string: `off`, `when-opened`, `always` | `when-opened` | When the encounter pane opens |
    | `showInSpinner` | boolean | `true` | Name the Modster in the spinner line while Claude works |
-   | `showInStatusLine` | boolean | `true` | Pin the biome and encounter in the status line |
+   | `showInStatusLine` | boolean | `true` | Show the encounter in the status line while one is up |
 
    The band and the pane keep today's behaviour by default. The spinner and
    the status line are **on by default** (@danielpg95's call): every player
@@ -97,12 +97,12 @@ Chosen: 1a, 2a, 3a.
    `Mossling caught!`). Between encounters, and for other agents' spinner rows,
    it leaves the spinner alone. Elapsed time and tokens stay the engine's.
 
-6. **Status line** (`showInStatusLine`): one line through `$.ui.status`.
-   Between encounters `Modster Hunter · <biome name>`; during one
+6. **Status line** (`showInStatusLine`): one line through `$.ui.status`,
+   **only while an encounter is up** (@danielpg95's call): from the appearance
    `<name> (<tier>) · <n> left · 1: Throw in the band or pane`, then the result
-   for the result time (0014). Cleared at `session.end`, and on load when the
-   setting is `false`. On by default, so this line is pinned for every player
-   unless they turn it off.
+   for the result time (0014). Between encounters the line is cleared, so
+   nothing is pinned under the prompt while there's no Modster. Also cleared
+   at `session.end`, and on load when the setting is `false`.
 
 7. **Finding the settings:** the `/modsters` reply ends with
    `· Change where the game shows in /config`. In-game controls for these
@@ -121,7 +121,7 @@ Chosen: 1a, 2a, 3a.
 - When accepted: 0002's, 0015's and 0019's status lines name 0023, and
   `CLAUDE.md` golden rule 6 and `docs/DEVELOPMENT.md` mention `always`.
 - The defaults change what existing players see: after updating, the spinner
-  and the status line show the game until turned off. The CHANGELOG (P5-07)
+  and the status line show encounters until turned off. The CHANGELOG (P5-07)
   should say so.
 - P5-08's roadmap entry said "the default (band only, as today)"; it now says
   band, spinner and status line on, pane `when-opened`.
