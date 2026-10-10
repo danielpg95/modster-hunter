@@ -29,6 +29,17 @@ export const BAND = {
   tickMs: 250,
 } as const
 
+/** Where the game shows, decision 0023 point 1: the `userConfig` defaults and the pane picker's values. */
+export const DISPLAY = {
+  encounterPaneModes: ['off', 'when-opened', 'always'],
+  defaults: {
+    showInBand: true,
+    encounterPane: 'when-opened',
+    showInSpinner: true,
+    showInStatusLine: true,
+  },
+} as const
+
 /** Content file bounds: docs/CONTENT_FORMAT.md (schema version 1), decisions 0004, 0007 and 0012. */
 export const CONTENT = {
   schemaVersion: 1,
