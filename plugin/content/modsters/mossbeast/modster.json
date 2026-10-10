@@ -9,7 +9,7 @@
   "shinyChance": null,
   "dex": {
     "number": 2,
-    "type": "grass",
+    "types": ["grass"],
     "category": "Moss Modster",
     "heightM": 0.6,
     "weightKg": 14.5,

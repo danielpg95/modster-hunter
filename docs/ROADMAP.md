@@ -263,14 +263,14 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [ ] A 48×48 sprite animates at 8 fps without flicker in a real terminal (checked by hand, noted in the handoff).
   - [x] CONTENT_FORMAT.md and the `add-modster` skill describe the bounds, where each size shows, and recommend ≤ 24×12 unless a Modster needs more.
 
-#### [ ] P2-17 — Up to two types
+#### [x] P2-17 — Up to two types
 - **Depends on:** P2-13
 - **Size:** S
 - **Goal:** decision 0022: `dex.types` (1–2 types, first one primary) replaces `dex.type`.
 - **Done when:**
-  - [ ] Unit tests: one and two types are valid; zero, three, a repeat, an unknown type and the old `dex.type` are errors, the last one naming `types`.
-  - [ ] `npm run check:content` requires `types` for built-in Modsters; the four placeholders use `types`.
-  - [ ] CONTENT_FORMAT.md, the `modster.json` template and the `add-modster` skill describe `types`.
+  - [x] Unit tests: one and two types are valid; zero, three, a repeat, an unknown type and the old `dex.type` are errors, the last one naming `types`.
+  - [x] `npm run check:content` requires `types` for built-in Modsters; the four placeholders use `types`.
+  - [x] CONTENT_FORMAT.md, the `modster.json` template and the `add-modster` skill describe `types`.
 
 ---
 

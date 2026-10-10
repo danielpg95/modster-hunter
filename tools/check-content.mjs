@@ -48,7 +48,7 @@ for (const [id, { sprite }] of content.modsters) {
   }
 }
 
-const DEX_FIELDS = ['number', 'type', 'category', 'heightM', 'weightKg', 'entry']
+const DEX_FIELDS = ['number', 'types', 'category', 'heightM', 'weightKg', 'entry']
 const numbers = new Map()
 for (const [id, { modster }] of content.modsters) {
   const missing = DEX_FIELDS.filter((field) => modster.dex?.[field] === undefined)
