@@ -244,13 +244,13 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [x] A `run` stats event is counted apart from flees (tested with an in-memory store; `mock.store` hides its contents).
   - [x] Band and pane show `2: Run` per 0020's layouts; render tests at `maxRows` 1, 2 and 7, including a narrow band where Run is left out and Throw stays.
 
-#### [ ] P2-14 — Reopen the encounter pane
+#### [x] P2-14 — Reopen the encounter pane
 - **Depends on:** P2-12
 - **Size:** S
 - **Goal:** decision 0019: the encounter pane reopens at session start for people who opened it, until they close it by hand.
 - **Done when:**
-  - [ ] `/modsters hunt` stores `prefs:huntPane` `{ v: 1, open: true }`; a close with origin `person` stores `open: false`; `plugin` and `unload` closes change nothing.
-  - [ ] `session.start` and `classic.SessionStart` reopen the pane when `open` is true, without focus; tested, including an unplaced pane (band keeps the encounter).
+  - [x] `/modsters hunt` stores `prefs:huntPane` `{ v: 1, open: true }`; a close with origin `person` stores `open: false`; `plugin` and `unload` closes change nothing (the close rule is unit-tested; the test engine has no `$.ui.close` to raise one).
+  - [x] `session.start` and `classic.SessionStart` reopen the pane when `open` is true, without focus; tested, including an unplaced pane (band keeps the encounter).
 
 
 #### [ ] P2-16 — Sprites up to 48×48
