@@ -225,14 +225,14 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [x] The band draws nothing while the pane is open, placed and shown, and takes the encounter back when it isn't.
   - [x] The mod never opens the pane by itself; render tests cover the pane and the band stepping aside.
 
-#### [ ] P2-15 — Run from an encounter
+#### [x] P2-15 — Run from an encounter
 - **Depends on:** P2-07, P2-08, P2-12
 - **Size:** S
 - **Goal:** decision 0020: a `2: Run` button lets the player end a waiting encounter; it ends as `ran`, with its own card and stats counter.
 - **Done when:**
-  - [ ] The machine accepts `run` only while waiting; it ends in a `ran` result card for the usual result time, then the normal countdown; fake-clock tests, including presses during appearing and the wobble being ignored.
-  - [ ] A `run` stats event is counted apart from flees (tested with `mock.store`).
-  - [ ] Band and pane show `2: Run` per 0020's layouts; render tests at `maxRows` 1, 2 and 7, including a narrow band where Run is left out and Throw stays.
+  - [x] The machine accepts `run` only while waiting; it ends in a `ran` result card for the usual result time, then the normal countdown; fake-clock tests, including presses during appearing and the wobble being ignored.
+  - [x] A `run` stats event is counted apart from flees (tested with an in-memory store; `mock.store` hides its contents).
+  - [x] Band and pane show `2: Run` per 0020's layouts; render tests at `maxRows` 1, 2 and 7, including a narrow band where Run is left out and Throw stays.
 
 #### [ ] P2-14 — Reopen the encounter pane
 - **Depends on:** P2-12
