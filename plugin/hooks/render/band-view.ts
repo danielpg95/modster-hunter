@@ -15,6 +15,8 @@ export interface BandEncounter {
   attemptsLeft: number
   spriteWidth: number
   spriteHeight: number
+  /** The collection had this Modster when it appeared (P5-10) */
+  alreadyCaught?: true
 }
 
 export interface BandInput {
@@ -104,6 +106,12 @@ export function resultText(e: BandEncounter): string {
   return (resultLines(e)[0] ?? []).map((segment) => ('text' in segment ? segment.text : '')).join('')
 }
 
+/** The name, bold, then the caught mark when the Modster is already in the collection (P5-10). */
+function nameSegments(e: BandEncounter, text = e.name): BandSegment[] {
+  const name: BandSegment = { text, bold: true }
+  return e.alreadyCaught ? [name, { text: ` ${BAND.caughtMark}` }] : [name]
+}
+
 const left = (n: number): string => `${n} ${n === 1 ? 'throw' : 'throws'} left`
 
 function resultLines(e: BandEncounter): BandLine[] {
@@ -115,7 +123,7 @@ function resultLines(e: BandEncounter): BandLine[] {
 
 // Full layout: beside the sprite, one line each for name and tier, throws left, and Throw and Run
 function fullLines(e: BandEncounter): BandLine[] {
-  const title: BandLine = [{ text: e.name, bold: true }, { text: ` · ${e.tier}`, dim: true }]
+  const title: BandLine = [...nameSegments(e), { text: ` · ${e.tier}`, dim: true }]
   switch (e.phase) {
     case 'appearing':
       return [title, [{ text: 'appeared!' }]]
@@ -131,7 +139,12 @@ function fullLines(e: BandEncounter): BandLine[] {
 
 // Compact layout: no sprite, at most 2 lines
 function compactLines(e: BandEncounter, columns: number): BandLine[] {
-  const wild: BandLine = [{ text: `A wild ${e.name} appeared!`, bold: true }, { text: ` (${e.tier})`, dim: true }]
+  const wild: BandLine = [
+    ...(e.alreadyCaught
+      ? [...nameSegments(e, `A wild ${e.name}`), { text: ' appeared!', bold: true } as const]
+      : [{ text: `A wild ${e.name} appeared!`, bold: true } as const]),
+    { text: ` (${e.tier})`, dim: true },
+  ]
   switch (e.phase) {
     case 'appearing':
       return [wild]
@@ -148,7 +161,7 @@ function compactLines(e: BandEncounter, columns: number): BandLine[] {
 
 // One row: everything on a single line
 function singleLine(e: BandEncounter, columns: number): BandLine {
-  const who: BandSegment[] = [{ text: e.name, bold: true }, { text: ` (${e.tier})`, dim: true }]
+  const who: BandSegment[] = [...nameSegments(e), { text: ` (${e.tier})`, dim: true }]
   switch (e.phase) {
     case 'appearing':
       return [...who, { text: ' appeared!' }]

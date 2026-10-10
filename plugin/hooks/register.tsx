@@ -19,7 +19,7 @@ import {
   type EncounterState,
 } from './game'
 import { BAND_BUTTONS, bandView, displayPlan, readDisplaySettings, spriteCells, type BandEncounter, type BandLine, type DisplayPlan } from './render'
-import { HUNT_PANE_KEY, huntPanePref, prefAfterClose, readHuntPaneOpen, recordEncounterEvents, recordStat, type StorePort } from './store'
+import { HUNT_PANE_KEY, huntPanePref, isCaught, prefAfterClose, readHuntPaneOpen, recordEncounterEvents, recordStat, type StorePort } from './store'
 
 // Rebuilt at every session start; cheap, so it isn't kept in $.state (ARCHITECTURE.md)
 let content: ContentRegistry | undefined
@@ -61,6 +61,10 @@ const PANE_ID = 'modster-hunt'
 let display = readDisplaySettings({})
 // What the status line shows now, so a tick that changes nothing doesn't re-pin it
 let shownStatus: string | undefined
+/** The collection had the current Modster when it appeared (P5-10); read once per encounter */
+let alreadyCaught = false
+/** Bumped on every appearance, so a slow read never marks a later encounter */
+let caughtCheck = 0
 
 // Points people to the settings until the collection pane has its own (0023 point 7)
 const CONFIG_HINT = ' · Change where the game shows in /config'
@@ -146,7 +150,8 @@ export const register: Register = (on, options) => {
       showIdleLine,
       // The band turned off still keeps Throw on screen during an encounter (0023 point 3)
       ...(currentPlan().band === 'one-row' ? { oneRow: true } : {}),
-      ...(band ? { encounter: band } : {}),
+      // The caught mark is the band's alone (P5-10); the pane draws the encounter without it
+      ...(band ? { encounter: alreadyCaught ? { ...band, alreadyCaught: true } : band } : {}),
       ...(biome ? { biome: biome.accentColor ? { name: biome.name, accentColor: biome.accentColor } : { name: biome.name } } : {}),
     })
 
@@ -375,6 +380,7 @@ function startMachine($: EngineInterface, idleTimeoutSec: number): void {
   stopTimers()
   machine = undefined
   machineContext = undefined
+  alreadyCaught = false
   cellsByModster.clear()
   const biome = biomeId === undefined ? undefined : content?.biomes.get(biomeId)?.biome
   if (!content || !biome) return
@@ -412,6 +418,24 @@ async function advanceMachine($: EngineInterface, action: MachineAction): Promis
   updateStatus($)
   const where = { sessionId, biomeId: machineContext.biome.id }
   if (step.events.length > 0) queueWrite($, (store) => recordEncounterEvents(store, where, step.events, now))
+  const appeared = step.events.find((event) => event.type === 'appeared')
+  if (appeared) checkAlreadyCaught($, appeared.modsterId)
+}
+
+/**
+ * Reads whether the collection has `modsterId`, once, as it appears (P5-10).
+ * Queued after earlier writes so the last encounter's catch counts; a catch in
+ * this encounter doesn't add the mark until the next one.
+ */
+function checkAlreadyCaught($: EngineInterface, modsterId: string): void {
+  alreadyCaught = false
+  const check = ++caughtCheck
+  queueWrite($, async (store) => {
+    const caught = await isCaught(store, modsterId)
+    if (!caught || check !== caughtCheck) return
+    alreadyCaught = true
+    $.ui.invalidate('ui.render')
+  })
 }
 
 /** Runs a store write after the ones before it; a failure is logged, never thrown at the game. */
