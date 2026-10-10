@@ -53,11 +53,12 @@ plugin/
 | `session.start` | Register `/modsters`, load content, pick the biome, restore `$.state` |
 | `classic.SessionStart` (`clear`, `resume`, `fork`) | Re-copy stored values into `$.state` (reset by those commands) |
 | `turn.start` / `turn.complete` | Tell the scheduler a turn is running / ended |
+| `classic.SubagentStart` / `classic.SubagentStop` | Tell the scheduler a subagent is running / stopped, by `agent_id`; work time includes it (0018) |
 | `ui.render` `{ component: 'AbovePrompt' }` | Draw the encounter or idle line |
 | `ui.render` `{ component: 'Pane' }` (our id) | Draw the collection pane (P3), or the encounter pane `modster-hunt` (0015) |
 | `ui.close` | The encounter pane closed: redraw so the band takes the encounter back (0015) |
 | `command.run` `{ command: 'modsters' }` | Open the pane; `hunt` opens the encounter pane (0015); subcommands like `reload` |
-| `session.end` | Stop timers, flush stats (≤ 1.5 s total budget) |
+| `session.end` | Clear running turn and subagents, stop timers, flush stats (≤ 1.5 s total budget) |
 
 ## Where state lives
 

@@ -1,6 +1,6 @@
 # 0005 — An encounter lingers after the turn ends, until resolved or idle timeout
 
-- **Status:** Accepted
+- **Status:** Accepted, amended by 0018 (new encounters spawn during any work time, including subagents)
 - **Date:** 2026-10-07
 - **Decided by:** @danielpg95 (accepted Claude's suggestion)
 
