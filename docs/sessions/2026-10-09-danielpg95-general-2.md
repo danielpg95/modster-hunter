@@ -15,7 +15,7 @@ Check whether issue #35 changed anything in the P1-05/P1-06 work, and record the
 - Decision 0018: background subagents count as work time (from the #34 draft, renumbered; 0016 and 0017 are taken).
 - Decision 0019: the encounter pane reopens for people who opened it, until they close it by hand.
 - Status lines and index updated for 0002, 0005, 0014, 0015. `CLAUDE.md` golden rule 6 and `docs/DEVELOPMENT.md` mention the 0019 exception.
-- Roadmap: P2-11 and P2-14 added; "Up next" refreshed. `node tools/check-tracking.mjs` passes.
+- Roadmap: P2-11, P2-14 and P5-08 (display settings) added; "Up next" refreshed. `node tools/check-tracking.mjs` passes.
 
 ## Decisions made
 
@@ -33,8 +33,9 @@ Check whether issue #35 changed anything in the P1-05/P1-06 work, and record the
 
 ## Open questions
 
-- P5-08 (display settings: band, pane, spinner, status) from #35 is still not on the roadmap. Add it? — @danielpg95.
+- None. P5-08 (display settings) was added at @danielpg95's request; its option shape is left to a decision inside the task.
 
 ## Found along the way
 
-- Local leftovers in the main checkout (not in git): `spikes/` (generated types, probe `node_modules/`, large fixtures) and an untracked `pnpm-lock.yaml` while the repo commits `package-lock.json`.
+- Local `spikes/` leftovers in the main checkout (generated types, probe `node_modules/`, large fixtures; nothing tracked) were deleted, as @danielpg95 left it to Claude.
+- An untracked `pnpm-lock.yaml` sits in the main checkout while the repo commits `package-lock.json`; left as is.
