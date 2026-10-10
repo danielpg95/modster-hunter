@@ -7,6 +7,7 @@
   "encounterEverySec": [10, 30],
   "modsters": [
     { "id": "dunebun", "weight": 100 },
+    { "id": "twiggle", "weight": 20 },
     { "id": "sunmane", "weight": 4 }
   ]
 }
