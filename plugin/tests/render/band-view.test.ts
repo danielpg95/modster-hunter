@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { bandRows, bandView, type BandEncounter, type BandInput, type BandLine } from '../../hooks/render'
+import { BAND_BUTTONS, bandRows, bandView, lineWidth, type BandEncounter, type BandInput, type BandLine } from '../../hooks/render'
 
 const encounter = (overrides: Partial<BandEncounter> = {}): BandEncounter => ({
   phase: 'waiting',
@@ -19,7 +19,8 @@ const input = (overrides: Partial<BandInput> = {}): BandInput => ({
   showIdleLine: true,
   ...overrides,
 })
-const text = (line: BandLine): string => line.map((segment) => ('button' in segment ? '[1: Throw]' : segment.text)).join('')
+const text = (line: BandLine): string =>
+  line.map((segment) => ('button' in segment ? `[${BAND_BUTTONS[segment.button].hotkey}: ${BAND_BUTTONS[segment.button].label}]` : segment.text)).join('')
 
 const PHASES: Partial<BandEncounter>[] = [
   { phase: 'appearing' },
@@ -28,6 +29,7 @@ const PHASES: Partial<BandEncounter>[] = [
   { phase: 'result', outcome: 'caught' },
   { phase: 'result', outcome: 'fled', fledBecause: 'attempts', attemptsLeft: 0 },
   { phase: 'result', outcome: 'fled', fledBecause: 'idle' },
+  { phase: 'result', outcome: 'ran' },
 ]
 const SPRITES = [
   { spriteWidth: 12, spriteHeight: 12 },
@@ -55,14 +57,14 @@ describe('bandView', () => {
     expect(bandView(input({ maxRows: 0 }))).toEqual({ kind: 'none' })
   })
 
-  test('maxRows 1 is a single line with the button', () => {
+  test('maxRows 1 is a single line with both buttons (0020)', () => {
     const view = bandView(input({ maxRows: 1 }))
-    expect(view.kind === 'compact' && view.lines.map(text)).toEqual(['Sproutling (common) · [1: Throw] · 3 left'])
+    expect(view.kind === 'compact' && view.lines.map(text)).toEqual(['Sproutling (common) · [1: Throw] · [2: Run] · 3 left'])
   })
 
   test('maxRows 2 is the compact layout: no sprite, two lines', () => {
     const view = bandView(input({ maxRows: 2 }))
-    expect(view.kind === 'compact' && view.lines.map(text)).toEqual(['A wild Sproutling appeared! (common)', '[1: Throw] · 3 left'])
+    expect(view.kind === 'compact' && view.lines.map(text)).toEqual(['A wild Sproutling appeared! (common)', '[1: Throw] · [2: Run] · 3 left'])
   })
 
   test('maxRows 5 is still compact for a 12 px tall sprite (6 rows)', () => {
@@ -73,7 +75,7 @@ describe('bandView', () => {
     expect(bandView(input({ maxRows: 5, encounter: encounter({ spriteWidth: 20, spriteHeight: 10 }) })).kind).toBe('full')
   })
 
-  test('maxRows 6 and 7 use the full layout: sprite, then name, throws left and the button', () => {
+  test('maxRows 6 and 7 use the full layout: sprite, then name, throws left and the buttons', () => {
     for (const maxRows of [6, 7]) {
       const view = bandView(input({ maxRows }))
       expect(view).toEqual({
@@ -83,7 +85,7 @@ describe('bandView', () => {
         lines: [
           [{ text: 'Sproutling', bold: true }, { text: ' · common', dim: true }],
           [{ text: '3 throws left', dim: true }],
-          [{ button: 'throw' }],
+          [{ button: 'throw' }, { text: '   ' }, { button: 'run' }],
         ],
       })
     }
@@ -96,6 +98,26 @@ describe('bandView', () => {
 
   test('off the terminal, no sprite: compact text (until P5-06)', () => {
     expect(bandView(input({ canDrawSprite: false })).kind).toBe('compact')
+  })
+
+  test('a band too narrow for both buttons leaves Run out and keeps Throw (0020)', () => {
+    const withRun = 'Sproutling (common) · [1: Throw] · [2: Run] · 3 left'
+    const withoutRun = 'Sproutling (common) · [1: Throw] · 3 left'
+    // Buttons are measured as drawn, `1: Throw`, without the test's brackets
+    const fits = withRun.length - 4
+    const one = (columns: number) => {
+      const view = bandView(input({ maxRows: 1, columns }))
+      return view.kind === 'compact' ? view.lines.map(text) : []
+    }
+    expect(one(fits)).toEqual([withRun])
+    expect(one(fits - 1)).toEqual([withoutRun])
+
+    const two = bandView(input({ maxRows: 2, columns: 20 }))
+    expect(two.kind === 'compact' && two.lines.map(text)[1]).toBe('[1: Throw] · 3 left')
+  })
+
+  test('a line is measured as the terminal draws it', () => {
+    expect(lineWidth([{ button: 'throw' }, { text: '   ' }, { button: 'run' }])).toBe('1: Throw   2: Run'.length)
   })
 
   test('the Throw button shows only while waiting (0014)', () => {
@@ -119,6 +141,7 @@ describe('bandView', () => {
     expect(lines({ phase: 'result', outcome: 'caught' })).toEqual(['Caught Sproutling!', 'common'])
     expect(lines({ phase: 'result', outcome: 'fled', fledBecause: 'attempts' })).toEqual(['Sproutling fled!', 'Better luck next time.'])
     expect(lines({ phase: 'result', outcome: 'fled', fledBecause: 'idle' })).toEqual(['Sproutling wandered off.'])
+    expect(lines({ phase: 'result', outcome: 'ran' })).toEqual(['You ran from Sproutling.'])
   })
 
   test('between encounters, the idle line names the biome in its accent color', () => {

@@ -24,6 +24,13 @@ describe('recordEncounterEvents', () => {
     expect(data['stats:s1']).toMatchObject({ flees: 1 })
   })
 
+  test('a run counts in stats as a run, not a flee, and touches no caught record (0020)', async () => {
+    const { store, data } = memoryStore()
+    await recordEncounterEvents(store, where, [appeared, { type: 'ran', modsterId: 'sproutling', tier: 'common' }], 1)
+    expect(Object.keys(data)).toEqual(['stats:s1'])
+    expect(data['stats:s1']).toMatchObject({ encounters: 1, runs: 1, flees: 0, biomes: { 'whispering-forest': { runs: 1, flees: 0 } } })
+  })
+
   test('a catch another session saved in between is kept (re-read before write)', async () => {
     const { store, data, onGet } = memoryStore()
     await recordEncounterEvents(store, where, [caught], 1_000)

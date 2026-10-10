@@ -11,6 +11,7 @@ import { resolveCatchOdds } from './resolve-catch-odds'
 //   idle ─(work time reaches the next spawn)→ appearing ─1 s→ waiting
 //   waiting ─throw→ throwing ─1.5 s→ caught → result
 //                                   └→ missed → waiting, or fled → result when no attempts are left
+//   waiting ─run→ ran → result (0020)
 //   appearing/waiting ─idle timeout→ fled → result ─4 s→ idle
 //
 // New encounters only spawn during work time: while a turn or any subagent runs
@@ -40,7 +41,7 @@ export interface Encounter {
   idleSince: number
   /** Rolled when the throw is made; revealed when the wobble ends */
   throwLands?: boolean
-  outcome?: 'caught' | 'fled'
+  outcome?: 'caught' | 'fled' | 'ran'
   fledBecause?: 'attempts' | 'idle'
 }
 
@@ -64,6 +65,7 @@ export type EncounterInput =
   | { type: 'sessionEnd'; now: number }
   | { type: 'tick'; now: number }
   | { type: 'throw'; now: number }
+  | { type: 'run'; now: number }
 
 /** What happened during a step, for storage and stats (P2-08). */
 export type EncounterEvent =
@@ -71,6 +73,7 @@ export type EncounterEvent =
   | { type: 'missed'; modsterId: string; attemptsLeft: number }
   | { type: 'caught'; modsterId: string; tier: Rarity }
   | { type: 'fled'; modsterId: string; tier: Rarity; because: 'attempts' | 'idle' }
+  | { type: 'ran'; modsterId: string; tier: Rarity }
 
 export interface EncounterStep {
   state: EncounterState
@@ -131,6 +134,14 @@ export function stepEncounter(state: EncounterState, input: EncounterInput, ctx:
             throwLands: ctx.random() < encounter.catchRate,
           },
         }
+      }
+      break
+    case 'run':
+      // Like a throw, only while waiting: a run can't cancel a throw already rolled (0020)
+      if (next.encounter?.phase === 'waiting') {
+        const encounter = next.encounter
+        events.push({ type: 'ran', modsterId: encounter.modsterId, tier: encounter.tier })
+        next = toResult(next, encounter, 'ran', undefined, input.now)
       }
       break
   }
@@ -222,7 +233,7 @@ function resolveDuePhase(state: EncounterState, now: number, ctx: EncounterConte
 function toResult(
   state: EncounterState,
   encounter: Encounter,
-  outcome: 'caught' | 'fled',
+  outcome: 'caught' | 'fled' | 'ran',
   because: 'attempts' | 'idle' | undefined,
   at: number,
 ): EncounterState {

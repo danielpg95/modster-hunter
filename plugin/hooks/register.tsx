@@ -18,7 +18,7 @@ import {
   type EncounterInput,
   type EncounterState,
 } from './game'
-import { bandView, spriteCells, type BandEncounter, type BandLine } from './render'
+import { BAND_BUTTONS, bandView, spriteCells, type BandEncounter, type BandLine } from './render'
 import { recordEncounterEvents, recordStat, type StorePort } from './store'
 
 // Rebuilt at every session start; cheap, so it isn't kept in $.state (ARCHITECTURE.md)
@@ -148,12 +148,12 @@ export const register: Register = (on, options) => {
         {segments.map((segment, at) =>
           'button' in segment ? (
             <Button
-              key="throw"
-              label="Throw"
-              hotkey="1"
+              key={segment.button}
+              label={BAND_BUTTONS[segment.button].label}
+              hotkey={BAND_BUTTONS[segment.button].hotkey}
               plain
               onPress={() => {
-                void advanceMachine($, { type: 'throw' })
+                void advanceMachine($, { type: segment.button })
               }}
             />
           ) : (
@@ -243,11 +243,11 @@ export const register: Register = (on, options) => {
         {segments.map((segment, at) =>
           'button' in segment ? (
             <Button
-              key="throw"
-              label="Throw"
-              hotkey="1"
+              key={segment.button}
+              label={BAND_BUTTONS[segment.button].label}
+              hotkey={BAND_BUTTONS[segment.button].hotkey}
               onPress={() => {
-                void advanceMachine($, { type: 'throw' })
+                void advanceMachine($, { type: segment.button })
               }}
             />
           ) : (
