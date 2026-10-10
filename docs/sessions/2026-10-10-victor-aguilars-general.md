@@ -22,7 +22,8 @@ Test the limits of what a Modster can look like by designing a legendary, then a
 
 ## Decisions made
 
-- @victor-aguilars chose to propose bigger sprites: up to 32×24, the compact text band where a sprite doesn't fit, and allowed for any Modster.
+- @victor-aguilars chose to propose bigger sprites: first up to 32×24, then raised to 48×48 ("I don't want to limit creativity"). Where a sprite doesn't fit, the compact text band shows. Any Modster may use them.
+- @victor-aguilars picked the three-quarter pose version of Sunmane as the one to use, not the front-facing v5.
 - Claude drafted the rest of 0021:
   - Only 0012 point 5's bounds change, because points 6–8 already choose a layout by fit.
   - No second sprite per Modster.

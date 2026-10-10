@@ -253,14 +253,16 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [ ] `session.start` and `classic.SessionStart` reopen the pane when `open` is true, without focus; tested, including an unplaced pane (band keeps the encounter).
 
 
-#### [ ] P2-16 — Sprites up to 32×24
+#### [ ] P2-16 — Sprites up to 48×48
 - **Depends on:** P2-01, P2-02, P2-07, P4-01
 - **Size:** S
-- **Goal:** decision 0021 (Proposed; start only once @danielpg95 accepts it): sprites may be 8–32 wide and 8–24 tall, and the band shows its compact layout where they don't fit.
+- **Goal:** decision 0021 (Proposed; start only once @danielpg95 accepts it): sprites may be 8–48 wide and 8–48 tall, and the band and pane show their compact layout where a sprite doesn't fit.
 - **Done when:**
-  - [ ] `CONTENT.sprite` bounds are 8–32 × 8–24; the validator, `tools/sprite.mjs` and user PNG sheets accept a 32×24 sprite and reject 34×24 and 32×26 (tests).
-  - [ ] Render tests: a 32×24 sprite shows the compact band at `maxRows` 7, the full band at 15, and full size in the encounter pane.
-  - [ ] CONTENT_FORMAT.md and the `add-modster` skill describe the new bounds and recommend ≤ 24×12 unless a Modster needs more.
+  - [ ] `CONTENT.sprite` bounds are 8–48 × 8–48; the validator, `tools/sprite.mjs` and user PNG sheets accept a 48×48 sprite and reject 50×48 and 48×50 (tests).
+  - [ ] Render tests: a 48×48 sprite shows the compact band at `maxRows` 7 and 15, full size in a pane with 26 body rows, and compact in a shorter pane.
+  - [ ] A 48×48 sprite animates at 8 fps without flicker in a real terminal (checked by hand, noted in the handoff).
+  - [ ] CONTENT_FORMAT.md and the `add-modster` skill describe the bounds, where each size shows, and recommend ≤ 24×12 unless a Modster needs more.
+
 ---
 
 ## Phase 3 — Collection pane

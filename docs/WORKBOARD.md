@@ -23,5 +23,5 @@ Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
 - **P2-14** — Reopen the encounter pane
-- **P2-16** — Sprites up to 32×24 (waits for decision 0021 to be accepted)
+- **P2-16** — Sprites up to 48×48 (waits for decision 0021 to be accepted)
 - **P4-04** — User-facing content skill

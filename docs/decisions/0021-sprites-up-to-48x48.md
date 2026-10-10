@@ -1,4 +1,4 @@
-# 0021 — Sprites up to 32×24; the compact band shows when they don't fit
+# 0021 — Sprites up to 48×48; the compact band shows when they don't fit
 
 - **Status:** Proposed — settled by @danielpg95 (amends 0012 point 5)
 - **Date:** 2026-10-10
@@ -17,6 +17,9 @@ lion at 32×24 read as a lion, with a flame mane that animates well
 ([24×12](0021/sunmane-24x12.png), [32×24](0021/sunmane-32x24.png)). An earlier
 attempt (Cragmaw, a large armored beast) failed at 24×12 for the same reason.
 
+@victor-aguilars doesn't want the size to limit what Modsters can be, so this
+proposes a generous cap rather than the smallest one that fixed Sunmane.
+
 Two things make a bigger limit cheap now:
 
 - 0012 already picks the band layout by fit at draw time (points 6–8). A sprite
@@ -29,11 +32,13 @@ Two things make a bigger limit cheap now:
 
 Size:
 
-1. **32×24.** Tested with Sunmane. 12 terminal rows, fits the full band from
-   about 120×40.
-2. **32×32.** Room for tall creatures, but 16 rows, more than most panes show.
-3. **48×24.** Very wide creatures, but 48 columns plus the text block rarely
-   fits beside it.
+1. **32×24.** Tested with Sunmane. 12 terminal rows, so it fits the full band
+   from about 120×40.
+2. **48×24.** Very wide creatures. Fits the band from about 120×40, if the
+   width allows the text block beside it.
+3. **48×48.** The most room: tall and wide creatures. 24 terminal rows, more
+   than any band measured (15 at 140×40), so these always show the compact
+   band and appear as pictures only in the panes.
 
 Where a big sprite doesn't fit:
 
@@ -48,29 +53,37 @@ Who may use them: any Modster, built-in only, or built-in legendaries only.
 
 ## Decision
 
-1. **Sprites may be 8–32 px wide and 8–24 px tall, height even.** This replaces
-   the bounds in 0012 point 5. A 24 px sprite uses 12 terminal rows.
+1. **Sprites may be 8–48 px wide and 8–48 px tall, height even.** This replaces
+   the bounds in 0012 point 5. A 48 px sprite uses 24 terminal rows.
 2. **Layouts are unchanged.** 0012 points 6–8 choose by fit at every draw: the
    full layout when `ceil(height / 2) ≤ maxRows` and the sprite, the gap and the
-   text block fit the width; otherwise the compact text layout. In an 80×24 band
-   (7 rows), a sprite taller than 14 px shows the compact layout. The encounter
-   pane uses the same rule (0015 point 1).
+   text block fit the width; otherwise the compact text layout. The encounter
+   pane uses the same rule (0015 point 1) with its body rows minus its header.
+   For example:
+   - At 80×24 (7 band rows), sprites up to 14 px tall show in the band.
+   - At 140×40 (15 band rows), sprites up to 30 px tall show in the band.
+   - A 48 px tall sprite never shows in the band; the pane needs about 26 body
+     rows for it.
 3. **Any Modster may use the bigger size,** built-in or user content, with the
    same rules. User PNG sheets (0016) follow the same bounds.
 4. **No second sprite.** A Modster has one sprite; where it doesn't fit, the
    compact text layout shows.
 5. **Small stays the default.** Content guidance (the `add-modster` skill)
-   recommends ≤ 24×12 so the sprite shows in the band of an 80×24 terminal, and
-   the bigger size for Modsters that need it, such as legendaries.
+   recommends ≤ 24×12 so the sprite shows in the band of an 80×24 terminal. It
+   suggests bigger sizes for Modsters that need them, such as legendaries, and
+   says where each size shows.
 6. `schemaVersion` stays `1`: every existing sprite stays valid.
 
 ## Consequences
 
 - New roadmap task P2-16: `CONTENT.sprite` bounds, which drive the validator,
-  the converter (`tools/sprite.mjs`) and the PNG decoder (0016). It adds tests
-  for a 32×24 sprite: valid, converted, the compact band at `maxRows` 7, the
-  full band at 15, and full size in the encounter pane. CONTENT_FORMAT.md and
-  the `add-modster` skill change too.
-- In small terminals, a big Modster shows no picture in the band. Players who
-  want to see it can open the encounter pane (`/modsters hunt`).
+  the converter (`tools/sprite.mjs`) and the PNG decoder (0016). Tests cover a
+  48×48 sprite: valid and converted; the compact band at `maxRows` 7 and 15;
+  full size in a pane with enough rows; compact in a shorter pane.
+  CONTENT_FORMAT.md and the `add-modster` skill change too.
+- The biggest Modsters are seen only by players who open the encounter pane
+  (`/modsters hunt`) in a tall terminal; everyone else sees the compact band.
+- Animation repaints more cells (48×24 per frame instead of 24×6). P1-03
+  measured smooth blits at 6–12 fps for small sprites; P2-16 checks a 48×48
+  sprite at 8 fps by hand.
 - If accepted, 0012's status line becomes "Accepted (amended by 0021)".
