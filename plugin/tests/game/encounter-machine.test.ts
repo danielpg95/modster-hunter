@@ -1,6 +1,14 @@
 import { describe, expect, test } from 'claude-code/testing'
 import type { Biome, Modster } from '../../hooks/content'
-import { startEncounters, stepEncounter, type EncounterContext, type EncounterInput, type EncounterState } from '../../hooks/game'
+import {
+  isWorking,
+  startEncounters,
+  stepEncounter,
+  workTime,
+  type EncounterContext,
+  type EncounterInput,
+  type EncounterState,
+} from '../../hooks/game'
 import { modsterNamed } from '../fixtures/modster-named'
 import { scriptedRandom } from '../fixtures/scripted-random'
 
@@ -40,6 +48,9 @@ function setup(...random: number[]) {
     at: (now: number) => ({
       turnStart: () => send({ type: 'turnStart', now }),
       turnEnd: () => send({ type: 'turnEnd', now }),
+      agentStart: (agentId: string) => send({ type: 'agentStart', now, agentId }),
+      agentStop: (agentId: string) => send({ type: 'agentStop', now, agentId }),
+      sessionEnd: () => send({ type: 'sessionEnd', now }),
       tick: () => send({ type: 'tick', now }),
       throw: () => send({ type: 'throw', now }),
     }),
@@ -250,6 +261,78 @@ describe('encounter machine', () => {
     let state = startEncounters(ctx)
     state = stepEncounter(state, { type: 'turnStart', now: 0 }, ctx).state
     expect(stepEncounter(state, { type: 'tick', now: 60 * S }, ctx).state.encounter).toBeUndefined()
+  })
+
+  // Background subagents count as work time (decision 0018)
+
+  test('a Modster appears while only a subagent runs', () => {
+    const game = setup(0, 0.1)
+    game.at(0).agentStart('a1')
+    game.at(10 * S - 1).tick()
+    expect(game.phase).toBe('idle')
+    expect(game.at(10 * S).tick()).toEqual([{ type: 'appeared', modsterId: 'sproutling', tier: 'common' }])
+  })
+
+  test('the countdown pauses when the last subagent stops and carries over', () => {
+    const game = setup(0, 0.1)
+    game.at(0).agentStart('a1')
+    game.at(6 * S).agentStop('a1') // 6 s of work
+    game.at(100 * S).tick()
+    expect(game.phase).toBe('idle')
+    game.at(200 * S).turnStart()
+    game.at(204 * S - 1).tick()
+    expect(game.phase).toBe('idle')
+    game.at(204 * S).tick()
+    expect(game.phase).toBe('appearing') // 10 s of work
+  })
+
+  test('overlapping turns and subagents count once', () => {
+    const game = setup(0, 0.1)
+    game.at(0).turnStart()
+    game.at(1 * S).agentStart('a1')
+    game.at(2 * S).agentStart('a2')
+    game.at(4 * S).turnEnd()
+    game.at(5 * S).agentStop('a1')
+    expect(workTime(game.state, 5 * S)).toBe(5 * S)
+    // Only a2 runs now; counted twice or three times, it would have spawned already
+    game.at(10 * S - 1).tick()
+    expect(game.phase).toBe('idle')
+    game.at(10 * S).tick()
+    expect(game.phase).toBe('appearing')
+  })
+
+  test('a subagent with no stop event stops counting after 30 minutes', () => {
+    const MIN = 60 * S
+    const game = setup(0, 0.1)
+    game.at(0).agentStart('lost')
+    expect(isWorking(game.state, 30 * MIN - 1)).toBe(true)
+    expect(isWorking(game.state, 30 * MIN)).toBe(false)
+    // The first tick comes late: by then nothing counts as running, so nothing appears
+    game.at(45 * MIN).tick()
+    expect(game.phase).toBe('idle')
+    expect(workTime(game.state, 45 * MIN)).toBe(30 * MIN)
+    expect(game.state.agents).toEqual({})
+    // The countdown was already past due, so the next turn brings the Modster at once
+    game.at(50 * MIN).turnStart()
+    expect(game.phase).toBe('appearing')
+  })
+
+  test('a stop for an unknown subagent changes nothing', () => {
+    const game = setup(0)
+    const before = game.state
+    game.at(5 * S).agentStop('never-started')
+    expect(game.state).toBe(before)
+  })
+
+  test('session end clears every running subagent and the turn', () => {
+    const game = setup(0, 0.1)
+    game.at(0).turnStart()
+    game.at(1 * S).agentStart('a1')
+    game.at(5 * S).sessionEnd()
+    expect([game.state.turnRunning, game.state.agents]).toEqual([false, {}])
+    game.at(60 * S).tick()
+    expect(game.phase).toBe('idle')
+    expect(workTime(game.state, 60 * S)).toBe(5 * S)
   })
 
   test('the state is never changed in place', () => {

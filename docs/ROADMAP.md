@@ -208,13 +208,13 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [ ] At least 2 people played ≥ 1 hour of real work each; feedback in the phase review.
   - [ ] Tier defaults in 0004 tuned (amend via a new decision if numbers change).
 
-#### [ ] P2-11 — Background agents count as work time
+#### [x] P2-11 — Background agents count as work time
 - **Depends on:** P2-06
 - **Size:** S
 - **Goal:** decision 0018: the spawn countdown runs, and new encounters can spawn, while a turn or any subagent runs.
 - **Done when:**
-  - [ ] `classic.SubagentStart` / `classic.SubagentStop` (by `agent_id`) feed the encounter machine; overlapping turns and agents count once.
-  - [ ] Fake-clock tests: spawn while only an agent runs; overlap counted once; an agent with no stop event stops counting after `AGENT_WORK_MAX_MIN` (30 min); agents cleared at `session.end`.
+  - [x] `classic.SubagentStart` / `classic.SubagentStop` (by `agent_id`) feed the encounter machine; overlapping turns and agents count once.
+  - [x] Fake-clock tests: spawn while only an agent runs; overlap counted once; an agent with no stop event stops counting after `AGENT_WORK_MAX_MIN` (30 min); agents cleared at `session.end`.
 
 #### [x] P2-12 — Encounter pane
 - **Depends on:** P2-07

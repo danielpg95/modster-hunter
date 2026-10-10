@@ -13,8 +13,9 @@ import { resolveCatchOdds } from './resolve-catch-odds'
 //                                   └→ missed → waiting, or fled → result when no attempts are left
 //   appearing/waiting ─idle timeout→ fled → result ─4 s→ idle
 //
-// New encounters only spawn while a turn runs. The countdown to the next one
-// counts "work time" only: it pauses between turns and carries over (0014).
+// New encounters only spawn during work time: while a turn or any subagent runs
+// (0018). The countdown to the next one counts work time only: it pauses when
+// nothing runs and carries over (0014).
 
 export interface EncounterContext {
   biome: Biome
@@ -45,9 +46,11 @@ export interface Encounter {
 
 export interface EncounterState {
   turnRunning: boolean
-  /** Work time (ms) counted up to `turnStartedAt`, or in total while no turn runs */
+  /** Running subagents: `agent_id` → when it started (0018) */
+  agents: Readonly<Record<string, number>>
+  /** Work time (ms) counted up to `settledAt`; what runs after it is added by `workTime` */
   workedMs: number
-  turnStartedAt: number
+  settledAt: number
   /** Work time at which the next Modster appears */
   nextSpawnAtWork: number
   encounter?: Encounter
@@ -56,6 +59,9 @@ export interface EncounterState {
 export type EncounterInput =
   | { type: 'turnStart'; now: number }
   | { type: 'turnEnd'; now: number }
+  | { type: 'agentStart'; now: number; agentId: string }
+  | { type: 'agentStop'; now: number; agentId: string }
+  | { type: 'sessionEnd'; now: number }
   | { type: 'tick'; now: number }
   | { type: 'throw'; now: number }
 
@@ -71,9 +77,9 @@ export interface EncounterStep {
   events: EncounterEvent[]
 }
 
-/** The state at session start: no turn running, the first spawn already scheduled. */
+/** The state at session start: nothing running, the first spawn already scheduled. */
 export function startEncounters(ctx: EncounterContext): EncounterState {
-  return { turnRunning: false, workedMs: 0, turnStartedAt: 0, nextSpawnAtWork: spawnDelayMs(ctx) }
+  return { turnRunning: false, agents: {}, workedMs: 0, settledAt: 0, nextSpawnAtWork: spawnDelayMs(ctx) }
 }
 
 /** Applies one input at `input.now`, first running every timer that came due. */
@@ -83,16 +89,33 @@ export function stepEncounter(state: EncounterState, input: EncounterInput, ctx:
 
   switch (input.type) {
     case 'turnStart':
-      if (!next.turnRunning) next = { ...next, turnRunning: true, turnStartedAt: input.now }
+      next = { ...settle(next, input.now), turnRunning: true }
       // A new turn resets the idle timer of an encounter in progress (0005)
       if (next.encounter && (next.encounter.phase === 'appearing' || next.encounter.phase === 'waiting')) {
         next = { ...next, encounter: { ...next.encounter, idleSince: input.now } }
       }
       break
     case 'turnEnd':
-      if (next.turnRunning) {
-        next = { ...next, turnRunning: false, workedMs: workTime(next, input.now) }
+      if (next.turnRunning) next = { ...settle(next, input.now), turnRunning: false }
+      break
+    case 'agentStart': {
+      const settled = settle(next, input.now)
+      next = { ...settled, agents: { ...settled.agents, [input.agentId]: input.now } }
+      break
+    }
+    case 'agentStop':
+      if (input.agentId in next.agents) {
+        const settled = settle(next, input.now)
+        const { [input.agentId]: _stopped, ...agents } = settled.agents
+        next = { ...settled, agents }
       }
+      break
+    case 'sessionEnd':
+      next = { ...settle(next, input.now), turnRunning: false, agents: {} }
+      break
+    case 'tick':
+      // Drop agents past the cap, so the state shows only work that still counts
+      if (Object.values(next.agents).some((startedAt) => agentEnd(startedAt) <= input.now)) next = settle(next, input.now)
       break
     case 'throw':
       // Only while waiting; presses during appearing or the wobble are ignored (0014)
@@ -110,8 +133,6 @@ export function stepEncounter(state: EncounterState, input: EncounterInput, ctx:
         }
       }
       break
-    case 'tick':
-      break
   }
 
   // A turn start can make a spawn due right away (work time was already past it)
@@ -119,9 +140,34 @@ export function stepEncounter(state: EncounterState, input: EncounterInput, ctx:
   return { state: next, events }
 }
 
-/** Work time so far: what was counted before this turn, plus this turn's share. */
+/**
+ * Work time so far: what was counted up to `settledAt`, plus the time after it
+ * that a turn or a subagent was running. Every agent in the state started at or
+ * before `settledAt` (each start settles), so their running time after it is one
+ * stretch, up to the latest capped end; overlaps count once (0018).
+ */
 export function workTime(state: EncounterState, now: number): number {
-  return state.workedMs + (state.turnRunning ? Math.max(now - state.turnStartedAt, 0) : 0)
+  if (now <= state.settledAt) return state.workedMs
+  if (state.turnRunning) return state.workedMs + now - state.settledAt
+  let end = state.settledAt
+  for (const startedAt of Object.values(state.agents)) end = Math.max(end, Math.min(now, agentEnd(startedAt)))
+  return state.workedMs + end - state.settledAt
+}
+
+/** Whether a turn or a subagent (within its cap) is running at `now`. */
+export function isWorking(state: EncounterState, now: number): boolean {
+  return state.turnRunning || Object.values(state.agents).some((startedAt) => agentEnd(startedAt) > now)
+}
+
+/** When an agent stops counting if no stop event arrives (0018 point 3). */
+function agentEnd(startedAt: number): number {
+  return startedAt + ENCOUNTER.agentWorkMaxMs
+}
+
+/** Banks the work time up to `now` and drops agents past their cap. */
+function settle(state: EncounterState, now: number): EncounterState {
+  const agents = Object.fromEntries(Object.entries(state.agents).filter(([, startedAt]) => agentEnd(startedAt) > now))
+  return { ...state, workedMs: workTime(state, now), settledAt: Math.max(now, state.settledAt), agents }
 }
 
 function advance(state: EncounterState, now: number, ctx: EncounterContext, events: EncounterEvent[]): EncounterState {
@@ -192,8 +238,8 @@ function withoutEncounter(state: EncounterState): EncounterState {
 }
 
 function maybeSpawn(state: EncounterState, now: number, ctx: EncounterContext, events: EncounterEvent[]): EncounterState {
-  // Only one encounter at a time, and new ones only while a turn runs (0005)
-  if (state.encounter || !state.turnRunning || workTime(state, now) < state.nextSpawnAtWork) return state
+  // Only one encounter at a time, and new ones only during work time (0005, 0018)
+  if (state.encounter || !isWorking(state, now) || workTime(state, now) < state.nextSpawnAtWork) return state
   const totalWeight = ctx.biome.modsters.reduce((sum, entry) => sum + entry.weight, 0)
   const entry = pickWeighted(
     ctx.biome.modsters.filter((candidate) => ctx.modsters.has(candidate.id)),

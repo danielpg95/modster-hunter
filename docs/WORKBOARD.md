@@ -16,7 +16,6 @@ this file lists only tasks someone has claimed.
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
 | P2-09 | @victor-aguilars | in-progress | p2-09-whispering-forest | 2026-10-08 | 2026-10-08 | Design biome 2 (and a 5th Forest Modster) with the user; first slice in review |
-| P2-11 | @danielpg95 | in-progress | p2-11-background-agents | 2026-10-09 | 2026-10-09 | Add agent start/stop inputs to plugin/hooks/game/encounter-machine.ts with the AGENT_WORK_MAX_MIN cap, plus fake-clock tests |
 
 ## Up next
 
