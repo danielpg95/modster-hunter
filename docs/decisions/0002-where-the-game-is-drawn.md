@@ -1,6 +1,6 @@
 # 0002 — Encounters in the band above the prompt, collection in a pane
 
-- **Status:** Accepted, amended by 0015 (encounters may also show in an opt-in pane) and 0019 (that pane reopens for people who opened it)
+- **Status:** Accepted, amended by 0015 (encounters may also show in an opt-in pane) 0019 (that pane reopens for people who opened it) and 0023 (display settings: band, pane, spinner, status line)
 - **Date:** 2026-10-07
 - **Decided by:** @danielpg95
 

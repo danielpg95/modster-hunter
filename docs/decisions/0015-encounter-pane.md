@@ -1,6 +1,6 @@
 # 0015 — An opt-in encounter pane, with the band stepping aside while it shows
 
-- **Status:** Accepted (amends 0002's first point); point 4 settled by 0019. Discussion: issue #35
+- **Status:** Accepted (amends 0002's first point); point 4 settled by 0019; points 2 and 5 amended by 0023 (display settings). Discussion: issue #35
 - **Date:** 2026-10-08 (accepted 2026-10-09)
 - **Decided by:** @danielpg95 (proposed by @victor-aguilars, after playing the P2-07 band and a local pane prototype)
 
