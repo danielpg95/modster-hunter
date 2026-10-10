@@ -164,7 +164,7 @@ Habitat isn't a field: it comes from the biomes that list the Modster.
 
 | Field | Rules |
 | --- | --- |
-| `width`, `height` | `width` 8–24; `height` 8–12 and even (two pixels per cell). See [0012](decisions/0012-sprite-size-and-band-layout.md) |
+| `width`, `height` | `width` 8–48; `height` 8–48 and even (two pixels per cell). See [0021](decisions/0021-sprites-up-to-48x48.md). A sprite shows wherever it fits; elsewhere the band and pane show the compact text layout ([0012](decisions/0012-sprite-size-and-band-layout.md) points 6–8). Up to 14 px tall fits the band of an 80×24 terminal |
 | `palette` | 1–64 colors, `#rrggbbaa`. Index 0 should be fully transparent |
 | `shinyPalette` | Optional; same length as `palette` (P5-01) |
 | `frames` | 1–8 frames, each exactly `width × height` bytes after base64 decoding; every byte < palette length |

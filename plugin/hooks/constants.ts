@@ -74,11 +74,12 @@ export const CONTENT = {
   catchRateMin: 0.01,
   catchRateMax: 1,
   sprite: {
-    // Decision 0012 point 5: fits an 80×24 band with a row to spare
+    // Decision 0021 (amends 0012 point 5). Where a sprite doesn't fit, the band and
+    // the pane show the compact layout (0012 points 6–8)
     widthMin: 8,
-    widthMax: 24,
+    widthMax: 48,
     heightMin: 8,
-    heightMax: 12,
+    heightMax: 48,
     paletteMin: 1,
     paletteMax: 64,
     framesMin: 1,
