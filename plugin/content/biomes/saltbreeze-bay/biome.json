@@ -6,6 +6,7 @@
   "accentColor": "#2196f3",
   "encounterEverySec": [10, 30],
   "modsters": [
-    { "id": "crabbit", "weight": 100 }
+    { "id": "crabbit", "weight": 100 },
+    { "id": "flopple", "weight": 20 }
   ]
 }

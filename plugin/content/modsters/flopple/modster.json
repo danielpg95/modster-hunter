@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "flopple",
+  "name": "Flopple",
+  "description": "Naps on warm rocks until the tide carries it off. Then naps in the water.",
+  "rarity": null,
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 6,
+    "types": ["water"],
+    "category": "Seal Pup Modster",
+    "heightM": 0.7,
+    "weightKg": 18,
+    "entry": "It falls asleep on the same rock every day. When the tide rises, it floats away without waking, and washes up somewhere new by evening."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 4
+  }
+}
