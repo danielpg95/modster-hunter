@@ -24,3 +24,4 @@ Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
 - **P4-04** — User-facing content skill
+- **P5-10** — Mark caught Modsters in the band
