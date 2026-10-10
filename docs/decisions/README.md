@@ -18,18 +18,19 @@ settled questions and avoid making assumptions about open ones.
 | [0002](0002-where-the-game-is-drawn.md) | Encounters in the band above the prompt, collection in a pane | Accepted (amended by 0015, 0019) |
 | [0003](0003-catch-mechanic.md) | Pure-luck catching for v1; light skill element as a later experiment | Accepted |
 | [0004](0004-attempts-and-catch-rate.md) | Attempts and catch rate per Modster, derived from rarity unless overridden | Accepted |
-| [0005](0005-encounter-lifetime.md) | An encounter lingers after the turn ends, until resolved or idle timeout | Accepted (amended by 0018) |
+| [0005](0005-encounter-lifetime.md) | An encounter lingers after the turn ends, until resolved or idle timeout | Accepted (amended by 0018, 0020) |
 | [0006](0006-biome-selection.md) | One random biome per session | Accepted |
 | [0007](0007-content-model.md) | Weights instead of percentages; built-in and user content merged by id | Accepted |
 | [0008](0008-sprite-pipeline.md) | PNG sprite sheets in, `.sprite.json` at runtime | Superseded by 0016 |
 | [0009](0009-collection-storage.md) | One `$.store` key per Modster | Accepted |
 | [0010](0010-contributor-tracking.md) | Roadmap + workboard + session handoffs as the tracking system | Accepted |
 | [0011](0011-license.md) | MIT for code, CC BY 4.0 for art | Accepted |
-| [0012](0012-sprite-size-and-band-layout.md) | Half-block `Raster` sprites up to 24×12; text-only band when they don't fit | Accepted |
+| [0012](0012-sprite-size-and-band-layout.md) | Half-block `Raster` sprites up to 24×12; text-only band when they don't fit | Accepted (amended by 0020) |
 | [0013](0013-host-calls-in-register.md) | All `$` calls live in `register.ts`; pure modules reach the host through plain ports | Accepted |
-| [0014](0014-encounter-timings.md) | Encounter timings, a work-time spawn countdown, and no throws outside "waiting" | Accepted (amended by 0018) |
+| [0014](0014-encounter-timings.md) | Encounter timings, a work-time spawn countdown, and no throws outside "waiting" | Accepted (amended by 0018, 0020) |
 | [0015](0015-encounter-pane.md) | An opt-in encounter pane, with the band stepping aside while it shows | Accepted (point 4 settled by 0019) |
 | [0016](0016-user-png-sprites.md) | User Modsters may use a PNG sheet directly; the mod decodes and caches it | Accepted |
 | [0017](0017-modster-dex-fields.md) | Modsters carry a dex entry: number, type, category, height, weight and entry text | Accepted |
 | [0018](0018-background-agents-count-as-work.md) | Background subagents count as work time for the spawn countdown | Accepted |
 | [0019](0019-reopen-encounter-pane.md) | The encounter pane reopens for people who opened it, until they close it by hand | Accepted |
+| [0020](0020-run-from-an-encounter.md) | The player can run from an encounter with `2: Run` | Accepted |

@@ -8,7 +8,7 @@ import type { EncounterPhase } from '../game'
 
 export interface BandEncounter {
   phase: EncounterPhase
-  outcome?: 'caught' | 'fled'
+  outcome?: 'caught' | 'fled' | 'ran'
   fledBecause?: 'attempts' | 'idle'
   name: string
   tier: Rarity
@@ -27,8 +27,15 @@ export interface BandInput {
   showIdleLine: boolean
 }
 
-/** A line is text segments, with the Throw button possibly among them. */
-export type BandSegment = { text: string; bold?: true; dim?: true; color?: string } | { button: 'throw' }
+/** The band's buttons; a plain Button draws as `1: Throw`, so a line's width is known (0020). */
+export const BAND_BUTTONS = {
+  throw: { hotkey: '1', label: 'Throw' },
+  run: { hotkey: '2', label: 'Run' },
+} as const
+export type BandButton = keyof typeof BAND_BUTTONS
+
+/** A line is text segments, with the Throw and Run buttons possibly among them. */
+export type BandSegment = { text: string; bold?: true; dim?: true; color?: string } | { button: BandButton }
 export type BandLine = BandSegment[]
 
 export type BandView =
@@ -56,8 +63,8 @@ export function bandView(input: BandInput): BandView {
     spriteRows <= rows &&
     encounter.spriteWidth + BAND.gapColumns + BAND.textColumns <= input.columns
   if (fullFits) return { kind: 'full', spriteColumns: encounter.spriteWidth, spriteRows, lines: fullLines(encounter) }
-  if (rows === 1) return { kind: 'compact', lines: [singleLine(encounter)] }
-  return { kind: 'compact', lines: compactLines(encounter) }
+  if (rows === 1) return { kind: 'compact', lines: [singleLine(encounter, input.columns)] }
+  return { kind: 'compact', lines: compactLines(encounter, input.columns) }
 }
 
 /** Rows the view takes; never more than `maxRows` (checked in tests for every phase and size). */
@@ -74,22 +81,40 @@ export function bandRows(view: BandView): number {
   }
 }
 
+/** Columns a line takes: text as written, a plain Button as `hotkey: label`. */
+export function lineWidth(line: BandLine): number {
+  return line.reduce((sum, segment) => {
+    if ('button' in segment) {
+      const { hotkey, label } = BAND_BUTTONS[segment.button]
+      return sum + hotkey.length + 2 + label.length
+    }
+    return sum + segment.text.length
+  }, 0)
+}
+
+/** The line with Run, or without it when it doesn't fit: buttons don't truncate, Throw always stays (0020). */
+function withRunIfFits(withRun: BandLine, withoutRun: BandLine, columns: number): BandLine {
+  return lineWidth(withRun) <= columns ? withRun : withoutRun
+}
+
 const left = (n: number): string => `${n} ${n === 1 ? 'throw' : 'throws'} left`
 
 function resultLines(e: BandEncounter): BandLine[] {
   if (e.outcome === 'caught') return [[{ text: `Caught ${e.name}!`, bold: true }], [{ text: e.tier, dim: true }]]
+  if (e.outcome === 'ran') return [[{ text: `You ran from ${e.name}.` }]]
   if (e.fledBecause === 'idle') return [[{ text: `${e.name} wandered off.` }]]
   return [[{ text: `${e.name} fled!` }], [{ text: 'Better luck next time.', dim: true }]]
 }
 
-// Full layout: beside the sprite, one line each for name and tier, throws left, and Throw
+// Full layout: beside the sprite, one line each for name and tier, throws left, and Throw and Run
 function fullLines(e: BandEncounter): BandLine[] {
   const title: BandLine = [{ text: e.name, bold: true }, { text: ` · ${e.tier}`, dim: true }]
   switch (e.phase) {
     case 'appearing':
       return [title, [{ text: 'appeared!' }]]
     case 'waiting':
-      return [title, [{ text: left(e.attemptsLeft), dim: true }], [{ button: 'throw' }]]
+      // `1: Throw   2: Run` is 17 columns, inside the full layout's 24-column text block
+      return [title, [{ text: left(e.attemptsLeft), dim: true }], [{ button: 'throw' }, { text: '   ' }, { button: 'run' }]]
     case 'throwing':
       return [title, [{ text: left(e.attemptsLeft), dim: true }], [{ text: 'wobble… wobble…' }]]
     case 'result':
@@ -98,13 +123,15 @@ function fullLines(e: BandEncounter): BandLine[] {
 }
 
 // Compact layout: no sprite, at most 2 lines
-function compactLines(e: BandEncounter): BandLine[] {
+function compactLines(e: BandEncounter, columns: number): BandLine[] {
   const wild: BandLine = [{ text: `A wild ${e.name} appeared!`, bold: true }, { text: ` (${e.tier})`, dim: true }]
   switch (e.phase) {
     case 'appearing':
       return [wild]
-    case 'waiting':
-      return [wild, [{ button: 'throw' }, { text: ` · ${e.attemptsLeft} left`, dim: true }]]
+    case 'waiting': {
+      const attempts: BandSegment = { text: ` · ${e.attemptsLeft} left`, dim: true }
+      return [wild, withRunIfFits([{ button: 'throw' }, { text: ' · ' }, { button: 'run' }, attempts], [{ button: 'throw' }, attempts], columns)]
+    }
     case 'throwing':
       return [wild, [{ text: 'wobble…' }, { text: ` · ${e.attemptsLeft} left`, dim: true }]]
     case 'result':
@@ -113,13 +140,19 @@ function compactLines(e: BandEncounter): BandLine[] {
 }
 
 // One row: everything on a single line
-function singleLine(e: BandEncounter): BandLine {
+function singleLine(e: BandEncounter, columns: number): BandLine {
   const who: BandSegment[] = [{ text: e.name, bold: true }, { text: ` (${e.tier})`, dim: true }]
   switch (e.phase) {
     case 'appearing':
       return [...who, { text: ' appeared!' }]
-    case 'waiting':
-      return [...who, { text: ' · ' }, { button: 'throw' }, { text: ` · ${e.attemptsLeft} left`, dim: true }]
+    case 'waiting': {
+      const attempts: BandSegment = { text: ` · ${e.attemptsLeft} left`, dim: true }
+      return withRunIfFits(
+        [...who, { text: ' · ' }, { button: 'throw' }, { text: ' · ' }, { button: 'run' }, attempts],
+        [...who, { text: ' · ' }, { button: 'throw' }, attempts],
+        columns,
+      )
+    }
     case 'throwing':
       return [...who, { text: ' · wobble…' }, { text: ` · ${e.attemptsLeft} left`, dim: true }]
     case 'result':
