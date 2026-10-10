@@ -3,7 +3,8 @@
 How biomes, Modsters and sprites are described on disk. This is the contract
 between the game, the built-in content, user content, the editor and the
 content skills. Rules come from decisions [0004](decisions/0004-attempts-and-catch-rate.md),
-[0007](decisions/0007-content-model.md) and [0016](decisions/0016-user-png-sprites.md).
+[0007](decisions/0007-content-model.md), [0016](decisions/0016-user-png-sprites.md)
+and [0017](decisions/0017-modster-dex-fields.md).
 
 > **Status:** schema version `1`, implemented by the validator in
 > `plugin/hooks/content/` (P2-01). Changing a field now needs a new decision
@@ -99,6 +100,14 @@ content/
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,
+  "dex": {
+    "number": 1,
+    "type": "grass",
+    "category": "Seed Modster",
+    "heightM": 0.3,
+    "weightKg": 1.2,
+    "entry": "It sprouted from a seed that refused to stay buried."
+  },
   "sprite": {
     "file": "sprite.sprite.json",
     "fps": 6
@@ -116,9 +125,27 @@ content/
 | `maxAttempts` | no | Integer 1–10, or `null` for the tier default |
 | `catchRate` | no | 0.01–1.0, or `null` for the tier default |
 | `shinyChance` | no | 0–1, or `null` for the default (P5-01) |
+| `dex` | no | The dex entry, see below (decision 0017). Built-in Modsters need every field |
 | `sprite.file` | yes | A `.sprite.json` in this folder. User content may name a `.png` sheet instead (decision 0016) |
 | `sprite.frames` | with a `.png` | Integer 1–8: how many frames sit side by side in the sheet. Required with a `.png`, an error with a `.sprite.json` |
 | `sprite.fps` | no | 1–12. Default 6 |
+
+### `dex`
+
+Shown in the collection's detail view; `???` until the Modster is caught,
+except the number. Every field is optional, but built-in Modsters must fill
+them all (`npm run check:content` checks this, and that numbers are unique).
+
+| Field | Rules |
+| --- | --- |
+| `number` | Integer 1–999, shown as `#001`. **Built-in only**: an error in a user file. A user Modster that replaces a built-in keeps its number; other user Modsters show `#—` |
+| `type` | One of `normal`, `fire`, `water`, `grass`, `electric`, `steel`, `fighting`, `poison`, `ground`, `flying`, `ice`, `dark`, `psychic`, `bug`, `rock`, `ghost`, `dragon`, `fairy`. Flavor only: no effect on odds. Badge colors are in `MODSTER_TYPES` (`plugin/hooks/constants.ts`) |
+| `category` | 1–24 chars, e.g. `"Seed Modster"` |
+| `heightM` | Meters, 0.01–100 |
+| `weightKg` | Kilograms, 0.01–10,000. Not the biome entry's `weight`, which sets encounter odds |
+| `entry` | 1–240 chars; the dex text. `description` stays the short line |
+
+Habitat isn't a field: it comes from the biomes that list the Modster.
 
 ## `.sprite.json`
 

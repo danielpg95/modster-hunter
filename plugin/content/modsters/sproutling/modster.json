@@ -7,6 +7,14 @@
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,
+  "dex": {
+    "number": 1,
+    "type": "grass",
+    "category": "Seed Modster",
+    "heightM": 0.3,
+    "weightKg": 1.2,
+    "entry": "It sprouted from a seed that refused to stay buried. On sunny days it stands perfectly still, pretending to be a houseplant."
+  },
   "sprite": {
     "file": "sprite.sprite.json",
     "fps": 6

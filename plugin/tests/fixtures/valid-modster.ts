@@ -9,6 +9,14 @@ export function validModster(): Record<string, unknown> {
     maxAttempts: null,
     catchRate: null,
     shinyChance: null,
+    dex: {
+      number: 1,
+      type: 'grass',
+      category: 'Seed Modster',
+      heightM: 0.3,
+      weightKg: 1.2,
+      entry: 'It sprouted from a seed that refused to stay buried.',
+    },
     sprite: { file: 'sprite.sprite.json', fps: 6 },
   }
 }

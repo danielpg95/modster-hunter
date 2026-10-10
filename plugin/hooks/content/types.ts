@@ -2,7 +2,23 @@
 // A value of these types has passed its validator; fields keep the file's own
 // shape, and defaults (e.g. `encounterEverySec`) are applied by the code that reads them.
 
+import type { MODSTER_TYPES } from '../constants'
+
 export type Rarity = 'common' | 'uncommon' | 'rare' | 'legendary'
+
+/** One of the keys of `MODSTER_TYPES` (decision 0017) */
+export type ModsterType = keyof typeof MODSTER_TYPES
+
+/** The dex entry (decision 0017). Every field is optional; built-in content fills them all. */
+export interface ModsterDex {
+  /** Built-in content only; a user override keeps the built-in's number */
+  number?: number
+  type?: ModsterType
+  category?: string
+  heightM?: number
+  weightKg?: number
+  entry?: string
+}
 
 export interface BiomeModsterEntry {
   id: string
@@ -31,6 +47,7 @@ export interface Modster {
   maxAttempts?: number | null
   catchRate?: number | null
   shinyChance?: number | null
+  dex?: ModsterDex
   /** `file` is a `.png` only in user content, and then `frames` is set (decision 0016) */
   sprite: { file: string; frames?: number; fps?: number }
 }

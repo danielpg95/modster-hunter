@@ -102,7 +102,9 @@ interface Folder {
 async function loadModster(at: Folder, folder: string): Promise<LoadedModster | undefined> {
   const file = `modsters/${folder}/modster.json`
   const json = await readJson(at, file)
-  const modster = json && keep(validateModster(json.value, { file: at.label + file, folder, allowPng: at.sheets !== undefined }), at.issues)
+  // Only the user folder is loaded with a sheet loader
+  const userContent = at.sheets !== undefined
+  const modster = json && keep(validateModster(json.value, { file: at.label + file, folder, userContent }), at.issues)
   if (!modster) return undefined
 
   const spriteFile = `modsters/${folder}/${modster.sprite.file}`

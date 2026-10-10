@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'claude-code/testing'
 import { formatIssue, loadAllContent, type SheetLoader } from '../../hooks/content'
 import { memoryReader } from '../fixtures/memory-reader'
-import { validModster } from '../fixtures/valid-modster'
+import { validUserModster } from '../fixtures/valid-user-modster'
 import { validSprite } from '../fixtures/valid-sprite'
 
 const BUILT_IN = '/plugin/content'
@@ -12,7 +12,7 @@ const LABEL = '~/.claude/modster-hunter/content/'
 function biomeWith(root: string, biomeId: string, modsterId: string, name = modsterId): Record<string, string> {
   return {
     [`${root}/biomes/${biomeId}/biome.json`]: JSON.stringify({ schemaVersion: 1, id: biomeId, name: biomeId, modsters: [{ id: modsterId, weight: 1 }] }),
-    [`${root}/modsters/${modsterId}/modster.json`]: JSON.stringify({ ...validModster(), id: modsterId, name }),
+    [`${root}/modsters/${modsterId}/modster.json`]: JSON.stringify({ ...validUserModster(), id: modsterId, name }),
     [`${root}/modsters/${modsterId}/sprite.sprite.json`]: JSON.stringify(validSprite()),
   }
 }

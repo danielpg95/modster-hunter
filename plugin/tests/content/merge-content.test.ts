@@ -47,6 +47,23 @@ describe('mergeContent', () => {
     expect([...content.biomes.keys()]).toEqual(['forest', 'shore', 'meadow'])
   })
 
+  test('a user Modster replacing a built-in keeps its dex number; its own dex fields win (decision 0017)', () => {
+    const built = builtIn()
+    const sproutling = built.modsters.get('sproutling')
+    if (!sproutling) throw new Error('fixture')
+    sproutling.modster.dex = { number: 1, type: 'grass', entry: 'Built-in.' }
+    const user = registry({}, { sproutling: 'Sprout II', blobby: 'Blobby' }, '~/')
+    const userSprout = user.modsters.get('sproutling')
+    if (!userSprout) throw new Error('fixture')
+    userSprout.modster.dex = { type: 'fairy' }
+    const content = mergeContent({ builtIn: built, user, settingsFile: SETTINGS })
+    expect(content.modsters.get('sproutling')?.modster.dex).toEqual({ number: 1, type: 'fairy' })
+    expect(content.modsters.get('blobby')?.modster.dex).toBe(undefined)
+    // The user's own object isn't changed
+    expect(userSprout.modster.dex).toEqual({ type: 'fairy' })
+    expect(names(content)).toEqual(['Sprout II', 'Mossbeast', 'Crablet', 'Blobby'])
+  })
+
   test('a user biome may list built-in Modsters', () => {
     const user = registry({ meadow: ['blobby', 'crablet'] }, { blobby: 'Blobby' })
     const content = mergeContent({ builtIn: builtIn(), user, settingsFile: SETTINGS })

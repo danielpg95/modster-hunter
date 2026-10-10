@@ -6,7 +6,8 @@
 //
 // Fails (exit 1) on any content issue, or when the P2-09 rules break: each
 // biome has a common, an uncommon and a rare Modster, at least one legendary
-// across all biomes, and every sprite has 2–4 frames.
+// across all biomes, and every sprite has 2–4 frames. Every built-in Modster
+// also needs a complete dex with a unique number (decision 0017 point 4).
 import './ts-resolve.mjs'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -45,6 +46,17 @@ for (const [id, { sprite }] of content.modsters) {
   if (sprite.frames.length < 2 || sprite.frames.length > 4) {
     problems.push(`modsters/${id}: ${sprite.frames.length} frames; built-in sprites have 2–4 (P2-09)`)
   }
+}
+
+const DEX_FIELDS = ['number', 'type', 'category', 'heightM', 'weightKg', 'entry']
+const numbers = new Map()
+for (const [id, { modster }] of content.modsters) {
+  const missing = DEX_FIELDS.filter((field) => modster.dex?.[field] === undefined)
+  if (missing.length > 0) problems.push(`modsters/${id}: dex is missing ${missing.join(', ')}; built-in Modsters need a complete dex (0017)`)
+  const number = modster.dex?.number
+  if (number === undefined) continue
+  if (numbers.has(number)) problems.push(`modsters/${id}: dex number ${number} is also ${numbers.get(number)}'s (0017)`)
+  else numbers.set(number, id)
 }
 
 console.log(`\n${content.biomes.size} biomes, ${content.modsters.size} Modsters`)

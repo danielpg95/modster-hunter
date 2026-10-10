@@ -7,6 +7,14 @@
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,
+  "dex": {
+    "number": 3,
+    "type": "bug",
+    "category": "Acorn Modster",
+    "heightM": 0.2,
+    "weightKg": 0.4,
+    "entry": "Its leaf-wings beat so fast they hum. It hides acorns everywhere and forgets where, which is how oaks get planted."
+  },
   "sprite": {
     "file": "sprite.sprite.json",
     "fps": 8

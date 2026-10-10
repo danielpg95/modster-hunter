@@ -7,6 +7,14 @@
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,
+  "dex": {
+    "number": 2,
+    "type": "grass",
+    "category": "Moss Modster",
+    "heightM": 0.6,
+    "weightKg": 14.5,
+    "entry": "It naps on fallen logs until moss grows over it. Travelers sit on it by mistake, and it does not mind."
+  },
   "sprite": {
     "file": "sprite.sprite.json",
     "fps": 3

@@ -7,6 +7,14 @@
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,
+  "dex": {
+    "number": 4,
+    "type": "grass",
+    "category": "Ancient Tree Modster",
+    "heightM": 4.2,
+    "weightKg": 980.0,
+    "entry": "Older than the forest. Its rings hold every season it has seen, and its amber eyes open only once a year."
+  },
   "sprite": {
     "file": "sprite.sprite.json",
     "fps": 2

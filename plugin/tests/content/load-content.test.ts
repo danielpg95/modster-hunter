@@ -2,7 +2,7 @@ import { describe, expect, test } from 'claude-code/testing'
 import { formatIssue, loadContent, type SheetLoader, type Sprite } from '../../hooks/content'
 import { memoryReader } from '../fixtures/memory-reader'
 import { validBiome } from '../fixtures/valid-biome'
-import { validModster } from '../fixtures/valid-modster'
+import { validUserModster } from '../fixtures/valid-user-modster'
 import { validSprite } from '../fixtures/valid-sprite'
 
 const ROOT = '/plugin/content'
@@ -14,7 +14,7 @@ function forest(): Record<string, string | Error> {
   delete biome.background
   files[`${ROOT}/biomes/whispering-forest/biome.json`] = JSON.stringify(biome)
   for (const id of ['sproutling', 'mossbeast', 'pinewraith']) {
-    files[`${ROOT}/modsters/${id}/modster.json`] = JSON.stringify({ ...validModster(), id, name: id })
+    files[`${ROOT}/modsters/${id}/modster.json`] = JSON.stringify({ ...validUserModster(), id, name: id })
     files[`${ROOT}/modsters/${id}/sprite.sprite.json`] = JSON.stringify(validSprite())
   }
   return files
@@ -23,7 +23,7 @@ function forest(): Record<string, string | Error> {
 /** The forest, with sproutling's sprite a 2-frame PNG sheet */
 function pngForest(): Record<string, string | Error> {
   const files = forest()
-  files[`${ROOT}/modsters/sproutling/modster.json`] = JSON.stringify({ ...validModster(), sprite: { file: 'sprite.png', frames: 2 } })
+  files[`${ROOT}/modsters/sproutling/modster.json`] = JSON.stringify({ ...validUserModster(), sprite: { file: 'sprite.png', frames: 2 } })
   return files
 }
 const sprite = validSprite() as unknown as Sprite
@@ -46,7 +46,7 @@ describe('loadContent', () => {
 
   test('a Modster with an invalid file is skipped and listed; the rest load', async () => {
     const files = forest()
-    files[`${ROOT}/modsters/mossbeast/modster.json`] = JSON.stringify({ ...validModster(), id: 'mossbeast', name: '' })
+    files[`${ROOT}/modsters/mossbeast/modster.json`] = JSON.stringify({ ...validUserModster(), id: 'mossbeast', name: '' })
     const content = await loadContent(memoryReader(files), ROOT)
     expect([...content.modsters.keys()]).toEqual(['pinewraith', 'sproutling'])
     expect(lines(content.issues)).toEqual([
