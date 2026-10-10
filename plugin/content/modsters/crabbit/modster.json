@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "crabbit",
+  "name": "Crabbit",
+  "description": "Lives in a shell three sizes too big. Says it'll grow into it.",
+  "rarity": null,
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 3,
+    "type": "water",
+    "category": "Hermit Modster",
+    "heightM": 0.2,
+    "weightKg": 1.5,
+    "entry": "It trades shells with other Crabbit at low tide. Nobody is sure who gets the better deal, including the Crabbit."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 4
+  }
+}

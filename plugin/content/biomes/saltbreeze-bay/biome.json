@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "saltbreeze-bay",
+  "name": "Saltbreeze Bay",
+  "description": "The tide comes in, the tide goes out, and something always stays behind.",
+  "accentColor": "#2196f3",
+  "encounterEverySec": [10, 30],
+  "modsters": [
+    { "id": "crabbit", "weight": 100 }
+  ]
+}

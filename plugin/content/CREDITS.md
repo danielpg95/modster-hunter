@@ -11,5 +11,6 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/elderbark/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Provisional design |
 | `modsters/dunebun/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
 | `modsters/hootlet/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
+| `modsters/crabbit/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
 
 The `.sprite.json` next to each sheet is generated from it with `npm run sprite`.
