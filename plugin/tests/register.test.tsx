@@ -230,6 +230,32 @@ describe('register', () => {
     expect(store[statsKey ?? '']).toMatchObject({ turns: 1, encounters: 1, catches: 1, flees: 0 })
     await ui.unmount()
   })
+
+  test('pressing Run shows the card, saves a run, and clears the band after it (0020)', async ($, on) => {
+    // Same in-memory stand-in for $.store as the catch test above
+    const store: Record<string, unknown> = {}
+    on('store.get', ($, e) => ({ value: structuredClone(store[e.key]) }))
+    on('store.set', ($, e) => {
+      store[e.key] = structuredClone(e.value)
+      return { value: undefined }
+    })
+    const { ui, clock } = await startBand($, on)
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(4_000 + BAND_TICK)
+    expect(await ui.find({ type: 'Button', key: 'run' })).toBeDefined()
+
+    await ui.press({ key: 'run' })
+    await clock.advance(BAND_TICK)
+    expect(await ui.find({ type: 'Text', text: 'You ran from Sproutling.' })).toBeDefined()
+    expect(await ui.find({ type: 'Button', key: 'run' })).toBeUndefined()
+    const statsKey = Object.keys(store).find((key) => key.startsWith('stats:'))
+    expect(store[statsKey ?? '']).toMatchObject({ encounters: 1, runs: 1, flees: 0, catches: 0 })
+    expect(Object.keys(store).some((key) => key.startsWith('caught:'))).toBe(false)
+
+    await clock.advance(4_000)
+    expect(await ui.find({ type: 'Text', text: 'You ran from Sproutling.' })).toBeUndefined()
+    await ui.unmount()
+  })
 })
 
 

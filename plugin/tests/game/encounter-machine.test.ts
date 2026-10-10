@@ -53,6 +53,7 @@ function setup(...random: number[]) {
       sessionEnd: () => send({ type: 'sessionEnd', now }),
       tick: () => send({ type: 'tick', now }),
       throw: () => send({ type: 'throw', now }),
+      run: () => send({ type: 'run', now }),
     }),
     get state() {
       return state
@@ -261,6 +262,49 @@ describe('encounter machine', () => {
     let state = startEncounters(ctx)
     state = stepEncounter(state, { type: 'turnStart', now: 0 }, ctx).state
     expect(stepEncounter(state, { type: 'tick', now: 60 * S }, ctx).state.encounter).toBeUndefined()
+  })
+
+  // The player can run (decision 0020)
+
+  test('running while waiting ends the encounter as ran, with the usual card', () => {
+    const game = setup(0, 0.1, 0) // the last number is the next delay, drawn when the card ends
+    game.at(0).turnStart()
+    game.at(10 * S).tick()
+    game.at(11 * S).tick() // waiting
+    expect(game.at(20 * S).run()).toEqual([{ type: 'ran', modsterId: 'sproutling', tier: 'common' }])
+    expect([game.phase, game.state.encounter?.outcome, game.state.encounter?.attemptsLeft]).toEqual(['result', 'ran', 3])
+    game.at(24 * S - 1).tick()
+    expect(game.phase).toBe('result')
+    game.at(24 * S).tick()
+    expect(game.phase).toBe('idle')
+  })
+
+  test('after a run, the next countdown starts when the card ends, like any result', () => {
+    const game = setup(0, 0.1, 0, 0.1) // next delay 10 s
+    game.at(0).turnStart()
+    game.at(10 * S).tick()
+    game.at(11 * S).run() // card until 15 s
+    game.at(25 * S - 1).tick()
+    expect(game.log).toEqual(['appeared sproutling', 'ran sproutling'])
+    game.at(25 * S).tick()
+    expect(game.log.at(-1)).toBe('appeared sproutling')
+  })
+
+  test('runs during appearing or the wobble are ignored, so a rolled throw still resolves', () => {
+    const game = setup(0, 0.1, 0.1)
+    game.at(0).turnStart()
+    game.at(10 * S).tick()
+    expect(game.at(10.5 * S).run()).toEqual([]) // appearing
+    game.at(11 * S).throw()
+    expect(game.at(11.5 * S).run()).toEqual([]) // wobbling
+    expect(game.at(12.5 * S).tick()).toEqual([{ type: 'caught', modsterId: 'sproutling', tier: 'common' }])
+  })
+
+  test('with no encounter, run does nothing', () => {
+    const game = setup(0)
+    const before = game.state
+    game.at(5 * S).run()
+    expect(game.state).toBe(before)
   })
 
   // Background subagents count as work time (decision 0018)

@@ -5,7 +5,7 @@ import type { StorePort } from './store-port'
 
 /**
  * Stores what an encounter step reported (decision 0009): a catch updates
- * `caught:<id>`, and every appearance, catch and flee counts in this session's
+ * `caught:<id>`, and every appearance, catch, flee and run counts in this session's
  * `stats:<sessionId>`. Each key is read again right before it's written, so a
  * catch saved by another session in the meantime isn't lost.
  */
@@ -42,6 +42,8 @@ function statsEventFor(event: EncounterEvent, biomeId: string, at: number): Stat
       return { kind: 'catch', biomeId, at }
     case 'fled':
       return { kind: 'flee', biomeId, at }
+    case 'ran':
+      return { kind: 'run', biomeId, at }
     case 'missed':
       return undefined
   }
