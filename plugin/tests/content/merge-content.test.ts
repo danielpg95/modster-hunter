@@ -51,16 +51,16 @@ describe('mergeContent', () => {
     const built = builtIn()
     const sproutling = built.modsters.get('sproutling')
     if (!sproutling) throw new Error('fixture')
-    sproutling.modster.dex = { number: 1, type: 'grass', entry: 'Built-in.' }
+    sproutling.modster.dex = { number: 1, types: ['grass'], entry: 'Built-in.' }
     const user = registry({}, { sproutling: 'Sprout II', blobby: 'Blobby' }, '~/')
     const userSprout = user.modsters.get('sproutling')
     if (!userSprout) throw new Error('fixture')
-    userSprout.modster.dex = { type: 'fairy' }
+    userSprout.modster.dex = { types: ['fairy'] }
     const content = mergeContent({ builtIn: built, user, settingsFile: SETTINGS })
-    expect(content.modsters.get('sproutling')?.modster.dex).toEqual({ number: 1, type: 'fairy' })
+    expect(content.modsters.get('sproutling')?.modster.dex).toEqual({ number: 1, types: ['fairy'] })
     expect(content.modsters.get('blobby')?.modster.dex).toBe(undefined)
     // The user's own object isn't changed
-    expect(userSprout.modster.dex).toEqual({ type: 'fairy' })
+    expect(userSprout.modster.dex).toEqual({ types: ['fairy'] })
     expect(names(content)).toEqual(['Sprout II', 'Mossbeast', 'Crablet', 'Blobby'])
   })
 

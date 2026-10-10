@@ -9,7 +9,7 @@
   "shinyChance": null,
   "dex": {
     "number": 3,
-    "type": "bug",
+    "types": ["bug"],
     "category": "Acorn Modster",
     "heightM": 0.2,
     "weightKg": 0.4,

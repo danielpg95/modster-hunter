@@ -45,8 +45,14 @@ const INVALID: [string, (modster: Modster) => void, string][] = [
   ['dex number 0 is an error', (m) => (dex(m).number = 0), 'dex.number'],
   ['dex number over 999 is an error', (m) => (dex(m).number = 1000), 'dex.number'],
   ['a fractional dex number is an error', (m) => (dex(m).number = 1.5), 'dex.number'],
-  ['a dex type outside the list is an error', (m) => (dex(m).type = 'plant'), 'dex.type'],
-  ['a dex type with capitals is an error', (m) => (dex(m).type = 'Grass'), 'dex.type'],
+  ['a dex type outside the list is an error', (m) => (dex(m).types = ['plant']), 'dex.types[0]'],
+  ['a dex type with capitals is an error', (m) => (dex(m).types = ['Grass']), 'dex.types[0]'],
+  ['an unknown second type is an error', (m) => (dex(m).types = ['grass', 'wood']), 'dex.types[1]'],
+  ['a repeated type is an error', (m) => (dex(m).types = ['grass', 'grass']), 'dex.types[1]'],
+  ['no types is an error', (m) => (dex(m).types = []), 'dex.types'],
+  ['three types is an error (decision 0022)', (m) => (dex(m).types = ['grass', 'ghost', 'fire']), 'dex.types'],
+  ['types that is not a list is an error', (m) => (dex(m).types = 'grass'), 'dex.types'],
+  ['the old dex.type is an error that names types', (m) => (dex(m).type = 'grass'), 'dex.type'],
   ['an empty dex category is an error', (m) => (dex(m).category = ''), 'dex.category'],
   ['a dex category over 24 characters is an error', (m) => (dex(m).category = 'c'.repeat(25)), 'dex.category'],
   ['a dex height below 0.01 m is an error', (m) => (dex(m).heightM = 0), 'dex.heightM'],
@@ -92,9 +98,22 @@ describe('validateModster', () => {
     modster.dex = {}
     expect(validateModster(modster, where).issues).toEqual([])
     for (const type of Object.keys(MODSTER_TYPES)) {
-      modster.dex = { type }
+      modster.dex = { types: [type] }
       expect(validateModster(modster, where).issues).toEqual([])
     }
+  })
+
+  test('two different types are valid, the first one primary (decision 0022)', () => {
+    const modster = validModster()
+    dex(modster).types = ['grass', 'ghost']
+    expect(validateModster(modster, where).issues).toEqual([])
+  })
+
+  test('the old dex.type says to use types', () => {
+    const modster = validModster()
+    dex(modster).type = 'grass'
+    const found = issuesAt(validateModster(modster, where), 'dex.type')
+    expect(found.map((issue) => issue.problem)).toEqual(['is now "types", a list of one or two: "types": ["grass"] (decision 0022)'])
   })
 
   test('the dex bounds themselves are valid', () => {
@@ -167,7 +186,7 @@ describe('validateModster', () => {
     for (const value of [{}, [], 'x', -1, Number.POSITIVE_INFINITY, false]) {
       const modster: Modster = { schemaVersion: value, id: value, name: value, description: value, rarity: value }
       Object.assign(modster, { maxAttempts: value, catchRate: value, shinyChance: value, sprite: { file: value, fps: value } })
-      modster.dex = { number: value, type: value, category: value, heightM: value, weightKg: value, entry: value }
+      modster.dex = { number: value, types: value, category: value, heightM: value, weightKg: value, entry: value }
       expect(validateModster(modster, where).ok).toBe(false)
     }
   })

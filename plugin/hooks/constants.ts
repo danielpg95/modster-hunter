@@ -67,6 +67,9 @@ export const CONTENT = {
     weightKgMin: 0.01,
     weightKgMax: 10_000,
     entryMaxChars: 240,
+    // Decision 0022: one or two types, the first one primary
+    typesMin: 1,
+    typesMax: 2,
   },
   // Decision 0004 point 5
   maxAttemptsMin: 1,

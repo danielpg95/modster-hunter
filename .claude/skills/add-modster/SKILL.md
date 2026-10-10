@@ -28,7 +28,8 @@ user-facing skill in `plugin/skills/`, phase 4.)
    for a yes/no approval.
    - Concept, biome(s) and intended tier.
    - Name and the one-line `description` (≤ 120 chars).
-   - Dex: type (one of the 18 in decision 0017), category ("Seed Modster"),
+   - Dex: one or two types (from the 18 in decision 0017; the first is the
+     primary one, decision 0022), category ("Seed Modster"),
      height, weight, and the entry text (≤ 240 chars).
    - Look: color scheme (≤ 16 colors), size (width 8–24, height 8–12 and even,
      decision 0012), and a 2–4 frame idle animation.

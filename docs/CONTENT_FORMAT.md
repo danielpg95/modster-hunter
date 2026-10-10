@@ -102,7 +102,7 @@ content/
   "shinyChance": null,
   "dex": {
     "number": 1,
-    "type": "grass",
+    "types": ["grass"],
     "category": "Seed Modster",
     "heightM": 0.3,
     "weightKg": 1.2,
@@ -139,7 +139,7 @@ them all (`npm run check:content` checks this, and that numbers are unique).
 | Field | Rules |
 | --- | --- |
 | `number` | Integer 1–999, shown as `#001`. **Built-in only**: an error in a user file. A user Modster that replaces a built-in keeps its number; other user Modsters show `#—` |
-| `type` | One of `normal`, `fire`, `water`, `grass`, `electric`, `steel`, `fighting`, `poison`, `ground`, `flying`, `ice`, `dark`, `psychic`, `bug`, `rock`, `ghost`, `dragon`, `fairy`. Flavor only: no effect on odds. Badge colors are in `MODSTER_TYPES` (`plugin/hooks/constants.ts`) |
+| `types` | A list of 1 or 2 different types; the first is the primary one (decision [0022](decisions/0022-up-to-two-types.md)). Each is one of `normal`, `fire`, `water`, `grass`, `electric`, `steel`, `fighting`, `poison`, `ground`, `flying`, `ice`, `dark`, `psychic`, `bug`, `rock`, `ghost`, `dragon`, `fairy`. Flavor only: no effect on odds. Badge colors are in `MODSTER_TYPES` (`plugin/hooks/constants.ts`). The old `type` field is an error |
 | `category` | 1–24 chars, e.g. `"Seed Modster"` |
 | `heightM` | Meters, 0.01–100 |
 | `weightKg` | Kilograms, 0.01–10,000. Not the biome entry's `weight`, which sets encounter odds |

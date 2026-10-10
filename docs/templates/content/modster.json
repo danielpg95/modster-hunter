@@ -9,7 +9,7 @@
   "shinyChance": null,
   "dex": {
     "number": 0,
-    "type": "normal",
+    "types": ["normal"],
     "category": "Something Modster",
     "heightM": 0.5,
     "weightKg": 5,
