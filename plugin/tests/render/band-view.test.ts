@@ -35,11 +35,14 @@ const SPRITES = [
   { spriteWidth: 12, spriteHeight: 12 },
   { spriteWidth: 24, spriteHeight: 12 },
   { spriteWidth: 20, spriteHeight: 10 },
+  // Bigger sprites (0021): taller than most bands
+  { spriteWidth: 33, spriteHeight: 30 },
+  { spriteWidth: 48, spriteHeight: 48 },
 ]
 
 describe('bandView', () => {
   test('never takes more rows than maxRows, for every phase, size and surface', () => {
-    for (const maxRows of [0, 1, 2, 3, 4, 5, 6, 7]) {
+    for (const maxRows of [0, 1, 2, 3, 4, 5, 6, 7, 15, 23, 24]) {
       for (const phase of PHASES) {
         for (const sprite of SPRITES) {
           for (const columns of [40, 80, 120]) {
@@ -89,6 +92,18 @@ describe('bandView', () => {
         ],
       })
     }
+  })
+
+  test('a 48×48 sprite shows the compact band at maxRows 7 and 15 (decision 0021)', () => {
+    const big = encounter({ spriteWidth: 48, spriteHeight: 48 })
+    for (const maxRows of [7, 15]) expect(bandView(input({ maxRows, columns: 140, encounter: big })).kind).toBe('compact')
+  })
+
+  test('a 48×48 sprite is full size with 24 rows (a pane with 26 body rows), compact with 23', () => {
+    const big = encounter({ spriteWidth: 48, spriteHeight: 48 })
+    const full = bandView(input({ maxRows: 24, columns: 80, encounter: big }))
+    expect(full.kind === 'full' && [full.spriteColumns, full.spriteRows]).toEqual([48, 24])
+    expect(bandView(input({ maxRows: 23, columns: 80, encounter: big })).kind).toBe('compact')
   })
 
   test('a band too narrow for sprite + gap + 24 columns falls back to compact', () => {

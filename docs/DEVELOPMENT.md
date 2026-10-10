@@ -94,7 +94,7 @@ npm run sprite -- path/to/idle.gif                                      # animat
 ```
 
 It writes `<name>.sprite.json` next to the input (or `--out <file>`), and fails
-with a hint when frames are outside 8–24 × 8–12 (even), the sheet doesn't split
+with a hint when frames are outside 8–48 × 8–48 (even), the sheet doesn't split
 into equal frames, or the art has more than 63 colors. Any PNG works (pngjs);
 alpha is snapped to transparent below 128 and opaque from 128. The conversion is
 `spriteFromSheet` in `plugin/hooks/content/`, the same code the mod uses for

@@ -61,15 +61,15 @@ describe('spriteFromSheet', () => {
 
   for (const [behavior, width, height, frames] of [
     ['a frame narrower than 8 px fails with a hint', 14, 8, 2],
-    ['a frame wider than 24 px fails with a hint', 25, 8, 1],
+    ['a frame wider than 48 px fails with a hint', 49, 8, 1],
     ['a frame shorter than 8 px fails with a hint', 8, 6, 1],
-    ['a frame taller than 12 px fails with a hint', 8, 14, 1],
+    ['a frame taller than 48 px fails with a hint', 8, 50, 1],
     ['an odd frame height fails with a hint', 8, 9, 1],
   ] as const) {
     test(behavior, () => {
       const result = spriteFromSheet(rgbaSheet(width, height, () => RED), frames, file)
       expect(result.ok).toBe(false)
-      expect(result.issues[0]?.problem.endsWith('(decision 0012). Resize the art or check --frames')).toBe(true)
+      expect(result.issues[0]?.problem.endsWith('(decision 0021). Resize the art or check --frames')).toBe(true)
     })
   }
 
@@ -82,8 +82,8 @@ describe('spriteFromSheet', () => {
     for (const frames of [0, 9, 1.5]) expect(spriteFromSheet(rgbaSheet(72, 8, () => RED), frames, file).ok).toBe(false)
   })
 
-  test('the largest allowed sheet converts: 8 frames of 24×12', () => {
-    const result = spriteFromSheet(rgbaSheet(192, 12, (x) => [x % 24, 0, 0, 255]), 8, file)
-    expect(result.ok && [result.value.width, result.value.height, result.value.frames.length]).toEqual([24, 12, 8])
+  test('the largest allowed sheet converts: 8 frames of 48×48', () => {
+    const result = spriteFromSheet(rgbaSheet(384, 48, (x) => [x % 48, 0, 0, 255]), 8, file)
+    expect(result.ok && [result.value.width, result.value.height, result.value.frames.length]).toEqual([48, 48, 8])
   })
 })
