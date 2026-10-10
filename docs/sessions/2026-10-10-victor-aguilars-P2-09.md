@@ -2,7 +2,7 @@
 
 - **Task:** P2-09 — Starter content
 - **Branch:** `p2-09-official-roster` (replaces `p2-09-whispering-forest`; built on P2-13 and the skill fix, PRs #45 and #50)
-- **Status at end:** in-progress (draft PR; `check:content` fails the tier mix for two biomes)
+- **Status at end:** in-progress (draft PR; `check:content` passes; waits on #53 → #55 and #56 → #57)
 - **Last commit:** see `git log` on the branch (this handoff commit)
 
 ## Goal for this session
@@ -24,6 +24,22 @@ Start the official roster: one starter Modster per biome, added with the `add-mo
 - `CREDITS.md` has a row per new sheet.
 - Verified: 367 plugin tests pass and every content file is valid. `check:content` fails only on the P2-09 tier mix, for Dustwind Expanse and Saltbreeze Bay.
 
+## Later the same session
+
+- Bigger sprites, after 0021 was proposed (#53) and P2-16 prepared (#55): Dunebun 22×20, Hootlet 18×20, Crabbit 26×18.
+- #004 Sunmane: Dustwind Expanse, fire, rare at weight 4. 33×30, three-quarter pose with a full flame mane at 8 fps. @victor-aguilars changed it from legendary to rare.
+- Two types per Modster: decision 0022 and task P2-17 (#56, #57). Every Modster now uses `dex.types`.
+- New Modsters, every field chosen by @victor-aguilars:
+
+  | # | Modster | Biome | Types | Tier | Sprite |
+  | --- | --- | --- | --- | --- | --- |
+  | 005 | Twiggle | Dustwind Expanse | grass, ghost | uncommon (weight 20) | 18×16 hand-drawn tangle; tones shift, mirror, blink |
+  | 006 | Flopple | Saltbreeze Bay | water | uncommon (weight 20) | 28×16 sleeping seal pup; breathing and a "z" |
+  | 007 | Serpentide | Saltbreeze Bay | water, dragon | rare (weight 4) | 28×32 rearing out of the waves; neck sway and a blink |
+
+- Changes during review: Flopple's face was redrawn front-on with whisker pads ("difficult to see that it is a seal"). Serpentide tried swimming arches, then a whirlpool coil, which read as a cone, then rearing up with a bigger head.
+- `check:content` now passes: every biome has a common, an uncommon and a rare. The legendary is still the placeholder Elderbark.
+
 ## Decisions made
 
 - @victor-aguilars: the 4 Whispering Forest Modsters are examples to replace. The official roster is built one Modster at a time with `add-modster`, starting with one starter per biome.
@@ -40,7 +56,7 @@ Start the official roster: one starter Modster per biome, added with the `add-mo
 
 ## Next steps
 
-1. Add an uncommon and a rare Modster to Dustwind Expanse and to Saltbreeze Bay with `add-modster`, asking the user for every field, sprite size included. Then mark the PR ready.
+1. Once @danielpg95 accepts 0021: merge #53 and #55, then #56 and #57. Then mark #52 ready and merge it. It contains those PRs' commits, so it must not merge before them.
 2. Replace the forest placeholders with official Modsters and pick a legendary for one biome. The P2-09 goal is 3 biomes × 5, numbers 1–15.
 3. Confirm Dustwind Expanse's description and accent with @victor-aguilars.
 
