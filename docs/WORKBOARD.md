@@ -15,7 +15,7 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P2-09 | @victor-aguilars | in-progress | p2-09-whispering-forest | 2026-10-08 | 2026-10-09 | Once P2-13 (PR) merges: design the official 3 biomes × 5 Modsters with dex entries (current ones are placeholders) |
+| P2-09 | @victor-aguilars | in-progress | p2-09-official-roster | 2026-10-08 | 2026-10-10 | Add an uncommon and a rare Modster to Dustwind Expanse and Saltbreeze Bay (draft PR fails the tier check until then) |
 
 ## Up next
 
