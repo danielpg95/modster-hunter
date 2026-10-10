@@ -15,7 +15,8 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P2-09 | @victor-aguilars | in-progress | p2-09-whispering-forest | 2026-10-08 | 2026-10-08 | Design biome 2 (and a 5th Forest Modster) with the user; first slice in review |
+| P2-09 | @victor-aguilars | blocked | p2-09-whispering-forest | 2026-10-08 | 2026-10-09 | Waits on P2-13; then design the official 3 biomes × 5 Modsters with dex entries (current ones are placeholders) |
+| P2-13 | @victor-aguilars | in-progress | p2-13-modster-dex | 2026-10-09 | 2026-10-09 | Add `dex` to types, validator, merge and tests |
 
 ## Up next
 
