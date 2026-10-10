@@ -412,3 +412,12 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] A decision settles the `userConfig` option: its name, the places, the default (band only, as today), and how it relates to 0019's pane reopening.
   - [ ] Every place draws from the same encounter machine; one Throw per encounter, and turning the band off never leaves Throw unreachable.
   - [ ] Option documented in CONTENT_FORMAT.md's `userConfig` table; tested with each place on and off.
+
+#### [ ] P5-09 — Sprite miniatures (spike)
+- **Depends on:** P2-16
+- **Size:** S
+- **Goal:** when a sprite doesn't fit the band or pane, show a miniature instead of the text-only layout (issue #54, accepted by @danielpg95). Only matters once decision 0021 is accepted.
+- **Done when:**
+  - [ ] A spike checks whether `Raster` takes quadrant characters (`▘▝▖▗▚▞▙▛▜▟▌▐`), how they render in Ghostty, iTerm2, kitty and Windows Terminal, and whether a 2× downscale still reads as the Modster; screenshots of a 2× downscale and quadrant blocks for Sunmane in an 80×24 band.
+  - [ ] A decision picks an approach (2× downscale, quadrants, a hand-drawn mini sprite, a mix, or none).
+  - [ ] If one is picked, a roadmap task implements it, with render tests at `maxRows` 7 for a sprite taller than 14 px and the miniature never taller than `maxRows`.
