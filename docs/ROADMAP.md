@@ -218,14 +218,14 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [x] The band draws nothing while the pane is open, placed and shown, and takes the encounter back when it isn't.
   - [x] The mod never opens the pane by itself; render tests cover the pane and the band stepping aside.
 
-#### [ ] P2-13 — Modster dex fields
+#### [x] P2-13 — Modster dex fields
 - **Depends on:** P2-01
 - **Size:** S
 - **Goal:** decision 0017: `modster.json` takes an optional `dex` (number, type, category, height, weight, entry), validated and merged.
 - **Done when:**
-  - [ ] Unit tests cover every `dex` rule in CONTENT_FORMAT.md, including the 18 types, a `number` in a user file, and a user override keeping the built-in number.
-  - [ ] `npm run check:content` fails when a built-in Modster's `dex` is incomplete or two numbers clash.
-  - [ ] CONTENT_FORMAT.md, the content templates and the `add-modster` skill describe `dex`.
+  - [x] Unit tests cover every `dex` rule in CONTENT_FORMAT.md, including the 18 types, a `number` in a user file, and a user override keeping the built-in number.
+  - [x] `npm run check:content` fails when a built-in Modster's `dex` is incomplete or two numbers clash.
+  - [x] CONTENT_FORMAT.md, the content templates and the `add-modster` skill describe `dex`.
 
 ---
 
