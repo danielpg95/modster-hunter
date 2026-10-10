@@ -136,8 +136,9 @@ workflow in the same PR.
   hotkeys stop working.
 - **A pane the mod opens by itself** only appears at ≥ 144 columns (≥ 110 for
   an id the person opened before, until they close it by hand). We never
-  auto-open (decision 0002), except reopening the encounter pane for people
-  who opened it (decision 0019).
+  auto-open (decision 0002), except the encounter pane: reopened for people
+  who opened it (decision 0019), or every session with `encounterPane: always`
+  (decision 0023).
 - **`Raster` cells must be one column wide.** `▀` is; emoji are not.
 - **Timers** started with `$.clock.every` stop on reload. Start them in
   `session.start`, never at module top level.

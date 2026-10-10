@@ -404,14 +404,14 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Done when:**
   - [ ] README with install instructions and a recording; CHANGELOG; version tag; marketplace entry tested from a clean machine.
 
-#### [ ] P5-08 — Display settings
+#### [x] P5-08 — Display settings
 - **Depends on:** P2-12, P2-14
 - **Size:** M
 - **Goal:** the person picks where the game shows: band, encounter pane, spinner teaser, status line, in any combination (issue #35, accepted by @danielpg95).
 - **Done when:**
   - [x] A decision settles the `userConfig` option: its name, the places, the default (band, spinner and status line on; pane as today), and how it relates to 0019's pane reopening (0023).
-  - [ ] Every place draws from the same encounter machine; one Throw per encounter, and turning the band off never leaves Throw unreachable.
-  - [ ] Option documented in CONTENT_FORMAT.md's `userConfig` table; tested with each place on and off.
+  - [x] Every place draws from the same encounter machine; one Throw per encounter, and turning the band off never leaves Throw unreachable.
+  - [x] Option documented in CONTENT_FORMAT.md's `userConfig` table; tested with each place on and off.
 
 #### [ ] P5-09 — Sprite miniatures (spike)
 - **Depends on:** P2-16
