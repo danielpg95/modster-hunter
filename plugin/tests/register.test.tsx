@@ -58,7 +58,7 @@ describe('register', () => {
     const message = 'No biomes to play: every biome is disabled or failed to load'
     expect(toasts).toEqual([`Modster Hunter: ${message}`])
     const result = (await $.command.run({ command: 'modsters' } as any)) as { text: string }
-    expect(result.text).toBe(`Modster Hunter is loaded · ${message}`)
+    expect(result.text).toBe(`Modster Hunter is loaded · ${message}${HINT}`)
   })
 
   test('user content loads from ~/.claude/modster-hunter/content, PNG sprites included (0007, 0016)', { options: { includeBuiltins: false } }, async ($, on) => {
@@ -70,7 +70,7 @@ describe('register', () => {
     await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' } as any)
 
     const result = (await $.command.run({ command: 'modsters' } as any)) as { text: string }
-    expect(result.text).toBe("Modster Hunter is loaded · You're in Pixel Meadow")
+    expect(result.text).toBe(`Modster Hunter is loaded · You're in Pixel Meadow${HINT}`)
     // The decoded sheet is cached for the next session
     expect(JSON.parse(user['cache/sprites/blobby.sprite.json'] ?? '{}')).toMatchObject({ v: 1, source: { frames: 2 }, sprite: { width: 8, height: 8 } })
   })
@@ -83,7 +83,7 @@ describe('register', () => {
 
     const result = (await $.command.run({ command: 'modsters' } as any)) as { text: string }
     expect(result.text).toBe(
-      'Modster Hunter is loaded · No biomes to play: built-in content is off and no biome in ~/.claude/modster-hunter/content/ loaded',
+      `Modster Hunter is loaded · No biomes to play: built-in content is off and no biome in ~/.claude/modster-hunter/content/ loaded${HINT}`,
     )
   })
 
@@ -96,7 +96,7 @@ describe('register', () => {
 
     const reply = async () => ((await $.command.run({ command: 'modsters' } as any)) as { text: string }).text
     const first = await reply()
-    expect(['Whispering Forest', 'Tidepool Shallows'].some((name) => first.endsWith(`You're in ${name}`))).toBe(true)
+    expect(['Whispering Forest', 'Tidepool Shallows'].some((name) => first.endsWith(`You're in ${name}${HINT}`))).toBe(true)
 
     for (const source of ['clear', 'resume', 'fork'] as const) {
       await $.classic.SessionStart({ source })
@@ -259,6 +259,8 @@ describe('register', () => {
 })
 
 
+// Every /modsters reply points to the settings (0023 point 7)
+const HINT = ' · Change where the game shows in /config'
 const BAND_TICK = 250
 const BAND_PROPS = { hasSurvey: false, isWorking: true, maxRows: 7, bodyColumns: 120 }
 

@@ -29,6 +29,31 @@
       "description": "Show the current biome in the band between encounters",
       "default": true
     },
+    "showInBand": {
+      "type": "boolean",
+      "title": "Show in the band",
+      "description": "Draw the game above the prompt. Off: one row during encounters only. Changing it ends an encounter in progress",
+      "default": true
+    },
+    "encounterPane": {
+      "type": "string",
+      "title": "Encounter pane",
+      "description": "off, when-opened (reopens after /modsters hunt) or always (every session). Changing it ends an encounter in progress",
+      "options": ["off", "when-opened", "always"],
+      "default": "when-opened"
+    },
+    "showInSpinner": {
+      "type": "boolean",
+      "title": "Show in the spinner",
+      "description": "Name the Modster in the spinner line while Claude works",
+      "default": true
+    },
+    "showInStatusLine": {
+      "type": "boolean",
+      "title": "Show in the status line",
+      "description": "Show the encounter in the status line while one is up",
+      "default": true
+    },
     "sounds": {
       "type": "boolean",
       "title": "Sounds",
