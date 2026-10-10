@@ -17,6 +17,8 @@ export const ENCOUNTER = {
   appearingMs: 1000,
   throwingMs: 1500,
   resultMs: 4000,
+  /** A subagent counts as work time for at most this long after its start, in case its stop event is lost (0018 point 3, `AGENT_WORK_MAX_MIN` = 30) */
+  agentWorkMaxMs: 30 * 60 * 1000,
 } as const
 
 /** Band layout, decision 0012: the full layout needs sprite + gap + text block in the band's width. */

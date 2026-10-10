@@ -159,6 +159,24 @@ describe('register', () => {
     await ui.unmount()
   })
 
+  test('a Modster appears while only a background subagent runs, and not after it stops (0018)', async ($, on) => {
+    // What Claude Code itself would answer beneath the mod
+    on('classic.SubagentStart', () => ({}))
+    on('classic.SubagentStop', () => ({}))
+    const { ui, clock } = await startBand($, on)
+
+    await $.classic.SubagentStart({ agent_id: 'a1', agent_type: 'general-purpose' } as any)
+    await clock.advance(2_000)
+    await $.classic.SubagentStop({ agent_id: 'a1', agent_type: 'general-purpose' } as any)
+    await clock.advance(10_000) // 2 s of work so far: the countdown waits
+    expect(await ui.find({ type: 'Text', text: 'appeared!' })).toBeUndefined()
+
+    await $.classic.SubagentStart({ agent_id: 'a2', agent_type: 'general-purpose' } as any)
+    await clock.advance(1_000 + BAND_TICK) // 3 s of work
+    expect(await ui.find({ type: 'Text', text: 'appeared!' })).toBeDefined()
+    await ui.unmount()
+  })
+
   test('a short band uses the compact layout: no sprite, never more lines than maxRows', async ($, on) => {
     const { ui, clock } = await startBand($, on)
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
