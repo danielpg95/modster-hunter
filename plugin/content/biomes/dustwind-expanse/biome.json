@@ -6,6 +6,7 @@
   "accentColor": "#e0a040",
   "encounterEverySec": [10, 30],
   "modsters": [
-    { "id": "dunebun", "weight": 100 }
+    { "id": "dunebun", "weight": 100 },
+    { "id": "sunmane", "weight": 4 }
   ]
 }
