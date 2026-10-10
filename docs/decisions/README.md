@@ -30,3 +30,4 @@ settled questions and avoid making assumptions about open ones.
 | [0014](0014-encounter-timings.md) | Encounter timings, a work-time spawn countdown, and no throws outside "waiting" | Accepted |
 | [0015](0015-encounter-pane.md) | An opt-in encounter pane, with the band stepping aside while it shows | Accepted |
 | [0016](0016-user-png-sprites.md) | User Modsters may use a PNG sheet directly; the mod decodes and caches it | Accepted |
+| [0017](0017-modster-dex-fields.md) | Modsters carry a dex entry: number, type, category, height, weight and entry text | Accepted |

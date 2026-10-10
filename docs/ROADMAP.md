@@ -191,7 +191,7 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [x] Tested with an in-memory store (`mock.store` can't be read back from a test), including a simulated second session writing in between.
 
 #### [ ] P2-09 — Starter content
-- **Depends on:** P2-02
+- **Depends on:** P2-02, P2-13
 - **Size:** L
 - **Goal:** 3 biomes × 5 Modsters, original pixel art, using the `add-biome`/`add-modster` skills.
 - **Done when:**
@@ -199,6 +199,7 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [ ] Every sprite has 2–4 animation frames and an entry in `plugin/content/CREDITS.md`.
   - [ ] All content passes the validator.
   - [ ] `formatOddsTable(oddsTable(…))` printed for each built-in biome and sanity-checked (moved from P2-05; @victor-aguilars, 2026-10-08).
+  - [ ] Every built-in Modster has a complete `dex` with numbers 1–15 (decision 0017; added 2026-10-09).
 
 #### [ ] P2-10 — Phase 2 playtest
 - **Depends on:** P2-04, P2-07, P2-08, P2-09
@@ -216,6 +217,15 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [x] The pane draws the biome and every encounter phase at the sprite's normal size; Throw works from it.
   - [x] The band draws nothing while the pane is open, placed and shown, and takes the encounter back when it isn't.
   - [x] The mod never opens the pane by itself; render tests cover the pane and the band stepping aside.
+
+#### [ ] P2-13 — Modster dex fields
+- **Depends on:** P2-01
+- **Size:** S
+- **Goal:** decision 0017: `modster.json` takes an optional `dex` (number, type, category, height, weight, entry), validated and merged.
+- **Done when:**
+  - [ ] Unit tests cover every `dex` rule in CONTENT_FORMAT.md, including the 18 types, a `number` in a user file, and a user override keeping the built-in number.
+  - [ ] `npm run check:content` fails when a built-in Modster's `dex` is incomplete or two numbers clash.
+  - [ ] CONTENT_FORMAT.md, the content templates and the `add-modster` skill describe `dex`.
 
 ---
 
@@ -235,7 +245,7 @@ Goal: `/modsters` opens a pane to browse what you've caught.
 - **Size:** M
 - **Goal:** caught Modsters in color, uncaught as dark silhouettes ("???"), count and best tier on each.
 - **Done when:**
-  - [ ] Selecting one shows a detail view: animated sprite, biomes found in, first/last caught.
+  - [ ] Selecting one shows a detail view: animated sprite, biomes found in, first/last caught, and the dex (decision 0017; `???` until caught).
   - [ ] Scrolls correctly with many Modsters.
 
 #### [ ] P3-03 — Biomes tab
