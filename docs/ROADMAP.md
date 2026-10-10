@@ -421,3 +421,12 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] A spike checks whether `Raster` takes quadrant characters (`▘▝▖▗▚▞▙▛▜▟▌▐`), how they render in Ghostty, iTerm2, kitty and Windows Terminal, and whether a 2× downscale still reads as the Modster; screenshots of a 2× downscale and quadrant blocks for Sunmane in an 80×24 band.
   - [ ] A decision picks an approach (2× downscale, quadrants, a hand-drawn mini sprite, a mix, or none).
   - [ ] If one is picked, a roadmap task implements it, with render tests at `maxRows` 7 for a sprite taller than 14 px and the miniature never taller than `maxRows`.
+
+#### [ ] P5-10 — Mark caught Modsters in the band
+- **Depends on:** P2-07, P2-08
+- **Size:** S
+- **Goal:** when a Modster you already caught appears, the band shows a small mark (`●`) next to its name, so you can tell new Modsters from repeats at a glance.
+- **Done when:**
+  - [ ] The mark shows only when the collection has `caught:<id>`; never for a first encounter.
+  - [ ] Fits the full and compact layouts per 0012; never exceeds `maxRows` (render tests with the mark at `maxRows` 0, 1, 2, 5, 6, 7).
+  - [ ] Render tests for a caught and an uncaught Modster, using an in-memory store.
