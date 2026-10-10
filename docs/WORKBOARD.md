@@ -23,4 +23,5 @@ this file lists only tasks someone has claimed.
 Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
+- **P2-14** — Reopen the encounter pane
 - **P4-04** — User-facing content skill
