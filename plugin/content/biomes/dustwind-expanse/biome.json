@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "dustwind-expanse",
+  "name": "Dustwind Expanse",
+  "description": "Endless sand where the wind never stops talking.",
+  "accentColor": "#e0a040",
+  "encounterEverySec": [10, 30],
+  "modsters": [
+    { "id": "dunebun", "weight": 100 }
+  ]
+}
