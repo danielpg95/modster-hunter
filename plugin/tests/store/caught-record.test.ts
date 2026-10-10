@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { addCatch, readCaughtRecord, type CaughtRecord } from '../../hooks/store'
+import { addCatch, isCaught, readCaughtRecord, type CaughtRecord } from '../../hooks/store'
+import { memoryStore } from '../fixtures/memory-store'
 
 const first = { tier: 'common', biomeId: 'whispering-forest', at: 1_000, shiny: false } as const
 
@@ -52,5 +53,12 @@ describe('caught records', () => {
   test('reading drops bad biome counts and fills missing optional numbers', () => {
     const raw = { v: 1, count: 2, bestTier: 'common', biomes: { a: 2, b: 'x' } }
     expect(readCaughtRecord(raw)).toEqual({ v: 1, count: 2, shinyCount: 0, firstCaughtAt: 0, lastCaughtAt: 0, bestTier: 'common', biomes: { a: 2 } })
+  })
+
+  test('isCaught is true only when the collection has a readable record (P5-10)', async () => {
+    const { store } = memoryStore({ 'caught:sproutling': addCatch(undefined, first), 'caught:broken': { v: 99 } })
+    expect(await isCaught(store, 'sproutling')).toBe(true)
+    expect(await isCaught(store, 'mossling')).toBe(false)
+    expect(await isCaught(store, 'broken')).toBe(false)
   })
 })

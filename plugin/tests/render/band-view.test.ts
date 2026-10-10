@@ -194,6 +194,38 @@ describe('bandView', () => {
     expect(waiting.kind === 'compact' ? waiting.lines.map(text) : []).toEqual(['Sproutling (common) · [1: Throw] · [2: Run] · 3 left'])
   })
 
+  // The caught mark (P5-10)
+  test('a Modster already caught gets a mark after its name in every layout', () => {
+    const caught = encounter({ alreadyCaught: true })
+    const lines = (maxRows: number) => {
+      const view = bandView(input({ maxRows, encounter: caught }))
+      return view.kind === 'full' || view.kind === 'compact' ? view.lines.map(text) : []
+    }
+    expect(lines(7)).toEqual(['Sproutling ● · common', '3 throws left', '[1: Throw]   [2: Run]'])
+    expect(lines(2)).toEqual(['A wild Sproutling ● appeared! (common)', '[1: Throw] · [2: Run] · 3 left'])
+    expect(lines(1)).toEqual(['Sproutling ● (common) · [1: Throw] · [2: Run] · 3 left'])
+    expect(lines(0)).toEqual([])
+  })
+
+  test('a Modster not caught yet has no mark', () => {
+    for (const maxRows of [1, 2, 7]) {
+      const view = bandView(input({ maxRows }))
+      const lines = view.kind === 'full' || view.kind === 'compact' ? view.lines.map(text) : []
+      expect([maxRows, lines.some((line) => line.includes('●'))]).toEqual([maxRows, false])
+    }
+  })
+
+  test('the caught mark never takes more rows than maxRows', () => {
+    for (const maxRows of [0, 1, 2, 5, 6, 7]) {
+      for (const phase of PHASES) {
+        for (const columns of [40, 80]) {
+          const view = bandView(input({ maxRows, columns, encounter: encounter({ ...phase, alreadyCaught: true }) }))
+          expect([maxRows, phase.phase, bandRows(view) <= maxRows]).toEqual([maxRows, phase.phase, true])
+        }
+      }
+    }
+  })
+
   test('the band off still draws nothing at maxRows 0', () => {
     expect(bandView(input({ maxRows: 0, oneRow: true }))).toEqual({ kind: 'none' })
   })

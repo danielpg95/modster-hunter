@@ -1,4 +1,4 @@
-export { addCatch, caughtKey, readCaughtRecord, type Catch, type CaughtRecord } from './caught-record'
+export { addCatch, caughtKey, isCaught, readCaughtRecord, type Catch, type CaughtRecord } from './caught-record'
 export { HUNT_PANE_KEY, huntPanePref, prefAfterClose, readHuntPaneOpen, type HuntPanePref } from './hunt-pane-pref'
 export { recordEncounterEvents, recordStat } from './record-encounter-events'
 export { addToStats, readSessionStats, statsKey, type BiomeStats, type SessionStats, type StatsEvent } from './session-stats'

@@ -27,6 +27,8 @@ export const BAND = {
   textColumns: 24,
   /** How often the encounter machine is stepped (timers resolve to within this) */
   tickMs: 250,
+  /** After the name of a Modster already in the collection (P5-10) */
+  caughtMark: '●',
 } as const
 
 /** Where the game shows, decision 0023 point 1: the `userConfig` defaults and the pane picker's values. */

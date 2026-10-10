@@ -231,6 +231,41 @@ describe('register', () => {
     await ui.unmount()
   })
 
+  test('a Modster already in the collection appears with the caught mark (P5-10)', async ($, on) => {
+    // Same in-memory stand-in for $.store as the catch test above
+    const store: Record<string, unknown> = {
+      'caught:sproutling': { v: 1, count: 1, shinyCount: 0, firstCaughtAt: 1, lastCaughtAt: 1, bestTier: 'common', biomes: { 'whispering-forest': 1 } },
+    }
+    on('store.get', ($, e) => ({ value: structuredClone(store[e.key]) }))
+    on('store.set', ($, e) => {
+      store[e.key] = structuredClone(e.value)
+      return { value: undefined }
+    })
+    const { ui, clock } = await startBand($, on)
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(4_000 + BAND_TICK)
+    expect((await ui.find({ type: 'Text', text: /●/ }))?.type).toBe('Text')
+    await ui.unmount()
+  })
+
+  test('a first encounter has no caught mark, even after the catch (P5-10)', async ($, on) => {
+    const store: Record<string, unknown> = {}
+    on('store.get', ($, e) => ({ value: structuredClone(store[e.key]) }))
+    on('store.set', ($, e) => {
+      store[e.key] = structuredClone(e.value)
+      return { value: undefined }
+    })
+    const { ui, clock } = await startBand($, on)
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(4_000 + BAND_TICK)
+    expect(await ui.find({ type: 'Text', text: /●/ })).toBeUndefined()
+    await ui.press({ key: 'throw' })
+    await clock.advance(1_500 + BAND_TICK)
+    expect(store['caught:sproutling']).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /●/ })).toBeUndefined()
+    await ui.unmount()
+  })
+
   test('pressing Run shows the card, saves a run, and clears the band after it (0020)', async ($, on) => {
     // Same in-memory stand-in for $.store as the catch test above
     const store: Record<string, unknown> = {}

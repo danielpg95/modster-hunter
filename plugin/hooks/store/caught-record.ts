@@ -1,4 +1,5 @@
 import type { Rarity } from '../content'
+import type { StorePort } from './store-port'
 
 /** `caught:<modsterId>` (decision 0009). */
 export interface CaughtRecord {
@@ -53,6 +54,11 @@ export function readCaughtRecord(raw: unknown): CaughtRecord | undefined {
     bestTier: tier,
     biomes,
   }
+}
+
+/** Whether the collection already has `modsterId` (P5-10); an unreadable record counts as not caught. */
+export async function isCaught(store: StorePort, modsterId: string): Promise<boolean> {
+  return readCaughtRecord(await store.get(caughtKey(modsterId))) !== undefined
 }
 
 /** The record after one more catch; never changes `record`. */
