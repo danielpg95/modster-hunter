@@ -76,3 +76,8 @@ user-facing skill in `plugin/skills/`, phase 4.)
    user to run `claude --plugin-dir ./plugin` (the biome is random; restart
    until it's the right one, or use `/modsters hunt`). Adjust colors that read
    poorly on a dark or light background.
+10. **Show it in the PR:** the PR description needs a preview of every new or
+    changed Modster: its sprite enlarged, every frame, on a dark and a light
+    background (the PR template's "Content and art" checklist). Save the
+    preview from step 3 and ask the user to attach it to the description, or
+    attach it yourself if you can upload images.
