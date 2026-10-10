@@ -202,4 +202,10 @@ Built-in on/off is the plugin option `includeBuiltins`, not this file.
 | `includeBuiltins` | boolean | `true` | Load the content that ships with the mod |
 | `encounterIdleTimeoutSec` | number | `90` | Seconds without a throw before an encounter's Modster wanders off |
 | `showIdleLine` | boolean | `true` | Show the current biome in the band between encounters |
+| `showInBand` | boolean | `true` | Draw the game in the band. Off: one row (Throw, Run) during encounters only, nothing between them (decision 0023) |
+| `encounterPane` | `off`, `when-opened`, `always` | `when-opened` | When the encounter pane opens: never (`/modsters hunt` says it's off), after `/modsters hunt` until closed by hand (0019), or every session (0023) |
+| `showInSpinner` | boolean | `true` | Name the Modster in the spinner line while Claude works (0023) |
+| `showInStatusLine` | boolean | `true` | Show the encounter in the status line while one is up; cleared between encounters (0023) |
 | `sounds` | boolean | `false` | Play sounds (P5-02) |
+
+Changing any option in `/config` reloads the mod, which ends an encounter in progress (decision 0005).

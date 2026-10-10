@@ -25,6 +25,8 @@ export interface BandInput {
   encounter?: BandEncounter
   biome?: { name: string; accentColor?: string }
   showIdleLine: boolean
+  /** The band is turned off (0023 point 3): one row during an encounter, nothing between them */
+  oneRow?: boolean
 }
 
 /** The band's buttons; a plain Button draws as `1: Throw`, so a line's width is known (0020). */
@@ -45,12 +47,12 @@ export type BandView =
   | { kind: 'compact'; lines: BandLine[] }
 
 export function bandView(input: BandInput): BandView {
-  const rows = Math.max(0, Math.floor(input.maxRows))
+  const rows = Math.min(Math.max(0, Math.floor(input.maxRows)), input.oneRow ? 1 : Infinity)
   if (rows === 0) return { kind: 'none' }
 
   const encounter = input.encounter
   if (!encounter) {
-    if (!input.showIdleLine || !input.biome) return { kind: 'none' }
+    if (input.oneRow || !input.showIdleLine || !input.biome) return { kind: 'none' }
     const name: BandSegment = input.biome.accentColor
       ? { text: input.biome.name, color: input.biome.accentColor }
       : { text: input.biome.name }
@@ -95,6 +97,11 @@ export function lineWidth(line: BandLine): number {
 /** The line with Run, or without it when it doesn't fit: buttons don't truncate, Throw always stays (0020). */
 function withRunIfFits(withRun: BandLine, withoutRun: BandLine, columns: number): BandLine {
   return lineWidth(withRun) <= columns ? withRun : withoutRun
+}
+
+/** The result card's first line as plain text, for places that draw text only (0023). */
+export function resultText(e: BandEncounter): string {
+  return (resultLines(e)[0] ?? []).map((segment) => ('text' in segment ? segment.text : '')).join('')
 }
 
 const left = (n: number): string => `${n} ${n === 1 ? 'throw' : 'throws'} left`

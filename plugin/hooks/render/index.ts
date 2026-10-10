@@ -1,3 +1,5 @@
-export { BAND_BUTTONS, bandRows, bandView, lineWidth, type BandButton, type BandEncounter, type BandInput, type BandLine, type BandSegment, type BandView } from './band-view'
+export { BAND_BUTTONS, bandRows, bandView, lineWidth, resultText, type BandButton, type BandEncounter, type BandInput, type BandLine, type BandSegment, type BandView } from './band-view'
+export { displayPlan, type DisplayPlan, type DisplayState } from './display-plan'
+export { readDisplaySettings, type DisplaySettings, type EncounterPaneMode } from './display-settings'
 export { DEFAULT_COLOR, pixelsToCells, type Frame } from './pixels-to-cells'
 export { spriteCells } from './sprite-cells'

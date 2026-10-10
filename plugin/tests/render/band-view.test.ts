@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { BAND_BUTTONS, bandRows, bandView, lineWidth, type BandEncounter, type BandInput, type BandLine } from '../../hooks/render'
+import { BAND_BUTTONS, bandRows, bandView, lineWidth, resultText, type BandEncounter, type BandInput, type BandLine } from '../../hooks/render'
 
 const encounter = (overrides: Partial<BandEncounter> = {}): BandEncounter => ({
   phase: 'waiting',
@@ -173,5 +173,35 @@ describe('bandView', () => {
     expect(bandView({ ...rest, showIdleLine: false }).kind).toBe('none')
     const { biome: _noBiome, ...noBiome } = rest
     expect(bandView(noBiome).kind).toBe('none')
+  })
+
+  // The band turned off (0023 point 3)
+  test('with the band off, nothing shows between encounters, even with the idle line on', () => {
+    const { encounter: _none, ...rest } = input()
+    expect(bandView({ ...rest, oneRow: true })).toEqual({ kind: 'none' })
+  })
+
+  test('with the band off, an encounter takes one row in every phase, and Throw shows while waiting', () => {
+    for (const phase of PHASES) {
+      for (const maxRows of [1, 7, 24]) {
+        const view = bandView(input({ maxRows, oneRow: true, encounter: encounter(phase) }))
+        expect([phase.phase, maxRows, view.kind, bandRows(view)]).toEqual([phase.phase, maxRows, 'compact', 1])
+        const hasThrow = view.kind === 'compact' && view.lines.some((line) => line.some((segment) => 'button' in segment && segment.button === 'throw'))
+        expect([phase.phase, hasThrow]).toEqual([phase.phase, phase.phase === 'waiting'])
+      }
+    }
+    const waiting = bandView(input({ oneRow: true }))
+    expect(waiting.kind === 'compact' ? waiting.lines.map(text) : []).toEqual(['Sproutling (common) · [1: Throw] · [2: Run] · 3 left'])
+  })
+
+  test('the band off still draws nothing at maxRows 0', () => {
+    expect(bandView(input({ maxRows: 0, oneRow: true }))).toEqual({ kind: 'none' })
+  })
+
+  test('resultText is the result card\'s first line', () => {
+    expect(resultText(encounter({ phase: 'result', outcome: 'caught' }))).toBe('Caught Sproutling!')
+    expect(resultText(encounter({ phase: 'result', outcome: 'fled', fledBecause: 'attempts' }))).toBe('Sproutling fled!')
+    expect(resultText(encounter({ phase: 'result', outcome: 'fled', fledBecause: 'idle' }))).toBe('Sproutling wandered off.')
+    expect(resultText(encounter({ phase: 'result', outcome: 'ran' }))).toBe('You ran from Sproutling.')
   })
 })

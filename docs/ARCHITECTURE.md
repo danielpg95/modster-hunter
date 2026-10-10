@@ -50,15 +50,16 @@ plugin/
 
 | Event | Purpose |
 | --- | --- |
-| `session.start` | Register `/modsters`, load content, pick the biome, restore `$.state`, reopen the encounter pane if `prefs:huntPane` says so (0019) |
-| `classic.SessionStart` (`clear`, `resume`, `fork`) | Re-copy stored values into `$.state` (reset by those commands); reopen the encounter pane as at `session.start` (0019) |
+| `session.start` | Register `/modsters`, load content, pick the biome, restore `$.state`, clear the status line, and open the encounter pane as `encounterPane` says: if `prefs:huntPane` says so (0019), every session, or never (0023) |
+| `classic.SessionStart` (`clear`, `resume`, `fork`) | Re-copy stored values into `$.state` (reset by those commands); open the encounter pane as at `session.start` (0019, 0023) |
 | `turn.start` / `turn.complete` | Tell the scheduler a turn is running / ended |
 | `classic.SubagentStart` / `classic.SubagentStop` | Tell the scheduler a subagent is running / stopped, by `agent_id`; work time includes it (0018) |
-| `ui.render` `{ component: 'AbovePrompt' }` | Draw the encounter or idle line |
+| `ui.render` `{ component: 'AbovePrompt' }` | Draw the encounter or idle line; one row during encounters only with `showInBand` off (0023) |
 | `ui.render` `{ component: 'Pane' }` (our id) | Draw the collection pane (P3), or the encounter pane `modster-hunt` (0015) |
+| `ui.render` `{ component: 'Spinner' }` | Name the Modster in the main turn's spinner while an encounter is up (`showInSpinner`, 0023) |
 | `ui.close` | The encounter pane closed: redraw so the band takes the encounter back (0015); a close by hand stores `prefs:huntPane` `open: false` (0019) |
-| `command.run` `{ command: 'modsters' }` | Open the pane; `hunt` opens the encounter pane (0015) and stores `prefs:huntPane` `open: true` (0019); subcommands like `reload` |
-| `session.end` | Clear running turn and subagents, stop timers, flush stats (≤ 1.5 s total budget) |
+| `command.run` `{ command: 'modsters' }` | Open the pane; `hunt` opens the encounter pane (0015) and stores `prefs:huntPane` `open: true` (0019); answers that it's off with `encounterPane: off` (0023); subcommands like `reload` |
+| `session.end` | Clear running turn and subagents, stop timers, clear the status line, flush stats (≤ 1.5 s total budget) |
 
 ## Where state lives
 
@@ -66,6 +67,8 @@ plugin/
 | --- | --- | --- |
 | Content registry, current biome | Module variable | Rebuilt on load; cheap |
 | Current encounter (machine state) | Module variable in `register.tsx` | Not persisted (decision 0005); the band redraws via `$.ui.invalidate` when a step changes it, and `/clear` (which resets `$.state`) leaves it alone |
+| Display settings (`showInBand`, `encounterPane`, `showInSpinner`, `showInStatusLine`) | `userConfig`, read once per load | A change in `/config` reloads the module (decision 0023) |
+| Status line | `$.ui.status`, updated when an encounter step changes it | Shown only while an encounter is up (decision 0023) |
 | Collection, stats | `$.store` | Persists across sessions (decision 0009) |
 | Whether the encounter pane reopens (`prefs:huntPane`) | `$.store` | Set by `/modsters hunt`, cleared by a close by hand (decision 0019) |
 | User content | Files in `~/.claude/modster-hunter/content/` | Editable by hand, by the editor and by Claude |

@@ -18,7 +18,7 @@ import {
   type EncounterInput,
   type EncounterState,
 } from './game'
-import { BAND_BUTTONS, bandView, spriteCells, type BandEncounter, type BandLine } from './render'
+import { BAND_BUTTONS, bandView, displayPlan, readDisplaySettings, spriteCells, type BandEncounter, type BandLine, type DisplayPlan } from './render'
 import { HUNT_PANE_KEY, huntPanePref, prefAfterClose, readHuntPaneOpen, recordEncounterEvents, recordStat, type StorePort } from './store'
 
 // Rebuilt at every session start; cheap, so it isn't kept in $.state (ARCHITECTURE.md)
@@ -53,13 +53,23 @@ let frameIndex = 0
 let isBlitting = false
 
 // The opt-in encounter pane (decision 0015), opened with `/modsters hunt`; it
-// reopens at session start for people who opened it (0019)
+// reopens at session start for people who opened it (0019), or every session (0023)
 const PANE_ID = 'modster-hunt'
+
+// Where the game shows (0023). A change in /config reloads the module, so this is
+// read once per load
+let display = readDisplaySettings({})
+// What the status line shows now, so a tick that changes nothing doesn't re-pin it
+let shownStatus: string | undefined
+
+// Points people to the settings until the collection pane has its own (0023 point 7)
+const CONFIG_HINT = ' · Change where the game shows in /config'
 
 export const register: Register = (on, options) => {
   const idleTimeoutSec = typeof options.encounterIdleTimeoutSec === 'number' ? options.encounterIdleTimeoutSec : 90
   const showIdleLine = options.showIdleLine !== false
   const includeBuiltins = options.includeBuiltins !== false
+  display = readDisplaySettings(options)
 
   on('session.start', async ($, e, next) => {
     content = await loadGameContent($, includeBuiltins)
@@ -68,7 +78,10 @@ export const register: Register = (on, options) => {
     // Keep the biome if session.start ever repeats in this process; pick only when there's none yet
     if (biomeId === undefined || !content.biomes.has(biomeId)) biomeId = pickBiome(content.biomes.keys(), Math.random)
     startMachine($, idleTimeoutSec)
-    await reopenHuntPane($)
+    // Clears a line left by a load that had the status line on (0023 point 6)
+    shownStatus = undefined
+    $.ui.status(undefined)
+    await openHuntPaneAtStart($)
     // Register last: a taken name throws and would skip the rest of this hook
     await $.command.register({ name: 'modsters', description: 'Open your Modster collection' })
     return next(e)
@@ -76,7 +89,7 @@ export const register: Register = (on, options) => {
 
   // /clear, /resume and /branch don't fire session.start; keep the pane for them too (0019)
   on('classic.SessionStart', async ($, e, next) => {
-    if (e.source !== 'startup') await reopenHuntPane($)
+    if (e.source !== 'startup') await openHuntPaneAtStart($)
     return next(e)
   })
 
@@ -106,6 +119,8 @@ export const register: Register = (on, options) => {
   on('session.end', async ($, e, next) => {
     await advanceMachine($, { type: 'sessionEnd' })
     stopTimers()
+    shownStatus = undefined
+    $.ui.status(undefined)
     // Let queued writes land, within the 1.5 s session.end budget (ARCHITECTURE.md)
     await Promise.race([pendingWrites, $.clock.sleep(1000)])
     return next(e)
@@ -120,29 +135,17 @@ export const register: Register = (on, options) => {
       removeSite(e.requestId)
       return next(e)
     }
-    const encounter = machine?.encounter
-    const modster = encounter && content?.modsters.get(encounter.modsterId)
+    const modster = currentModster()
     const biome = biomeId === undefined ? undefined : content?.biomes.get(biomeId)?.biome
-
-    const band: BandEncounter | undefined =
-      encounter && modster
-        ? {
-            phase: encounter.phase,
-            name: modster.modster.name,
-            tier: encounter.tier,
-            attemptsLeft: encounter.attemptsLeft,
-            spriteWidth: modster.sprite.width,
-            spriteHeight: modster.sprite.height,
-            ...(encounter.outcome ? { outcome: encounter.outcome } : {}),
-            ...(encounter.fledBecause ? { fledBecause: encounter.fledBecause } : {}),
-          }
-        : undefined
+    const band = currentEncounter()
     const view = bandView({
       maxRows: e.props.maxRows,
       columns: e.props.bodyColumns,
       // Raster is terminal only (0012; Svg for the desktop app is P5-06)
       canDrawSprite: e.surface === 'terminal',
       showIdleLine,
+      // The band turned off still keeps Throw on screen during an encounter (0023 point 3)
+      ...(currentPlan().band === 'one-row' ? { oneRow: true } : {}),
       ...(band ? { encounter: band } : {}),
       ...(biome ? { biome: biome.accentColor ? { name: biome.name, accentColor: biome.accentColor } : { name: biome.name } } : {}),
     })
@@ -201,8 +204,8 @@ export const register: Register = (on, options) => {
   on('ui.render', { component: 'Pane' }, ($, e, next) => {
     if (e.requestId !== PANE_ID) return next(e)
     const { Box, Text, Button } = $.ui.resolve(e)
-    const encounter = machine?.encounter
-    const modster = encounter && content?.modsters.get(encounter.modsterId)
+    const modster = currentModster()
+    const encounter = currentEncounter()
     const biome = biomeId === undefined ? undefined : content?.biomes.get(biomeId)?.biome
     const rows = Math.max(0, e.props.scroll.bodyRows - 2) // header and a blank line
     const columns = e.props.bodyColumns
@@ -235,16 +238,7 @@ export const register: Register = (on, options) => {
       columns,
       canDrawSprite: e.surface === 'terminal' && fits(),
       showIdleLine: false,
-      encounter: {
-        phase: encounter.phase,
-        name: modster.modster.name,
-        tier: encounter.tier,
-        attemptsLeft: encounter.attemptsLeft,
-        spriteWidth: modster.sprite.width,
-        spriteHeight: modster.sprite.height,
-        ...(encounter.outcome ? { outcome: encounter.outcome } : {}),
-        ...(encounter.fledBecause ? { fledBecause: encounter.fledBecause } : {}),
-      },
+      encounter,
     })
     const line = (segments: BandLine, index: number) => (
       <Box key={`line-${index}`} flexDirection="row">
@@ -297,6 +291,15 @@ export const register: Register = (on, options) => {
     )
   })
 
+  // The spinner names the Modster while Claude works (0023 point 5). Subagents'
+  // rows keep their own words; their requestId is the agent id
+  on('ui.render', { component: 'Spinner' }, ($, e, next) => {
+    const message = currentPlan().spinner
+    if (message === undefined || (machine && e.requestId in machine.agents)) return next(e)
+    // An empty suffix: the engine's ellipsis would follow "Caught Sproutling!"
+    return next({ ...e, props: { ...e.props, message, suffix: '' } })
+  })
+
   // When the pane closes, the band takes the encounter back (0015). Only a close
   // by hand stops the reopening; ours and an unload change nothing (0019)
   on('ui.close', async ($, e, next) => {
@@ -311,6 +314,7 @@ export const register: Register = (on, options) => {
     // `/modsters hunt` opens the encounter pane; the mod opens it by itself only to reopen it (0015, 0019)
     const verb = typeof e.args === 'string' ? e.args.trim() : ''
     if (verb === 'hunt') {
+      if (display.encounterPane === 'off') return { text: 'The encounter pane is off · turn it on in /config' }
       queueWrite($, (store) => store.set(HUNT_PANE_KEY, huntPanePref(true)))
       const opened = await $.ui.open({ id: PANE_ID, title: 'Modster Hunter' })
       // The band redraws without the encounter now that the pane shows it
@@ -321,8 +325,8 @@ export const register: Register = (on, options) => {
     const biome = biomeId === undefined ? undefined : content?.biomes.get(biomeId)?.biome
     return {
       text: biome
-        ? `Modster Hunter is loaded · You're in ${biome.name}`
-        : `Modster Hunter is loaded · ${noBiomesMessage(includeBuiltins, USER_FOLDER_LABEL)}`,
+        ? `Modster Hunter is loaded · You're in ${biome.name}${CONFIG_HINT}`
+        : `Modster Hunter is loaded · ${noBiomesMessage(includeBuiltins, USER_FOLDER_LABEL)}${CONFIG_HINT}`,
     }
   })
 }
@@ -334,6 +338,33 @@ function cellsFor(loaded: LoadedModster): string[] {
     cellsByModster.set(loaded.modster.id, cells)
   }
   return cells
+}
+
+function currentModster(): LoadedModster | undefined {
+  const encounter = machine?.encounter
+  return encounter && content?.modsters.get(encounter.modsterId)
+}
+
+/** The encounter as the band, pane, spinner and status line draw it. */
+function currentEncounter(): BandEncounter | undefined {
+  const encounter = machine?.encounter
+  const modster = currentModster()
+  if (!encounter || !modster) return undefined
+  return {
+    phase: encounter.phase,
+    name: modster.modster.name,
+    tier: encounter.tier,
+    attemptsLeft: encounter.attemptsLeft,
+    spriteWidth: modster.sprite.width,
+    spriteHeight: modster.sprite.height,
+    ...(encounter.outcome ? { outcome: encounter.outcome } : {}),
+    ...(encounter.fledBecause ? { fledBecause: encounter.fledBecause } : {}),
+  }
+}
+
+function currentPlan(): DisplayPlan {
+  const encounter = currentEncounter()
+  return displayPlan(display, { turnRunning: machine?.turnRunning ?? false, ...(encounter ? { encounter } : {}) })
 }
 
 // Functions that take `$` live in this file: the engine follows `$` only into
@@ -378,6 +409,7 @@ async function advanceMachine($: EngineInterface, action: MachineAction): Promis
   if (step.state === machine) return
   machine = step.state
   $.ui.invalidate('ui.render')
+  updateStatus($)
   const where = { sessionId, biomeId: machineContext.biome.id }
   if (step.events.length > 0) queueWrite($, (store) => recordEncounterEvents(store, where, step.events, now))
 }
@@ -420,19 +452,36 @@ function addSite($: EngineInterface, requestId: string, loaded: LoadedModster): 
   })
 }
 
+/** Pins the status line the plan asks for (0023 point 6); undefined clears it. */
+function updateStatus($: EngineInterface): void {
+  const text = currentPlan().status
+  if (text === shownStatus) return
+  shownStatus = text
+  $.ui.status(text)
+}
+
 /**
- * Reopens the encounter pane when the person left it open (0019). Never asks for
- * focus; under 110 columns it waits unplaced and the band keeps the encounter.
+ * Opens the encounter pane at session start as `encounterPane` says (0023 point 4):
+ * `when-opened` reopens it when the person left it open (0019), `always` opens it
+ * every session, `off` closes one left open. Never asks for focus; under 110
+ * columns it waits unplaced and the band keeps the encounter.
  */
-async function reopenHuntPane($: EngineInterface): Promise<void> {
+async function openHuntPaneAtStart($: EngineInterface): Promise<void> {
   try {
-    // A close by hand may still be queued
-    await pendingWrites
-    if (!readHuntPaneOpen(await $.store.get(HUNT_PANE_KEY))) return
+    if (display.encounterPane === 'off') {
+      // Our close, so prefs:huntPane is kept for when the setting comes back (0019 point 2)
+      if ((await $.ui.panes()).some((pane) => pane.id === PANE_ID)) await $.ui.close({ id: PANE_ID })
+      return
+    }
+    if (display.encounterPane === 'when-opened') {
+      // A close by hand may still be queued
+      await pendingWrites
+      if (!readHuntPaneOpen(await $.store.get(HUNT_PANE_KEY))) return
+    }
     const opened = await $.ui.open({ id: PANE_ID, title: 'Modster Hunter' })
     if (opened.isPlaced) $.ui.invalidate('ui.render')
   } catch (error) {
-    $.ui.log(`hunt pane: not reopened: ${error instanceof Error ? error.message : String(error)}`, { to: 'debug' })
+    $.ui.log(`hunt pane: not opened at start: ${error instanceof Error ? error.message : String(error)}`, { to: 'debug' })
   }
 }
 
