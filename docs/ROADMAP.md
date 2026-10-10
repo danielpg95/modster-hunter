@@ -404,7 +404,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Done when:**
   - [ ] README with install instructions and a recording; CHANGELOG; version tag; marketplace entry tested from a clean machine.
 
-#### [x] P5-08 — Display settings
+#### [ ] P5-08 — Display settings
 - **Depends on:** P2-12, P2-14
 - **Size:** M
 - **Goal:** the person picks where the game shows: band, encounter pane, spinner teaser, status line, in any combination (issue #35, accepted by @danielpg95).
