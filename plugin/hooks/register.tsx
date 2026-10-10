@@ -19,7 +19,7 @@ import {
   type EncounterState,
 } from './game'
 import { BAND_BUTTONS, bandView, spriteCells, type BandEncounter, type BandLine } from './render'
-import { recordEncounterEvents, recordStat, type StorePort } from './store'
+import { HUNT_PANE_KEY, huntPanePref, prefAfterClose, readHuntPaneOpen, recordEncounterEvents, recordStat, type StorePort } from './store'
 
 // Rebuilt at every session start; cheap, so it isn't kept in $.state (ARCHITECTURE.md)
 let content: ContentRegistry | undefined
@@ -52,7 +52,8 @@ let frameModster: LoadedModster | undefined
 let frameIndex = 0
 let isBlitting = false
 
-// The opt-in encounter pane (decision 0015), opened with `/modsters hunt`
+// The opt-in encounter pane (decision 0015), opened with `/modsters hunt`; it
+// reopens at session start for people who opened it (0019)
 const PANE_ID = 'modster-hunt'
 
 export const register: Register = (on, options) => {
@@ -67,8 +68,15 @@ export const register: Register = (on, options) => {
     // Keep the biome if session.start ever repeats in this process; pick only when there's none yet
     if (biomeId === undefined || !content.biomes.has(biomeId)) biomeId = pickBiome(content.biomes.keys(), Math.random)
     startMachine($, idleTimeoutSec)
+    await reopenHuntPane($)
     // Register last: a taken name throws and would skip the rest of this hook
     await $.command.register({ name: 'modsters', description: 'Open your Modster collection' })
+    return next(e)
+  })
+
+  // /clear, /resume and /branch don't fire session.start; keep the pane for them too (0019)
+  on('classic.SessionStart', async ($, e, next) => {
+    if (e.source !== 'startup') await reopenHuntPane($)
     return next(e)
   })
 
@@ -289,17 +297,21 @@ export const register: Register = (on, options) => {
     )
   })
 
-  // When the pane closes, the band takes the encounter back (0015)
+  // When the pane closes, the band takes the encounter back (0015). Only a close
+  // by hand stops the reopening; ours and an unload change nothing (0019)
   on('ui.close', async ($, e, next) => {
     const result = await next(e)
+    const pref = e.id === PANE_ID ? prefAfterClose(e.origin.kind) : undefined
+    if (pref) queueWrite($, (store) => store.set(HUNT_PANE_KEY, pref))
     $.ui.invalidate('ui.render')
     return result
   })
 
   on('command.run', { command: 'modsters' }, async ($, e) => {
-    // `/modsters hunt` opens the encounter pane; the mod never opens it by itself (0002, 0015)
+    // `/modsters hunt` opens the encounter pane; the mod opens it by itself only to reopen it (0015, 0019)
     const verb = typeof e.args === 'string' ? e.args.trim() : ''
     if (verb === 'hunt') {
+      queueWrite($, (store) => store.set(HUNT_PANE_KEY, huntPanePref(true)))
       const opened = await $.ui.open({ id: PANE_ID, title: 'Modster Hunter' })
       // The band redraws without the encounter now that the pane shows it
       $.ui.invalidate('ui.render')
@@ -406,6 +418,22 @@ function addSite($: EngineInterface, requestId: string, loaded: LoadedModster): 
       isBlitting = false
     })
   })
+}
+
+/**
+ * Reopens the encounter pane when the person left it open (0019). Never asks for
+ * focus; under 110 columns it waits unplaced and the band keeps the encounter.
+ */
+async function reopenHuntPane($: EngineInterface): Promise<void> {
+  try {
+    // A close by hand may still be queued
+    await pendingWrites
+    if (!readHuntPaneOpen(await $.store.get(HUNT_PANE_KEY))) return
+    const opened = await $.ui.open({ id: PANE_ID, title: 'Modster Hunter' })
+    if (opened.isPlaced) $.ui.invalidate('ui.render')
+  } catch (error) {
+    $.ui.log(`hunt pane: not reopened: ${error instanceof Error ? error.message : String(error)}`, { to: 'debug' })
+  }
 }
 
 /** Whether our encounter pane is open, placed and the shown tab. Unknown counts as no. */
