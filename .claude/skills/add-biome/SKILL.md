@@ -7,9 +7,11 @@ description: Add a new built-in biome to Modster Hunter — theme, biome.json, M
 
 ## Steps
 
-1. **Agree on the theme with the user:** name, one-line description, accent
-   color, encounter pacing (`encounterEverySec`), and its Modster roster:
-   existing Modsters to reuse and new ones to create.
+1. **Ask the user for the theme, one field at a time:** name, one-line
+   description, accent color, encounter pacing (`encounterEverySec`), and its
+   Modster roster: existing Modsters to reuse and new ones to create. The user
+   decides; you only suggest, with 2–3 options and room for their own answer.
+   Never present a finished theme for a yes/no approval.
 2. **Check balance** against ROADMAP P2-09: at least one common, one uncommon,
    one rare. Compute and show the odds table (weight ÷ total, and the tier from
    decision 0004) before writing anything.
