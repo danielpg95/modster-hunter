@@ -29,8 +29,8 @@ describe('spriteFromPng', () => {
   })
 
   test('a sheet wider than its frames allow is refused before decoding', () => {
-    const result = spriteFromPng(sheet(32), 1, file)
-    expect(result.issues.map(formatIssue)).toEqual([`${file} can't be read as a sprite sheet: PNG is 32×8 px; at most 24×12 fits`])
+    const result = spriteFromPng(sheet(56), 1, file)
+    expect(result.issues.map(formatIssue)).toEqual([`${file} can't be read as a sprite sheet: PNG is 56×8 px; at most 48×48 fits`])
   })
 
   test('a broken file is an error, never a throw', () => {

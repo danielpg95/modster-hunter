@@ -14,11 +14,11 @@ const INVALID: [string, (sprite: Sprite) => void, string][] = [
   ['a missing schemaVersion is an error', (s) => delete s.schemaVersion, 'schemaVersion'],
   ['a missing width is an error', (s) => delete s.width, 'width'],
   ['a width under 8 is an error', (s) => (s.width = 7), 'width'],
-  ['a width over 24 is an error', (s) => (s.width = 25), 'width'],
+  ['a width over 48 is an error', (s) => (s.width = 49), 'width'],
   ['a fractional width is an error', (s) => (s.width = 8.5), 'width'],
   ['a missing height is an error', (s) => delete s.height, 'height'],
   ['a height under 8 is an error', (s) => (s.height = 6), 'height'],
-  ['a height over 12 is an error (decision 0012)', (s) => (s.height = 14), 'height'],
+  ['a height over 48 is an error (decision 0021)', (s) => (s.height = 50), 'height'],
   ['an odd height is an error', (s) => (s.height = 9), 'height'],
   ['a missing palette is an error', (s) => delete s.palette, 'palette'],
   ['an empty palette is an error', (s) => (s.palette = []), 'palette'],
@@ -46,8 +46,8 @@ describe('validateSprite', () => {
     expect(result.issues).toEqual([])
   })
 
-  test('the size bounds of decision 0012 are valid', () => {
-    for (const [width, height] of [[8, 8], [24, 12], [16, 10]] as const) {
+  test('the size bounds of decision 0021 are valid', () => {
+    for (const [width, height] of [[8, 8], [24, 12], [16, 10], [48, 48], [33, 30]] as const) {
       const sprite = { ...validSprite(), width, height, frames: [blank(width, height)] }
       expect(validateSprite(sprite, where).issues).toEqual([])
     }
@@ -127,7 +127,7 @@ describe('validateSprite', () => {
 
   test('frames are not decoded when the size is already wrong, so errors are not repeated', () => {
     const sprite = validSprite()
-    sprite.width = 30
+    sprite.width = 60
     expect(validateSprite(sprite, where).issues.map((issue) => issue.field)).toEqual(['width'])
   })
 

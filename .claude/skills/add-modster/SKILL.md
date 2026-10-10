@@ -31,8 +31,12 @@ user-facing skill in `plugin/skills/`, phase 4.)
    - Dex: one or two types (from the 18 in decision 0017; the first is the
      primary one, decision 0022), category ("Seed Modster"),
      height, weight, and the entry text (≤ 240 chars).
-   - Look: color scheme (≤ 16 colors), size (width 8–24, height 8–12 and even,
-     decision 0012), and a 2–4 frame idle animation.
+   - Look: color scheme (≤ 16 colors), size, and a 2–4 frame idle animation.
+     Sizes go up to 48×48, height even (decision 0021). Tell the user where
+     each size shows: up to 14 px tall shows in the band of an 80×24 terminal;
+     taller sprites show the compact text band there, and in full only in
+     bigger terminals or the encounter pane (`/modsters hunt`). Recommend
+     ≤ 24×14 unless the Modster needs more room (a legendary, a big beast).
 
    Check `plugin/content/modsters/` so the id and look are new. If the user
    shares a reference image, take ideas from it, not its look: the art must be
@@ -43,8 +47,11 @@ user-facing skill in `plugin/skills/`, phase 4.)
    script to the scratchpad, not the repo. Look at the result (open the PNG,
    enlarged, on a dark and a light background) and show it to the user before
    continuing. What reads at this size:
-   - A concept with 2–3 bold features. Squat or wide creatures fit 24×12;
-     tall, detailed or winged ones don't.
+   - A concept with 2–3 bold features. Squat or wide creatures fit 24×14;
+     tall, detailed or winged ones need a bigger size.
+   - For round bodies, build from shaded ellipses (lit from the top left, with
+     an automatic outline) and place eyes and details by hand; typing big
+     shapes pixel by pixel comes out stiff.
    - A three-quarter view, big head and small body, big eyes with a shine pixel.
    - Three tones per color (shadow, base, highlight), lit from the top left.
      A dark outline outside; a darker shade of the fill inside.

@@ -253,6 +253,16 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [ ] `session.start` and `classic.SessionStart` reopen the pane when `open` is true, without focus; tested, including an unplaced pane (band keeps the encounter).
 
 
+#### [ ] P2-16 — Sprites up to 48×48
+- **Depends on:** P2-01, P2-02, P2-07, P4-01
+- **Size:** S
+- **Goal:** decision 0021 (Proposed; start only once @danielpg95 accepts it): sprites may be 8–48 wide and 8–48 tall, and the band and pane show their compact layout where a sprite doesn't fit.
+- **Done when:**
+  - [x] `CONTENT.sprite` bounds are 8–48 × 8–48; the validator, `tools/sprite.mjs` and user PNG sheets accept a 48×48 sprite and reject 50×48 and 48×50 (tests).
+  - [x] Render tests: a 48×48 sprite shows the compact band at `maxRows` 7 and 15, full size in a pane with 26 body rows, and compact in a shorter pane.
+  - [ ] A 48×48 sprite animates at 8 fps without flicker in a real terminal (checked by hand, noted in the handoff).
+  - [x] CONTENT_FORMAT.md and the `add-modster` skill describe the bounds, where each size shows, and recommend ≤ 24×12 unless a Modster needs more.
+
 #### [x] P2-17 — Up to two types
 - **Depends on:** P2-13
 - **Size:** S
@@ -261,6 +271,7 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [x] Unit tests: one and two types are valid; zero, three, a repeat, an unknown type and the old `dex.type` are errors, the last one naming `types`.
   - [x] `npm run check:content` requires `types` for built-in Modsters; the four placeholders use `types`.
   - [x] CONTENT_FORMAT.md, the `modster.json` template and the `add-modster` skill describe `types`.
+
 ---
 
 ## Phase 3 — Collection pane

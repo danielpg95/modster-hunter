@@ -38,7 +38,7 @@ export function spriteFromSheet(sheet: RgbaImage, frameCount: number, file: stri
   if (width < bounds.widthMin || width > bounds.widthMax || height < bounds.heightMin || height > bounds.heightMax || height % 2 !== 0) {
     return issues.fail(
       '',
-      `frames are ${width}×${height} px; they must be ${bounds.widthMin}–${bounds.widthMax} wide and ${bounds.heightMin}–${bounds.heightMax} tall with an even height (decision 0012). Resize the art or check --frames`,
+      `frames are ${width}×${height} px; they must be ${bounds.widthMin}–${bounds.widthMax} wide and ${bounds.heightMin}–${bounds.heightMax} tall with an even height (decision 0021). Resize the art or check --frames`,
     )
   }
 

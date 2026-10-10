@@ -34,4 +34,5 @@ settled questions and avoid making assumptions about open ones.
 | [0018](0018-background-agents-count-as-work.md) | Background subagents count as work time for the spawn countdown | Accepted |
 | [0019](0019-reopen-encounter-pane.md) | The encounter pane reopens for people who opened it, until they close it by hand | Accepted |
 | [0020](0020-run-from-an-encounter.md) | The player can run from an encounter with `2: Run` | Accepted |
+| [0021](0021-sprites-up-to-48x48.md) | Sprites up to 48×48; the compact band shows when they don't fit | Proposed |
 | [0022](0022-up-to-two-types.md) | A Modster has one or two types, the first one primary | Accepted |
