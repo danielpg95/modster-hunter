@@ -25,7 +25,8 @@ PN-NN — Task title  <!-- one task per PR; title the PR "PN-NN: short descripti
 - [ ] Follows `docs/CONTENT_FORMAT.md` and passes the validator
 - [ ] Original art; I have the right to contribute it under the repo's art license
 - [ ] Credited in `plugin/content/CREDITS.md`
+- [ ] Every new or changed Modster has a preview in this description: its sprite enlarged, every frame, on a dark and a light background
 
 ## Screenshots or recording
 
-<!-- Optional for logic changes, expected for anything visual. -->
+<!-- Optional for logic changes, expected for anything visual. Required for new or changed Modsters (see above). -->
