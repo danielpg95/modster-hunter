@@ -409,7 +409,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Size:** M
 - **Goal:** the person picks where the game shows: band, encounter pane, spinner teaser, status line, in any combination (issue #35, accepted by @danielpg95).
 - **Done when:**
-  - [ ] A decision settles the `userConfig` option: its name, the places, the default (band only, as today), and how it relates to 0019's pane reopening.
+  - [ ] A decision settles the `userConfig` option: its name, the places, the default (band only, as today), and how it relates to 0019's pane reopening (0023, proposed).
   - [ ] Every place draws from the same encounter machine; one Throw per encounter, and turning the band off never leaves Throw unreachable.
   - [ ] Option documented in CONTENT_FORMAT.md's `userConfig` table; tested with each place on and off.
 
