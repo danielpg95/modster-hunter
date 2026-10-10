@@ -1,6 +1,6 @@
 # 0019 — The encounter pane reopens for people who opened it, until they close it by hand
 
-- **Status:** Accepted
+- **Status:** Accepted, amended by 0023 (`encounterPane`: `off`, `when-opened`, `always`)
 - **Date:** 2026-10-09
 - **Decided by:** @danielpg95 (issue #35; details drafted by Claude)
 

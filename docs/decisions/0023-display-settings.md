@@ -1,8 +1,8 @@
 # 0023 — Display settings: one toggle per place, a pane picker, and a one-line band that keeps Throw
 
-- **Status:** Proposed — settled by @danielpg95 (P5-08; amends 0002 point 3, 0015 points 2 and 5, 0019 point 5)
+- **Status:** Accepted (amends 0002 point 3, 0015 points 2 and 5, 0019 point 5)
 - **Date:** 2026-10-10
-- **Proposed by:** @danielpg95 (choices made in the P5-08 planning session; details drafted by Claude)
+- **Decided by:** @danielpg95 (choices made in the P5-08 planning session; details drafted by Claude)
 
 ## Context
 
@@ -118,8 +118,8 @@ Chosen: 1a, 2a, 3a.
 - P5-08 implements it: a pure `displayPlan` that decides what each place
   draws, tests with each place on and off, and the `userConfig` table in
   CONTENT_FORMAT.md.
-- When accepted: 0002's, 0015's and 0019's status lines name 0023, and
-  `CLAUDE.md` golden rule 6 and `docs/DEVELOPMENT.md` mention `always`.
+- 0002's, 0015's and 0019's status lines name 0023. P5-08's code PR updates
+  `CLAUDE.md` golden rule 6 and `docs/DEVELOPMENT.md` to mention `always`.
 - The defaults change what existing players see: after updating, the spinner
   and the status line show encounters until turned off. The CHANGELOG (P5-07)
   should say so.
