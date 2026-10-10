@@ -208,6 +208,14 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [ ] At least 2 people played ≥ 1 hour of real work each; feedback in the phase review.
   - [ ] Tier defaults in 0004 tuned (amend via a new decision if numbers change).
 
+#### [ ] P2-11 — Background agents count as work time
+- **Depends on:** P2-06
+- **Size:** S
+- **Goal:** decision 0018: the spawn countdown runs, and new encounters can spawn, while a turn or any subagent runs.
+- **Done when:**
+  - [ ] `classic.SubagentStart` / `classic.SubagentStop` (by `agent_id`) feed the encounter machine; overlapping turns and agents count once.
+  - [ ] Fake-clock tests: spawn while only an agent runs; overlap counted once; an agent with no stop event stops counting after `AGENT_WORK_MAX_MIN` (30 min); agents cleared at `session.end`.
+
 #### [x] P2-12 — Encounter pane
 - **Depends on:** P2-07
 - **Size:** M
@@ -216,6 +224,14 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [x] The pane draws the biome and every encounter phase at the sprite's normal size; Throw works from it.
   - [x] The band draws nothing while the pane is open, placed and shown, and takes the encounter back when it isn't.
   - [x] The mod never opens the pane by itself; render tests cover the pane and the band stepping aside.
+
+#### [ ] P2-14 — Reopen the encounter pane
+- **Depends on:** P2-12
+- **Size:** S
+- **Goal:** decision 0019: the encounter pane reopens at session start for people who opened it, until they close it by hand.
+- **Done when:**
+  - [ ] `/modsters hunt` stores `prefs:huntPane` `{ v: 1, open: true }`; a close with origin `person` stores `open: false`; `plugin` and `unload` closes change nothing.
+  - [ ] `session.start` and `classic.SessionStart` reopen the pane when `open` is true, without focus; tested, including an unplaced pane (band keeps the encounter).
 
 ---
 
@@ -348,3 +364,12 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Goal:** public release.
 - **Done when:**
   - [ ] README with install instructions and a recording; CHANGELOG; version tag; marketplace entry tested from a clean machine.
+
+#### [ ] P5-08 — Display settings
+- **Depends on:** P2-12, P2-14
+- **Size:** M
+- **Goal:** the person picks where the game shows: band, encounter pane, spinner teaser, status line, in any combination (issue #35, accepted by @danielpg95).
+- **Done when:**
+  - [ ] A decision settles the `userConfig` option: its name, the places, the default (band only, as today), and how it relates to 0019's pane reopening.
+  - [ ] Every place draws from the same encounter machine; one Throw per encounter, and turning the band off never leaves Throw unreachable.
+  - [ ] Option documented in CONTENT_FORMAT.md's `userConfig` table; tested with each place on and off.

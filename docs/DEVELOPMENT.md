@@ -134,8 +134,10 @@ workflow in the same PR.
   one key per item (decision 0009).
 - **Never exceed the band's `maxRows`.** A taller band scrolls and bare-digit
   hotkeys stop working.
-- **A pane the mod opens by itself** only appears at ≥ 144 columns. We never
-  auto-open (decision 0002).
+- **A pane the mod opens by itself** only appears at ≥ 144 columns (≥ 110 for
+  an id the person opened before, until they close it by hand). We never
+  auto-open (decision 0002), except reopening the encounter pane for people
+  who opened it (decision 0019).
 - **`Raster` cells must be one column wide.** `▀` is; emoji are not.
 - **Timers** started with `$.clock.every` stop on reload. Start them in
   `session.start`, never at module top level.
