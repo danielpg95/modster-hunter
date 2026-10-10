@@ -191,7 +191,7 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [x] Tested with an in-memory store (`mock.store` can't be read back from a test), including a simulated second session writing in between.
 
 #### [ ] P2-09 — Starter content
-- **Depends on:** P2-02, P2-13
+- **Depends on:** P2-02, P2-13, P2-17
 - **Size:** L
 - **Goal:** 3 biomes × 5 Modsters, original pixel art, using the `add-biome`/`add-modster` skills.
 - **Done when:**
@@ -262,6 +262,15 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [x] Render tests: a 48×48 sprite shows the compact band at `maxRows` 7 and 15, full size in a pane with 26 body rows, and compact in a shorter pane.
   - [ ] A 48×48 sprite animates at 8 fps without flicker in a real terminal (checked by hand, noted in the handoff).
   - [x] CONTENT_FORMAT.md and the `add-modster` skill describe the bounds, where each size shows, and recommend ≤ 24×12 unless a Modster needs more.
+
+#### [ ] P2-17 — Up to two types
+- **Depends on:** P2-13
+- **Size:** S
+- **Goal:** decision 0022: `dex.types` (1–2 types, first one primary) replaces `dex.type`.
+- **Done when:**
+  - [ ] Unit tests: one and two types are valid; zero, three, a repeat, an unknown type and the old `dex.type` are errors, the last one naming `types`.
+  - [ ] `npm run check:content` requires `types` for built-in Modsters; the four placeholders use `types`.
+  - [ ] CONTENT_FORMAT.md, the `modster.json` template and the `add-modster` skill describe `types`.
 
 ---
 
