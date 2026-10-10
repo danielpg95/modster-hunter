@@ -7,6 +7,14 @@
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,
+  "dex": {
+    "number": 0,
+    "type": "normal",
+    "category": "Something Modster",
+    "heightM": 0.5,
+    "weightKg": 5,
+    "entry": "Two or three sentences a field researcher would write about it."
+  },
   "sprite": {
     "file": "sprite.sprite.json",
     "fps": 6

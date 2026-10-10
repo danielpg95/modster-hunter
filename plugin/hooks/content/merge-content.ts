@@ -14,7 +14,8 @@ export interface ContentSources {
 
 /**
  * Merges built-in and user content (decision 0007): a user biome or Modster
- * with a built-in's id replaces it whole; ids in `disabledBiomes` and
+ * with a built-in's id replaces it whole, except that a Modster keeps the
+ * built-in's dex number (decision 0017); ids in `disabledBiomes` and
  * `disabledModsters` are removed; then biome entries are checked against the
  * Modsters left. A user file that failed to load replaces nothing.
  */
@@ -22,13 +23,21 @@ export function mergeContent(sources: ContentSources): ContentRegistry {
   const { builtIn, user, settings, settingsFile } = sources
   const issues: ContentIssue[] = [...(builtIn?.issues ?? []), ...user.issues]
 
-  const modsters = new Map<string, LoadedModster>([...(builtIn?.modsters ?? []), ...user.modsters])
+  const modsters = new Map<string, LoadedModster>(builtIn?.modsters ?? [])
+  for (const [id, loaded] of user.modsters) modsters.set(id, keepDexNumber(loaded, modsters.get(id)))
   const biomes = new Map<string, LoadedBiome>([...(builtIn?.biomes ?? []), ...user.biomes])
 
   disable(modsters, settings?.disabledModsters, 'disabledModsters', 'a Modster', settingsFile, issues)
   disable(biomes, settings?.disabledBiomes, 'disabledBiomes', 'a biome', settingsFile, issues)
 
   return resolveReferences({ biomes, modsters, issues })
+}
+
+/** A user Modster that replaces a built-in keeps the built-in's dex number (decision 0017 point 3). */
+function keepDexNumber(loaded: LoadedModster, replaced: LoadedModster | undefined): LoadedModster {
+  const number = replaced?.modster.dex?.number
+  if (number === undefined) return loaded
+  return { ...loaded, modster: { ...loaded.modster, dex: { ...loaded.modster.dex, number } } }
 }
 
 function disable(

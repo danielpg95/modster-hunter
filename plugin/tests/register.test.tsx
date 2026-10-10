@@ -5,12 +5,13 @@ import { oneModsterForest } from './fixtures/one-modster-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
 import { validBiome } from './fixtures/valid-biome'
 import { validModster } from './fixtures/valid-modster'
+import { validUserModster } from './fixtures/valid-user-modster'
 import { validSprite } from './fixtures/valid-sprite'
 
 /** A user folder (paths under ~/.claude/modster-hunter/) with one biome whose Modster is a 2-frame PNG sheet. */
 function userPngMeadow(): Record<string, string> {
   const biome = { schemaVersion: 1, id: 'pixel-meadow', name: 'Pixel Meadow', modsters: [{ id: 'blobby', weight: 1 }] }
-  const modster = { ...validModster(), id: 'blobby', name: 'Blobby', sprite: { file: 'sprite.png', frames: 2 } }
+  const modster = { ...validUserModster(), id: 'blobby', name: 'Blobby', sprite: { file: 'sprite.png', frames: 2 } }
   const samples = Array.from({ length: 16 * 8 }, (_, i) => (i % 5 === 0 ? 1 : 0))
   const png = encodePng({ width: 16, height: 8, colorType: 3, bitDepth: 1, samples, palette: [0, 0, 0, 46, 125, 50], transparency: [0] })
   return {

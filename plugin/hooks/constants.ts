@@ -57,6 +57,17 @@ export const CONTENT = {
     fpsMax: 12,
     defaultFps: 6,
   },
+  // Decision 0017 point 1
+  dex: {
+    numberMin: 1,
+    numberMax: 999,
+    categoryMaxChars: 24,
+    heightMMin: 0.01,
+    heightMMax: 100,
+    weightKgMin: 0.01,
+    weightKgMax: 10_000,
+    entryMaxChars: 240,
+  },
   // Decision 0004 point 5
   maxAttemptsMin: 1,
   maxAttemptsMax: 10,
@@ -73,6 +84,28 @@ export const CONTENT = {
     framesMin: 1,
     framesMax: 8,
   },
+} as const
+
+/** Modster types and their badge colors, decision 0017 point 2. Flavor only: no effect on odds. */
+export const MODSTER_TYPES = {
+  normal: '#9e9e8e',
+  fire: '#f4511e',
+  water: '#2196f3',
+  grass: '#4caf50',
+  electric: '#fdd835',
+  steel: '#90a4ae',
+  fighting: '#c62828',
+  poison: '#9c27b0',
+  ground: '#c49a5a',
+  flying: '#90a4ff',
+  ice: '#80deea',
+  dark: '#6d5d4b',
+  psychic: '#ec407a',
+  bug: '#9ccc65',
+  rock: '#a1887f',
+  ghost: '#6a5acd',
+  dragon: '#5c6bc0',
+  fairy: '#f8a5c2',
 } as const
 
 /** Where user content and the decoded-PNG cache live, under the home folder (decisions 0007, 0016). */

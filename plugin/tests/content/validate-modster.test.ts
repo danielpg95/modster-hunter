@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'claude-code/testing'
+import { MODSTER_TYPES } from '../../hooks/constants'
 import { validateModster } from '../../hooks/content'
 import { issuesAt } from '../fixtures/issues-at'
 import { validModster } from '../fixtures/valid-modster'
@@ -7,6 +8,7 @@ const where = { file: 'modsters/sproutling/modster.json', folder: 'sproutling' }
 
 type Modster = Record<string, unknown>
 const sprite = (modster: Modster): Record<string, unknown> => modster.sprite as Record<string, unknown>
+const dex = (modster: Modster): Record<string, unknown> => modster.dex as Record<string, unknown>
 
 // [behavior, change to a valid Modster, field that must get an error]
 const INVALID: [string, (modster: Modster) => void, string][] = [
@@ -38,6 +40,21 @@ const INVALID: [string, (modster: Modster) => void, string][] = [
   ['an unknown top-level field is an error', (m) => (m.weight = 60), 'weight'],
   ['an unknown sprite field is an error', (m) => (sprite(m).loop = true), 'sprite.loop'],
   ['frames with a .sprite.json is an error', (m) => (sprite(m).frames = 4), 'sprite.frames'],
+  ['a dex that is not an object is an error', (m) => (m.dex = 'grass'), 'dex'],
+  ['an unknown dex field is an error', (m) => (dex(m).habitat = 'forest'), 'dex.habitat'],
+  ['dex number 0 is an error', (m) => (dex(m).number = 0), 'dex.number'],
+  ['dex number over 999 is an error', (m) => (dex(m).number = 1000), 'dex.number'],
+  ['a fractional dex number is an error', (m) => (dex(m).number = 1.5), 'dex.number'],
+  ['a dex type outside the list is an error', (m) => (dex(m).type = 'plant'), 'dex.type'],
+  ['a dex type with capitals is an error', (m) => (dex(m).type = 'Grass'), 'dex.type'],
+  ['an empty dex category is an error', (m) => (dex(m).category = ''), 'dex.category'],
+  ['a dex category over 24 characters is an error', (m) => (dex(m).category = 'c'.repeat(25)), 'dex.category'],
+  ['a dex height below 0.01 m is an error', (m) => (dex(m).heightM = 0), 'dex.heightM'],
+  ['a dex height over 100 m is an error', (m) => (dex(m).heightM = 101), 'dex.heightM'],
+  ['a dex weight below 0.01 kg is an error', (m) => (dex(m).weightKg = 0.001), 'dex.weightKg'],
+  ['a dex weight over 10,000 kg is an error', (m) => (dex(m).weightKg = 10_001), 'dex.weightKg'],
+  ['an empty dex entry is an error', (m) => (dex(m).entry = ''), 'dex.entry'],
+  ['a dex entry over 240 characters is an error', (m) => (dex(m).entry = 'e'.repeat(241)), 'dex.entry'],
 ]
 
 describe('validateModster', () => {
@@ -70,6 +87,33 @@ describe('validateModster', () => {
     expect(validateModster(modster, where).issues).toEqual([])
   })
 
+  test('every dex field is optional, and every type is accepted (decision 0017)', () => {
+    const modster = validModster()
+    modster.dex = {}
+    expect(validateModster(modster, where).issues).toEqual([])
+    for (const type of Object.keys(MODSTER_TYPES)) {
+      modster.dex = { type }
+      expect(validateModster(modster, where).issues).toEqual([])
+    }
+  })
+
+  test('the dex bounds themselves are valid', () => {
+    const modster = validModster()
+    modster.dex = { number: 1, category: 'c', heightM: 0.01, weightKg: 0.01, entry: 'e' }
+    expect(validateModster(modster, where).issues).toEqual([])
+    modster.dex = { number: 999, category: 'c'.repeat(24), heightM: 100, weightKg: 10_000, entry: 'e'.repeat(240) }
+    expect(validateModster(modster, where).issues).toEqual([])
+  })
+
+  test('a dex number in user content is an error; the rest of the dex is fine there', () => {
+    const modster = validModster()
+    const result = validateModster(modster, { ...where, userContent: true })
+    expect(result.ok).toBe(false)
+    expect(issuesAt(result, 'dex.number').length).toBe(1)
+    delete dex(modster).number
+    expect(validateModster(modster, { ...where, userContent: true }).issues).toEqual([])
+  })
+
   for (const [behavior, change, field] of INVALID) {
     test(behavior, () => {
       const modster = validModster()
@@ -84,8 +128,9 @@ describe('validateModster', () => {
 
   test('user content may name a PNG sheet with its frame count (decision 0016)', () => {
     const modster = validModster()
+    delete modster.dex
     modster.sprite = { file: 'sprite.png', frames: 4, fps: 6 }
-    const result = validateModster(modster, { ...where, allowPng: true })
+    const result = validateModster(modster, { ...where, userContent: true })
     expect(result.ok).toBe(true)
     expect(result.issues).toEqual([])
   })
@@ -104,7 +149,7 @@ describe('validateModster', () => {
     test(behavior, () => {
       const modster = validModster()
       modster.sprite = spriteValue
-      const result = validateModster(modster, { ...where, allowPng: true })
+      const result = validateModster(modster, { ...where, userContent: true })
       expect(result.ok).toBe(false)
       expect(issuesAt(result, field).length).toBe(1)
     })
@@ -122,6 +167,7 @@ describe('validateModster', () => {
     for (const value of [{}, [], 'x', -1, Number.POSITIVE_INFINITY, false]) {
       const modster: Modster = { schemaVersion: value, id: value, name: value, description: value, rarity: value }
       Object.assign(modster, { maxAttempts: value, catchRate: value, shinyChance: value, sprite: { file: value, fps: value } })
+      modster.dex = { number: value, type: value, category: value, heightM: value, weightKg: value, entry: value }
       expect(validateModster(modster, where).ok).toBe(false)
     }
   })
