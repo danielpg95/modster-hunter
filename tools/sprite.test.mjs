@@ -136,12 +136,20 @@ test('more than 63 colors fails with a hint', () => {
   assert.match(stderr, /80 opaque colors; at most 63 fit .* Reduce the colors/)
 })
 
-test('frames outside the 0012 bounds fail with a hint', () => {
-  for (const [name, width, height] of [['wide.png', 32, 8], ['tall.png', 8, 16], ['odd.png', 8, 9], ['small.png', 6, 8]]) {
+test('frames outside the 0021 bounds fail with a hint', () => {
+  for (const [name, width, height] of [['wide.png', 50, 8], ['tall.png', 8, 50], ['odd.png', 8, 9], ['small.png', 6, 8]]) {
     const { code, stderr } = run(writePng(name, width, height, () => RED), '--frames', '1')
     assert.equal(code, 1, name)
-    assert.match(stderr, /must be 8–24 wide and 8–12 tall with an even height \(decision 0012\)\. Resize the art or check --frames/, name)
+    assert.match(stderr, /must be 8–48 wide and 8–48 tall with an even height \(decision 0021\)\. Resize the art or check --frames/, name)
   }
+})
+
+test('the largest frames convert: 48×48 (decision 0021)', () => {
+  const path = writePng('big.png', 96, 48, (x, y) => ((x + y) % 2 === 0 ? RED : BLUE))
+  const { code, stdout } = run(path, '--frames', '2')
+  assert.equal(code, 0)
+  assert.match(stdout, /big\.sprite\.json: 48×48, 2 frames, 2 colors/)
+  readSprite(join(dir, 'big.sprite.json'))
 })
 
 test('a sheet that does not split into the frame count fails with a hint', () => {
