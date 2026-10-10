@@ -1,6 +1,6 @@
 # 0014 — Encounter timings, a work-time spawn countdown, and no throws outside "waiting"
 
-- **Status:** Accepted, amended by 0018 (work time includes running subagents)
+- **Status:** Accepted, amended by 0018 (work time includes running subagents) and 0020 (Run, like Throw, only while waiting)
 - **Date:** 2026-10-08
 - **Decided by:** @victor-aguilars (in P2-06; numbers proposed by Claude, tune in P2-10)
 
