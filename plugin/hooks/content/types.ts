@@ -13,7 +13,8 @@ export type ModsterType = keyof typeof MODSTER_TYPES
 export interface ModsterDex {
   /** Built-in content only; a user override keeps the built-in's number */
   number?: number
-  type?: ModsterType
+  /** One or two types; the first is the primary one (decision 0022) */
+  types?: ModsterType[]
   category?: string
   heightM?: number
   weightKg?: number

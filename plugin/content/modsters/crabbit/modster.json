@@ -9,7 +9,7 @@
   "shinyChance": null,
   "dex": {
     "number": 3,
-    "type": "water",
+    "types": ["water"],
     "category": "Hermit Modster",
     "heightM": 0.2,
     "weightKg": 1.5,

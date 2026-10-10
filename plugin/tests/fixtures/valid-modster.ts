@@ -11,7 +11,7 @@ export function validModster(): Record<string, unknown> {
     shinyChance: null,
     dex: {
       number: 1,
-      type: 'grass',
+      types: ['grass'],
       category: 'Seed Modster',
       heightM: 0.3,
       weightKg: 1.2,

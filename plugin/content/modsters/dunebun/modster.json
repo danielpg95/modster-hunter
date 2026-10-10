@@ -9,7 +9,7 @@
   "shinyChance": null,
   "dex": {
     "number": 1,
-    "type": "ground",
+    "types": ["ground"],
     "category": "Sand Hare Modster",
     "heightM": 0.4,
     "weightKg": 2.8,

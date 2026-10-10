@@ -9,7 +9,7 @@
   "shinyChance": null,
   "dex": {
     "number": 2,
-    "type": "grass",
+    "types": ["grass"],
     "category": "Owlet Modster",
     "heightM": 0.3,
     "weightKg": 0.9,

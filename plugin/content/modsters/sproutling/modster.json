@@ -9,7 +9,7 @@
   "shinyChance": null,
   "dex": {
     "number": 901,
-    "type": "grass",
+    "types": ["grass"],
     "category": "Seed Modster",
     "heightM": 0.3,
     "weightKg": 1.2,

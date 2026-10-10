@@ -9,7 +9,7 @@
   "shinyChance": null,
   "dex": {
     "number": 904,
-    "type": "grass",
+    "types": ["grass"],
     "category": "Ancient Tree Modster",
     "heightM": 4.2,
     "weightKg": 980.0,

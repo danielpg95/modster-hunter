@@ -1,5 +1,5 @@
 import { CONTENT, MODSTER_TYPES } from '../constants'
-import { checkKeys, checkNumber, checkPattern, checkSchemaVersion, checkString, describe, isObject } from './fields'
+import { checkKeys, checkNumber, checkPattern, checkSchemaVersion, checkString, describe, fieldPath, isObject, type JsonObject } from './fields'
 import { IssueList } from './issue-list'
 import type { Modster, Rarity, Validation } from './types'
 
@@ -8,7 +8,8 @@ const REQUIRED = ['schemaVersion', 'id', 'name', 'sprite']
 const SPRITE_KEYS = ['file', 'frames', 'fps']
 const SPRITE_REQUIRED = ['file']
 const RARITIES: readonly Rarity[] = ['common', 'uncommon', 'rare', 'legendary']
-const DEX_KEYS = ['number', 'type', 'category', 'heightM', 'weightKg', 'entry']
+// `type` is listed only so its rename error isn't doubled by "not a known field" (decision 0022)
+const DEX_KEYS = ['number', 'types', 'type', 'category', 'heightM', 'weightKg', 'entry']
 const TYPES = Object.keys(MODSTER_TYPES)
 
 /**
@@ -50,7 +51,7 @@ function checkRarity(value: unknown, issues: IssueList): void {
 function checkDex(value: unknown, userContent: boolean, issues: IssueList): void {
   if (value === undefined) return
   if (!isObject(value)) {
-    issues.error('dex', 'must be an object like { "type": "grass", "entry": "…" }')
+    issues.error('dex', 'must be an object like { "types": ["grass"], "entry": "…" }')
     return
   }
   const rules = CONTENT.dex
@@ -61,13 +62,29 @@ function checkDex(value: unknown, userContent: boolean, issues: IssueList): void
   } else {
     checkNumber(value, 'number', { min: rules.numberMin, max: rules.numberMax, integer: true }, issues, 'dex')
   }
-  if (Object.hasOwn(value, 'type') && !TYPES.some((type) => type === value.type)) {
-    issues.error('dex.type', `must be one of ${TYPES.join(', ')} (it is ${describe(value.type)})`)
-  }
+  if (Object.hasOwn(value, 'type')) issues.error('dex.type', 'is now "types", a list of one or two: "types": ["grass"] (decision 0022)')
+  checkTypes(value, issues)
   checkString(value, 'category', { min: 1, max: rules.categoryMaxChars }, issues, 'dex')
   checkNumber(value, 'heightM', { min: rules.heightMMin, max: rules.heightMMax }, issues, 'dex')
   checkNumber(value, 'weightKg', { min: rules.weightKgMin, max: rules.weightKgMax }, issues, 'dex')
   checkString(value, 'entry', { min: 1, max: rules.entryMaxChars }, issues, 'dex')
+}
+
+function checkTypes(dex: JsonObject, issues: IssueList): void {
+  if (!Object.hasOwn(dex, 'types')) return
+  const { typesMin, typesMax } = CONTENT.dex
+  const types = dex.types
+  if (!Array.isArray(types) || types.length < typesMin || types.length > typesMax) {
+    issues.error('dex.types', `must be a list of ${typesMin} or ${typesMax} types, the first one primary (it is ${describe(types)})`)
+    return
+  }
+  types.forEach((type, index) => {
+    if (!TYPES.some((known) => known === type)) {
+      issues.error(fieldPath('dex.types', index), `must be one of ${TYPES.join(', ')} (it is ${describe(type)})`)
+    } else if (types.indexOf(type) !== index) {
+      issues.error(fieldPath('dex.types', index), `repeats "${String(type)}"`)
+    }
+  })
 }
 
 function checkSprite(value: unknown, allowPng: boolean, issues: IssueList): void {

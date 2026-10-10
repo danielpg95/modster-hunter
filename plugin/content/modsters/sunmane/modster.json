@@ -9,7 +9,7 @@
   "shinyChance": null,
   "dex": {
     "number": 4,
-    "type": "fire",
+    "types": ["fire"],
     "category": "Sun Lion Modster",
     "heightM": 3.2,
     "weightKg": 640,
