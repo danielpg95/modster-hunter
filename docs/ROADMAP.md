@@ -191,7 +191,7 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [x] Tested with an in-memory store (`mock.store` can't be read back from a test), including a simulated second session writing in between.
 
 #### [ ] P2-09 — Starter content
-- **Depends on:** P2-02, P2-13
+- **Depends on:** P2-02, P2-13, P2-17
 - **Size:** L
 - **Goal:** 3 biomes × 5 Modsters, original pixel art, using the `add-biome`/`add-modster` skills.
 - **Done when:**
@@ -252,6 +252,15 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [ ] `/modsters hunt` stores `prefs:huntPane` `{ v: 1, open: true }`; a close with origin `person` stores `open: false`; `plugin` and `unload` closes change nothing.
   - [ ] `session.start` and `classic.SessionStart` reopen the pane when `open` is true, without focus; tested, including an unplaced pane (band keeps the encounter).
 
+
+#### [ ] P2-17 — Up to two types
+- **Depends on:** P2-13
+- **Size:** S
+- **Goal:** decision 0022: `dex.types` (1–2 types, first one primary) replaces `dex.type`.
+- **Done when:**
+  - [ ] Unit tests: one and two types are valid; zero, three, a repeat, an unknown type and the old `dex.type` are errors, the last one naming `types`.
+  - [ ] `npm run check:content` requires `types` for built-in Modsters; the four placeholders use `types`.
+  - [ ] CONTENT_FORMAT.md, the `modster.json` template and the `add-modster` skill describe `types`.
 ---
 
 ## Phase 3 — Collection pane

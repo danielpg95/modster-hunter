@@ -1,6 +1,6 @@
 # 0017 — Modsters carry a dex entry: number, type, category, height, weight and entry text
 
-- **Status:** Accepted
+- **Status:** Accepted (point 2 amended by 0022: one or two types)
 - **Date:** 2026-10-09
 - **Decided by:** @victor-aguilars (in P2-13; details drafted by Claude)
 
