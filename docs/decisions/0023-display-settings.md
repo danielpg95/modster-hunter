@@ -55,11 +55,12 @@ Chosen: 1a, 2a, 3a.
    | --- | --- | --- | --- |
    | `showInBand` | boolean | `true` | Draw the game in the band above the prompt |
    | `encounterPane` | string: `off`, `when-opened`, `always` | `when-opened` | When the encounter pane opens |
-   | `showInSpinner` | boolean | `false` | Name the Modster in the spinner line while Claude works |
-   | `showInStatusLine` | boolean | `false` | Pin the biome and encounter in the status line |
+   | `showInSpinner` | boolean | `true` | Name the Modster in the spinner line while Claude works |
+   | `showInStatusLine` | boolean | `true` | Pin the biome and encounter in the status line |
 
-   The defaults are today's behaviour: nothing changes for someone who never
-   opens `/config`.
+   The band and the pane keep today's behaviour by default. The spinner and
+   the status line are **on by default** (@danielpg95's call): every player
+   sees the encounter there too, and can turn them off in `/config`.
 
 2. **One encounter machine** drives every place (0015 point 3). The spinner
    and status line only read its state; they hold no button, so a Throw is
@@ -100,7 +101,8 @@ Chosen: 1a, 2a, 3a.
    Between encounters `Modster Hunter · <biome name>`; during one
    `<name> (<tier>) · <n> left · 1: Throw in the band or pane`, then the result
    for the result time (0014). Cleared at `session.end`, and on load when the
-   setting is `false`.
+   setting is `false`. On by default, so this line is pinned for every player
+   unless they turn it off.
 
 7. **Finding the settings:** the `/modsters` reply ends with
    `· Change where the game shows in /config`. In-game controls for these
@@ -118,6 +120,11 @@ Chosen: 1a, 2a, 3a.
   CONTENT_FORMAT.md.
 - When accepted: 0002's, 0015's and 0019's status lines name 0023, and
   `CLAUDE.md` golden rule 6 and `docs/DEVELOPMENT.md` mention `always`.
+- The defaults change what existing players see: after updating, the spinner
+  and the status line show the game until turned off. The CHANGELOG (P5-07)
+  should say so.
+- P5-08's roadmap entry said "the default (band only, as today)"; it now says
+  band, spinner and status line on, pane `when-opened`.
 - Changing any of these settings drops an encounter in progress (reload).
   `/config`'s help text says so for `showInBand` and `encounterPane`.
 - ARCHITECTURE.md's event map gains `ui.render` (`Spinner`) and the status
