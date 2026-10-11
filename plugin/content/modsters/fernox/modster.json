@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "fernox",
+  "name": "Fernox",
+  "description": "A fox kit that hides in the ferns. Its tail is the one fern that wags.",
+  "rarity": null,
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 9,
+    "types": ["grass"],
+    "category": "Fern Fox Modster",
+    "heightM": 0.4,
+    "weightKg": 2.5,
+    "entry": "When a Fernox loses a frond, a new one uncurls by morning. Some forest paths are lined with ferns that started as Fernox tails."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 4
+  }
+}
