@@ -37,3 +37,4 @@ settled questions and avoid making assumptions about open ones.
 | [0021](0021-sprites-up-to-48x48.md) | Sprites up to 48×48; the compact band shows when they don't fit | Proposed |
 | [0022](0022-up-to-two-types.md) | A Modster has one or two types, the first one primary | Accepted |
 | [0023](0023-display-settings.md) | Display settings: one toggle per place, a pane picker, and a one-line band that keeps Throw | Accepted |
+| [0024](0024-encounter-pane-focus.md) | `/modsters hunt` gives the encounter pane the keys, and the pane says how to switch | Proposed |
