@@ -15,7 +15,7 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P2-09 | @victor-aguilars | in-progress | p2-09-forest-roster | 2026-10-08 | 2026-10-10 | Design Whispering Forest's official uncommon and rare with `add-modster`, then retire the placeholders |
+| P2-09 | @victor-aguilars | in-progress | p2-09-forest-roster | 2026-10-08 | 2026-10-10 | Merge the Sporrow + Fernox PR; then design an official forest common to replace Sproutling, and an official legendary to replace Elderbark |
 | P2-16 | @victor-aguilars | in-review | p2-16-sprite-bounds | 2026-10-10 | 2026-10-10 | Code merged (#55); hand-check a 48×48 sprite at 8 fps, and @danielpg95 to accept 0021 (#53) |
 
 ## Up next

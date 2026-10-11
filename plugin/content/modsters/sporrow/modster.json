@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "sporrow",
+  "name": "Sporrow",
+  "description": "A bright orange mushroom that walks on its own threads, looking for something to grow on.",
+  "rarity": null,
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 8,
+    "types": ["poison", "grass"],
+    "category": "Puppet Fungus Modster",
+    "heightM": 0.1,
+    "weightKg": 0.05,
+    "entry": "Sporrow steers whatever it rides with threads finer than hair. It still walks into trees often, but its rides never complain."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 4
+  }
+}

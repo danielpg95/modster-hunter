@@ -8,8 +8,8 @@
   "modsters": [
     { "id": "hootlet", "weight": 100 },
     { "id": "sproutling", "weight": 120 },
-    { "id": "mossbeast", "weight": 25 },
-    { "id": "acornsprite", "weight": 6 },
+    { "id": "fernox", "weight": 25 },
+    { "id": "sporrow", "weight": 6 },
     { "id": "elderbark", "weight": 1 }
   ]
 }
