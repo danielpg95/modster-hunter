@@ -17,11 +17,11 @@ this file lists only tasks someone has claimed.
 | --- | --- | --- | --- | --- | --- | --- |
 | P2-09 | @victor-aguilars | in-progress | p2-09-forest-roster | 2026-10-08 | 2026-10-10 | Design Whispering Forest's official uncommon and rare with `add-modster`, then retire the placeholders |
 | P2-16 | @victor-aguilars | in-review | p2-16-sprite-bounds | 2026-10-10 | 2026-10-10 | Code merged (#55); hand-check a 48×48 sprite at 8 fps, and @danielpg95 to accept 0021 (#53) |
+| P2-18 | @victor-aguilars | in-progress | p2-18-pane-focus | 2026-10-10 | 2026-10-10 | Once @danielpg95 accepts 0024, port the experiment's focus, hints and `plain` buttons, then add the render tests |
 
 ## Up next
 
 Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
-- **P2-18** — Encounter pane focus and hints
 - **P4-04** — User-facing content skill
