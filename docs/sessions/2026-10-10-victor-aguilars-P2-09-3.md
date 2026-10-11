@@ -2,7 +2,7 @@
 
 - **Task:** P2-09 — Starter content
 - **Branch:** `p2-09-forest-roster`
-- **Status at end:** in-progress (PR open for Sporrow and Fernox)
+- **Status at end:** in-progress (PR #71 open: Sporrow, Fernox, Elderbark)
 - **Last commit:** see `git log` on the branch
 
 ## Goal for this session
