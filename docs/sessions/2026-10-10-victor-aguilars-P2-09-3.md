@@ -1,4 +1,4 @@
-# Session — 2026-10-10 — @victor-aguilars — P2-09 Starter content (forest rare and uncommon)
+# Session — 2026-10-10 — @victor-aguilars — P2-09 Starter content (forest roster)
 
 - **Task:** P2-09 — Starter content
 - **Branch:** `p2-09-forest-roster`
@@ -7,8 +7,8 @@
 
 ## Goal for this session
 
-Design Whispering Forest's official rare and uncommon with `add-modster`, and
-take the placeholders they replace out of the forest.
+Design Whispering Forest's official rare, uncommon and legendary with
+`add-modster`, and take the placeholders out of the forest.
 
 ## Done
 
@@ -25,23 +25,33 @@ take the placeholders they replace out of the forest.
     tail sways and an ear flicks.
   - 24×18, 4 frames, 15 colors, 4 fps.
   - Grass, Fern Fox Modster, 0.4 m, 2.5 kg.
-- `whispering-forest/biome.json`:
-  - Sporrow weight 6 (2.4%, rare) replaces Acornsprite.
-  - Fernox weight 25 (9.9%, uncommon) replaces Mossbeast.
-  - Acornsprite and Mossbeast keep their files and credits but are in no
-    biome, so they never appear (@victor-aguilars: "don't remove entirely").
-- Credits in `plugin/content/CREDITS.md`; previews in
-  `docs/previews/sporrow.png` and `docs/previews/fernox.png`.
+- **Elderbark (#010, was placeholder #904), legendary:** redrawn in
+  `plugin/content/modsters/elderbark/`.
+  - A rooted ancient tree: a full crown with limbs showing, a heavy brow,
+    half-lidded glowing amber eyes, a bark-knot nose and a long moss beard.
+    No legs or arms. Wide roots.
+  - The crown sways and the eyes slowly brighten and dim.
+  - 32×32, 4 frames, 13 colors, 3 fps.
+  - Name, description, Grass, category, size and entry kept from the
+    placeholder. The credit's "Provisional design" note is removed.
+- `whispering-forest/biome.json` is now Hootlet 100, Fernox 20, Sporrow 4,
+  Elderbark 1, the same mix as the other biomes.
+  - Sporrow replaces Acornsprite, and Fernox replaces Mossbeast.
+  - Sproutling is out too, since Hootlet is the official common.
+  - Acornsprite, Mossbeast and Sproutling keep their files and credits but
+    are in no biome, so they never appear (@victor-aguilars: "don't remove
+    entirely").
+- Credits in `plugin/content/CREDITS.md`. Previews in `docs/previews/`:
+  `sporrow.png`, `fernox.png`, `elderbark.png`.
 - Verified: `npm run check:content` passes (13 Modsters) and prints the forest
   table below. Plugin tests pass (419). `validate --strict` passes.
 
 ```
-Modster     Weight  Appears  Tier       Throws  Per throw  Caught
-Hootlet     100     39.7%    common     3       50.0%      87.5%
-Sproutling  120     47.6%    common     3       50.0%      87.5%
-Fernox      25      9.9%     uncommon   3       35.0%      72.5%
-Sporrow     6       2.4%     rare       4       20.0%      59.0%
-Elderbark   1       0.4%     legendary  5       8.0%       34.1%
+Modster    Weight  Appears  Tier       Throws  Per throw  Caught
+Hootlet    100     80.0%    common     3       50.0%      87.5%
+Fernox     20      16.0%    uncommon   3       35.0%      72.5%
+Sporrow    4       3.2%     rare       4       20.0%      59.0%
+Elderbark  1       0.8%     legendary  5       8.0%       34.1%
 ```
 
 ## Decisions made
@@ -54,6 +64,10 @@ Elderbark   1       0.4%     legendary  5       8.0%       34.1%
   green, and the pose went from sitting to standing in side view (sitting
   "looks like a squirrel"). The size went from 24×14 to 24×18 for face detail.
 - Placeholders leave the biome but stay in the repo.
+- Elderbark: a walking elder tree at 32×32, then "more serious, wise" with "no
+  legs", so it became rooted. Its text fields are kept from the placeholder.
+- Forest weights 100/20/4/1, chosen by @victor-aguilars, so each tier sits
+  well inside its band.
 
 ## Problems and findings
 
@@ -67,22 +81,23 @@ Elderbark   1       0.4%     legendary  5       8.0%       34.1%
   (a quadratic Bézier with leaflets perpendicular to it) helped.
 - **Repo tools need Node 22.18+.** nvm only has 20 here, but `/usr/bin/node`
   is 22.23. Use `PATH=/usr/bin:$PATH npm run …`.
-- **Fernox is 18 px tall**, so it shows the compact band in an 80×24 terminal
-  and in full in the encounter pane. This relies on decision 0021, which is
-  still Proposed. Sunmane (33 px wide) already relies on it on `main`.
+- **Fernox (18 px) and Elderbark (32 px) are taller than 14 px**, so they show
+  the compact band in an 80×24 terminal and in full in the encounter pane.
+  Elderbark needs 16 rows. This relies on decision 0021, which is still
+  Proposed. Sunmane (33 px wide) already relies on it on `main`.
 
 ## Next steps
 
-1. Merge the Sporrow + Fernox PR (@victor-aguilars).
-2. Design an official forest common with `add-modster` to replace Sproutling,
-   then an official legendary to replace Elderbark. Take each placeholder out
-   of `whispering-forest/biome.json` the same way.
-3. Continue to 3 × 5 Modsters with dex #001–#015, then tick P2-09's roadmap
-   items. Official so far: #001–#009.
+1. Merge the forest roster PR #71 (@victor-aguilars).
+2. Continue to 15 Modsters (#011–#015) with `add-modster`. The forest has 4
+   official Modsters; Dustwind Expanse and Saltbreeze Bay have 3 each. Ask
+   @victor-aguilars which biomes get the next ones.
+3. Then tick P2-09's roadmap items. Official so far: #001–#010, and every
+   biome has a common, an uncommon and a rare, with Elderbark as the legendary.
 
 ## Open questions
 
-- Does @danielpg95 accept 0021? Fernox and Sunmane rely on it. — @danielpg95 (#53)
+- Does @danielpg95 accept 0021? Fernox, Elderbark and Sunmane rely on it. — @danielpg95 (#53)
 
 ## Found along the way
 
