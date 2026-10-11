@@ -8,7 +8,7 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/sproutling/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Provisional design |
 | `modsters/mossbeast/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Provisional design |
 | `modsters/acornsprite/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Provisional design |
-| `modsters/elderbark/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Provisional design |
+| `modsters/elderbark/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
 | `modsters/dunebun/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
 | `modsters/hootlet/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
 | `modsters/crabbit/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
