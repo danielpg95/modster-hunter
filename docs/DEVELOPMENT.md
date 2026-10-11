@@ -139,6 +139,12 @@ workflow in the same PR.
   auto-open (decision 0002), except the encounter pane: reopened for people
   who opened it (decision 0019), or every session with `encounterPane: always`
   (decision 0023).
+- **Pane hotkeys need the pane to hold the keys.** A bare digit typed in an
+  empty prompt only presses band Buttons, never a pane's. The person moves the
+  keys with `ctrl+x tab` (into the pane) and `Esc` (back); `/modsters hunt`
+  opens the encounter pane with focus (decision 0024).
+- **Clicks only work in the fullscreen layout** (`/tui fullscreen`). Inline,
+  even the engine's close mark (×) can't be clicked; `ctrl+x x` closes a pane.
 - **`Raster` cells must be one column wide.** `▀` is; emoji are not.
 - **Timers** started with `$.clock.every` stop on reload. Start them in
   `session.start`, never at module top level.

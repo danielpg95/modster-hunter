@@ -35,7 +35,8 @@ async function start($: any, on: On, init: { panes?: () => UiPane[]; store?: Rec
     return { value: undefined }
   })
   on('ui.open', ($, e) => {
-    seen.opens.push(e.id)
+    // A focus request shows up as `id:focus`, so the reopen tests also check it never asks (0024 point 2)
+    seen.opens.push(e.focus ? `${e.id}:focus` : e.id)
     return { value: { isPlaced: true } }
   })
   on('ui.close', ($, e) => {

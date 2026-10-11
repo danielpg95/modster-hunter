@@ -272,16 +272,16 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [x] `npm run check:content` requires `types` for built-in Modsters; the four placeholders use `types`.
   - [x] CONTENT_FORMAT.md, the `modster.json` template and the `add-modster` skill describe `types`.
 
-#### [ ] P2-18 — Encounter pane focus and hints
+#### [x] P2-18 — Encounter pane focus and hints
 - **Depends on:** P2-12, P2-14
 - **Size:** S
-- **Goal:** decision 0024 (Proposed; start only once @danielpg95 accepts it): `/modsters hunt` gives the encounter pane the keys, and the pane shows `1: Throw` and how to move the keys between it and the prompt.
+- **Goal:** decision 0024 (accepted 2026-10-10): `/modsters hunt` gives the encounter pane the keys, and the pane shows `1: Throw` and how to move the keys between it and the prompt.
 - **Done when:**
-  - [ ] `/modsters hunt` calls `$.ui.open` with `focus: true`; the reopen at session start (0019, `always`) still doesn't (tests).
-  - [ ] The pane's Throw and Run Buttons are `plain`; render tests show `1: Throw` and `2: Run` in the pane.
-  - [ ] Render tests cover the header hint for focused and not focused, docked and inline, per 0024 point 4; the hint is cut first in a narrow pane.
-  - [ ] `docs/DEVELOPMENT.md` notes that pane hotkeys need the pane focused and clicks need the fullscreen layout; 0015's status line names 0024.
-  - [ ] Checked by hand, inline and docked (`/tui fullscreen`): `/modsters hunt`, `1`, `Esc`, `ctrl+x tab`, `ctrl+x x` (noted in the handoff).
+  - [x] `/modsters hunt` calls `$.ui.open` with `focus: true`; the reopen at session start (0019, `always`) still doesn't (tests).
+  - [x] The pane's Throw and Run Buttons are `plain`; render tests show `1: Throw` and `2: Run` in the pane.
+  - [x] Render tests cover the header hint for focused and not focused, docked and inline, per 0024 point 4; the hint is cut first in a narrow pane.
+  - [x] `docs/DEVELOPMENT.md` notes that pane hotkeys need the pane focused and clicks need the fullscreen layout; 0015's status line names 0024.
+  - [x] Checked by hand, inline and docked (`/tui fullscreen`): `/modsters hunt`, `1`, `Esc`, `ctrl+x tab`, `ctrl+x x` (noted in the handoff).
 
 ---
 

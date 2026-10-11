@@ -1,8 +1,8 @@
 # 0024 — `/modsters hunt` gives the encounter pane the keys, and the pane says how to switch
 
-- **Status:** Proposed — settled by @danielpg95 (P2-18 starts once accepted)
+- **Status:** Accepted (amends 0015 point 1)
 - **Date:** 2026-10-10
-- **Proposed by:** @victor-aguilars (after playing the pane on the local experiment branch; details drafted by Claude)
+- **Decided by:** @danielpg95 (proposed by @victor-aguilars after playing the pane on the local experiment branch; details drafted by Claude)
 
 ## Context
 
@@ -88,8 +88,8 @@ request (`rows`): the pane keeps the engine's default size.
 
 - New roadmap task P2-18 implements it, with render tests for each cell of
   point 4's table and for the `focus` request on `/modsters hunt` only.
-- Once accepted, 0015's status line names 0024 (point 1 amended: the pane
-  opens with focus when the person asks for it).
+- 0015's status line names 0024 (point 1 amended: the pane opens with focus
+  when the person asks for it).
 - `docs/DEVELOPMENT.md` gains the pitfall: pane hotkeys need the pane to hold
   the keys; bare digits from the prompt reach band Buttons only; clicks need
   the fullscreen layout.
