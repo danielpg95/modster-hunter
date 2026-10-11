@@ -8,7 +8,7 @@
   "catchRate": null,
   "shinyChance": null,
   "dex": {
-    "number": 904,
+    "number": 10,
     "types": ["grass"],
     "category": "Ancient Tree Modster",
     "heightM": 4.2,
@@ -17,6 +17,6 @@
   },
   "sprite": {
     "file": "sprite.sprite.json",
-    "fps": 2
+    "fps": 3
   }
 }

@@ -7,9 +7,8 @@
   "encounterEverySec": [10, 30],
   "modsters": [
     { "id": "hootlet", "weight": 100 },
-    { "id": "sproutling", "weight": 120 },
-    { "id": "fernox", "weight": 25 },
-    { "id": "sporrow", "weight": 6 },
+    { "id": "fernox", "weight": 20 },
+    { "id": "sporrow", "weight": 4 },
     { "id": "elderbark", "weight": 1 }
   ]
 }
