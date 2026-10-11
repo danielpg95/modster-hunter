@@ -2,4 +2,5 @@ export { BAND_BUTTONS, bandRows, bandView, lineWidth, resultText, type BandButto
 export { displayPlan, type DisplayPlan, type DisplayState } from './display-plan'
 export { readDisplaySettings, type DisplaySettings, type EncounterPaneMode } from './display-settings'
 export { DEFAULT_COLOR, pixelsToCells, type Frame } from './pixels-to-cells'
+export { paneHint, type PaneHintInput } from './pane-hint'
 export { spriteCells } from './sprite-cells'

@@ -18,7 +18,7 @@ import {
   type EncounterInput,
   type EncounterState,
 } from './game'
-import { BAND_BUTTONS, bandView, displayPlan, readDisplaySettings, spriteCells, type BandEncounter, type BandLine, type DisplayPlan } from './render'
+import { BAND_BUTTONS, bandView, displayPlan, paneHint, readDisplaySettings, spriteCells, type BandEncounter, type BandLine, type DisplayPlan } from './render'
 import { HUNT_PANE_KEY, huntPanePref, isCaught, prefAfterClose, readHuntPaneOpen, recordEncounterEvents, recordStat, type StorePort } from './store'
 
 // Rebuilt at every session start; cheap, so it isn't kept in $.state (ARCHITECTURE.md)
@@ -215,12 +215,21 @@ export const register: Register = (on, options) => {
     const rows = Math.max(0, e.props.scroll.bodyRows - 2) // header and a blank line
     const columns = e.props.bodyColumns
 
+    const biomeName = biome ? biome.name : 'No biome'
+    const working = workingLabel(machine)
+    // How to move the keys between the prompt and the pane (0024 point 4)
+    const hint = paneHint({ isFocused: e.props.isFocused, placement: e.props.placement, columns: columns - biomeName.length - working.length })
     const header = (
       <Box key="header" flexDirection="row">
         <Text bold {...(biome?.accentColor ? { color: biome.accentColor } : {})}>
-          {biome ? biome.name : 'No biome'}
+          {biomeName}
         </Text>
-        <Text dimColor>{workingLabel(machine)}</Text>
+        <Text dimColor>{working}</Text>
+        {hint ? (
+          <Text key="hint" dimColor>
+            {hint}
+          </Text>
+        ) : null}
       </Box>
     )
     if (!encounter || !modster) {
@@ -253,6 +262,7 @@ export const register: Register = (on, options) => {
               key={segment.button}
               label={BAND_BUTTONS[segment.button].label}
               hotkey={BAND_BUTTONS[segment.button].hotkey}
+              plain
               onPress={() => {
                 void advanceMachine($, { type: segment.button })
               }}
@@ -321,7 +331,8 @@ export const register: Register = (on, options) => {
     if (verb === 'hunt') {
       if (display.encounterPane === 'off') return { text: 'The encounter pane is off · turn it on in /config' }
       queueWrite($, (store) => store.set(HUNT_PANE_KEY, huntPanePref(true)))
-      const opened = await $.ui.open({ id: PANE_ID, title: 'Modster Hunter' })
+      // The person asked for it, so the pane takes the keys; granted only over an empty composer (0024)
+      const opened = await $.ui.open({ id: PANE_ID, title: 'Modster Hunter', focus: true })
       // The band redraws without the encounter now that the pane shows it
       $.ui.invalidate('ui.render')
       return opened.isPlaced ? {} : { text: 'Modster Hunter: the pane is waiting for more room (widen the terminal)' }

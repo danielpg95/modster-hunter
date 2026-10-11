@@ -25,8 +25,8 @@ async function start($: any, on: On, panes: () => UiPane[] = () => []) {
   return clock
 }
 
-const mountPane = ($: any) =>
-  $.ui.mount({ plugin: 'modster-hunter', surface: 'terminal', component: 'Pane', requestId: 'modster-hunt', props: PANE_PROPS })
+const mountPane = ($: any, props: Partial<typeof PANE_PROPS> = {}) =>
+  $.ui.mount({ plugin: 'modster-hunter', surface: 'terminal', component: 'Pane', requestId: 'modster-hunt', props: { ...PANE_PROPS, ...props } })
 const mountBand = ($: any) => $.ui.mount({ plugin: 'modster-hunter', surface: 'terminal', component: 'AbovePrompt', props: BAND_PROPS })
 
 /** An in-memory stand-in for $.store (the test engine has none), read back by the test. */
@@ -141,6 +141,51 @@ describe('register: encounter pane', () => {
     expect(opened).toEqual([])
     await $.command.run({ command: 'modsters', args: 'hunt' } as any)
     expect(opened).toEqual(['modster-hunt'])
+  })
+
+  // Focus and hints (0024)
+  test('/modsters hunt opens the pane with focus', async ($, on) => {
+    const opens = recordOpens(on)
+    await startSession($, on)
+    await $.command.run({ command: 'modsters', args: 'hunt' } as any)
+    expect(opens).toEqual([{ id: 'modster-hunt', focus: true }])
+  })
+
+  test('the pane\'s Throw and Run read 1: Throw and 2: Run', async ($, on) => {
+    const clock = await start($, on)
+    const pane = await mountPane($)
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(4_250)
+    for (const key of ['throw', 'run']) {
+      const button = await pane.find({ type: 'Button', key })
+      expect([button?.props.plain, button?.props.hotkey]).toEqual([true, key === 'throw' ? '1' : '2'])
+    }
+    await pane.unmount()
+  })
+
+  test('the header says how to move the keys, by focus and placement', async ($, on) => {
+    await start($, on)
+    const cases = [
+      [{ isFocused: true, placement: 'dock', bodyColumns: 100 }, ' · Esc: back to prompt'],
+      [{ isFocused: true, placement: 'inline', bodyColumns: 100 }, ' · Esc: back to prompt · ctrl+x x: close'],
+      [{ isFocused: false, placement: 'dock', bodyColumns: 100 }, ' · ctrl+x tab to play'],
+      [{ isFocused: false, placement: 'inline', bodyColumns: 100 }, ' · ctrl+x tab to play'],
+    ] as const
+    for (const [props, hint] of cases) {
+      const pane = await mountPane($, props)
+      expect(await pane.find({ type: 'Text', text: hint })).toBeDefined()
+      // One hint at a time: an inline pane with focus shows the long one only
+      expect(await pane.find({ type: 'Text', text: /ctrl\+x|Esc/ })).toEqual(await pane.find({ type: 'Text', text: hint }))
+      await pane.unmount()
+    }
+  })
+
+  test('a narrow pane leaves the hint out before the biome name', async ($, on) => {
+    await start($, on)
+    const pane = await mountPane($, { isFocused: false, bodyColumns: 40 })
+    expect(await pane.find({ type: 'Text', text: /ctrl\+x|Esc/ })).toBeUndefined()
+    expect(await pane.find({ type: 'Text', text: 'Whispering Forest' })).toBeDefined()
+    await pane.unmount()
   })
 
   // Reopening for people who opened it (0019)
