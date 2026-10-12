@@ -2,7 +2,7 @@
 // A value of these types has passed its validator; fields keep the file's own
 // shape, and defaults (e.g. `encounterEverySec`) are applied by the code that reads them.
 
-import type { MODSTER_TYPES } from '../constants'
+import type { CONTENT, MODSTER_TYPES } from '../constants'
 
 export type Rarity = 'common' | 'uncommon' | 'rare' | 'legendary'
 
@@ -28,13 +28,26 @@ export interface BiomeModsterEntry {
   catchRate?: number
 }
 
+/** How a biome's idle-scene particles move (decision 0026 point 3) */
+export type ParticleStyle = (typeof CONTENT.biome.particleStyles)[number]
+
+export interface BiomeParticles {
+  style: ParticleStyle
+  /** Default: the biome's `accentColor`, else white */
+  color?: string
+  density?: number
+}
+
 export interface Biome {
   schemaVersion: 1
   id: string
   name: string
   description?: string
   accentColor?: string
+  /** 1–4 frames; tiled across the band between encounters (decision 0026) */
   background?: string
+  backgroundFps?: number
+  particles?: BiomeParticles
   encounterEverySec?: [number, number]
   modsters: BiomeModsterEntry[]
 }

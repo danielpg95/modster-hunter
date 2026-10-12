@@ -10,9 +10,9 @@ const BASE64 = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$
 
 /**
  * Checks a parsed `.sprite.json` against CONTENT_FORMAT.md and decision 0012.
- * `singleFrame` is for a biome background, which has exactly one frame.
+ * `maxFrames` lowers the frame limit, for a biome background (decision 0026 point 1).
  */
-export function validateSprite(input: unknown, where: { file: string; singleFrame?: boolean }): Validation<Sprite> {
+export function validateSprite(input: unknown, where: { file: string; maxFrames?: number }): Validation<Sprite> {
   const issues = new IssueList(where.file)
   if (!isObject(input)) return issues.fail('', 'must be a JSON object')
 
@@ -32,7 +32,7 @@ export function validateSprite(input: unknown, where: { file: string; singleFram
     }
   }
 
-  const frames = checkFrameList(input.frames, where.singleFrame === true, issues)
+  const frames = checkFrameList(input.frames, where.maxFrames, issues)
   if (frames && typeof width === 'number' && typeof height === 'number' && height % 2 === 0 && palette) {
     frames.forEach((frame, index) => checkFrame(frame, index, width, height, palette.length, issues))
   }
@@ -70,15 +70,12 @@ function checkPalette(value: unknown, field: string, issues: IssueList): string[
   return colors
 }
 
-function checkFrameList(value: unknown, singleFrame: boolean, issues: IssueList): string[] | undefined {
+function checkFrameList(value: unknown, maxFrames: number | undefined, issues: IssueList): string[] | undefined {
   if (value === undefined) return undefined
-  const { framesMin, framesMax } = CONTENT.sprite
+  const { framesMin } = CONTENT.sprite
+  const framesMax = Math.min(maxFrames ?? CONTENT.sprite.framesMax, CONTENT.sprite.framesMax)
   if (!Array.isArray(value)) {
     issues.error('frames', `must be a list of ${framesMin}–${framesMax} base64 strings`)
-    return undefined
-  }
-  if (singleFrame && value.length !== 1) {
-    issues.error('frames', `must have exactly 1 frame for a background (it has ${value.length})`)
     return undefined
   }
   if (value.length < framesMin || value.length > framesMax) {

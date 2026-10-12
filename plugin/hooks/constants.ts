@@ -62,6 +62,13 @@ export const CONTENT = {
     modstersMax: 50,
     weightMin: 1,
     weightMax: 10_000,
+    // Decision 0026 points 1 and 3: the idle scene and its particles
+    backgroundFramesMax: 4,
+    backgroundFpsMin: 1,
+    backgroundFpsMax: 12,
+    particleStyles: ['sparkle', 'leaf', 'sand', 'bubble', 'snow'],
+    particleDensityMin: 1,
+    particleDensityMax: 5,
   },
   modster: {
     // Has to fit in the band
