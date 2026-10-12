@@ -18,7 +18,7 @@ this file lists only tasks someone has claimed.
 | P2-09 | @victor-aguilars | in-progress | p2-09-forest-roster | 2026-10-08 | 2026-10-10 | Merge the forest roster PR (#71); then add Modsters to Dustwind Expanse and Saltbreeze Bay toward 15 (#011–#015) |
 | P2-16 | @victor-aguilars | in-review | p2-16-sprite-bounds | 2026-10-10 | 2026-10-10 | Code merged (#55); hand-check a 48×48 sprite at 8 fps, and @danielpg95 to accept 0021 (#53) |
 | P4-04 | @danielpg95 | in-progress | p4-04-content-skill | 2026-10-11 | 2026-10-11 | Waits on P4-06 (helper); then draft plugin/skills/create-modster-content/SKILL.md around its convert, draw, preview and check |
-| P4-06 | @danielpg95 | in-progress | p4-06-content-helper | 2026-10-11 | 2026-10-11 | Extend vendor/png.ts to every PNG (0025 point 7), then the GIF decoder and the helper's convert command |
+| P4-06 | @danielpg95 | in-progress | p4-06-content-helper | 2026-10-11 | 2026-10-11 | PNG decoder done; next the GIF decoder in plugin/hooks/vendor/ and the helper's convert command |
 
 ## Up next
 
