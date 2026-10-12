@@ -15,7 +15,6 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P4-04 | @danielpg95 | in-review | p4-04-skill-fixes | 2026-10-11 | 2026-10-12 | Skill fixes merged (#78); waiting on @victor-aguilars's end-to-end run, then tick both done-when items |
 
 ## Up next
 
