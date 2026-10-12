@@ -31,6 +31,30 @@ export const BAND = {
   caughtMark: '●',
 } as const
 
+/**
+ * The biome idle scene, decision 0026. Particle speeds are pixels per tick at
+ * `particleFps`; `sway` is how far a particle rocks sideways, in pixels.
+ */
+export const SCENE = {
+  defaultFps: 2,
+  defaultDensity: 2,
+  defaultParticleColor: '#ffffff',
+  particleFps: 8,
+  /** The strip a biome with particles and no background gets (0026 point 4) */
+  particleOnlyRows: 3,
+  /** One particle per this many pixels at density 1 */
+  pixelsPerParticle: 240,
+  /** A sparkle shows for `on` ticks out of every `period` */
+  sparkleTicks: { on: 3, period: 12 },
+  motion: {
+    sparkle: { dx: 0, dy: 0, sway: 0 },
+    leaf: { dx: 0.4, dy: 0.2, sway: 1 },
+    sand: { dx: 1.2, dy: 0.05, sway: 0 },
+    bubble: { dx: 0, dy: -0.3, sway: 0.5 },
+    snow: { dx: 0, dy: 0.25, sway: 1 },
+  },
+} as const
+
 /** Where the game shows, decision 0023 point 1: the `userConfig` defaults and the pane picker's values. */
 export const DISPLAY = {
   encounterPaneModes: ['off', 'when-opened', 'always'],
