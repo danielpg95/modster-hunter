@@ -20,8 +20,11 @@ which the mod loads at the start of every session next to the built-in content.
   limits.
 - **Look first.** List `~/.claude/modster-hunter/content/` and the built-in
   `modsters/` and `biomes/`, so new ids are new and you know what exists.
-- **Scratch files** (grids, previews) go in a temporary folder, never in the
-  content folder.
+- **Scratch files** (grids, previews, drawing scripts) go in a temporary
+  folder, never in the content folder.
+- **Access.** The content folder is outside the player's project, so the first
+  read or write there asks them for permission. Say what it's for when it
+  comes up.
 
 ## Rules
 
@@ -64,7 +67,10 @@ which the mod loads at the start of every session next to the built-in content.
    - Optional `"fps"` 1–12 (default 6).
 3. **Preview** every sprite before going on:
    `preview <sprite> [--frames N] --out <tmp>/preview.png`. Open the PNG to look
-   at it, show the player, and fix colors that vanish on dark or light.
+   at it, and fix colors that vanish on dark or light. After every render,
+   first pass included, post the preview's full path in chat on its own line
+   so the player can open it, then wait for their reply before asking whether
+   to keep it.
 4. **Put it in a biome.** A Modster only appears in a biome that lists it:
    - **Their own biome:** add `{ "id": "<id>", "weight": W }` to its `modsters`.
    - **A built-in biome:** copy its `biome.json` into
@@ -106,10 +112,13 @@ Show a table of each Modster's percent and tier whenever weights change.
 ## Drawing
 
 1. Agree on size and colors first. Up to 48×48 px; the height must be even.
-   Up to 14 px tall shows in the band of an 80×24 terminal. Bigger sprites
-   show in full in bigger terminals or the encounter pane (`/modsters hunt`),
-   and as text elsewhere. Suggest about 24×14 unless it needs room. Use ≤ 16 colors
-   and a 2–4 frame idle animation.
+   Match the built-ins: read the `width` and `height` of a few built-in
+   `.sprite.json` files. Most are 16–33 px wide and 14–32 tall, and the
+   biggest are rares and legendaries. Sizes of 16×14 or less leave little room
+   for detail. Tell the player that up to 14 px tall shows in the band of an
+   80×24 terminal; taller sprites show in full in bigger terminals or the
+   encounter pane (`/modsters hunt`), and as text there. Use ≤ 16 colors and a
+   4-frame idle animation.
 2. Write a grid file in the scratch folder: one character per pixel, every row
    and frame the same size.
    ```json
@@ -124,10 +133,23 @@ Show a table of each Modster's percent and tier whenever weights change.
 3. `draw <tmp>/grid.json --out ~/.claude/modster-hunter/content/modsters/<id>/sprite.png`.
    It refuses a grid that wouldn't make a valid sprite, and prints the
    `"sprite"` line for `modster.json`.
-4. Preview, look, show the player, and adjust. What reads at this size:
-   - 2–3 bold features; a big head, small body, big eyes with a shine pixel.
-   - A dark outline outside; three tones per color, lit from the top left.
-   - Animation moves of 1–2 pixels: a bob, a blink, an ear flick.
+4. Preview, look, post the path, and adjust. What reads at this size:
+   - One identifier feature that makes the Modster recognizable (a glowing
+     cap, a crystal claw), plus 1–2 supporting ones. Keep the face small and
+     simple unless it is the identifier.
+   - Big, simple shapes: each main part 8 px or more across, so it has room
+     for three tones.
+   - Three tones per color, lit from the top left, and a dark outline.
+   - Draw thin parts (limbs, spikes, feathers, fingers) with the outline
+     outside the shape; an outline inside eats a 2–3 px part. Give separate
+     parts (each crystal, each feather) their own outline so they read apart.
+   - Animation moves of 1–2 pixels: a bob, a blink, a glint, a glow that
+     pulses.
+   - When the player is choosing between colors or poses, render the options
+     into one side-by-side image so they can compare.
+   - Drawing programmatically (shapes in a script that writes the grid) is
+     easier to adjust than typing grids by hand; keep the script in the
+     scratch folder.
    - After a few passes that still don't read, suggest a pixel editor
      (Aseprite, LibreSprite, Piskel) and importing a PNG sheet.
 
