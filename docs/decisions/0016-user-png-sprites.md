@@ -1,6 +1,6 @@
 # 0016 — User Modsters may use a PNG sheet directly; the mod decodes and caches it
 
-- **Status:** Accepted
+- **Status:** Accepted (points 3 and 5 amended by 0025)
 - **Date:** 2026-10-09
 - **Decided by:** @danielpg95 (in P4-01; details drafted by Claude)
 - **Supersedes:** 0008

@@ -362,18 +362,19 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] Claude converts PNG/GIF sprites through the converter (or the runtime path from 0016).
   - [ ] Tested end to end by someone who didn't write it.
 
-#### [ ] P4-06 — Content helper for users
+#### [x] P4-06 — Content helper for users
 - **Depends on:** P4-01, P2-02
 - **Size:** M
 - **Goal:** a dependency-free helper shipped with the P4-04 skill, run with `node`, that converts, draws, previews and checks user content (decision 0025).
 - **Done when:**
-  - [ ] Decision 0025 accepted: a user-side helper, amending 0016 point 3.
-  - [ ] `convert` turns a GIF, or a PNG sheet with `--frames`, into a `.sprite.json` through the mod's `spriteFromSheet`; the GIF decoder lives in `plugin/hooks/vendor/` with its license header.
-  - [ ] `draw` turns a palette and text pixel rows into a PNG sheet the mod decodes (0016).
-  - [ ] `preview` writes the sprite enlarged, every frame, on a dark and a light background.
-  - [ ] `check` runs the mod's validator and merge over the user folder and prints every issue with `formatIssue`.
-  - [ ] Writes only the files it's asked to; a Node too old to run it gets one clear message.
-  - [ ] Unit tests under `plugin/tests/` for the GIF decoder, `draw` and `check`.
+  - [x] Decision 0025 accepted: a user-side helper, amending 0016 points 3 and 5.
+  - [x] `plugin/hooks/vendor/png.ts` reads every PNG: grayscale, 16-bit and interlaced too, with unit tests; `docs/CONTENT_FORMAT.md` "User PNG sheets" updated (0025 point 7).
+  - [x] `convert` turns a GIF, or a PNG sheet with `--frames`, into a `.sprite.json` through the mod's `spriteFromSheet`; the GIF decoder lives in `plugin/hooks/vendor/` with its license header.
+  - [x] `draw` turns a palette and text pixel rows into a PNG sheet the mod decodes (0016).
+  - [x] `preview` writes the sprite enlarged, every frame, on a dark and a light background.
+  - [x] `check` runs the mod's validator and merge over the user folder and prints every issue with `formatIssue`.
+  - [x] Writes only the files it's asked to; a Node too old to run it gets one clear message.
+  - [x] Unit tests under `plugin/tests/` for the GIF decoder, `draw` and `check`.
 
 #### [ ] P4-05 — Phase 4 review
 - **Depends on:** P4-02, P4-03, P4-04, P4-06

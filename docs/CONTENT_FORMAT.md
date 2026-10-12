@@ -3,8 +3,8 @@
 How biomes, Modsters and sprites are described on disk. This is the contract
 between the game, the built-in content, user content, the editor and the
 content skills. Rules come from decisions [0004](decisions/0004-attempts-and-catch-rate.md),
-[0007](decisions/0007-content-model.md), [0016](decisions/0016-user-png-sprites.md)
-and [0017](decisions/0017-modster-dex-fields.md).
+[0007](decisions/0007-content-model.md), [0016](decisions/0016-user-png-sprites.md),
+[0017](decisions/0017-modster-dex-fields.md) and [0025](decisions/0025-user-content-helper.md).
 
 > **Status:** schema version `1`, implemented by the validator in
 > `plugin/hooks/content/` (P2-01). Changing a field now needs a new decision
@@ -179,8 +179,8 @@ instead of a `.sprite.json`. The mod converts it on load, with the same rules
 as `tools/sprite.mjs`, and caches the result in
 `~/.claude/modster-hunter/cache/sprites/` (decision 0016).
 
-- Supported: non-interlaced RGB or RGBA at 8 bits, and palette PNGs at 1, 2, 4
-  or 8 bits. For any other PNG, convert it with `tools/sprite.mjs`.
+- Every valid PNG works: grayscale, RGB, palette and alpha, at any bit depth,
+  interlaced or not (decision 0025). 16-bit samples are scaled to 8 bits.
 - Each frame must fit the `.sprite.json` bounds above; at most 63 opaque colors.
 
 ## User `settings.json` (user folder only)

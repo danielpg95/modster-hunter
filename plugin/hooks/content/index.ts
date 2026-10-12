@@ -15,6 +15,7 @@ export {
 } from './load-content'
 export { mergeContent, type ContentSources } from './merge-content'
 export { noBiomesMessage } from './no-biomes-message'
+export { spriteFromGif } from './sprite-from-gif'
 export { spriteFromPng } from './sprite-from-png'
 export { spriteFromSheet, type RgbaImage } from './sprite-from-sheet'
 export type { Biome, BiomeModsterEntry, ContentIssue, Modster, ModsterDex, ModsterType, Rarity, Sprite, UserSettings, Validation } from './types'

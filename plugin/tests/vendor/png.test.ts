@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { decodePng, UnsupportedPngError } from '../../hooks/vendor/png'
+import { decodePng } from '../../hooks/vendor/png'
 import { bytesFromBase64 } from '../fixtures/bytes-from-base64'
 import { encodePng } from '../fixtures/encode-png'
 import { REAL_PNGS } from '../fixtures/real-pngs'
@@ -48,27 +48,84 @@ describe('decodePng', () => {
     expect(() => decodePng(png, LIMITS)).toThrow('PNG is 200×8 px; at most 192×12 fits')
   })
 
-  // [variant, spec changes, message]
-  const UNSUPPORTED: [string, Parameters<typeof encodePng>[0], string][] = [
-    ['grayscale', { width: 2, height: 2, colorType: 0, bitDepth: 8, samples: [] }, '8-bit grayscale PNGs are not supported'],
-    ['16-bit RGBA', { width: 2, height: 2, colorType: 6, bitDepth: 16, samples: [] }, '16-bit RGBA PNGs are not supported'],
-    ['4-bit RGB', { width: 2, height: 2, colorType: 2, bitDepth: 4, samples: [] }, '4-bit RGB PNGs are not supported'],
-    ['interlaced', { width: 2, height: 2, colorType: 6, bitDepth: 8, samples: [], interlace: 1 }, 'interlaced PNGs are not supported'],
-  ]
-  for (const [variant, spec, message] of UNSUPPORTED) {
-    test(`a ${variant} PNG throws UnsupportedPngError: "${message}"`, () => {
-      let caught: unknown
-      try {
-        decodePng(encodePng(spec), LIMITS)
-      } catch (error) {
-        caught = error
+  /** A sample scaled to 8 bits the way pngjs does it. */
+  const to8 = (value: number, bitDepth: number) => Math.round((value * 255) / (2 ** bitDepth - 1))
+
+  test('grayscale at 1, 2, 4, 8 and 16 bits stretches to 0–255 with full alpha', () => {
+    for (const bitDepth of [1, 2, 4, 8, 16]) {
+      const max = 2 ** bitDepth - 1
+      // 9 px wide, so rows end mid-byte below 8 bits
+      const samples = Array.from({ length: 18 }, (_, i) => (i * 5 + 1) % (max + 1))
+      const png = decodePng(encodePng({ width: 9, height: 2, colorType: 0, bitDepth, samples, filter: 4 }), LIMITS)
+      expect([...png.data]).toEqual(samples.flatMap((v) => [to8(v, bitDepth), to8(v, bitDepth), to8(v, bitDepth), 255]))
+    }
+  })
+
+  test('a grayscale tRNS key clears matching pixels, compared before scaling', () => {
+    // Key 0x0102: the 16-bit sample 0x0103 scales to the same byte but stays opaque
+    const png = decodePng(
+      encodePng({ width: 2, height: 1, colorType: 0, bitDepth: 16, samples: [0x0102, 0x0103], transparency: [0x01, 0x02] }),
+      LIMITS,
+    )
+    expect([...png.data]).toEqual([0, 0, 0, 0, 1, 1, 1, 255])
+  })
+
+  test('grayscale-alpha at 8 and 16 bits', () => {
+    const eight = decodePng(encodePng({ width: 2, height: 1, colorType: 4, bitDepth: 8, samples: [10, 0, 200, 255], filter: 1 }), LIMITS)
+    expect([...eight.data]).toEqual([10, 10, 10, 0, 200, 200, 200, 255])
+    const sixteen = decodePng(encodePng({ width: 1, height: 1, colorType: 4, bitDepth: 16, samples: [0x8000, 0xffff] }), LIMITS)
+    expect([...sixteen.data]).toEqual([128, 128, 128, 255])
+  })
+
+  test('16-bit RGB and RGBA scale every channel', () => {
+    const samples = [0x0000, 0x00ff, 0x8080, 0xffff, 0x7f00, 0x1234, 0xfedc, 0x0101]
+    const rgba = decodePng(encodePng({ width: 2, height: 1, colorType: 6, bitDepth: 16, samples, filter: 3 }), LIMITS)
+    expect([...rgba.data]).toEqual(samples.map((v) => to8(v, 16)))
+    const rgb = decodePng(encodePng({ width: 2, height: 1, colorType: 2, bitDepth: 16, samples: samples.slice(0, 6), filter: 2 }), LIMITS)
+    expect([...rgb.data]).toEqual([...samples.slice(0, 3).map((v) => to8(v, 16)), 255, ...samples.slice(3, 6).map((v) => to8(v, 16)), 255])
+  })
+
+  test('an RGB tRNS key clears only the exact color', () => {
+    const png = decodePng(
+      encodePng({ width: 3, height: 1, colorType: 2, bitDepth: 8, samples: [9, 8, 7, 9, 8, 6, 1, 2, 3], transparency: [0, 9, 0, 8, 0, 7] }),
+      LIMITS,
+    )
+    expect([...png.data]).toEqual([0, 0, 0, 0, 9, 8, 6, 255, 1, 2, 3, 255])
+  })
+
+  test('interlaced PNGs decode to the same pixels as plain ones, at sizes that leave Adam7 passes empty', () => {
+    const variants = [
+      { colorType: 6, bitDepth: 8, channels: 4, max: 255 },
+      { colorType: 3, bitDepth: 2, channels: 1, max: 3 },
+      { colorType: 0, bitDepth: 16, channels: 1, max: 0xffff },
+    ]
+    for (const [width, height] of [[1, 1], [3, 5], [9, 9], [17, 10]] as const) {
+      for (const { colorType, bitDepth, channels, max } of variants) {
+        const samples = Array.from({ length: width * height * channels }, (_, i) => (i * 7919 + 13) % (max + 1))
+        const palette = colorType === 3 ? [0, 0, 0, 80, 80, 80, 160, 160, 160, 240, 240, 240] : undefined
+        const spec = { width, height, colorType, bitDepth, samples, palette, filter: [1, 4, 2, 3] }
+        const plain = decodePng(encodePng(spec), LIMITS)
+        const interlaced = decodePng(encodePng({ ...spec, interlace: 1 }), LIMITS)
+        expect([interlaced.width, interlaced.height]).toEqual([width, height])
+        expect([...interlaced.data]).toEqual([...plain.data])
       }
-      expect(caught instanceof UnsupportedPngError).toBe(true)
-      expect((caught as Error).message).toBe(message)
+    }
+  })
+
+  // [problem, spec, message]
+  const INVALID: [string, Parameters<typeof encodePng>[0], string][] = [
+    ['4-bit RGB', { width: 2, height: 2, colorType: 2, bitDepth: 4, samples: [] }, "4-bit RGB isn't a valid PNG"],
+    ['16-bit palette', { width: 2, height: 2, colorType: 3, bitDepth: 16, samples: [] }, "16-bit palette isn't a valid PNG"],
+    ['color type 5', { width: 2, height: 2, colorType: 5, bitDepth: 8, samples: [] }, 'PNG has unknown color type 5'],
+    ['interlace method 2', { width: 2, height: 2, colorType: 6, bitDepth: 8, samples: [], interlace: 2 }, 'PNG has unknown interlace method 2'],
+  ]
+  for (const [problem, spec, message] of INVALID) {
+    test(`a PNG with ${problem} throws "${message}"`, () => {
+      expect(() => decodePng(encodePng(spec), LIMITS)).toThrow(message)
     })
   }
 
-  test('files that are not PNGs, or are broken, throw plain errors', () => {
+  test('files that are not PNGs, or are broken, throw', () => {
     const good = encodePng({ width: 4, height: 2, colorType: 6, bitDepth: 8, samples: CARD })
     const broken: [Uint8Array, RegExp][] = [
       [new TextEncoder().encode('GIF89a not a png'), /not a PNG file/],
@@ -84,7 +141,6 @@ describe('decodePng', () => {
       } catch (error) {
         caught = error
       }
-      expect(caught instanceof UnsupportedPngError).toBe(false)
       expect(String(caught)).toMatch(message)
     }
   })

@@ -19,13 +19,21 @@ describe('spriteFromPng', () => {
     expect(result.value.palette).toEqual(['#00000000', '#ff0000ff'])
   })
 
-  test('an unsupported PNG is one error that points to tools/sprite.mjs', () => {
-    const png = encodePng({ width: 16, height: 8, colorType: 0, bitDepth: 8, samples: [] })
+  test('a 16-bit grayscale sheet converts too (decision 0025)', () => {
+    // Black on white, with white as the tRNS key: one opaque pixel per frame
+    const samples = Array.from({ length: 16 * 8 }, (_, i) => (i < 16 && i % 8 === 0 ? 0 : 0xffff))
+    const png = encodePng({ width: 16, height: 8, colorType: 0, bitDepth: 16, samples, transparency: [0xff, 0xff] })
+    const result = spriteFromPng(png, 2, file)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.value.palette).toEqual(['#00000000', '#000000ff'])
+  })
+
+  test('an invalid PNG is one error', () => {
+    const png = encodePng({ width: 16, height: 8, colorType: 2, bitDepth: 4, samples: [] })
     const result = spriteFromPng(png, 2, file)
     expect(result.ok).toBe(false)
-    expect(result.issues.map(formatIssue)).toEqual([
-      `${file} can't be read as a sprite sheet: 8-bit grayscale PNGs are not supported; convert it with tools/sprite.mjs, which reads every PNG`,
-    ])
+    expect(result.issues.map(formatIssue)).toEqual([`${file} can't be read as a sprite sheet: 4-bit RGB isn't a valid PNG`])
   })
 
   test('a sheet wider than its frames allow is refused before decoding', () => {

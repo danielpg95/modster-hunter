@@ -39,9 +39,9 @@ plugin/
 │   ├── game/                # pure: random source, rarity resolver, encounter machine, scheduler
 │   ├── render/              # pure: pixels → Raster cells, band and pane trees from state
 │   ├── store/               # pure: collection + stats over a store port, migrations
-│   └── vendor/              # our own dependency-free code kept apart: inflate and PNG decode (0016)
+│   └── vendor/              # our own dependency-free code kept apart: inflate, PNG and GIF decode (0016, 0025)
 ├── content/                 # built-in biomes and Modsters (see CONTENT_FORMAT.md)
-├── skills/                  # user-facing skills shipped with the mod (P4-04)
+├── skills/                  # user-facing skills shipped with the mod (P4-04); the content helper in scripts/ (0025)
 ├── tests/                   # *.test.ts mirroring hooks/ paths, run by `claude plugin test`
 └── types/index.d.ts         # PluginState declarations for $.state
 ```
