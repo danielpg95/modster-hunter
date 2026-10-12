@@ -1,6 +1,6 @@
 # 0012 — Half-block `Raster` sprites up to 24×12; text-only band when they don't fit
 
-- **Status:** Accepted, amended by 0020 (the full and compact layouts gain `2: Run`)
+- **Status:** Accepted, amended by 0020 (the full and compact layouts gain `2: Run`) and 0021 (point 5: sprites up to 48×48)
 - **Date:** 2026-10-08
 - **Decided by:** @danielpg95
 - **Supersedes:** 0001

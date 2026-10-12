@@ -1,8 +1,8 @@
 # 0021 — Sprites up to 48×48; the compact band shows when they don't fit
 
-- **Status:** Proposed — settled by @danielpg95 (amends 0012 point 5)
-- **Date:** 2026-10-10
-- **Proposed by:** @victor-aguilars (after testing a legendary in P2-09; details drafted by Claude)
+- **Status:** Accepted (amends 0012 point 5)
+- **Date:** 2026-10-10 (accepted 2026-10-12)
+- **Decided by:** @danielpg95; proposed by @victor-aguilars (after testing a legendary in P2-09; details drafted by Claude)
 
 ## Context
 
@@ -70,7 +70,7 @@ Who may use them: any Modster, built-in only, or built-in legendaries only.
 4. **No second sprite.** A Modster has one sprite; where it doesn't fit, the
    compact text layout shows.
 5. **Small stays the default.** Content guidance (the `add-modster` skill)
-   recommends ≤ 24×12 so the sprite shows in the band of an 80×24 terminal. It
+   recommends ≤ 24×14 so the sprite shows in the band of an 80×24 terminal. It
    suggests bigger sizes for Modsters that need them, such as legendaries, and
    says where each size shows.
 6. `schemaVersion` stays `1`: every existing sprite stays valid.
