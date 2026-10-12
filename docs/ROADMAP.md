@@ -256,7 +256,7 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
 #### [ ] P2-16 — Sprites up to 48×48
 - **Depends on:** P2-01, P2-02, P2-07, P4-01
 - **Size:** S
-- **Goal:** decision 0021 (Proposed; start only once @danielpg95 accepts it): sprites may be 8–48 wide and 8–48 tall, and the band and pane show their compact layout where a sprite doesn't fit.
+- **Goal:** decision 0021 (accepted by @danielpg95 on 2026-10-12): sprites may be 8–48 wide and 8–48 tall, and the band and pane show their compact layout where a sprite doesn't fit.
 - **Done when:**
   - [x] `CONTENT.sprite` bounds are 8–48 × 8–48; the validator, `tools/sprite.mjs` and user PNG sheets accept a 48×48 sprite and reject 50×48 and 48×50 (tests).
   - [x] Render tests: a 48×48 sprite shows the compact band at `maxRows` 7 and 15, full size in a pane with 26 body rows, and compact in a shorter pane.

@@ -1,8 +1,8 @@
 # 0021 — Sprites up to 48×48; the compact band shows when they don't fit
 
-- **Status:** Proposed — settled by @danielpg95 (amends 0012 point 5)
-- **Date:** 2026-10-10
-- **Proposed by:** @victor-aguilars (after testing a legendary in P2-09; details drafted by Claude)
+- **Status:** Accepted (amends 0012 point 5)
+- **Date:** 2026-10-10 (accepted 2026-10-12)
+- **Decided by:** @danielpg95; proposed by @victor-aguilars (after testing a legendary in P2-09; details drafted by Claude)
 
 ## Context
 
