@@ -481,11 +481,11 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Size:** M
 - **Goal:** between encounters the band shows the biome as an animated scene with drifting particles instead of only its name (decision 0026).
 - **Done when:**
-  - [ ] The validator accepts a `background` of 1–4 frames, `backgroundFps` (1–12) and `particles` (`style`, `color`, `density`) per 0026, with tests for each bound; `docs/CONTENT_FORMAT.md` documents them.
-  - [ ] A pure scene compositor in `plugin/hooks/render/` tiles the scene to the band's width and adds particles for every style, tested with an injected random source and the fake clock.
-  - [ ] `bandView` draws the scene above the idle line when it fits, the 3-row particle strip for a biome without art, and today's line otherwise; never exceeds `maxRows` (render tests at `maxRows` 0, 1, 2, 5, 7, 15).
+  - [x] The validator accepts a `background` of 1–4 frames, `backgroundFps` (1–12) and `particles` (`style`, `color`, `density`) per 0026, with tests for each bound; `docs/CONTENT_FORMAT.md` documents them.
+  - [x] A pure scene compositor in `plugin/hooks/render/` tiles the scene to the band's width and adds particles for every style, tested with an injected random source and the fake clock.
+  - [x] `bandView` draws the scene above the idle line when it fits, the 3-row particle strip for a biome without art, and today's line otherwise; never exceeds `maxRows` (render tests at `maxRows` 0, 1, 2, 5, 7, 15).
   - [ ] The scene animates only while a turn runs (subagents count, 0018) and holds still between turns; the timer stops when an encounter starts and on module reload (tested).
-  - [ ] A `showIdleScene` option (default `true`) in `plugin.json` and the `userConfig` table; `false` gives today's idle line.
+  - [x] A `showIdleScene` option (default `true`) in `plugin.json` and the `userConfig` table; `false` gives today's idle line.
   - [ ] Checked by hand in a real terminal at 80×24 and 140×40 with a test scene: no flicker, typing unaffected (noted in the handoff).
 
 #### [ ] P5-14 — Scenes for the built-in biomes
