@@ -1,8 +1,8 @@
 # 0025 — The content skill ships a Node helper that converts, draws, previews and checks
 
-- **Status:** Proposed — settled by P4-06 / @danielpg95 (amends 0016 point 3)
+- **Status:** Accepted (amends 0016 points 3 and 5)
 - **Date:** 2026-10-11
-- **Proposed by:** @danielpg95 (choices made in the P4-04 planning session; details drafted by Claude)
+- **Decided by:** @danielpg95 (choices made in the P4-04 planning session; details drafted by Claude)
 
 ## Context
 
@@ -46,9 +46,10 @@ interlaced):
 
 ## Decision
 
-Option 1. Point 3 of 0016 becomes: `tools/sprite.mjs` stays the dev-time
-converter for built-in content, and users get the helper below. Points 4–7 of
-0016 stand.
+Option 1, with option a for other PNGs. Point 3 of 0016 becomes:
+`tools/sprite.mjs` stays the dev-time converter for built-in content, and
+users get the helper below. Point 5's list of supported PNGs is replaced by
+point 7 here. Points 4, 6 and 7 of 0016 stand.
 
 1. **Where:** `plugin/skills/create-modster-content/scripts/modster-content.mjs`.
    SKILL.md runs it with the skill's base directory, which Claude Code gives
@@ -81,7 +82,11 @@ converter for built-in content, and users get the helper below. Points 4–7 of
 6. **Without Node:** the skill falls back to the 0016 runtime path for PNGs the
    mod decodes, asks for a PNG sheet instead of a GIF, and checks files against
    a format reference shipped with the skill.
-7. **Other PNGs:** option a or b above. *Open: settled with this decision.*
+7. **Every PNG decodes.** `plugin/hooks/vendor/png.ts` also reads grayscale
+   (color types 0 and 4), 16-bit channels (reduced to 8 bits) and Adam7
+   interlaced PNGs. The mod and the helper both use it, so a user's PNG sheet
+   works with or without Node. 0016 point 6's size check still runs before
+   inflating.
 
 ## Consequences
 
@@ -93,5 +98,5 @@ converter for built-in content, and users get the helper below. Points 4–7 of
 - `tools/sprite.mjs` and the helper overlap. Moving the dev tool onto the
   helper's GIF decoder (and dropping `omggif`) is possible later; not part of
   P4-06.
-- With option a, `docs/CONTENT_FORMAT.md` "User PNG sheets" and 0016 point 5's
-  list change in the same PR.
+- `docs/CONTENT_FORMAT.md` "User PNG sheets" drops its list of supported PNGs
+  in the PR that extends the decoder (P4-06).
