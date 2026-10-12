@@ -7,6 +7,8 @@ export function validBiome(): Record<string, unknown> {
     description: 'Tall pines, soft moss, something rustling.',
     accentColor: '#4caf50',
     background: 'background.sprite.json',
+    backgroundFps: 2,
+    particles: { style: 'leaf', color: '#a5d6a7', density: 2 },
     encounterEverySec: [8, 20],
     modsters: [
       { id: 'sproutling', weight: 60 },

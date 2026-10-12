@@ -38,7 +38,7 @@ content/
 ├── biomes/
 │   └── <biome-id>/
 │       ├── biome.json
-│       └── background.sprite.json # optional
+│       └── background.sprite.json # optional: the idle scene (decision 0026)
 └── modsters/
     └── <modster-id>/
         ├── modster.json
@@ -64,6 +64,8 @@ content/
   "description": "Tall pines, soft moss, something rustling.",
   "accentColor": "#4caf50",
   "background": "background.sprite.json",
+  "backgroundFps": 2,
+  "particles": { "style": "leaf", "color": "#a5d6a7", "density": 2 },
   "encounterEverySec": [8, 20],
   "modsters": [
     { "id": "sproutling", "weight": 60 },
@@ -80,7 +82,12 @@ content/
 | `name` | yes | 1–32 chars |
 | `description` | no | ≤ 120 chars |
 | `accentColor` | no | `#rrggbb`; tints the band's idle line |
-| `background` | no | A `.sprite.json` in this folder; single frame |
+| `background` | no | A `.sprite.json` in this folder, 1–4 frames. The idle scene: tiled left to right above the idle line, so its left and right edges should line up. Keep it about 12 px tall (6 rows); it stays on screen all session (decision 0026) |
+| `backgroundFps` | no | 1–12 frames per second for the scene. Default 2 |
+| `particles` | no | Single pixels drifting over the scene, or a 3-row strip of them without one: `{ "style", "color", "density" }` |
+| `particles.style` | yes | `sparkle` (twinkles in place), `leaf` (falls and drifts right), `sand` (blows right), `bubble` (rises) or `snow` (falls) |
+| `particles.color` | no | `#rrggbb`. Default: `accentColor`, else white |
+| `particles.density` | no | Integer 1–5. Default 2 |
 | `encounterEverySec` | no | `[min, max]` seconds between encounters while a turn runs; 3 ≤ min ≤ max ≤ 600. Default `[10, 30]` |
 | `modsters` | yes | 1–50 entries, ids unique within the biome |
 | `modsters[].id` | yes | A Modster that exists after merging. A missing id is an error for that entry only |
@@ -202,6 +209,7 @@ Built-in on/off is the plugin option `includeBuiltins`, not this file.
 | `includeBuiltins` | boolean | `true` | Load the content that ships with the mod |
 | `encounterIdleTimeoutSec` | number | `90` | Seconds without a throw before an encounter's Modster wanders off |
 | `showIdleLine` | boolean | `true` | Show the current biome in the band between encounters |
+| `showIdleScene` | boolean | `true` | Draw the biome's scene above the idle line when the biome has one and it fits; it moves only while Claude works (decision 0026) |
 | `showInBand` | boolean | `true` | Draw the game in the band. Off: one row (Throw, Run) during encounters only, nothing between them (decision 0023) |
 | `encounterPane` | `off`, `when-opened`, `always` | `when-opened` | When the encounter pane opens: never (`/modsters hunt` says it's off), after `/modsters hunt` until closed by hand (0019), or every session (0023) |
 | `showInSpinner` | boolean | `true` | Name the Modster in the spinner line while Claude works (0023) |
