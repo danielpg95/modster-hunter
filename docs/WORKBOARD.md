@@ -17,10 +17,11 @@ this file lists only tasks someone has claimed.
 | --- | --- | --- | --- | --- | --- | --- |
 | P2-09 | @victor-aguilars | in-progress | p2-09-forest-roster | 2026-10-08 | 2026-10-10 | Merge the forest roster PR (#71); then add Modsters to Dustwind Expanse and Saltbreeze Bay toward 15 (#011–#015) |
 | P2-16 | @victor-aguilars | in-review | p2-16-sprite-bounds | 2026-10-10 | 2026-10-10 | Code merged (#55); hand-check a 48×48 sprite at 8 fps, and @danielpg95 to accept 0021 (#53) |
+| P4-04 | @danielpg95 | in-progress | p4-04-content-skill | 2026-10-11 | 2026-10-11 | Draft plugin/skills/create-modster-content/SKILL.md; settle how it converts PNG/GIF (tools/sprite.mjs isn't shipped; 0016 runtime path covers PNG only) |
 
 ## Up next
 
 Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
-- **P4-04** — User-facing content skill
+- None right now: every task with its dependencies done is claimed.
