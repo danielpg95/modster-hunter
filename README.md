@@ -9,7 +9,8 @@ just above the prompt. Press `1` to throw, and you have a few tries to catch
 each one before it gets away. Type `/modsters` to browse your collection.
 
 You can keep the built-in biomes and Modsters, switch them off, or make your
-own, sprites included.
+own, sprites included: ask Claude to "make me a Modster" and the mod's
+`create-modster-content` skill designs, draws and checks it with you.
 
 > **Status: in planning.** Nothing is playable yet. See the
 > [roadmap](docs/ROADMAP.md) for where things stand.
