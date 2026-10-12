@@ -15,14 +15,13 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P2-09 | @victor-aguilars | in-progress | p2-09-forest-roster | 2026-10-08 | 2026-10-10 | Merge the forest roster PR (#71); then add Modsters to Dustwind Expanse and Saltbreeze Bay toward 15 (#011–#015) |
-| P2-16 | @victor-aguilars | in-review | p2-16-sprite-bounds | 2026-10-10 | 2026-10-10 | Code merged (#55); hand-check a 48×48 sprite at 8 fps, and @danielpg95 to accept 0021 (#53) |
 | P4-04 | @danielpg95 | in-review | p4-04-content-skill | 2026-10-11 | 2026-10-11 | Waiting on an end-to-end run by @victor-aguilars (claude --plugin-dir ./plugin, make and draw a Modster, import a GIF); then tick both done-when items and merge |
-| P5-12 | @danielpg95 | in-progress | p5-12-crystal-grotto | 2026-10-12 | 2026-10-12 | Waits on P2-09 (dex #011–#015) and P2-16 (accept 0021); then copy the user content in, convert sprites, add dex #016–#025 and credits |
+| P5-12 | @danielpg95 | in-progress | p5-12-crystal-grotto | 2026-10-12 | 2026-10-12 | Copy the user content into plugin/content/, convert the sprites, add dex #011–#020 and credits, and remove the user copies |
 
 ## Up next
 
 Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
-- None right now: every task with its dependencies done is claimed.
+- **P2-10** — Phase 2 playtest
+- **P5-09** — Sprite miniatures (spike)

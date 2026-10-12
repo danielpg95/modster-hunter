@@ -190,16 +190,16 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [x] Catch writes `caught:<id>` with re-read-before-write; stats counters written.
   - [x] Tested with an in-memory store (`mock.store` can't be read back from a test), including a simulated second session writing in between.
 
-#### [ ] P2-09 — Starter content
+#### [x] P2-09 — Starter content
 - **Depends on:** P2-02, P2-13, P2-17
 - **Size:** L
-- **Goal:** 3 biomes × 5 Modsters, original pixel art, using the `add-biome`/`add-modster` skills.
+- **Goal:** 3 biomes × 5 Modsters, original pixel art, using the `add-biome`/`add-modster` skills. Closed by @danielpg95 on 2026-10-12 with the roster as it is: 3 biomes, 10 Modsters (#001–#010); more can be added on top later.
 - **Done when:**
-  - [ ] Each biome has at least one Modster per tier from common to rare, and one legendary across all biomes.
-  - [ ] Every sprite has 2–4 animation frames and an entry in `plugin/content/CREDITS.md`.
-  - [ ] All content passes the validator.
-  - [ ] `formatOddsTable(oddsTable(…))` printed for each built-in biome and sanity-checked (moved from P2-05; @victor-aguilars, 2026-10-08).
-  - [ ] Every built-in Modster has a complete `dex` with numbers 1–15 (decision 0017; added 2026-10-09).
+  - [x] Each biome has at least one Modster per tier from common to rare, and one legendary across all biomes.
+  - [x] Every sprite has 2–4 animation frames and an entry in `plugin/content/CREDITS.md`.
+  - [x] All content passes the validator.
+  - [x] `formatOddsTable(oddsTable(…))` printed for each built-in biome and sanity-checked (moved from P2-05; @victor-aguilars, 2026-10-08).
+  - [x] Every built-in Modster has a complete `dex` with numbers 1–10 (decision 0017; added 2026-10-09; the dex is closed at #010 for these biomes, 2026-10-12).
 
 #### [ ] P2-10 — Phase 2 playtest
 - **Depends on:** P2-04, P2-07, P2-08, P2-09
@@ -253,14 +253,14 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [x] `session.start` and `classic.SessionStart` reopen the pane when `open` is true, without focus; tested, including an unplaced pane (band keeps the encounter).
 
 
-#### [ ] P2-16 — Sprites up to 48×48
+#### [x] P2-16 — Sprites up to 48×48
 - **Depends on:** P2-01, P2-02, P2-07, P4-01
 - **Size:** S
 - **Goal:** decision 0021 (accepted by @danielpg95 on 2026-10-12): sprites may be 8–48 wide and 8–48 tall, and the band and pane show their compact layout where a sprite doesn't fit.
 - **Done when:**
   - [x] `CONTENT.sprite` bounds are 8–48 × 8–48; the validator, `tools/sprite.mjs` and user PNG sheets accept a 48×48 sprite and reject 50×48 and 48×50 (tests).
   - [x] Render tests: a 48×48 sprite shows the compact band at `maxRows` 7 and 15, full size in a pane with 26 body rows, and compact in a shorter pane.
-  - [ ] A 48×48 sprite animates at 8 fps without flicker in a real terminal (checked by hand, noted in the handoff).
+  - [x] A 48×48 sprite animates at 8 fps without flicker in a real terminal (checked by hand, noted in the handoff). Waived by @danielpg95 on 2026-10-12: not checked by hand; no built-in sprite is that big yet (the largest is 33×30).
   - [x] CONTENT_FORMAT.md and the `add-modster` skill describe the bounds, where each size shows, and recommend ≤ 24×14 unless a Modster needs more.
 
 #### [x] P2-17 — Up to two types
@@ -467,10 +467,10 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 #### [ ] P5-12 — Crystal Grotto biome
 - **Depends on:** P2-09, P2-16
 - **Size:** M
-- **Goal:** bring @danielpg95's Crystal Grotto (made with the user content skill, 2026-10-12) into the built-in content: the biome and its 10 Modsters, with dex numbers #016–#025.
+- **Goal:** bring @danielpg95's Crystal Grotto (made with the user content skill, 2026-10-12) into the built-in content: the biome and its 10 Modsters, with dex numbers #011–#020.
 - **Done when:**
   - [ ] `plugin/content/biomes/crystal-grotto/` and the 10 Modster folders, each with `sprite.png` and a `sprite.sprite.json` converted with `npm run sprite`.
-  - [ ] Every Modster has a complete dex with numbers #016–#025 (decision 0017).
+  - [ ] Every Modster has a complete dex with numbers #011–#020 (decision 0017).
   - [ ] A credits row in `plugin/content/CREDITS.md` for every sprite.
   - [ ] `npm run check:content` passes, and the odds table (3 common, 3 uncommon, 3 rare, 1 legendary) is checked; a second legendary across biomes is intended.
   - [ ] A preview of every Modster in the PR description (enlarged, every frame, dark and light).
