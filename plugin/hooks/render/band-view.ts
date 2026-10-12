@@ -27,6 +27,8 @@ export interface BandInput {
   encounter?: BandEncounter
   biome?: { name: string; accentColor?: string }
   showIdleLine: boolean
+  /** Rows of the biome's idle scene, when it has one and `showIdleScene` is on (decision 0026) */
+  sceneRows?: number
   /** The band is turned off (0023 point 3): one row during an encounter, nothing between them */
   oneRow?: boolean
 }
@@ -45,6 +47,7 @@ export type BandLine = BandSegment[]
 export type BandView =
   | { kind: 'none' }
   | { kind: 'idle'; line: BandLine }
+  | { kind: 'scene'; sceneRows: number; line: BandLine }
   | { kind: 'full'; spriteColumns: number; spriteRows: number; lines: BandLine[] }
   | { kind: 'compact'; lines: BandLine[] }
 
@@ -58,7 +61,11 @@ export function bandView(input: BandInput): BandView {
     const name: BandSegment = input.biome.accentColor
       ? { text: input.biome.name, color: input.biome.accentColor }
       : { text: input.biome.name }
-    return { kind: 'idle', line: [name, { text: ' · listening for Modsters', dim: true }] }
+    const line: BandLine = [name, { text: ' · listening for Modsters', dim: true }]
+    // The scene above the idle line, when both fit (0026 point 4); a Raster, so terminal only
+    const sceneRows = input.sceneRows ?? 0
+    if (input.canDrawSprite && sceneRows > 0 && sceneRows + 1 <= rows) return { kind: 'scene', sceneRows, line }
+    return { kind: 'idle', line }
   }
 
   const spriteRows = Math.ceil(encounter.spriteHeight / 2)
@@ -78,6 +85,8 @@ export function bandRows(view: BandView): number {
       return 0
     case 'idle':
       return 1
+    case 'scene':
+      return view.sceneRows + 1
     case 'full':
       return Math.max(view.spriteRows, view.lines.length)
     case 'compact':

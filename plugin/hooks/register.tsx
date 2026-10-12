@@ -18,7 +18,23 @@ import {
   type EncounterInput,
   type EncounterState,
 } from './game'
-import { BAND_BUTTONS, bandView, displayPlan, paneHint, readDisplaySettings, spriteCells, type BandEncounter, type BandLine, type DisplayPlan } from './render'
+import {
+  BAND_BUTTONS,
+  bandView,
+  displayPlan,
+  idleScene,
+  isAnimated,
+  makeParticles,
+  paneHint,
+  readDisplaySettings,
+  sceneCells,
+  spriteCells,
+  type BandEncounter,
+  type BandLine,
+  type DisplayPlan,
+  type IdleScene,
+  type Particle,
+} from './render'
 import { HUNT_PANE_KEY, huntPanePref, isCaught, prefAfterClose, readHuntPaneOpen, recordEncounterEvents, recordStat, type StorePort } from './store'
 
 // Rebuilt at every session start; cheap, so it isn't kept in $.state (ARCHITECTURE.md)
@@ -52,6 +68,16 @@ let frameModster: LoadedModster | undefined
 let frameIndex = 0
 let isBlitting = false
 
+// The biome's idle scene between encounters (decision 0026). The band is its only
+// site; it moves only while Claude works and holds still otherwise (point 5).
+const SCENE_KEY = 'scene'
+let scene: IdleScene | undefined
+const particlesByColumns = new Map<number, Particle[]>()
+const sceneSites = new Map<string, number>() // requestId → columns
+let sceneTimer: Timer | undefined
+let sceneTick = 0
+let isBlittingScene = false
+
 // The opt-in encounter pane (decision 0015), opened with `/modsters hunt`; it
 // reopens at session start for people who opened it (0019), or every session (0023)
 const PANE_ID = 'modster-hunt'
@@ -72,6 +98,7 @@ const CONFIG_HINT = ' · Change where the game shows in /config'
 export const register: Register = (on, options) => {
   const idleTimeoutSec = typeof options.encounterIdleTimeoutSec === 'number' ? options.encounterIdleTimeoutSec : 90
   const showIdleLine = options.showIdleLine !== false
+  const showIdleScene = options.showIdleScene !== false
   const includeBuiltins = options.includeBuiltins !== false
   display = readDisplaySettings(options)
 
@@ -152,9 +179,11 @@ export const register: Register = (on, options) => {
       ...(currentPlan().band === 'one-row' ? { oneRow: true } : {}),
       ...(band ? { encounter: band } : {}),
       ...(biome ? { biome: biome.accentColor ? { name: biome.name, accentColor: biome.accentColor } : { name: biome.name } } : {}),
+      ...(scene && showIdleScene ? { sceneRows: scene.rows } : {}),
     })
 
     if (view.kind !== 'full') removeSite(e.requestId)
+    if (view.kind !== 'scene') removeSceneSite(e.requestId)
     if (view.kind === 'none') return next(e)
 
     const { Box, Text, Button } = $.ui.resolve(e)
@@ -187,6 +216,19 @@ export const register: Register = (on, options) => {
     )
 
     if (view.kind === 'idle') return line(view.line, 0)
+    if (view.kind === 'scene') {
+      // Chosen only on the terminal (canDrawSprite); the check narrows the surface so Raster resolves
+      if (e.surface !== 'terminal') return line(view.line, 0)
+      const { Raster } = $.ui.resolve(e)
+      const columns = e.props.bodyColumns
+      addSceneSite($, e.requestId, columns)
+      return (
+        <Box flexDirection="column">
+          <Raster key={SCENE_KEY} columns={columns} rows={view.sceneRows} cells={sceneCellsFor(columns)} />
+          {line(view.line, 0)}
+        </Box>
+      )
+    }
     if (view.kind === 'compact') return <Box flexDirection="column">{view.lines.map(line)}</Box>
 
     // Full layout: the sprite, then the text block beside it. Only chosen on the
@@ -398,7 +440,11 @@ function startMachine($: EngineInterface, idleTimeoutSec: number): void {
   machineContext = undefined
   alreadyCaught = false
   cellsByModster.clear()
-  const biome = biomeId === undefined ? undefined : content?.biomes.get(biomeId)?.biome
+  const loaded = biomeId === undefined ? undefined : content?.biomes.get(biomeId)
+  scene = loaded && idleScene(loaded.biome, loaded.background)
+  particlesByColumns.clear()
+  sceneTick = 0
+  const biome = loaded?.biome
   if (!content || !biome) return
   machineContext = {
     biome,
@@ -430,6 +476,8 @@ async function advanceMachine($: EngineInterface, action: MachineAction): Promis
   const step = stepEncounter(machine, { ...action, now } as EncounterInput, machineContext)
   if (step.state === machine) return
   machine = step.state
+  // Before the redraw, so a scene that stops is drawn still
+  updateSceneTimer($)
   $.ui.invalidate('ui.render')
   updateStatus($)
   const where = { sessionId, biomeId: machineContext.biome.id }
@@ -550,6 +598,57 @@ function stopTimers(): void {
   tickTimer?.cancel()
   tickTimer = undefined
   stopFrames()
+  stopScene()
+  sceneSites.clear()
+}
+
+/** The scene's cells now, for a band `columns` wide; particles are made once per width. */
+function sceneCellsFor(columns: number): string {
+  if (!scene) return ''
+  let particles = particlesByColumns.get(columns)
+  if (!particles) {
+    particles = makeParticles(scene, columns, Math.random)
+    particlesByColumns.set(columns, particles)
+  }
+  // Held still, the background shows its first frame (0026 point 5)
+  return sceneTimer ? sceneCells(scene, columns, particles, sceneTick) : sceneCells(scene, columns, particles, sceneTick, 0)
+}
+
+function addSceneSite($: EngineInterface, requestId: string, columns: number): void {
+  sceneSites.set(requestId, columns)
+  updateSceneTimer($)
+}
+
+function removeSceneSite(requestId: string): void {
+  if (sceneSites.delete(requestId) && sceneSites.size === 0) stopScene()
+}
+
+/** Runs the scene's timer only while Claude works, no encounter is up and the band draws the scene (0026 point 5). */
+function updateSceneTimer($: EngineInterface): void {
+  const working = machine !== undefined && !machine.encounter && (machine.turnRunning || Object.keys(machine.agents).length > 0)
+  const current = scene
+  if (!working || !current || !isAnimated(current) || sceneSites.size === 0) {
+    stopScene()
+    return
+  }
+  if (sceneTimer) return
+  sceneTimer = $.clock.every(Math.max(1, Math.round(1000 / current.timerFps)), () => {
+    // Skip a tick while the last blits are in flight (P1-03)
+    if (isBlittingScene || sceneSites.size === 0) return
+    isBlittingScene = true
+    sceneTick++
+    const blits = [...sceneSites].map(([site, columns]) =>
+      $.ui.blit({ requestId: site, key: SCENE_KEY, cells: sceneCellsFor(columns) }).catch(() => undefined),
+    )
+    void Promise.all(blits).finally(() => {
+      isBlittingScene = false
+    })
+  })
+}
+
+function stopScene(): void {
+  sceneTimer?.cancel()
+  sceneTimer = undefined
 }
 
 /**

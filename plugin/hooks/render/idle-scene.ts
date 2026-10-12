@@ -86,20 +86,20 @@ export function particlePixel(
   return { x: wrap(Math.floor(x), width), y: wrap(Math.floor(y), height) }
 }
 
-/** The strip's Raster cells at `tick`: `columns` × `scene.rows` cells. */
-export function sceneCells(scene: IdleScene, columns: number, particles: readonly Particle[], tick: number): string {
+/** The strip's Raster cells at `tick`: `columns` × `scene.rows` cells. A still strip passes `frame` 0 (0026 point 5). */
+export function sceneCells(scene: IdleScene, columns: number, particles: readonly Particle[], tick: number, frame = artFrame(scene, tick)): string {
   const width = Math.max(0, columns)
   const height = scene.rows * 2
   const rgba = new Uint8Array(width * height * 4)
 
   const art = scene.art
-  const frame = art?.frames[artFrame(scene, tick)]
-  if (art && frame) {
+  const pixels = art?.frames[frame]
+  if (art && pixels) {
     // Tiled left to right, cut at the right edge (0026 point 2)
     for (let y = 0; y < Math.min(art.height, height); y++) {
       for (let x = 0; x < width; x++) {
         const from = (y * art.width + (x % art.width)) * 4
-        rgba.set(frame.subarray(from, from + 4), (y * width + x) * 4)
+        rgba.set(pixels.subarray(from, from + 4), (y * width + x) * 4)
       }
     }
   }
