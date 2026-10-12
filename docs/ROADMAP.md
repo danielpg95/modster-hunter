@@ -369,7 +369,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Done when:**
   - [x] Decision 0025 accepted: a user-side helper, amending 0016 points 3 and 5.
   - [x] `plugin/hooks/vendor/png.ts` reads every PNG: grayscale, 16-bit and interlaced too, with unit tests; `docs/CONTENT_FORMAT.md` "User PNG sheets" updated (0025 point 7).
-  - [ ] `convert` turns a GIF, or a PNG sheet with `--frames`, into a `.sprite.json` through the mod's `spriteFromSheet`; the GIF decoder lives in `plugin/hooks/vendor/` with its license header.
+  - [x] `convert` turns a GIF, or a PNG sheet with `--frames`, into a `.sprite.json` through the mod's `spriteFromSheet`; the GIF decoder lives in `plugin/hooks/vendor/` with its license header.
   - [ ] `draw` turns a palette and text pixel rows into a PNG sheet the mod decodes (0016).
   - [ ] `preview` writes the sprite enlarged, every frame, on a dark and a light background.
   - [ ] `check` runs the mod's validator and merge over the user folder and prints every issue with `formatIssue`.
