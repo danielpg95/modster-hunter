@@ -38,3 +38,4 @@ settled questions and avoid making assumptions about open ones.
 | [0022](0022-up-to-two-types.md) | A Modster has one or two types, the first one primary | Accepted |
 | [0023](0023-display-settings.md) | Display settings: one toggle per place, a pane picker, and a one-line band that keeps Throw | Accepted |
 | [0024](0024-encounter-pane-focus.md) | `/modsters hunt` gives the encounter pane the keys, and the pane says how to switch | Accepted |
+| [0025](0025-user-content-helper.md) | The content skill ships a Node helper that converts, draws, previews and checks | Proposed |
