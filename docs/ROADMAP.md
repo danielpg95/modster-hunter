@@ -441,3 +441,11 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] The mark shows only when the collection has `caught:<id>`; never for a first encounter.
   - [x] Fits the full and compact layouts per 0012; never exceeds `maxRows` (render tests with the mark at `maxRows` 0, 1, 2, 5, 6, 7).
   - [x] Render tests for a caught and an uncaught Modster, using an in-memory store.
+
+#### [x] P5-11 — Caught mark in the encounter pane
+- **Depends on:** P5-10
+- **Size:** S
+- **Goal:** the encounter pane shows the same `●` mark as the band, so a Modster you already caught is marked wherever the encounter is drawn (while the pane is shown, the band steps aside and showed no mark at all).
+- **Done when:**
+  - [x] The pane marks a Modster whose `caught:<id>` is in the collection, and never a first encounter.
+  - [x] Pane render tests for a caught and an uncaught Modster, using an in-memory store.
