@@ -101,6 +101,28 @@ alpha is snapped to transparent below 128 and opaque from 128. The conversion is
 user PNGs (`spriteFromPng`, decision 0016). Never hand-edit the output.
 
 `npm run test:tools` runs the tool's tests (`tools/*.test.mjs`, Node's test runner).
+
+## Content helper (for users)
+
+`plugin/skills/create-modster-content/scripts/modster-content.mjs` ships with
+the mod for the user content skill (decision 0025). It needs Node 22.18+ and no
+packages, and imports the mod's own code, so it and the mod can't disagree.
+
+```bash
+H=plugin/skills/create-modster-content/scripts/modster-content.mjs
+node $H convert sheet.png --frames 2        # or anim.gif; writes sheet.sprite.json
+node $H draw grid.json --out sprite.png     # text grid → PNG sheet
+node $H preview sprite.png --frames 2 --out preview.png
+node $H check [folder] [--without-builtins] # default ~/.claude/modster-hunter/content
+```
+
+A grid is `{ "palette": { ".": "transparent", "k": "#1b1b1b" }, "frames": [["..kk..", …], …] }`:
+one character per pixel, every frame and row the same size. `check` loads the
+folder with the mod's loader and merge, prints every issue as the mod logs it,
+and exits 1 on errors; it writes nothing, not even the PNG cache. Its pure
+parts are in `scripts/lib/` with tests in `plugin/tests/skills/`; the CLI is
+tested by `tools/modster-content.test.mjs`.
+
 ## Continuous integration
 
 `.github/workflows/ci.yml` runs on every PR and on pushes to `main`:
@@ -109,7 +131,7 @@ user PNGs (`spriteFromPng`, decision 0016). Never hand-edit the output.
 | --- | --- |
 | Tracking and content checks | `node tools/check-tracking.mjs`; every `*.json` file parses |
 | Plugin validate and tests | Installs Claude Code (pinned in `CLAUDE_CODE_VERSION`), then `claude plugin validate ./plugin --strict` and `claude plugin test ./plugin` |
-| Tools tests | Node 22, `npm ci`, then `npm run test:tools` (the sprite converter) and `npm run check:content` (built-in content) |
+| Tools tests | Node 22, `npm ci`, then `npm run test:tools` (the sprite converter and the content helper) and `npm run check:content` (built-in content) |
 
 Neither `claude plugin` command needs a login or network access, so CI runs
 them as they are.

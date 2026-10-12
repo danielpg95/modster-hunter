@@ -104,7 +104,7 @@ function paeth(a: number, b: number, c: number): number {
 }
 
 /** zlib with stored blocks of at most 65535 bytes, and the Adler-32 trailer. */
-function storedZlib(data: Uint8Array): Uint8Array {
+export function storedZlib(data: Uint8Array): Uint8Array {
   const parts: Uint8Array[] = [Uint8Array.from([0x78, 0x01])]
   let at = 0
   do {

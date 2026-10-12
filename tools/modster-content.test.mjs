@@ -5,14 +5,14 @@
 import './ts-resolve.mjs'
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
 import omggif from 'omggif'
 import pngjs from 'pngjs'
 
-const { validateSprite } = await import('../plugin/hooks/content/index.ts')
+const { spriteFromPng, validateSprite } = await import('../plugin/hooks/content/index.ts')
 const { encodePng } = await import('../plugin/tests/fixtures/encode-png.ts')
 const HELPER = new URL('../plugin/skills/create-modster-content/scripts/modster-content.mjs', import.meta.url).pathname
 const dir = mkdtempSync(join(tmpdir(), 'modster-content-test-'))
@@ -108,7 +108,7 @@ test('convert: bad arguments fail with a hint', () => {
     [['convert', join(dir, 'art.jpg')], /expected a \.png sheet or a \.gif animation/],
     [['convert', join(dir, 'missing.png'), '--frames', '1'], /ENOENT/],
     [['convert'], /usage:/],
-    [['draw'], /unknown command "draw"/],
+    [['paint'], /unknown command "paint"/],
     [[], /usage:/],
   ]
   for (const [args, message] of cases) {
@@ -116,4 +116,84 @@ test('convert: bad arguments fail with a hint', () => {
     assert.equal(code, 1, args.join(' '))
     assert.match(stderr, message)
   }
+})
+
+const GRID = {
+  palette: { '.': 'transparent', k: '#1b1b1b', g: '#4caf50' },
+  frames: [
+    ['........', '..kkkk..', '.kggggk.', 'kggggggk', 'kggggggk', 'kggggggk', '.kggggk.', '..kkkk..'],
+    ['........', '........', '..kkkk..', '.kggggk.', 'kggggggk', 'kggggggk', 'kggggggk', '.kkkkkk.'],
+  ],
+}
+
+function writeJson(name, value) {
+  const path = join(dir, name)
+  mkdirSync(join(path, '..'), { recursive: true })
+  writeFileSync(path, JSON.stringify(value))
+  return path
+}
+
+test('draw: a grid becomes a PNG sheet the mod decodes', () => {
+  const out = join(dir, 'drawn.png')
+  const { code, stdout } = run('draw', writeJson('grid.json', GRID), '--out', out)
+  assert.equal(code, 0, stdout)
+  assert.match(stdout, /drawn\.png: 8×8, 2 frames, 2 colors; in modster\.json: "sprite": \{ "file": "drawn\.png", "frames": 2 \}/)
+  const result = spriteFromPng(new Uint8Array(readFileSync(out)), 2, 'drawn.png')
+  assert.equal(result.ok, true)
+  assert.deepEqual(result.value.palette, ['#00000000', '#1b1b1bff', '#4caf50ff'])
+})
+
+test('draw: a grid with problems, or too small for a sprite, prints them and writes nothing', () => {
+  const out = join(dir, 'bad.png')
+  const broken = run('draw', writeJson('broken.json', { palette: { k: '#000000' }, frames: [['kq']] }), '--out', out)
+  assert.equal(broken.code, 1)
+  assert.match(broken.stderr, /broken\.json: frames\[0\]\[0\] uses "q" at column 1, which isn't in the palette/)
+  const tiny = run('draw', writeJson('tiny.json', { palette: { k: '#000000' }, frames: [['kk', 'kk']] }), '--out', out)
+  assert.equal(tiny.code, 1)
+  assert.match(tiny.stderr, /bad\.png/)
+  assert.equal(existsSync(out), false)
+  assert.match(run('draw', writeJson('g2.json', GRID)).stderr, /draw needs a grid file and --out/)
+  assert.match(run('draw', writeJson('g3.json', GRID), '--out', join(dir, 'x.gif')).stderr, /--out must name a \.png file/)
+})
+
+test('preview: a sheet, a GIF or a .sprite.json becomes an enlarged PNG', () => {
+  const sheet = join(dir, 'for-preview.png')
+  run('draw', writeJson('pv.json', GRID), '--out', sheet)
+  const out = join(dir, 'preview.png')
+  const { code, stdout } = run('preview', sheet, '--frames', '2', '--out', out, '--scale', '4')
+  assert.equal(code, 0, stdout)
+  assert.match(stdout, /8×8, 2 frames, 2 colors, shown 4× on dark and light/)
+  const png = pngjs.PNG.sync.read(readFileSync(out))
+  // 2 frames × (8 + 1) × 4 + 4 wide; 2 strips × (8 + 1) × 4 + 4 tall
+  assert.deepEqual([png.width, png.height], [76, 76])
+
+  run('convert', sheet, '--frames', '2', '--out', join(dir, 'pv.sprite.json'))
+  assert.equal(run('preview', join(dir, 'pv.sprite.json'), '--out', out).code, 0)
+  assert.match(run('preview', join(dir, 'pv.sprite.json'), '--frames', '2', '--out', out).stderr, /--frames is only for a PNG sheet/)
+  assert.match(run('preview', sheet, '--out', out).stderr, /--frames is required/)
+  assert.match(run('preview', sheet, '--frames', '2', '--out', out, '--scale', '0').stderr, /--scale must be a whole number 1–32/)
+})
+
+test('check: a user folder loads like the mod loads it, with every issue', () => {
+  const root = join(dir, 'content')
+  const sheet = join(root, 'modsters', 'blobby', 'sprite.png')
+  mkdirSync(join(sheet, '..'), { recursive: true })
+  run('draw', writeJson('blobby.json', GRID), '--out', sheet)
+  writeJson('content/modsters/blobby/modster.json', {
+    schemaVersion: 1, id: 'blobby', name: 'Blobby', sprite: { file: 'sprite.png', frames: 2 },
+  })
+  writeJson('content/biomes/test-meadow/biome.json', {
+    schemaVersion: 1, id: 'test-meadow', name: 'Test Meadow', modsters: [{ id: 'blobby', weight: 10 }, { id: 'sproutling', weight: 50 }],
+  })
+  const clean = run('check', root)
+  assert.equal(clean.code, 0, clean.stdout)
+  assert.match(clean.stdout, /^4 biomes and 14 Modsters load; 0 errors, 0 warnings$/m)
+
+  // Without the built-ins, sproutling is missing
+  const alone = run('check', root, '--without-builtins')
+  assert.equal(alone.code, 1)
+  assert.match(alone.stdout, /content\/biomes\/test-meadow\/biome\.json: modsters\[1\]\.id names a Modster that doesn't exist: "sproutling"/)
+  assert.match(alone.stdout, /1 biome and 1 Modster load; 1 error, 0 warnings/)
+
+  assert.match(run('check', join(dir, 'nowhere')).stderr, /no content folder here yet/)
 })
