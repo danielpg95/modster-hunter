@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "shardling",
+  "name": "Shardling",
+  "description": "A lump of grotto rock with crystals breaking through. It blinks when the light hits them.",
+  "rarity": null,
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 11,
+    "types": ["rock", "psychic"],
+    "category": "Shard Modster",
+    "heightM": 0.15,
+    "weightKg": 0.4,
+    "entry": "Shardlings break off the grotto walls when the crystals hum too loud. They spend their lives looking for the exact spot they fell from."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json"
+  }
+}

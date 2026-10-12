@@ -5,7 +5,7 @@
 import './ts-resolve.mjs'
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
@@ -16,6 +16,9 @@ const { spriteFromPng, validateSprite } = await import('../plugin/hooks/content/
 const { encodePng } = await import('../plugin/tests/fixtures/encode-png.ts')
 const HELPER = new URL('../plugin/skills/create-modster-content/scripts/modster-content.mjs', import.meta.url).pathname
 const dir = mkdtempSync(join(tmpdir(), 'modster-content-test-'))
+// Counted from the built-in content, so adding a biome or a Modster doesn't break the tests
+const BUILT_IN = new URL('../plugin/content/', import.meta.url).pathname
+const builtInCount = (kind) => readdirSync(join(BUILT_IN, kind), { withFileTypes: true }).filter((entry) => entry.isDirectory()).length
 
 function run(...args) {
   const result = spawnSync(process.execPath, [HELPER, ...args], { encoding: 'utf8' })
@@ -187,7 +190,9 @@ test('check: a user folder loads like the mod loads it, with every issue', () =>
   })
   const clean = run('check', root)
   assert.equal(clean.code, 0, clean.stdout)
-  assert.match(clean.stdout, /^4 biomes and 14 Modsters load; 0 errors, 0 warnings$/m)
+  const biomes = builtInCount('biomes') + 1
+  const modsters = builtInCount('modsters') + 1
+  assert.match(clean.stdout, new RegExp(`^${biomes} biomes and ${modsters} Modsters load; 0 errors, 0 warnings$`, 'm'))
 
   // Without the built-ins, sproutling is missing
   const alone = run('check', root, '--without-builtins')

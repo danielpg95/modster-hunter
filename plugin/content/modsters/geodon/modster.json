@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "geodon",
+  "name": "Geodon",
+  "description": "Its shell is a geode. Tap it and you'll hear the crystals inside ring.",
+  "rarity": null,
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 17,
+    "types": ["rock", "ground"],
+    "category": "Geode Modster",
+    "heightM": 0.9,
+    "weightKg": 120,
+    "entry": "Each year it sleeps, another ring of crystal grows inside its shell. The oldest ones glitter like a night sky when they crack open."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json"
+  }
+}
