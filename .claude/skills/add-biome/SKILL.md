@@ -1,6 +1,6 @@
 ---
 name: add-biome
-description: Add a new built-in biome to Modster Hunter — theme, biome.json, Modster roster with balanced weights, optional background, credits, and validation. Use when a contributor wants to create or add a biome or area to the built-in content.
+description: Add a new built-in biome to the Modster Hunter repo's plugin/content/ — theme, biome.json, Modster roster with balanced weights, optional background, credits, and validation. Use when a contributor wants to create or add a biome or area to the built-in content. Not for a player's own biomes in ~/.claude/modster-hunter/content/ (that's the mod's create-modster-content skill).
 ---
 
 # Add a built-in biome

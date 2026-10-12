@@ -1,13 +1,13 @@
 ---
 name: add-modster
-description: Add a new built-in Modster (creature) to Modster Hunter — design, pixel-art sprite sheet, modster.json, conversion, credits, and validation. Use when a contributor wants to create, draw or add a Modster to the built-in content.
+description: Add a new built-in Modster (creature) to the Modster Hunter repo's plugin/content/ — design, pixel-art sprite sheet, modster.json, conversion, credits, and validation. Use when a contributor wants to create, draw or add a Modster to the built-in content. Not for a player's own Modsters in ~/.claude/modster-hunter/content/ (that's the mod's create-modster-content skill).
 ---
 
 # Add a built-in Modster
 
 Built-in content lives in `plugin/content/`. Follow `docs/CONTENT_FORMAT.md` and
-`.claude/rules/content.md`. (Users adding their *own* Modsters use the
-user-facing skill in `plugin/skills/`, phase 4.)
+`.claude/rules/content.md`. (Players adding their *own* Modsters use the
+mod's `create-modster-content` skill in `plugin/skills/`.)
 
 ## Before you start
 
