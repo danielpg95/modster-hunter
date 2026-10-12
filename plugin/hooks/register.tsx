@@ -141,7 +141,7 @@ export const register: Register = (on, options) => {
     }
     const modster = currentModster()
     const biome = biomeId === undefined ? undefined : content?.biomes.get(biomeId)?.biome
-    const band = currentEncounter()
+    const band = markedEncounter()
     const view = bandView({
       maxRows: e.props.maxRows,
       columns: e.props.bodyColumns,
@@ -150,8 +150,7 @@ export const register: Register = (on, options) => {
       showIdleLine,
       // The band turned off still keeps Throw on screen during an encounter (0023 point 3)
       ...(currentPlan().band === 'one-row' ? { oneRow: true } : {}),
-      // The caught mark is the band's alone (P5-10); the pane draws the encounter without it
-      ...(band ? { encounter: alreadyCaught ? { ...band, alreadyCaught: true } : band } : {}),
+      ...(band ? { encounter: band } : {}),
       ...(biome ? { biome: biome.accentColor ? { name: biome.name, accentColor: biome.accentColor } : { name: biome.name } } : {}),
     })
 
@@ -210,7 +209,7 @@ export const register: Register = (on, options) => {
     if (e.requestId !== PANE_ID) return next(e)
     const { Box, Text, Button } = $.ui.resolve(e)
     const modster = currentModster()
-    const encounter = currentEncounter()
+    const encounter = markedEncounter()
     const biome = biomeId === undefined ? undefined : content?.biomes.get(biomeId)?.biome
     const rows = Math.max(0, e.props.scroll.bodyRows - 2) // header and a blank line
     const columns = e.props.bodyColumns
@@ -376,6 +375,12 @@ function currentEncounter(): BandEncounter | undefined {
     ...(encounter.outcome ? { outcome: encounter.outcome } : {}),
     ...(encounter.fledBecause ? { fledBecause: encounter.fledBecause } : {}),
   }
+}
+
+/** The encounter as the band and pane draw it: with the caught mark (P5-10, P5-11); the spinner and status line go without */
+function markedEncounter(): BandEncounter | undefined {
+  const encounter = currentEncounter()
+  return encounter && alreadyCaught ? { ...encounter, alreadyCaught: true } : encounter
 }
 
 function currentPlan(): DisplayPlan {

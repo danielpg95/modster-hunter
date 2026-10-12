@@ -143,6 +143,29 @@ describe('register: encounter pane', () => {
     expect(opened).toEqual(['modster-hunt'])
   })
 
+  test('the pane shows the caught mark for a Modster already in the collection (P5-11)', async ($, on) => {
+    stubStore(on, {
+      'caught:sproutling': { v: 1, count: 1, shinyCount: 0, firstCaughtAt: 1, lastCaughtAt: 1, bestTier: 'common', biomes: { 'whispering-forest': 1 } },
+    })
+    const clock = await start($, on)
+    const pane = await mountPane($)
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(3_250)
+    expect(await pane.find({ type: 'Text', text: /●/ })).toBeDefined()
+    await pane.unmount()
+  })
+
+  test('a first encounter in the pane has no caught mark (P5-11)', async ($, on) => {
+    stubStore(on)
+    const clock = await start($, on)
+    const pane = await mountPane($)
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(3_250)
+    expect(await pane.find({ type: 'Text', text: 'appeared!' })).toBeDefined()
+    expect(await pane.find({ type: 'Text', text: /●/ })).toBeUndefined()
+    await pane.unmount()
+  })
+
   // Focus and hints (0024)
   test('/modsters hunt opens the pane with focus', async ($, on) => {
     const opens = recordOpens(on)
