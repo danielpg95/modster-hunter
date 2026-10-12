@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "glowcap",
+  "name": "Glowcap",
+  "description": "It dims its cap when someone looks. Stay still and it lights up again.",
+  "rarity": null,
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 12,
+    "types": ["grass", "fairy"],
+    "category": "Lantern Modster",
+    "heightM": 0.2,
+    "weightKg": 0.3,
+    "entry": "It grows where crystal cracks leak light. When the grotto goes dark, a patch of glowcaps lights the path like tiny lanterns."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json"
+  }
+}

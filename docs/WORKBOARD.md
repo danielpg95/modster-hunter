@@ -15,8 +15,8 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P4-04 | @danielpg95 | in-review | p4-04-skill-fixes | 2026-10-11 | 2026-10-12 | Skill fixes from @danielpg95's run (Crystal Grotto, 10 Modsters) in review; still needs the run by someone who didn't write it (@victor-aguilars), then tick both done-when items |
-| P5-12 | @danielpg95 | in-progress | p5-12-crystal-grotto | 2026-10-12 | 2026-10-12 | Copy the user content into plugin/content/, convert the sprites, add dex #011–#020 and credits, and remove the user copies |
+| P4-04 | @danielpg95 | in-review | p4-04-skill-fixes | 2026-10-11 | 2026-10-12 | Skill fixes merged (#78); waiting on @victor-aguilars's end-to-end run, then tick both done-when items |
+| P5-12 | @danielpg95 | in-review | p5-12-crystal-grotto | 2026-10-12 | 2026-10-12 | PR open; after it merges, remove or rename the user copies in ~/.claude/modster-hunter/content/ so they don't replace the built-ins |
 
 ## Up next
 

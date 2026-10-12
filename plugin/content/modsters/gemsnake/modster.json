@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "gemsnake",
+  "name": "Gemsnake",
+  "description": "Its scales are cut gems. When it slithers, the whole cave chimes.",
+  "rarity": null,
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 18,
+    "types": ["rock", "dragon"],
+    "category": "Jewel Modster",
+    "heightM": 2.4,
+    "weightKg": 46,
+    "entry": "It sheds one gem scale each season. Miners who find one keep it for luck, but the serpent always seems to know where it went."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json"
+  }
+}

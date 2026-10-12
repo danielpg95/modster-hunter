@@ -469,9 +469,9 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Size:** M
 - **Goal:** bring @danielpg95's Crystal Grotto (made with the user content skill, 2026-10-12) into the built-in content: the biome and its 10 Modsters, with dex numbers #011–#020.
 - **Done when:**
-  - [ ] `plugin/content/biomes/crystal-grotto/` and the 10 Modster folders, each with `sprite.png` and a `sprite.sprite.json` converted with `npm run sprite`.
-  - [ ] Every Modster has a complete dex with numbers #011–#020 (decision 0017).
-  - [ ] A credits row in `plugin/content/CREDITS.md` for every sprite.
-  - [ ] `npm run check:content` passes, and the odds table (3 common, 3 uncommon, 3 rare, 1 legendary) is checked; a second legendary across biomes is intended.
-  - [ ] A preview of every Modster in the PR description (enlarged, every frame, dark and light).
+  - [x] `plugin/content/biomes/crystal-grotto/` and the 10 Modster folders, each with `sprite.png` and a `sprite.sprite.json` converted with `npm run sprite`.
+  - [x] Every Modster has a complete dex with numbers #011–#020 (decision 0017).
+  - [x] A credits row in `plugin/content/CREDITS.md` for every sprite.
+  - [x] `npm run check:content` passes, and the odds table (3 common, 3 uncommon, 3 rare, 1 legendary) is checked; a second legendary across biomes is intended.
+  - [x] A preview of every Modster in the PR description (enlarged, every frame, dark and light).
   - [ ] The user copies in `~/.claude/modster-hunter/content/` are removed or renamed, so they don't replace the built-ins by id.

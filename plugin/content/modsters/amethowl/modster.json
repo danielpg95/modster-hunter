@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "amethowl",
+  "name": "Amethowl",
+  "description": "Its eyes glow like amethyst. It sees in the dark and remembers every tunnel.",
+  "rarity": null,
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 19,
+    "types": ["psychic", "flying"],
+    "category": "Seer Modster",
+    "heightM": 0.9,
+    "weightKg": 6.5,
+    "entry": "It perches on the tallest crystal in the grotto and watches. Lost miners swear they followed two violet lights all the way back to the exit."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json"
+  }
+}

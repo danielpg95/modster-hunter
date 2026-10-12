@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "prismite",
+  "name": "Prismite",
+  "description": "A floating sliver of crystal. Wherever it drifts, little rainbows follow.",
+  "rarity": null,
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 15,
+    "types": ["fairy", "psychic"],
+    "category": "Prism Modster",
+    "heightM": 0.25,
+    "weightKg": 0.2,
+    "entry": "It drinks the faint light of the grotto and breaks it into colors. Cave folk say a rainbow on the wall means a Prismite is napping nearby."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json"
+  }
+}

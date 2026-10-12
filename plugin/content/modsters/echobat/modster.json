@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "echobat",
+  "name": "Echobat",
+  "description": "Its quartz ears hum back whatever you say, only a little higher.",
+  "rarity": null,
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 14,
+    "types": ["flying", "psychic"],
+    "category": "Echo Modster",
+    "heightM": 0.4,
+    "weightKg": 0.8,
+    "entry": "Echobats map the grotto by humming at the crystals and listening to them answer. A whole colony humming sounds like a choir."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json"
+  }
+}

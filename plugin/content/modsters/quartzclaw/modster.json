@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "quartzclaw",
+  "name": "Quartzclaw",
+  "description": "It polishes its one giant quartz claw all day. Compliment it and it'll follow you anywhere.",
+  "rarity": null,
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 16,
+    "types": ["rock", "water"],
+    "category": "Polish Modster",
+    "heightM": 0.35,
+    "weightKg": 3.8,
+    "entry": "Its big claw is real quartz, grown a little bigger every year. It snips loose crystals off the walls and buffs them until they shine."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json"
+  }
+}

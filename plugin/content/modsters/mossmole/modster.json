@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "mossmole",
+  "name": "Mossmole",
+  "description": "It can't see a thing, so it wears a glowing crystal on its head like a headlamp.",
+  "rarity": null,
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 13,
+    "types": ["ground", "grass"],
+    "category": "Lamp Modster",
+    "heightM": 0.3,
+    "weightKg": 2.4,
+    "entry": "Moss grows on its back while it naps in the tunnels. It sniffs out crystal veins and polishes the best one to wear."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json"
+  }
+}
