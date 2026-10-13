@@ -166,6 +166,7 @@ export const register: Register = (on, options) => {
     // encounter isn't drawn twice (0015)
     if (await isPaneShown($)) {
       removeSite(e.requestId)
+      removeSceneSite(e.requestId)
       return next(e)
     }
     const modster = currentModster()
@@ -284,17 +285,50 @@ export const register: Register = (on, options) => {
     )
     if (!encounter || !modster) {
       removeSite(e.requestId)
+      const idleText = (
+        <Text key="idle" dimColor>
+          Listening for Modsters… they appear while Claude works.
+        </Text>
+      )
+      // The scene above the idle text, by the band's rule on the pane's rows (0027)
+      const idleView = bandView({
+        maxRows: rows,
+        columns,
+        canDrawSprite: e.surface === 'terminal',
+        showIdleLine: true,
+        biome: { name: biomeName },
+        ...(scene && showIdleScene ? { sceneRows: scene.rows } : {}),
+      })
+      if (idleView.kind === 'scene' && e.surface === 'terminal') {
+        const { Raster } = $.ui.resolve(e)
+        addSceneSite($, e.requestId, columns)
+        return (
+          <Box flexDirection="column">
+            {header}
+            <Text key="gap"> </Text>
+            <Raster key={SCENE_KEY} columns={columns} rows={idleView.sceneRows} cells={sceneCellsFor(columns)} />
+            {idleText}
+          </Box>
+        )
+      }
+      removeSceneSite(e.requestId)
+      if (scene && showIdleScene) {
+        const skip = `idle scene: not drawn in the pane (surface ${e.surface}, ${rows} rows, scene needs ${scene.rows + 1})`
+        if (skip !== loggedSceneSkip) {
+          loggedSceneSkip = skip
+          $.ui.log(skip, { to: 'debug' })
+        }
+      }
       return (
         <Box flexDirection="column">
           {header}
           <Text key="gap"> </Text>
-          <Text key="idle" dimColor>
-            Listening for Modsters… they appear while Claude works.
-          </Text>
+          {idleText}
         </Box>
       )
     }
 
+    removeSceneSite(e.requestId)
     // The sprite's normal size, as in the band: 2x looked far too big in a real terminal (0015)
     const fits = () => Math.ceil(modster.sprite.height / 2) <= rows && modster.sprite.width + BAND.gapColumns + BAND.textColumns <= columns
     const view = bandView({

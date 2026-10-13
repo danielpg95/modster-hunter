@@ -1,6 +1,7 @@
 import { describe, expect, mock, test } from 'claude-code/testing'
 import type { On, UiPane } from 'claude-code'
 import { oneModsterForest } from './fixtures/one-modster-forest'
+import { sceneForest } from './fixtures/scene-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
 
 // The encounter pane (decision 0015): `/modsters hunt`, drawn on the terminal surface.
@@ -9,7 +10,7 @@ import { stubContentFs } from './fixtures/stub-content-fs'
 const PANE_PROPS = { title: 'Modster Hunter', isFocused: true, bodyColumns: 60, placement: 'dock', scroll: { offset: 0, bodyRows: 30 }, view: {} }
 const BAND_PROPS = { hasSurvey: false, isWorking: true, maxRows: 7, bodyColumns: 120 }
 
-async function start($: any, on: On, panes: () => UiPane[] = () => []) {
+async function start($: any, on: On, panes: () => UiPane[] = () => [], files = oneModsterForest()) {
   on('session.start', ($, e) => ({ cwd: e.cwd }))
   on('command.register', ($, e) => ({ value: { command: e.name } }))
   on('turn.start', ($, e) => ({ turnId: e.turnId }))
@@ -19,11 +20,23 @@ async function start($: any, on: On, panes: () => UiPane[] = () => []) {
     const { Box } = $.ui.resolve(e)
     return <Box />
   })
-  stubContentFs(on, oneModsterForest())
+  stubContentFs(on, files)
   const clock = mock.clock(on)
   await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' })
   return clock
 }
+
+/** Records the idle scene's blits: which site each went to. */
+function sceneBlits(on: On): string[] {
+  const sites: string[] = []
+  on('ui.blit', ($, e) => {
+    if (e.key === 'scene') sites.push(e.requestId)
+    return { value: {} }
+  })
+  return sites
+}
+
+const SHOWN: UiPane[] = [{ id: 'modster-hunt', title: 'Modster Hunter', isShown: true, isFocused: false, isPlaced: true }]
 
 const mountPane = ($: any, props: Partial<typeof PANE_PROPS> = {}) =>
   $.ui.mount({ plugin: 'modster-hunter', surface: 'terminal', component: 'Pane', requestId: 'modster-hunt', props: { ...PANE_PROPS, ...props } })
@@ -268,5 +281,66 @@ describe('register: encounter pane', () => {
     expect(await band.find({ type: 'Raster', key: 'sprite' })).toBeDefined()
     expect(await band.find({ type: 'Button', key: 'throw' })).toBeDefined()
     await band.unmount()
+  })
+
+  // The idle scene in the pane (decision 0027)
+  test('between encounters the pane shows the biome scene above its idle text', async ($, on) => {
+    await start($, on, () => SHOWN, sceneForest())
+    const pane = await mountPane($)
+    expect(await pane.find({ type: 'Raster', key: 'scene' })).toBeDefined()
+    expect(await pane.find({ type: 'Text', text: /Listening for Modsters/ })).toBeDefined()
+    await pane.unmount()
+  })
+
+  test('the pane scene moves only while Claude works, and the band that stepped aside gets no blits', async ($, on) => {
+    on('turn.complete', () => ({ text: '' }))
+    const blits = sceneBlits(on)
+    const clock = await start($, on, () => SHOWN, sceneForest())
+    const band = await mountBand($)
+    const pane = await mountPane($)
+    await clock.advance(2_000)
+    expect(blits.length).toBe(0)
+
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(2_000) // under the 3 s before the Modster appears
+    expect(blits.length).toBeGreaterThan(8)
+    expect(new Set(blits)).toEqual(new Set(['modster-hunt']))
+    expect(await band.find({ type: 'Raster' })).toBeUndefined()
+
+    await $.turn.complete({ reason: 'answer', answer: 'ok', durationMs: 1 } as any)
+    const stopped = blits.length
+    await clock.advance(2_000)
+    expect(blits.length).toBe(stopped)
+    await band.unmount()
+    await pane.unmount()
+  })
+
+  test('an encounter replaces the pane scene', async ($, on) => {
+    const clock = await start($, on, () => SHOWN, sceneForest())
+    const pane = await mountPane($)
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(4_250)
+    expect(await pane.find({ type: 'Raster', key: 'scene' })).toBeUndefined()
+    expect(await pane.find({ type: 'Raster', key: 'sprite' })).toBeDefined()
+    await pane.unmount()
+  })
+
+  test('a pane too short for the scene keeps its idle text', async ($, on) => {
+    await start($, on, () => SHOWN, sceneForest())
+    // 6 body rows leave 4 after the header and blank row; the 4-row scene and its text need 5
+    const short = await mountPane($, { scroll: { offset: 0, bodyRows: 6 } })
+    expect(await short.find({ type: 'Raster' })).toBeUndefined()
+    expect(await short.find({ type: 'Text', text: /Listening for Modsters/ })).toBeDefined()
+    await short.redraw({ ...PANE_PROPS, scroll: { offset: 0, bodyRows: 7 } } as any)
+    expect(await short.find({ type: 'Raster', key: 'scene' })).toBeDefined()
+    await short.unmount()
+  })
+
+  test('showIdleScene off keeps the pane text-only', { options: { showIdleScene: false } }, async ($, on) => {
+    await start($, on, () => SHOWN, sceneForest())
+    const pane = await mountPane($)
+    expect(await pane.find({ type: 'Raster' })).toBeUndefined()
+    expect(await pane.find({ type: 'Text', text: /Listening for Modsters/ })).toBeDefined()
+    await pane.unmount()
   })
 })
