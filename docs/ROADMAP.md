@@ -475,3 +475,25 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `npm run check:content` passes, and the odds table (3 common, 3 uncommon, 3 rare, 1 legendary) is checked; a second legendary across biomes is intended.
   - [x] A preview of every Modster in the PR description (enlarged, every frame, dark and light).
   - [x] The user copies in `~/.claude/modster-hunter/content/` are removed or renamed, so they don't replace the built-ins by id.
+
+#### [ ] P5-13 — Biome idle scene
+- **Depends on:** P2-07, P5-08
+- **Size:** M
+- **Goal:** between encounters the band shows the biome as an animated scene with drifting particles instead of only its name (decision 0026).
+- **Done when:**
+  - [ ] The validator accepts a `background` of 1–4 frames, `backgroundFps` (1–12) and `particles` (`style`, `color`, `density`) per 0026, with tests for each bound; `docs/CONTENT_FORMAT.md` documents them.
+  - [ ] A pure scene compositor in `plugin/hooks/render/` tiles the scene to the band's width and adds particles for every style, tested with an injected random source and the fake clock.
+  - [ ] `bandView` draws the scene above the idle line when it fits, the 3-row particle strip for a biome without art, and today's line otherwise; never exceeds `maxRows` (render tests at `maxRows` 0, 1, 2, 5, 7, 15).
+  - [ ] The scene animates only while a turn runs (subagents count, 0018) and holds still between turns; the timer stops when an encounter starts and on module reload (tested).
+  - [ ] A `showIdleScene` option (default `true`) in `plugin.json` and the `userConfig` table; `false` gives today's idle line.
+  - [ ] Checked by hand in a real terminal at 80×24 and 140×40 with a test scene: no flicker, typing unaffected (noted in the handoff).
+
+#### [ ] P5-14 — Scenes for the built-in biomes
+- **Depends on:** P5-13
+- **Size:** M
+- **Goal:** every built-in biome gets an idle scene and particles (decision 0026).
+- **Done when:**
+  - [ ] Whispering Forest, Saltbreeze Bay, Dustwind Expanse and Crystal Grotto each have a `background` (about 12 px tall, edges that tile) and a `particles` style.
+  - [ ] A credits row in `plugin/content/CREDITS.md` for every scene.
+  - [ ] `npm run check:content` passes.
+  - [ ] A preview of every scene in the PR description (enlarged, every frame, dark and light).
