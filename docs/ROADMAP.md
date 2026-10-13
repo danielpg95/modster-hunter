@@ -289,12 +289,12 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
 
 Goal: `/modsters` opens a pane to browse what you've caught.
 
-#### [ ] P3-01 — Pane shell and tabs
+#### [x] P3-01 — Pane shell and tabs
 - **Depends on:** P2-10
 - **Size:** S
 - **Goal:** `/modsters` opens a focused pane with tabs Collection · Biomes · Stats · Settings, Esc closes it.
 - **Done when:**
-  - [ ] Tabs switch by hotkeys `1`–`4`; layout adapts to `bodyColumns` and to inline vs docked placement.
+  - [x] Tabs switch by hotkeys `1`–`4`; layout adapts to `bodyColumns` and to inline vs docked placement. Checked by hand by @danielpg95 on 2026-10-12, inline and docked.
 
 #### [ ] P3-02 — Collection grid
 - **Depends on:** P3-01
