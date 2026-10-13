@@ -15,13 +15,13 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
+| P3-03 | @danielpg95 | in-progress | p3-03-biomes-tab | 2026-10-13 | 2026-10-13 | Replace the Biomes tab placeholder with a list of biomes, percentages from the P2-05 resolver |
 
 ## Up next
 
 Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
-- **P3-03** — Biomes tab
 - **P3-04** — Stats tab
 - **P4-02** — `/modsters reload` and error reporting
 - **P5-01** — Shiny variants
