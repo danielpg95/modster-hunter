@@ -45,6 +45,6 @@ export function listRow(entry: CollectionEntry, isSelected: boolean): BandLine {
 }
 
 /** `text` cut to `columns` with an ellipsis, padded to exactly `columns`. */
-function fit(text: string, columns: number): string {
+export function fit(text: string, columns: number): string {
   return text.length > columns ? `${text.slice(0, columns - 1)}…` : text.padEnd(columns)
 }

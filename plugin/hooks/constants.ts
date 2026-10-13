@@ -80,6 +80,13 @@ export const COLLECTION = {
   detailRows: 9,
   /** An uncaught Modster's still silhouette: one gray that reads on dark and light terminals */
   silhouetteColor: '#5a5a5a',
+  /** P3-03's biome list: `▸ Whispering Forest 2/5 here`; names past `biomeNameColumns` are cut */
+  biomeListColumns: 30,
+  biomeNameColumns: 17,
+  /** P3-03's odds rows: `#001 Sproutling     40.0%  legendary ×3` */
+  oddsColumns: 44,
+  /** A biome list under nothing but the odds (a narrow dock) shows at most this many rows */
+  biomeStackRows: 3,
 } as const
 
 /** Content file bounds: docs/CONTENT_FORMAT.md (schema version 1), decisions 0004, 0007 and 0012. */

@@ -22,6 +22,10 @@ import {
   BAND_BUTTONS,
   COLLECTION_TABS,
   bandView,
+  biomeEntries,
+  biomeRow,
+  biomesBody,
+  oddsRow,
   collectionBody,
   collectionEntries,
   collectionLayout,
@@ -40,6 +44,7 @@ import {
   spriteCells,
   type BandEncounter,
   type BandLine,
+  type BiomeEntry,
   type CollectionEntry,
   type CollectionTab,
   type DisplayPlan,
@@ -127,6 +132,8 @@ let collectionTab: CollectionTab = 'collection'
 const collectionRecords = new Map<string, CaughtRecord>()
 // The selected Modster's id; kept across tab switches like the tab
 let collectionSelected: string | undefined
+// The Biomes tab's selection (P3-03); none yet means the session's biome
+let biomesSelected: string | undefined
 // Its sprite animates on a loop of its own: the encounter's loop follows the encounter's Modster
 const COLLECTION_SPRITE_KEY = 'collection-sprite'
 const silhouettes = new Map<string, string>()
@@ -510,9 +517,76 @@ export const register: Register = (on, options) => {
             {noBiomesMessage(includeBuiltins, USER_FOLDER_LABEL)}
           </Text>
         )}
-        {collectionTab === 'collection' ? collectionView(e.props.scroll.bodyRows - usedRows) : <Text key="body">{tab?.placeholder}</Text>}
+        {collectionTab === 'collection'
+          ? collectionView(e.props.scroll.bodyRows - usedRows)
+          : collectionTab === 'biomes'
+            ? biomesView(e.props.scroll.bodyRows - usedRows)
+            : <Text key="body">{tab?.placeholder}</Text>}
       </Box>
     )
+
+    /** The Biomes tab: a summary line with k/j, the biome list, and the selected biome's odds (P3-03). */
+    function biomesView(rows: number) {
+      const entries = content ? biomeEntries(content.biomes.values(), content.modsters, collectionRecords, biomeId) : []
+      // A selected biome that no longer loads falls back to the session's
+      const at = (id: string | undefined) => entries.findIndex((entry) => entry.id === id)
+      const index = Math.max(0, at(biomesSelected) >= 0 ? at(biomesSelected) : at(biomeId))
+      const selected = entries[index]
+      const select = (entry: BiomeEntry | undefined) => {
+        if (!entry || entry.id === selected?.id) return
+        biomesSelected = entry.id
+        $.ui.invalidate('ui.render')
+      }
+      const summary = (
+        <Box key="summary" flexDirection="row" columnGap={COLLECTION.gapColumns}>
+          <Text bold>{`Biomes ${entries.length}`}</Text>
+          <Button key="biome-up" label="Up" hotkey="k" plain dimColor onPress={() => select(entries[index - 1])} />
+          <Button key="biome-down" label="Down" hotkey="j" plain dimColor onPress={() => select(entries[index + 1])} />
+        </Box>
+      )
+      if (!selected) return <Box key="biomes" flexDirection="column">{summary}</Box>
+      // Less the summary line
+      const plan = biomesBody(e.props.bodyColumns, rows - 1)
+      const window = listWindow(entries.length, index, plan.listRows)
+      const more = moreText(window)
+      const list = (
+        <Box key="biome-list" flexDirection="column" {...(plan.split === 'side' ? { width: COLLECTION.biomeListColumns } : {})}>
+          {entries.slice(window.start, window.end).map((entry) => (
+            <Button key={entry.id} plain onPress={() => select(entry)}>
+              {texts(biomeRow(entry, entry.id === selected.id), 'truncate')}
+            </Button>
+          ))}
+          {more ? <Text dimColor>{more}</Text> : null}
+        </Box>
+      )
+      const odds = (
+        <Box key="odds" flexDirection="column">
+          {selected.odds.length === 0 ? <Text dimColor>No Modsters loaded.</Text> : null}
+          {selected.odds.map((row) => (
+            <Box key={`odds-${row.id}`} flexDirection="row">
+              {texts(oddsRow(row, selected.id), 'truncate')}
+            </Box>
+          ))}
+        </Box>
+      )
+      return (
+        <Box key="biomes" flexDirection="column">
+          {summary}
+          {plan.split === 'side' ? (
+            <Box key="split" flexDirection="row" columnGap={COLLECTION.gapColumns}>
+              {list}
+              {odds}
+            </Box>
+          ) : (
+            <Box key="split" flexDirection="column">
+              {list}
+              <Text> </Text>
+              {odds}
+            </Box>
+          )}
+        </Box>
+      )
+    }
 
     /** The Collection tab: a summary line with k/j, the list, and the selected Modster (P3-02). */
     function collectionView(rows: number) {
