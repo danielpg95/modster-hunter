@@ -69,10 +69,11 @@ plugin/
 | Current encounter (machine state) | Module variable in `register.tsx` | Not persisted (decision 0005); the band redraws via `$.ui.invalidate` when a step changes it, and `/clear` (which resets `$.state`) leaves it alone |
 | Display settings (`showInBand`, `encounterPane`, `showInSpinner`, `showInStatusLine`) | `userConfig`, read once per load | A change in `/config` reloads the module (decision 0023) |
 | Status line | `$.ui.status`, updated when an encounter step changes it | Shown only while an encounter is up (decision 0023) |
-| Collection, stats | `$.store` | Persists across sessions (decision 0009) |
+| Collection, stats | `$.store` | Persists across sessions (decision 0009); session `stats:` keys idle 24 hours fold into `stats:total` (0029) |
 | The collection pane's shown tab | Module variable in `register.tsx` | Set by a tab's `onPress` (a render hook can't write `$.state`); a reopened pane shows the last tab (P3-01) |
 | The Collection tab's records and selection | Module variables in `register.tsx` | Render hooks can't wait on `$.store`, so `caught:*` records are read at session start, on `/modsters` and after a catch (P3-02) |
 | The Biomes tab's selected biome | A module variable in `register.tsx` | Starts on the session's biome; kept across tabs and reopening (P3-03). Its odds and caught counts come from the same records as the Collection tab. Its scene runs on its own timer while the tab draws it (0028) |
+| The Stats tab's summed stats | A module variable in `register.tsx` | Read, after folding idle session keys (0029), when the tab is pressed or `/modsters` opens on it (P3-04) |
 | Whether the encounter pane reopens (`prefs:huntPane`) | `$.store` | Set by `/modsters hunt`, cleared by a close by hand (decision 0019) |
 | User content | Files in `~/.claude/modster-hunter/content/` | Editable by hand, by the editor and by Claude |
 | Decoded user PNG sprites | Files in `~/.claude/modster-hunter/cache/sprites/` | Keyed by the PNG's size, mtime and frame count; safe to delete (decision 0016) |

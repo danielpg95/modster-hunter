@@ -312,12 +312,12 @@ Goal: `/modsters` opens a pane to browse what you've caught.
   - [x] Percentages match the P2-05 resolver.
   - [x] The selected biome's idle scene shows above the list, animated, and is left out when it doesn't fit (decision 0028).
 
-#### [ ] P3-04 — Stats tab
+#### [x] P3-04 — Stats tab
 - **Depends on:** P3-01
 - **Size:** S
 - **Goal:** totals: encounters, catches, flees, catch ratio, turns played, by biome.
 - **Done when:**
-  - [ ] Aggregates `stats:*` keys and compacts old ones (decision 0009).
+  - [x] Aggregates `stats:*` keys and compacts old ones (decisions 0009, 0029).
 
 #### [ ] P3-05 — Phase 3 review
 - **Depends on:** P3-02, P3-03, P3-04

@@ -22,7 +22,7 @@ settled questions and avoid making assumptions about open ones.
 | [0006](0006-biome-selection.md) | One random biome per session | Accepted |
 | [0007](0007-content-model.md) | Weights instead of percentages; built-in and user content merged by id | Accepted |
 | [0008](0008-sprite-pipeline.md) | PNG sprite sheets in, `.sprite.json` at runtime | Superseded by 0016 |
-| [0009](0009-collection-storage.md) | One `$.store` key per Modster | Accepted |
+| [0009](0009-collection-storage.md) | One `$.store` key per Modster | Accepted (amended by 0029) |
 | [0010](0010-contributor-tracking.md) | Roadmap + workboard + session handoffs as the tracking system | Accepted |
 | [0011](0011-license.md) | MIT for code, CC BY 4.0 for art | Accepted |
 | [0012](0012-sprite-size-and-band-layout.md) | Half-block `Raster` sprites up to 24×12; text-only band when they don't fit | Accepted (amended by 0020, 0021) |
@@ -42,3 +42,4 @@ settled questions and avoid making assumptions about open ones.
 | [0026](0026-biome-idle-scene.md) | Between encounters the band shows the biome as an animated scene with particles | Accepted (amended by 0027) |
 | [0027](0027-pane-idle-scene.md) | Between encounters the encounter pane shows the biome's idle scene | Accepted |
 | [0028](0028-biomes-tab-scene.md) | The Biomes tab shows the selected biome's idle scene | Accepted |
+| [0029](0029-stats-compaction.md) | The Stats tab folds session stats idle for 24 hours into `stats:total` | Accepted |

@@ -3,3 +3,5 @@ export { HUNT_PANE_KEY, huntPanePref, prefAfterClose, readHuntPaneOpen, type Hun
 export { recordEncounterEvents, recordStat } from './record-encounter-events'
 export { addToStats, readSessionStats, statsKey, type BiomeStats, type SessionStats, type StatsEvent } from './session-stats'
 export type { StorePort } from './store-port'
+export { compactStats, type StatsStorePort } from './compact-stats'
+export { readStatsTotal, STATS_TOTAL_KEY, sumStats, type StatsTotal } from './stats-total'

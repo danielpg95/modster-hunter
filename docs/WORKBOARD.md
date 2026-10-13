@@ -15,16 +15,17 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P3-04 | @danielpg95 | in-progress | p3-04-stats-tab | 2026-10-13 | 2026-10-13 | Read how `stats:<sessionId>` keys are flushed, then write the pure aggregate + compact functions with tests |
 
 ## Up next
 
 Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
+- **P3-05** — Phase 3 review
 - **P4-02** — `/modsters reload` and error reporting
 - **P5-01** — Shiny variants
 - **P5-02** — Sounds
+- **P5-03** — Extended stats and milestones
 - **P5-05** — Light skill catch experiment
 - **P5-06** — Desktop app support
 - **P5-09** — Sprite miniatures (spike)

@@ -89,6 +89,13 @@ export const COLLECTION = {
   biomeStackRows: 3,
   /** The selected biome's scene shows only when the list still gets this many rows (0028 point 3) */
   biomeSceneListRows: 3,
+  /** P3-04's per-biome table: each count right-aligned in this many columns */
+  statColumns: 7,
+} as const
+
+/** Stats compaction, decision 0029: a session's `stats:` key idle this long folds into `stats:total`. */
+export const STATS = {
+  compactAfterMs: 24 * 60 * 60 * 1000,
 } as const
 
 /** Content file bounds: docs/CONTENT_FORMAT.md (schema version 1), decisions 0004, 0007 and 0012. */
