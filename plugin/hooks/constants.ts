@@ -76,6 +76,8 @@ export const COLLECTION = {
   gapColumns: 2,
   /** The detail's text needs this much room beside the list, else it goes under the list */
   detailMinColumns: 24,
+  /** The detail's text always takes this many rows, so the layout holds still while scrolling; a long dex entry is cut */
+  detailRows: 9,
   /** An uncaught Modster's still silhouette: one gray that reads on dark and light terminals */
   silhouetteColor: '#5a5a5a',
 } as const

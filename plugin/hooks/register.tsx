@@ -26,7 +26,6 @@ import {
   collectionEntries,
   collectionLayout,
   detailLines,
-  lineWidth,
   listRow,
   listWindow,
   moreText,
@@ -547,19 +546,16 @@ export const register: Register = (on, options) => {
         ? [...content.biomes.values()].filter(({ biome }) => biome.modsters.some((entry) => entry.id === selected.id)).map(({ biome }) => biome.name)
         : []
       const lines = detailLines({ entry: selected, ...(loaded?.modster.dex ? { dex: loaded.modster.dex } : {}), habitat })
-      // Rows the text takes as it wraps; the side's width, or the whole width when stacked
-      const sideColumns = e.props.bodyColumns - COLLECTION.listColumns - COLLECTION.gapColumns
-      const textColumns = Math.max(1, sideColumns >= COLLECTION.detailMinColumns ? sideColumns : e.props.bodyColumns)
-      const detailRows = lines.reduce((sum, line) => sum + Math.max(1, Math.ceil(lineWidth(line) / textColumns)), 0)
-      // Raster is terminal only (0012); elsewhere the sprite never fits
-      const sprite = e.surface === 'terminal' ? loaded?.sprite : undefined
+      // Sized from the pane and the largest sprite, never the selection, so scrolling
+      // keeps one layout. Raster is terminal only (0012); elsewhere no sprite fits
+      const box = e.surface === 'terminal' ? spriteBox() : undefined
       const plan = collectionBody({
         columns: e.props.bodyColumns,
         // Less the summary line
         rows: Math.max(1, rows - 1),
-        spriteColumns: sprite ? sprite.width : Number.MAX_SAFE_INTEGER,
-        spriteRows: sprite ? Math.ceil(sprite.height / 2) : Number.MAX_SAFE_INTEGER,
-        detailRows,
+        spriteColumns: box ? box.columns : Number.MAX_SAFE_INTEGER,
+        spriteRows: box ? box.rows : Number.MAX_SAFE_INTEGER,
+        detailRows: COLLECTION.detailRows,
       })
       const window = listWindow(entries.length, index, plan.listRows)
       const more = moreText(window)
@@ -573,8 +569,9 @@ export const register: Register = (on, options) => {
           {more ? <Text dimColor>{more}</Text> : null}
         </Box>
       )
+      // Always the same height: a short detail leaves room, a long entry is cut
       const text = (
-        <Box key="detail-text" flexDirection="column">
+        <Box key="detail-text" flexDirection="column" width={plan.textColumns} height={COLLECTION.detailRows} overflow="hidden">
           {lines.map((line, at) => (
             <Box key={`detail-${at}`} flexDirection="row">
               {texts(line, 'wrap')}
@@ -583,14 +580,16 @@ export const register: Register = (on, options) => {
         </Box>
       )
       let detail = text
-      if (plan.sprite !== 'none' && loaded && e.surface === 'terminal') {
+      if (plan.sprite !== 'none' && box && loaded && e.surface === 'terminal') {
         const { Raster } = $.ui.resolve(e)
         // Only a caught Modster animates; the silhouette holds still
         setCollectionSite($, e.requestId, selected.record ? loaded : undefined)
         const beside = plan.sprite === 'beside'
         detail = (
           <Box key="detail" flexDirection={beside ? 'row' : 'column'} {...(beside ? { columnGap: COLLECTION.gapColumns } : {})}>
-            <Raster key={COLLECTION_SPRITE_KEY} columns={loaded.sprite.width} rows={Math.ceil(loaded.sprite.height / 2)} cells={collectionCells(loaded, selected)} />
+            <Box key="sprite-box" width={box.columns} height={box.rows} alignItems="center" justifyContent="center">
+              <Raster key={COLLECTION_SPRITE_KEY} columns={loaded.sprite.width} rows={Math.ceil(loaded.sprite.height / 2)} cells={collectionCells(loaded, selected)} />
+            </Box>
             {text}
           </Box>
         )
@@ -945,6 +944,17 @@ function refreshCollectionRecord($: EngineInterface, modsterId: string): void {
     else collectionRecords.delete(modsterId)
     $.ui.invalidate('ui.render')
   })
+}
+
+/** The Collection tab's sprite box: the largest loaded sprite, in cells (0012: two pixel rows a cell). */
+function spriteBox(): { columns: number; rows: number } {
+  let columns = 0
+  let rows = 0
+  for (const { sprite } of content?.modsters.values() ?? []) {
+    columns = Math.max(columns, sprite.width)
+    rows = Math.max(rows, Math.ceil(sprite.height / 2))
+  }
+  return { columns, rows }
 }
 
 /** The Collection tab's sprite cells: the current frame when caught, else the still silhouette. */

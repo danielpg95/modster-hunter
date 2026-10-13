@@ -1,6 +1,7 @@
 // The selected Modster's details in the Collection tab (P3-02): the dex
 // (decision 0017, both types primary first per 0022), where it lives, and its
 // catches. Until the first catch only the number shows; the rest reads `???`.
+// The dex entry comes last: the text has a fixed height, so a long one is cut.
 
 import { MODSTER_TYPES } from '../constants'
 import type { ModsterDex } from '../content'
@@ -37,10 +38,10 @@ export function detailLines(input: DetailInput): BandLine[] {
   if (kind.length > 0) lines.push(kind)
   const size = [dex?.heightM === undefined ? '' : `${dex.heightM} m`, dex?.weightKg === undefined ? '' : `${dex.weightKg} kg`].filter(Boolean)
   if (size.length > 0) lines.push([{ text: size.join(' · '), dim: true }])
-  if (dex?.entry) lines.push([{ text: dex.entry }])
   lines.push([{ text: `Caught ×${record.count} · best ${record.bestTier}` }])
   lines.push([{ text: `First ${day(record.firstCaughtAt)} · last ${day(record.lastCaughtAt)}`, dim: true }])
   if (input.habitat.length > 0) lines.push([{ text: `Lives in ${input.habitat.join(', ')}`, dim: true }])
+  if (dex?.entry) lines.push([{ text: dex.entry }])
   return lines
 }
 

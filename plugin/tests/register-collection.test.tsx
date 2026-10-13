@@ -258,6 +258,26 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
+  test('the layout holds still while scrolling past sprites of other sizes, caught or not', async ($, on) => {
+    await start($, on, () => [], collectionForest(3, true), { 'caught:mon-03': record() })
+    const pane = await mountPane($, DOCK)
+    // The box is the largest sprite's, 16 columns by 8 rows, whichever Modster is selected
+    const layout = async () => {
+      const box = await pane.find({ type: 'Box', key: 'sprite-box' })
+      const text = await pane.find({ type: 'Box', key: 'detail-text' })
+      const list = (await pane.findAll({ type: 'Button' })).filter((button: any) => /^(mon-|aardvark)/.test(button.key ?? '')).length
+      return [box?.props.width, box?.props.height, text?.props.width, text?.props.height, list]
+    }
+    const first = await layout()
+    expect(first.slice(0, 2)).toEqual([16, 8])
+    // #001 caught 8×8, #002 uncaught 16×16, #003 uncaught 8×8, #— uncaught 8×8
+    for (let i = 0; i < 3; i++) {
+      await pane.press({ key: 'down' })
+      expect(await layout()).toEqual(first)
+    }
+    await pane.unmount()
+  })
+
   test('a short inline pane shows the list and the text, without the sprite', async ($, on) => {
     await start($, on, () => [], collectionForest(3), { 'caught:mon-03': record() })
     // 6 rows: header, gap and summary leave 3, less than the sprite's 4

@@ -2,6 +2,7 @@ import { describe, expect, test } from 'claude-code/testing'
 import { detailLines, type CollectionEntry } from '../../hooks/render'
 
 // P3-02: the dex (0017), both types (0022), habitat and catches; `???` until caught.
+// The entry comes last: the text has a fixed height, so a long entry is what gets cut.
 
 // Midday, so the local date is the same in every time zone the tests run in
 const FIRST = Date.UTC(2026, 9, 8, 12)
@@ -23,10 +24,10 @@ describe('collectionDetail', () => {
       'Twiggle  #007',
       'grass · ghost · Twig Modster',
       '0.3 m · 1.2 kg',
-      'It hides as a branch.',
       'Caught ×3 · best rare',
       'First 2026-10-08 · last 2026-10-12',
       'Lives in Whispering Forest, Saltbreeze Bay',
+      'It hides as a branch.',
     ])
   })
 
