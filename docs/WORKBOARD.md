@@ -15,10 +15,8 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P4-04 | @danielpg95 | in-review | p4-04-skill-fixes | 2026-10-11 | 2026-10-12 | Skill fixes merged (#78); waiting on @victor-aguilars's end-to-end run, then tick both done-when items |
-| P5-12 | @danielpg95 | in-review | p5-12-crystal-grotto | 2026-10-12 | 2026-10-12 | PR open; after it merges, remove or rename the user copies in ~/.claude/modster-hunter/content/ so they don't replace the built-ins |
-| P5-13 | @danielpg95 | in-progress | p5-13-idle-scene | 2026-10-12 | 2026-10-12 | Hand check: add `"particles": { "style": "sparkle" }` to a user biome, run `claude --plugin-dir ./plugin` at 80×24 and 140×40, watch a turn; then tick the last two done-when items |
-| P5-14 | @danielpg95 | in-review | p5-14-biome-scenes | 2026-10-12 | 2026-10-12 | PR open, stacked on p5-13-idle-scene; all done-when items met. Once P5-13 is done, tick the P5-14 heading and remove this row |
+| P5-13 | @danielpg95 | in-review | p5-13-idle-scene | 2026-10-12 | 2026-10-12 | Combined P5-13 + P5-14 PR is a draft. Hand check: `claude --plugin-dir ./plugin` at 80×24 and 140×40, watch a turn and a reload; then tick the last two done-when items, both headings, and remove both rows |
+| P5-14 | @danielpg95 | in-review | p5-13-idle-scene | 2026-10-12 | 2026-10-12 | Done-when items met; #87 merged into p5-13-idle-scene, so it ships in the combined PR. Tick the heading once P5-13 is done |
 
 ## Up next
 

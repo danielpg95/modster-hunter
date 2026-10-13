@@ -354,13 +354,13 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] Edits write valid JSON into the user folder; editing a built-in creates a user override.
   - [ ] Every edit is validated before writing.
 
-#### [ ] P4-04 — User-facing content skill
+#### [x] P4-04 — User-facing content skill
 - **Depends on:** P4-01, P2-02, P4-06
 - **Size:** M
 - **Goal:** `plugin/skills/create-modster-content/SKILL.md`: users ask Claude to create a biome or Modster (including pixel art), and it writes valid files into the user folder.
 - **Done when:**
-  - [ ] Claude converts PNG/GIF sprites through the converter (or the runtime path from 0016).
-  - [ ] Tested end to end by someone who didn't write it.
+  - [x] Claude converts PNG/GIF sprites through the converter (or the runtime path from 0016). The helper's `convert` (P4-06, 0025) for GIFs and PNGs, the runtime path for PNG sheets.
+  - [x] Tested end to end by someone who didn't write it. Waived by @danielpg95 on 2026-10-12: tested end to end by @danielpg95 (Crystal Grotto, 10 Modsters, now built-in as P5-12), not by someone else.
 
 #### [x] P4-06 — Content helper for users
 - **Depends on:** P4-01, P2-02
@@ -464,7 +464,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] The pane marks a Modster whose `caught:<id>` is in the collection, and never a first encounter.
   - [x] Pane render tests for a caught and an uncaught Modster, using an in-memory store.
 
-#### [ ] P5-12 — Crystal Grotto biome
+#### [x] P5-12 — Crystal Grotto biome
 - **Depends on:** P2-09, P2-16
 - **Size:** M
 - **Goal:** bring @danielpg95's Crystal Grotto (made with the user content skill, 2026-10-12) into the built-in content: the biome and its 10 Modsters, with dex numbers #011–#020.
@@ -474,7 +474,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] A credits row in `plugin/content/CREDITS.md` for every sprite.
   - [x] `npm run check:content` passes, and the odds table (3 common, 3 uncommon, 3 rare, 1 legendary) is checked; a second legendary across biomes is intended.
   - [x] A preview of every Modster in the PR description (enlarged, every frame, dark and light).
-  - [ ] The user copies in `~/.claude/modster-hunter/content/` are removed or renamed, so they don't replace the built-ins by id.
+  - [x] The user copies in `~/.claude/modster-hunter/content/` are removed or renamed, so they don't replace the built-ins by id.
 
 #### [ ] P5-13 — Biome idle scene
 - **Depends on:** P2-07, P5-08
