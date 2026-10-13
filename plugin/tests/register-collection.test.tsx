@@ -1,5 +1,6 @@
 import { describe, expect, mock, test } from 'claude-code/testing'
 import type { On, UiPane } from 'claude-code'
+import { collectionForest } from './fixtures/collection-forest'
 import { oneModsterForest } from './fixtures/one-modster-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
 
@@ -11,7 +12,7 @@ const BAND_PROPS = { hasSurvey: false, isWorking: true, maxRows: 7, bodyColumns:
 
 type Open = { id: string; title?: string; focus?: boolean; closeOnEscape?: boolean }
 
-async function start($: any, on: On, panes: () => UiPane[] = () => []) {
+async function start($: any, on: On, panes: () => UiPane[] = () => [], files = oneModsterForest(), stored: Record<string, unknown> = {}) {
   on('session.start', ($, e) => ({ cwd: e.cwd }))
   on('command.register', ($, e) => ({ value: { command: e.name } }))
   on('turn.start', ($, e) => ({ turnId: e.turnId }))
@@ -30,7 +31,14 @@ async function start($: any, on: On, panes: () => UiPane[] = () => []) {
     })
     return { value: { isPlaced: true } }
   })
-  stubContentFs(on, oneModsterForest())
+  stubContentFs(on, files)
+  // An in-memory $.store (the test engine has none); the test's own object, so a test can play another session
+  const store = stored
+  on('store.get', ($, e) => ({ value: structuredClone(store[e.key]) }))
+  on('store.set', ($, e) => {
+    store[e.key] = structuredClone(e.value)
+    return { value: undefined }
+  })
   const clock = mock.clock(on)
   await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' })
   return { clock, opens }
@@ -39,6 +47,37 @@ async function start($: any, on: On, panes: () => UiPane[] = () => []) {
 const mountPane = ($: any, props: Partial<typeof PANE_PROPS> = {}) =>
   $.ui.mount({ plugin: 'modster-hunter', surface: 'terminal', component: 'Pane', requestId: 'modster-collection', props: { ...PANE_PROPS, ...props } })
 const mountBand = ($: any) => $.ui.mount({ plugin: 'modster-hunter', surface: 'terminal', component: 'AbovePrompt', props: BAND_PROPS })
+
+const TAB_KEYS = ['collection', 'biomes', 'stats', 'settings']
+
+/** The four tab Buttons, in order; the pane has others (k, j, the list's rows). */
+async function tabButtons(pane: any): Promise<any[]> {
+  return (await pane.findAll({ type: 'Button' })).filter((button: any) => TAB_KEYS.includes(button.key))
+}
+
+/** A `caught:` record (decision 0009) caught `count` times at midday UTC on 2026-10-08. */
+const record = (count = 1) => ({
+  v: 1,
+  count,
+  shinyCount: 0,
+  firstCaughtAt: Date.UTC(2026, 9, 8, 12),
+  lastCaughtAt: Date.UTC(2026, 9, 8, 12),
+  bestTier: 'common',
+  biomes: { 'whispering-forest': count },
+})
+
+/** A tall, wide dock: room for the list, the sprite and the text side by side. */
+const DOCK = { placement: 'dock', bodyColumns: 120, scroll: { offset: 0, bodyRows: 30 } } as const
+
+/** Records the collection sprite's blits. */
+function collectionBlits(on: On): string[] {
+  const cells: string[] = []
+  on('ui.blit', ($, e) => {
+    if (e.key === 'collection-sprite' && 'cells' in e) cells.push(e.cells)
+    return { value: {} }
+  })
+  return cells
+}
 
 /** Whether the header row holds the tabs (inline and wide), found by their keys in its children. */
 async function tabsInHeader(pane: any): Promise<boolean> {
@@ -63,14 +102,14 @@ describe('register: collection pane', () => {
     await start($, on)
     const pane = await mountPane($)
     expect(await pane.find({ type: 'Text', text: 'Whispering Forest' })).toBeDefined()
-    expect(await pane.find({ type: 'Text', text: 'Your Modsters will show here.' })).toBeDefined()
+    expect(await pane.find({ type: 'Text', text: 'Caught 0/1' })).toBeDefined()
     await pane.unmount()
   })
 
   test('the tabs read 1: Collection to 4: Settings, the shown one not dim', async ($, on) => {
     await start($, on)
     const pane = await mountPane($)
-    const buttons = await pane.findAll({ type: 'Button' })
+    const buttons = await tabButtons(pane)
     expect(buttons.map((button: any) => [button.key, button.props.label, button.props.hotkey, button.props.plain])).toEqual([
       ['collection', 'Collection', '1', true],
       ['biomes', 'Biomes', '2', true],
@@ -120,7 +159,7 @@ describe('register: collection pane', () => {
     await start($, on)
     const pane = await mountPane($, { placement: 'dock', bodyColumns: 30, scroll: { offset: 0, bodyRows: 30 } })
     expect((await pane.find({ type: 'Box', key: 'tabs' }))?.props.flexDirection).toBe('column')
-    expect(await pane.findAll({ type: 'Button' })).toHaveLength(4)
+    expect(await tabButtons(pane)).toHaveLength(4)
     await pane.unmount()
   })
 
@@ -139,5 +178,135 @@ describe('register: collection pane', () => {
     await clock.advance(4_250)
     expect(await band.find({ type: 'Button', key: 'throw' })).toBeDefined()
     await band.unmount()
+  })
+
+  // P3-02: the Collection tab, a list beside the selected Modster
+
+  test('the list is in dex order, unnumbered Modsters last, ??? until caught', async ($, on) => {
+    await start($, on, () => [], collectionForest(3), { 'caught:mon-02': record(4) })
+    const pane = await mountPane($, DOCK)
+    expect(await pane.find({ type: 'Text', text: 'Caught 1/4' })).toBeDefined()
+    const rows = (await pane.findAll({ type: 'Button' })).filter((button: any) => /^(mon-|aardvark)/.test(button.key ?? ''))
+    // mon-03 is #001: numbers run against file order
+    expect(rows.map((row: any) => row.key)).toEqual(['mon-03', 'mon-02', 'mon-01', 'aardvark'])
+    expect(rows.map((row: any) => row.text)).toEqual(['▸ #001 ???', '  #002 Mon 02         ×4 common', '  #003 ???', '  #—   ???'])
+    await pane.unmount()
+  })
+
+  test('j and k move the selection, and the detail follows', async ($, on) => {
+    await start($, on, () => [], collectionForest(3), { 'caught:mon-02': record(4) })
+    const pane = await mountPane($, DOCK)
+    expect(await pane.find({ type: 'Text', text: 'Not caught yet' })).toBeDefined()
+    await pane.press({ key: 'down' })
+    expect(await pane.find({ type: 'Text', text: 'Caught ×4 · best common' })).toBeDefined()
+    expect(await pane.find({ type: 'Text', text: 'Lives in Whispering Forest' })).toBeDefined()
+    await pane.press({ key: 'up' })
+    await pane.press({ key: 'up' })
+    expect((await pane.find({ type: 'Button', key: 'mon-03' }))?.text).toMatch(/^▸/)
+    await pane.unmount()
+  })
+
+  test('pressing a row selects it', async ($, on) => {
+    await start($, on, () => [], collectionForest(3), { 'caught:mon-01': record() })
+    const pane = await mountPane($, DOCK)
+    await pane.press({ key: 'mon-01' })
+    expect(await pane.find({ type: 'Text', text: 'Mon 01' })).toBeDefined()
+    await pane.press({ key: 'mon-03' })
+    await pane.unmount()
+  })
+
+  test('the J and K buttons read k: Up and j: Down', async ($, on) => {
+    await start($, on, () => [], collectionForest(3))
+    const pane = await mountPane($, DOCK)
+    const up = await pane.find({ type: 'Button', key: 'up' })
+    const down = await pane.find({ type: 'Button', key: 'down' })
+    expect([up?.props.hotkey, up?.props.label, down?.props.hotkey, down?.props.label]).toEqual(['k', 'Up', 'j', 'Down'])
+    await pane.unmount()
+  })
+
+  test('an uncaught Modster shows a still silhouette; a caught one animates', async ($, on) => {
+    const blits = collectionBlits(on)
+    const { clock } = await start($, on, () => [], collectionForest(3), { 'caught:mon-02': record() })
+    const pane = await mountPane($, DOCK)
+    const silhouette = (await pane.find({ type: 'Raster', key: 'collection-sprite' }))?.props.cells
+    expect(silhouette).toBeDefined()
+    await clock.advance(1_000)
+    expect(blits).toHaveLength(0)
+
+    await pane.press({ key: 'down' })
+    const color = (await pane.find({ type: 'Raster', key: 'collection-sprite' }))?.props.cells
+    expect(color).not.toBe(silhouette)
+    // 6 fps: about 6 frames a second, alternating between the sprite's two
+    await clock.advance(1_000)
+    expect(blits.length).toBeGreaterThanOrEqual(5)
+    expect(new Set(blits).size).toBe(2)
+    await pane.unmount()
+  })
+
+  // The test engine can't raise ui.close, so the close path is checked by hand
+  test('another tab stops the animation', async ($, on) => {
+    const blits = collectionBlits(on)
+    const { clock } = await start($, on, () => [], collectionForest(3), { 'caught:mon-03': record() })
+    const pane = await mountPane($, DOCK)
+    await clock.advance(500)
+    expect(blits.length).toBeGreaterThan(0)
+    await pane.press({ key: 'stats' })
+    const afterTab = blits.length
+    await clock.advance(1_000)
+    expect(blits).toHaveLength(afterTab)
+    await pane.press({ key: 'collection' })
+    await pane.unmount()
+  })
+
+  test('a short inline pane shows the list and the text, without the sprite', async ($, on) => {
+    await start($, on, () => [], collectionForest(3), { 'caught:mon-03': record() })
+    // 6 rows: header, gap and summary leave 3, less than the sprite's 4
+    const pane = await mountPane($, { placement: 'inline', bodyColumns: 120, scroll: { offset: 0, bodyRows: 6 } })
+    expect(await pane.find({ type: 'Raster' })).toBeUndefined()
+    expect(await pane.find({ type: 'Text', text: 'Mon 03' })).toBeDefined()
+    await pane.unmount()
+  })
+
+  test('with many Modsters the list scrolls to keep the selection in view', async ($, on) => {
+    await start($, on, () => [], collectionForest(30))
+    // Inline at 8 rows: header, gap and summary leave 5 for the list, 4 entries and the count row
+    const pane = await mountPane($, { placement: 'inline', bodyColumns: 120, scroll: { offset: 0, bodyRows: 8 } })
+    const shown = async () => (await pane.findAll({ type: 'Button' })).filter((button: any) => /^(mon-|aardvark)/.test(button.key ?? '')).map((row: any) => row.key)
+    expect(await shown()).toEqual(['mon-30', 'mon-29', 'mon-28', 'mon-27'])
+    expect(await pane.find({ type: 'Text', text: '↓ 27 more' })).toBeDefined()
+    for (let i = 0; i < 20; i++) await pane.press({ key: 'down' })
+    // #021 is selected, mid-window
+    expect(await shown()).toContain('mon-10')
+    expect((await pane.find({ type: 'Button', key: 'mon-10' }))?.text).toMatch(/^▸ #021/)
+    expect(await pane.find({ type: 'Text', text: /^↑ \d+ · ↓ \d+ more$/ })).toBeDefined()
+    for (let i = 0; i < 20; i++) await pane.press({ key: 'down' })
+    expect(await shown()).toContain('aardvark')
+    expect(await pane.find({ type: 'Text', text: '↑ 27 more' })).toBeDefined()
+    await pane.unmount()
+  })
+
+  test('a catch this session shows in the open pane', async ($, on) => {
+    const { clock } = await start($, on)
+    const pane = await mountPane($, DOCK)
+    expect(await pane.find({ type: 'Text', text: 'Caught 0/1' })).toBeDefined()
+    const band = await mountBand($)
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(4_250)
+    await band.press({ key: 'throw' })
+    await clock.advance(2_000)
+    expect(await pane.find({ type: 'Text', text: 'Caught 1/1' })).toBeDefined()
+    expect(await pane.find({ type: 'Text', text: 'Sproutling' })).toBeDefined()
+    await band.unmount()
+    await pane.unmount()
+  })
+
+  test('/modsters reads catches made in other sessions', async ($, on) => {
+    const stored: Record<string, unknown> = {}
+    await start($, on, () => [], oneModsterForest(), stored)
+    stored['caught:sproutling'] = record(2)
+    await $.command.run({ command: 'modsters' } as any)
+    const pane = await mountPane($, DOCK)
+    expect(await pane.find({ type: 'Text', text: 'Caught 1/1' })).toBeDefined()
+    await pane.unmount()
   })
 })

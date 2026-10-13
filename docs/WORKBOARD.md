@@ -15,7 +15,7 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P3-02 | @danielpg95 | in-progress | p3-02-collection-grid | 2026-10-13 | 2026-10-13 | Build the Collection tab as a list (left, `j`/`k` to move) beside the selected Modster's sprite and dex (right) |
+| P3-02 | @danielpg95 | in-progress | p3-02-collection-grid | 2026-10-13 | 2026-10-13 | Check by hand: `/modsters` inline at 80×24 and docked at 140×40, `j`/`k`, silhouette on dark and light themes, animation stops on Esc |
 
 ## Up next
 

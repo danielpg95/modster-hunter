@@ -22,7 +22,15 @@ import {
   BAND_BUTTONS,
   COLLECTION_TABS,
   bandView,
+  collectionBody,
+  collectionEntries,
   collectionLayout,
+  detailLines,
+  lineWidth,
+  listRow,
+  listWindow,
+  moreText,
+  silhouettePalette,
   displayPlan,
   idleScene,
   isAnimated,
@@ -33,12 +41,25 @@ import {
   spriteCells,
   type BandEncounter,
   type BandLine,
+  type CollectionEntry,
   type CollectionTab,
   type DisplayPlan,
   type IdleScene,
   type Particle,
 } from './render'
-import { HUNT_PANE_KEY, huntPanePref, isCaught, prefAfterClose, readHuntPaneOpen, recordEncounterEvents, recordStat, type StorePort } from './store'
+import {
+  HUNT_PANE_KEY,
+  caughtKey,
+  huntPanePref,
+  isCaught,
+  prefAfterClose,
+  readCaughtRecord,
+  readHuntPaneOpen,
+  recordEncounterEvents,
+  recordStat,
+  type CaughtRecord,
+  type StorePort,
+} from './store'
 
 // Rebuilt at every session start; cheap, so it isn't kept in $.state (ARCHITECTURE.md)
 let content: ContentRegistry | undefined
@@ -102,6 +123,19 @@ let caughtCheck = 0
 const COLLECTION_PANE_ID = 'modster-collection'
 // The tab it shows; kept while the module lives, so a reopened pane shows the last one
 let collectionTab: CollectionTab = 'collection'
+// The Collection tab (P3-02). Render hooks can't wait on $.store, so the records are
+// read into memory at session start, when /modsters opens the pane, and after a catch
+const collectionRecords = new Map<string, CaughtRecord>()
+// The selected Modster's id; kept across tab switches like the tab
+let collectionSelected: string | undefined
+// Its sprite animates on a loop of its own: the encounter's loop follows the encounter's Modster
+const COLLECTION_SPRITE_KEY = 'collection-sprite'
+const silhouettes = new Map<string, string>()
+let collectionSite: string | undefined
+let collectionSpriteModster: LoadedModster | undefined
+let collectionFrame = 0
+let collectionTimer: Timer | undefined
+let isBlittingCollection = false
 
 export const register: Register = (on, options) => {
   const idleTimeoutSec = typeof options.encounterIdleTimeoutSec === 'number' ? options.encounterIdleTimeoutSec : 90
@@ -117,6 +151,7 @@ export const register: Register = (on, options) => {
     // Keep the biome if session.start ever repeats in this process; pick only when there's none yet
     if (biomeId === undefined || !content.biomes.has(biomeId)) biomeId = pickBiome(content.biomes.keys(), Math.random)
     startMachine($, idleTimeoutSec)
+    loadCollectionRecords($)
     // Clears a line left by a load that had the status line on (0023 point 6)
     shownStatus = undefined
     $.ui.status(undefined)
@@ -448,6 +483,24 @@ export const register: Register = (on, options) => {
       </Box>
     )
     const tab = COLLECTION_TABS.find((info) => info.id === collectionTab) ?? COLLECTION_TABS[0]
+    const texts = (line: BandLine, wrap: 'wrap' | 'truncate') =>
+      line.map((segment, at) =>
+        'text' in segment ? (
+          <Text
+            key={`text-${at}`}
+            wrap={wrap}
+            {...(segment.bold ? { bold: true } : {})}
+            {...(segment.dim ? { dimColor: true } : {})}
+            {...(segment.color ? { color: segment.color } : {})}
+          >
+            {segment.text}
+          </Text>
+        ) : null,
+      )
+    const tabRows = layout.tabs === 'beside' ? 0 : layout.tabs === 'row' ? 1 : COLLECTION_TABS.length
+    // Header, tabs, the blank line, and the no-biome note when there's no biome
+    const usedRows = 1 + tabRows + 1 + (biome ? 0 : 1)
+    if (collectionTab !== 'collection') dropCollectionSite(e.requestId)
     return (
       <Box flexDirection="column">
         {header}
@@ -458,9 +511,110 @@ export const register: Register = (on, options) => {
             {noBiomesMessage(includeBuiltins, USER_FOLDER_LABEL)}
           </Text>
         )}
-        <Text key="body">{tab?.placeholder}</Text>
+        {collectionTab === 'collection' ? collectionView(e.props.scroll.bodyRows - usedRows) : <Text key="body">{tab?.placeholder}</Text>}
       </Box>
     )
+
+    /** The Collection tab: a summary line with k/j, the list, and the selected Modster (P3-02). */
+    function collectionView(rows: number) {
+      const entries = collectionEntries(content ? content.modsters.values() : [], collectionRecords)
+      const caught = entries.filter((entry) => entry.record).length
+      const index = Math.max(0, entries.findIndex((entry) => entry.id === collectionSelected))
+      const selected = entries[index]
+      const select = (entry: CollectionEntry | undefined) => {
+        if (!entry || entry.id === selected?.id) return
+        collectionSelected = entry.id
+        $.ui.invalidate('ui.render')
+      }
+      const summary = (
+        <Box key="summary" flexDirection="row" columnGap={COLLECTION.gapColumns}>
+          <Text bold>{`Caught ${caught}/${entries.length}`}</Text>
+          <Button key="up" label="Up" hotkey="k" plain dimColor onPress={() => select(entries[index - 1])} />
+          <Button key="down" label="Down" hotkey="j" plain dimColor onPress={() => select(entries[index + 1])} />
+        </Box>
+      )
+      if (!selected) {
+        dropCollectionSite(e.requestId)
+        return (
+          <Box key="collection" flexDirection="column">
+            {summary}
+            <Text dimColor>No Modsters loaded.</Text>
+          </Box>
+        )
+      }
+      const loaded = content?.modsters.get(selected.id)
+      const habitat = content
+        ? [...content.biomes.values()].filter(({ biome }) => biome.modsters.some((entry) => entry.id === selected.id)).map(({ biome }) => biome.name)
+        : []
+      const lines = detailLines({ entry: selected, ...(loaded?.modster.dex ? { dex: loaded.modster.dex } : {}), habitat })
+      // Rows the text takes as it wraps; the side's width, or the whole width when stacked
+      const sideColumns = e.props.bodyColumns - COLLECTION.listColumns - COLLECTION.gapColumns
+      const textColumns = Math.max(1, sideColumns >= COLLECTION.detailMinColumns ? sideColumns : e.props.bodyColumns)
+      const detailRows = lines.reduce((sum, line) => sum + Math.max(1, Math.ceil(lineWidth(line) / textColumns)), 0)
+      // Raster is terminal only (0012); elsewhere the sprite never fits
+      const sprite = e.surface === 'terminal' ? loaded?.sprite : undefined
+      const plan = collectionBody({
+        columns: e.props.bodyColumns,
+        // Less the summary line
+        rows: Math.max(1, rows - 1),
+        spriteColumns: sprite ? sprite.width : Number.MAX_SAFE_INTEGER,
+        spriteRows: sprite ? Math.ceil(sprite.height / 2) : Number.MAX_SAFE_INTEGER,
+        detailRows,
+      })
+      const window = listWindow(entries.length, index, plan.listRows)
+      const more = moreText(window)
+      const list = (
+        <Box key="list" flexDirection="column" {...(plan.split === 'side' ? { width: COLLECTION.listColumns } : {})}>
+          {entries.slice(window.start, window.end).map((entry) => (
+            <Button key={entry.id} plain onPress={() => select(entry)}>
+              {texts(listRow(entry, entry.id === selected.id), 'truncate')}
+            </Button>
+          ))}
+          {more ? <Text dimColor>{more}</Text> : null}
+        </Box>
+      )
+      const text = (
+        <Box key="detail-text" flexDirection="column">
+          {lines.map((line, at) => (
+            <Box key={`detail-${at}`} flexDirection="row">
+              {texts(line, 'wrap')}
+            </Box>
+          ))}
+        </Box>
+      )
+      let detail = text
+      if (plan.sprite !== 'none' && loaded && e.surface === 'terminal') {
+        const { Raster } = $.ui.resolve(e)
+        // Only a caught Modster animates; the silhouette holds still
+        setCollectionSite($, e.requestId, selected.record ? loaded : undefined)
+        const beside = plan.sprite === 'beside'
+        detail = (
+          <Box key="detail" flexDirection={beside ? 'row' : 'column'} {...(beside ? { columnGap: COLLECTION.gapColumns } : {})}>
+            <Raster key={COLLECTION_SPRITE_KEY} columns={loaded.sprite.width} rows={Math.ceil(loaded.sprite.height / 2)} cells={collectionCells(loaded, selected)} />
+            {text}
+          </Box>
+        )
+      } else {
+        dropCollectionSite(e.requestId)
+      }
+      return (
+        <Box key="collection" flexDirection="column">
+          {summary}
+          {plan.split === 'side' ? (
+            <Box key="split" flexDirection="row" columnGap={COLLECTION.gapColumns}>
+              {list}
+              {detail}
+            </Box>
+          ) : (
+            <Box key="split" flexDirection="column">
+              {list}
+              <Text> </Text>
+              {detail}
+            </Box>
+          )}
+        </Box>
+      )
+    }
   })
 
   // The spinner names the Modster while Claude works (0023 point 5). Subagents'
@@ -476,6 +630,7 @@ export const register: Register = (on, options) => {
   // by hand stops the reopening; ours and an unload change nothing (0019)
   on('ui.close', async ($, e, next) => {
     const result = await next(e)
+    if (e.id === COLLECTION_PANE_ID) dropCollectionSite(COLLECTION_PANE_ID)
     const pref = e.id === PANE_ID ? prefAfterClose(e.origin.kind) : undefined
     if (pref) queueWrite($, (store) => store.set(HUNT_PANE_KEY, pref))
     $.ui.invalidate('ui.render')
@@ -494,6 +649,9 @@ export const register: Register = (on, options) => {
       $.ui.invalidate('ui.render')
       return opened.isPlaced ? {} : { text: 'Modster Hunter: the pane is waiting for more room (widen the terminal)' }
     }
+    // Catches from other sessions show up when the pane opens
+    loadCollectionRecords($)
+    await pendingWrites
     // The person asked for it, so the pane takes the keys over an empty composer (0024)
     const opened = await $.ui.open({ id: COLLECTION_PANE_ID, title: 'Modster collection', focus: true, closeOnEscape: true })
     return opened.isPlaced ? {} : { text: 'Modster Hunter: the collection is waiting for more room (widen the terminal)' }
@@ -596,6 +754,7 @@ async function advanceMachine($: EngineInterface, action: MachineAction): Promis
   updateStatus($)
   const where = { sessionId, biomeId: machineContext.biome.id }
   if (step.events.length > 0) queueWrite($, (store) => recordEncounterEvents(store, where, step.events, now))
+  for (const event of step.events) if (event.type === 'caught') refreshCollectionRecord($, event.modsterId)
   const appeared = step.events.find((event) => event.type === 'appeared')
   if (appeared) checkAlreadyCaught($, appeared.modsterId)
 }
@@ -714,6 +873,8 @@ function stopTimers(): void {
   stopFrames()
   stopScene()
   sceneSites.clear()
+  stopCollectionFrames()
+  collectionSite = undefined
 }
 
 /** The scene's cells now, for a band `columns` wide; particles are made once per width. */
@@ -763,6 +924,79 @@ function updateSceneTimer($: EngineInterface): void {
 function stopScene(): void {
   sceneTimer?.cancel()
   sceneTimer = undefined
+}
+
+/** Reads every loaded Modster's `caught:` record into memory, after the writes before it (P3-02). */
+function loadCollectionRecords($: EngineInterface): void {
+  const ids = content ? [...content.modsters.keys()] : []
+  queueWrite($, async (store) => {
+    const records = await Promise.all(ids.map(async (id) => [id, readCaughtRecord(await store.get(caughtKey(id)))] as const))
+    collectionRecords.clear()
+    for (const [id, record] of records) if (record) collectionRecords.set(id, record)
+    $.ui.invalidate('ui.render')
+  })
+}
+
+/** Re-reads one record once the catch before it is written. */
+function refreshCollectionRecord($: EngineInterface, modsterId: string): void {
+  queueWrite($, async (store) => {
+    const record = readCaughtRecord(await store.get(caughtKey(modsterId)))
+    if (record) collectionRecords.set(modsterId, record)
+    else collectionRecords.delete(modsterId)
+    $.ui.invalidate('ui.render')
+  })
+}
+
+/** The Collection tab's sprite cells: the current frame when caught, else the still silhouette. */
+function collectionCells(loaded: LoadedModster, entry: CollectionEntry): string {
+  if (entry.record) {
+    const cells = cellsFor(loaded)
+    const frame = collectionSpriteModster?.modster.id === loaded.modster.id ? collectionFrame : 0
+    return cells[frame] ?? cells[0] ?? ''
+  }
+  let cells = silhouettes.get(loaded.modster.id)
+  if (cells === undefined) {
+    cells = spriteCells(loaded.sprite, silhouettePalette(loaded.sprite))[0] ?? ''
+    silhouettes.set(loaded.modster.id, cells)
+  }
+  return cells
+}
+
+/** Animates `loaded` in the collection pane; undefined (a silhouette) holds it still. */
+function setCollectionSite($: EngineInterface, requestId: string, loaded: LoadedModster | undefined): void {
+  collectionSite = requestId
+  if (collectionSpriteModster?.modster.id === loaded?.modster.id) return
+  stopCollectionFrames()
+  collectionFrame = 0
+  collectionSpriteModster = loaded
+  if (!loaded || loaded.sprite.frames.length < 2) return
+  collectionTimer = $.clock.every(Math.max(1, Math.round(1000 / (loaded.modster.sprite.fps ?? 6))), () => {
+    const current = collectionSpriteModster
+    const site = collectionSite
+    // Skip a tick while the last blit is in flight (P1-03)
+    if (!current || !site || isBlittingCollection) return
+    isBlittingCollection = true
+    collectionFrame = (collectionFrame + 1) % current.sprite.frames.length
+    void $.ui
+      .blit({ requestId: site, key: COLLECTION_SPRITE_KEY, cells: cellsFor(current)[collectionFrame] ?? '' })
+      .catch(() => undefined)
+      .finally(() => {
+        isBlittingCollection = false
+      })
+  })
+}
+
+/** The collection pane stopped drawing a sprite: another tab, no room, or closed. */
+function dropCollectionSite(requestId: string): void {
+  if (collectionSite !== requestId) return
+  collectionSite = undefined
+  collectionSpriteModster = undefined
+  stopCollectionFrames()
+}
+
+function stopCollectionFrames(): void {
+  collectionTimer?.cancel()
+  collectionTimer = undefined
 }
 
 /**

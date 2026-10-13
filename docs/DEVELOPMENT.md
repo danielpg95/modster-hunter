@@ -169,6 +169,8 @@ workflow in the same PR.
   even the engine's close mark (×) can't be clicked; `ctrl+x x` closes a pane.
 - **In tests, a drawn `Text` keeps no `key`.** `find({ type: 'Text', key })`
   finds nothing; match its `text` instead. Box, Button and Raster keep theirs.
+- **The test engine can't raise `ui.close`.** There's no `$.ui.close` on a
+  test's `$`; check a pane's close by hand.
 - **`Raster` cells must be one column wide.** `▀` is; emoji are not.
 - **Timers** started with `$.clock.every` stop on reload. Start them in
   `session.start`, never at module top level.

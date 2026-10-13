@@ -69,6 +69,15 @@ export const DISPLAY = {
 /** The collection pane, decision 0002 and P3-01: its tab row is plain Buttons `1`–`4`, this far apart. */
 export const COLLECTION = {
   tabGapColumns: 2,
+  /** P3-02's list: `▸ #001 Sproutling      ×3 legendary`; names past `nameColumns` are cut */
+  listColumns: 36,
+  nameColumns: 14,
+  /** Between the list and the detail, and between the sprite and the text beside it */
+  gapColumns: 2,
+  /** The detail's text needs this much room beside the list, else it goes under the list */
+  detailMinColumns: 24,
+  /** An uncaught Modster's still silhouette: one gray that reads on dark and light terminals */
+  silhouetteColor: '#5a5a5a',
 } as const
 
 /** Content file bounds: docs/CONTENT_FORMAT.md (schema version 1), decisions 0004, 0007 and 0012. */

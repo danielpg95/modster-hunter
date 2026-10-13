@@ -71,6 +71,7 @@ plugin/
 | Status line | `$.ui.status`, updated when an encounter step changes it | Shown only while an encounter is up (decision 0023) |
 | Collection, stats | `$.store` | Persists across sessions (decision 0009) |
 | The collection pane's shown tab | Module variable in `register.tsx` | Set by a tab's `onPress` (a render hook can't write `$.state`); a reopened pane shows the last tab (P3-01) |
+| The Collection tab's records and selection | Module variables in `register.tsx` | Render hooks can't wait on `$.store`, so `caught:*` records are read at session start, on `/modsters` and after a catch (P3-02) |
 | Whether the encounter pane reopens (`prefs:huntPane`) | `$.store` | Set by `/modsters hunt`, cleared by a close by hand (decision 0019) |
 | User content | Files in `~/.claude/modster-hunter/content/` | Editable by hand, by the editor and by Claude |
 | Decoded user PNG sprites | Files in `~/.claude/modster-hunter/cache/sprites/` | Keyed by the PNG's size, mtime and frame count; safe to delete (decision 0016) |
