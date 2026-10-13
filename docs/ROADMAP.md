@@ -486,7 +486,8 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `bandView` draws the scene above the idle line when it fits, the 3-row particle strip for a biome without art, and today's line otherwise; never exceeds `maxRows` (render tests at `maxRows` 0, 1, 2, 5, 7, 15).
   - [ ] The scene animates only while a turn runs (subagents count, 0018) and holds still between turns; the timer stops when an encounter starts and on module reload (tested).
   - [x] A `showIdleScene` option (default `true`) in `plugin.json` and the `userConfig` table; `false` gives today's idle line.
-  - [ ] Checked by hand in a real terminal at 80×24 and 140×40 with a test scene: no flicker, typing unaffected (noted in the handoff).
+  - [ ] Between encounters the encounter pane shows the scene above its idle text when it fits, and its text otherwise (decision 0027); pane render tests for both, for motion with turns and for `showIdleScene: false`.
+  - [ ] Checked by hand in a real terminal at 80×24 and 140×40 with a test scene, in the band and in the encounter pane: no flicker, typing unaffected (noted in the handoff).
 
 #### [ ] P5-14 — Scenes for the built-in biomes
 - **Depends on:** P5-13
