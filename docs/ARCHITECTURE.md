@@ -70,6 +70,7 @@ plugin/
 | Display settings (`showInBand`, `encounterPane`, `showInSpinner`, `showInStatusLine`) | `userConfig`, read once per load | A change in `/config` reloads the module (decision 0023) |
 | Status line | `$.ui.status`, updated when an encounter step changes it | Shown only while an encounter is up (decision 0023) |
 | Collection, stats | `$.store` | Persists across sessions (decision 0009) |
+| The collection pane's shown tab | Module variable in `register.tsx` | Set by a tab's `onPress` (a render hook can't write `$.state`); a reopened pane shows the last tab (P3-01) |
 | Whether the encounter pane reopens (`prefs:huntPane`) | `$.store` | Set by `/modsters hunt`, cleared by a close by hand (decision 0019) |
 | User content | Files in `~/.claude/modster-hunter/content/` | Editable by hand, by the editor and by Claude |
 | Decoded user PNG sprites | Files in `~/.claude/modster-hunter/cache/sprites/` | Keyed by the PNG's size, mtime and frame count; safe to delete (decision 0016) |

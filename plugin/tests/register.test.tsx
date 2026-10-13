@@ -58,8 +58,7 @@ describe('register', () => {
 
     const message = 'No biomes to play: every biome is disabled or failed to load'
     expect(toasts).toEqual([`Modster Hunter: ${message}`])
-    const result = (await $.command.run({ command: 'modsters' } as any)) as { text: string }
-    expect(result.text).toBe(`Modster Hunter is loaded · ${message}${HINT}`)
+    expect(await collectionHeader($)).toEqual({ title: 'No biome', note: message })
   })
 
   test('user content loads from ~/.claude/modster-hunter/content, PNG sprites included (0007, 0016)', { options: { includeBuiltins: false } }, async ($, on) => {
@@ -70,8 +69,7 @@ describe('register', () => {
     stubContentFs(on, twoBiomes(), user)
     await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' } as any)
 
-    const result = (await $.command.run({ command: 'modsters' } as any)) as { text: string }
-    expect(result.text).toBe(`Modster Hunter is loaded · You're in Pixel Meadow${HINT}`)
+    expect((await collectionHeader($)).title).toBe('Pixel Meadow')
     // The decoded sheet is cached for the next session
     expect(JSON.parse(user['cache/sprites/blobby.sprite.json'] ?? '{}')).toMatchObject({ v: 1, source: { frames: 2 }, sprite: { width: 8, height: 8 } })
   })
@@ -82,9 +80,8 @@ describe('register', () => {
     stubContentFs(on, twoBiomes())
     await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' } as any)
 
-    const result = (await $.command.run({ command: 'modsters' } as any)) as { text: string }
-    expect(result.text).toBe(
-      `Modster Hunter is loaded · No biomes to play: built-in content is off and no biome in ~/.claude/modster-hunter/content/ loaded${HINT}`,
+    expect((await collectionHeader($)).note).toBe(
+      'No biomes to play: built-in content is off and no biome in ~/.claude/modster-hunter/content/ loaded',
     )
   })
 
@@ -95,9 +92,9 @@ describe('register', () => {
     on('classic.SessionStart', () => ({}))
     await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' } as any)
 
-    const reply = async () => ((await $.command.run({ command: 'modsters' } as any)) as { text: string }).text
+    const reply = async () => (await collectionHeader($)).title
     const first = await reply()
-    expect(['Whispering Forest', 'Tidepool Shallows'].some((name) => first.endsWith(`You're in ${name}${HINT}`))).toBe(true)
+    expect(['Whispering Forest', 'Tidepool Shallows']).toContain(first)
 
     for (const source of ['clear', 'resume', 'fork'] as const) {
       await $.classic.SessionStart({ source })
@@ -110,7 +107,7 @@ describe('register', () => {
     on('command.register', ($, e) => ({ value: { command: e.name } }))
     stubContentFs(on, twoBiomes())
     const start = () => $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' } as any)
-    const reply = async () => ((await $.command.run({ command: 'modsters' } as any)) as { text: string }).text
+    const reply = async () => (await collectionHeader($)).title
 
     await start()
     const first = await reply()
@@ -383,8 +380,21 @@ describe('register', () => {
 })
 
 
-// Every /modsters reply points to the settings (0023 point 7)
-const HINT = ' · Change where the game shows in /config'
+/** The collection pane's title and its no-biome note, as `/modsters` opens it (P3-01). */
+async function collectionHeader($: any): Promise<{ title?: string; note?: string }> {
+  const pane = await $.ui.mount({
+    plugin: 'modster-hunter',
+    surface: 'terminal',
+    component: 'Pane',
+    requestId: 'modster-collection',
+    props: { title: 'Modster collection', isFocused: true, bodyColumns: 120, placement: 'inline', scroll: { offset: 0, bodyRows: 8 }, view: {} },
+  })
+  // Texts keep no key in the drawn tree; the title is the pane's first Text
+  const title = (await pane.findAll({ type: 'Text' }))[0]?.text
+  const note = (await pane.find({ type: 'Text', text: /^No biomes to play/ }))?.text
+  await pane.unmount()
+  return { ...(title === undefined ? {} : { title }), ...(note === undefined ? {} : { note }) }
+}
 const BAND_TICK = 250
 const BAND_PROPS = { hasSurvey: false, isWorking: true, maxRows: 7, bodyColumns: 120 }
 

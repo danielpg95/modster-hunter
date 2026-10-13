@@ -167,6 +167,8 @@ workflow in the same PR.
   opens the encounter pane with focus (decision 0024).
 - **Clicks only work in the fullscreen layout** (`/tui fullscreen`). Inline,
   even the engine's close mark (×) can't be clicked; `ctrl+x x` closes a pane.
+- **In tests, a drawn `Text` keeps no `key`.** `find({ type: 'Text', key })`
+  finds nothing; match its `text` instead. Box, Button and Raster keep theirs.
 - **`Raster` cells must be one column wide.** `▀` is; emoji are not.
 - **Timers** started with `$.clock.every` stop on reload. Start them in
   `session.start`, never at module top level.

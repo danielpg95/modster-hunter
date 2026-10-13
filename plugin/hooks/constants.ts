@@ -66,6 +66,11 @@ export const DISPLAY = {
   },
 } as const
 
+/** The collection pane, decision 0002 and P3-01: its tab row is plain Buttons `1`–`4`, this far apart. */
+export const COLLECTION = {
+  tabGapColumns: 2,
+} as const
+
 /** Content file bounds: docs/CONTENT_FORMAT.md (schema version 1), decisions 0004, 0007 and 0012. */
 export const CONTENT = {
   schemaVersion: 1,
