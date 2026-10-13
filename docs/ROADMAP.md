@@ -201,13 +201,13 @@ Goal: a complete, fun encounter loop with starter content. No customization yet.
   - [x] `formatOddsTable(oddsTable(…))` printed for each built-in biome and sanity-checked (moved from P2-05; @victor-aguilars, 2026-10-08).
   - [x] Every built-in Modster has a complete `dex` with numbers 1–10 (decision 0017; added 2026-10-09; the dex is closed at #010 for these biomes, 2026-10-12).
 
-#### [ ] P2-10 — Phase 2 playtest
+#### [x] P2-10 — Phase 2 playtest
 - **Depends on:** P2-04, P2-07, P2-08, P2-09
 - **Size:** S
 - **Goal:** play it for real sessions and tune.
 - **Done when:**
-  - [ ] At least 2 people played ≥ 1 hour of real work each; feedback in the phase review.
-  - [ ] Tier defaults in 0004 tuned (amend via a new decision if numbers change).
+  - [x] At least 2 people played ≥ 1 hour of real work each; feedback in the phase review.
+  - [x] Tier defaults in 0004 tuned (amend via a new decision if numbers change).
 
 #### [x] P2-11 — Background agents count as work time
 - **Depends on:** P2-06
