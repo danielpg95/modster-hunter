@@ -18,7 +18,7 @@ this file lists only tasks someone has claimed.
 | P4-04 | @danielpg95 | in-review | p4-04-skill-fixes | 2026-10-11 | 2026-10-12 | Skill fixes merged (#78); waiting on @victor-aguilars's end-to-end run, then tick both done-when items |
 | P5-12 | @danielpg95 | in-review | p5-12-crystal-grotto | 2026-10-12 | 2026-10-12 | PR open; after it merges, remove or rename the user copies in ~/.claude/modster-hunter/content/ so they don't replace the built-ins |
 | P5-13 | @danielpg95 | in-progress | p5-13-idle-scene | 2026-10-12 | 2026-10-12 | Hand check: add `"particles": { "style": "sparkle" }` to a user biome, run `claude --plugin-dir ./plugin` at 80×24 and 140×40, watch a turn; then tick the last two done-when items |
-| P5-14 | @danielpg95 | in-progress | p5-14-biome-scenes | 2026-10-12 | 2026-10-12 | Started before P5-13 is done (accepted by @danielpg95); stacked on p5-13-idle-scene. Draw the four 48×12 painted scenes |
+| P5-14 | @danielpg95 | in-review | p5-14-biome-scenes | 2026-10-12 | 2026-10-12 | PR open, stacked on p5-13-idle-scene; all done-when items met. Once P5-13 is done, tick the P5-14 heading and remove this row |
 
 ## Up next
 
