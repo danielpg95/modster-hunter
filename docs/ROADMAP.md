@@ -296,13 +296,13 @@ Goal: `/modsters` opens a pane to browse what you've caught.
 - **Done when:**
   - [x] Tabs switch by hotkeys `1`–`4`; layout adapts to `bodyColumns` and to inline vs docked placement. Checked by hand by @danielpg95 on 2026-10-12, inline and docked.
 
-#### [ ] P3-02 — Collection grid
+#### [x] P3-02 — Collection grid
 - **Depends on:** P3-01
 - **Size:** M
 - **Goal:** caught Modsters in color, uncaught as dark silhouettes ("???"), count and best tier on each.
 - **Done when:**
-  - [ ] Selecting one shows a detail view: animated sprite, biomes found in, first/last caught, and the dex (decision 0017; `???` until caught).
-  - [ ] Scrolls correctly with many Modsters.
+  - [x] Selecting one shows a detail view: animated sprite, biomes found in, first/last caught, and the dex (decision 0017; `???` until caught). Built as a list beside the selected Modster's detail (agreed with @danielpg95); checked by hand on 2026-10-13.
+  - [x] Scrolls correctly with many Modsters. Render test with 31 Modsters; one layout per pane whatever is selected, checked by hand on 2026-10-13.
 
 #### [ ] P3-03 — Biomes tab
 - **Depends on:** P3-01
