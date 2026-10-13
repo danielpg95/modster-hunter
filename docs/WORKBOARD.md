@@ -15,7 +15,6 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P3-02 | @danielpg95 | in-progress | p3-02-collection-grid | 2026-10-13 | 2026-10-13 | Check by hand: `/modsters` inline at 80×24 and docked at 140×40, `j`/`k`, silhouette on dark and light themes, animation stops on Esc |
 
 ## Up next
 
@@ -28,4 +27,5 @@ list when you finish a task.
 - **P5-01** — Shiny variants
 - **P5-02** — Sounds
 - **P5-05** — Light skill catch experiment
+- **P5-06** — Desktop app support
 - **P5-09** — Sprite miniatures (spike)
