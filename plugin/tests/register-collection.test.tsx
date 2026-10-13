@@ -3,6 +3,8 @@ import type { On, UiPane } from 'claude-code'
 import { collectionForest } from './fixtures/collection-forest'
 import { oneModsterForest } from './fixtures/one-modster-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
+import { sceneForest } from './fixtures/scene-forest'
+import { twoBiomes } from './fixtures/two-biomes'
 
 // The collection pane (decision 0002, P3-01): `/modsters` opens it focused, Esc
 // closes it, tabs switch on 1–4. The one-Modster forest is "Whispering Forest".
@@ -79,6 +81,19 @@ function collectionBlits(on: On): string[] {
   return cells
 }
 
+/** Records the Biomes tab's scene blits (0028). */
+function biomesSceneBlits(on: On): string[] {
+  const cells: string[] = []
+  on('ui.blit', ($, e) => {
+    if (e.key === 'biomes-scene' && 'cells' in e) cells.push(e.cells)
+    return { value: {} }
+  })
+  return cells
+}
+
+/** Two biomes; only Whispering Forest has a scene (4 rows, animated). */
+const sceneAndDunes = () => ({ ...twoBiomes(), ...sceneForest() })
+
 /** Whether the header row holds the tabs (inline and wide), found by their keys in its children. */
 async function tabsInHeader(pane: any): Promise<boolean> {
   const header = await pane.find({ type: 'Box', key: 'header' })
@@ -130,11 +145,11 @@ describe('register: collection pane', () => {
     await pane.press({ key: 'settings' })
     expect(await pane.find({ type: 'Text', text: /in \/config/ })).toBeDefined()
     await pane.press({ key: 'biomes' })
-    expect(await pane.find({ type: 'Text', text: /Biomes and the Modsters/ })).toBeDefined()
+    expect(await pane.find({ type: 'Text', text: /^Biomes \d+$/ })).toBeDefined()
     await pane.unmount()
 
     const again = await mountPane($)
-    expect(await again.find({ type: 'Text', text: /Biomes and the Modsters/ })).toBeDefined()
+    expect(await again.find({ type: 'Text', text: /^Biomes \d+$/ })).toBeDefined()
     await again.press({ key: 'collection' })
     await again.unmount()
   })
@@ -327,6 +342,126 @@ describe('register: collection pane', () => {
     await $.command.run({ command: 'modsters' } as any)
     const pane = await mountPane($, DOCK)
     expect(await pane.find({ type: 'Text', text: 'Caught 1/1' })).toBeDefined()
+    await pane.unmount()
+  })
+
+  test('the Biomes tab opens on the session biome, marked here, with each Modster\'s encounter %', async ($, on) => {
+    await start($, on, () => [], twoBiomes())
+    const pane = await mountPane($)
+    await pane.press({ key: 'biomes' })
+    expect(await pane.find({ type: 'Text', text: 'Biomes 2' })).toBeDefined()
+    // The session's biome is random (0006); the header names it
+    const header = JSON.stringify(await pane.find({ type: 'Box', key: 'header' }))
+    const current = header.includes('Ash Dunes') ? 'ash-dunes' : 'whispering-forest'
+    const row = await pane.find({ type: 'Button', key: current })
+    expect(JSON.stringify(row)).toContain(' here')
+    expect(JSON.stringify(row)).toContain('▸ ')
+    expect(await pane.find({ type: 'Text', text: current === 'ash-dunes' ? '  75.0%  common' : ' 100.0%  common' })).toBeDefined()
+    await pane.press({ key: 'collection' })
+    await pane.unmount()
+  })
+
+  test('j and k move between biomes, and the odds follow', async ($, on) => {
+    await start($, on, () => [], twoBiomes())
+    const pane = await mountPane($)
+    await pane.press({ key: 'biomes' })
+    // Ash Dunes lists first by name
+    await pane.press({ key: 'biome-up' })
+    expect(await pane.find({ type: 'Box', key: 'odds-emberkit' })).toBeDefined()
+    expect(await pane.find({ type: 'Text', text: '  25.0%  common' })).toBeDefined()
+    await pane.press({ key: 'biome-down' })
+    expect(await pane.find({ type: 'Box', key: 'odds-emberkit' })).toBeUndefined()
+    expect(await pane.find({ type: 'Text', text: ' 100.0%  common' })).toBeDefined()
+    await pane.press({ key: 'biome-up' })
+    await pane.press({ key: 'collection' })
+    await pane.unmount()
+  })
+
+  test('uncaught Modsters read ??? in the Biomes tab; caught ones show their name and catches there', async ($, on) => {
+    await start($, on, () => [], twoBiomes(), { 'caught:sproutling': { ...record(3), biomes: { 'ash-dunes': 3 } } })
+    const pane = await mountPane($)
+    await pane.press({ key: 'biomes' })
+    await pane.press({ key: 'biome-up' })
+    const sproutling = JSON.stringify(await pane.find({ type: 'Box', key: 'odds-sproutling' }))
+    expect(sproutling).toContain('Sproutling')
+    expect(sproutling).toContain(' ×3')
+    const emberkit = JSON.stringify(await pane.find({ type: 'Box', key: 'odds-emberkit' }))
+    expect(emberkit).toContain('???')
+    expect(emberkit).not.toContain('Emberkit')
+    expect(JSON.stringify(await pane.find({ type: 'Button', key: 'ash-dunes' }))).toContain(' 1/2')
+    await pane.press({ key: 'collection' })
+    await pane.unmount()
+  })
+
+  test('a narrow dock puts the biome list above the odds', async ($, on) => {
+    await start($, on, () => [], twoBiomes())
+    const pane = await mountPane($, { placement: 'dock', bodyColumns: 50, scroll: { offset: 0, bodyRows: 20 } })
+    await pane.press({ key: 'biomes' })
+    expect((await pane.find({ type: 'Box', key: 'split' }))?.props.flexDirection).toBe('column')
+    expect((await pane.findAll({ type: 'Button' })).filter((button: any) => ['ash-dunes', 'whispering-forest'].includes(button.key))).toHaveLength(2)
+    await pane.press({ key: 'collection' })
+    await pane.unmount()
+  })
+
+  test('a docked Biomes tab shows the selected biome\'s scene on top, animated between turns', async ($, on) => {
+    const blits = biomesSceneBlits(on)
+    const { clock } = await start($, on, () => [], sceneForest())
+    const pane = await mountPane($, DOCK)
+    await pane.press({ key: 'biomes' })
+    const raster = await pane.find({ type: 'Raster', key: 'biomes-scene' })
+    expect(raster?.props.rows).toBe(4)
+    expect(raster?.props.columns).toBe(120)
+    // No turn is running: the tab's scene moves anyway (0028 point 4)
+    await clock.advance(1_000)
+    expect(blits.length).toBeGreaterThan(0)
+    expect(new Set(blits).size).toBeGreaterThan(1)
+    await pane.press({ key: 'collection' })
+    await pane.unmount()
+  })
+
+  test('another tab stops the Biomes tab\'s scene', async ($, on) => {
+    const blits = biomesSceneBlits(on)
+    const { clock } = await start($, on, () => [], sceneForest())
+    const pane = await mountPane($, DOCK)
+    await pane.press({ key: 'biomes' })
+    await clock.advance(500)
+    await pane.press({ key: 'stats' })
+    const afterTab = blits.length
+    await clock.advance(1_000)
+    expect(blits).toHaveLength(afterTab)
+    await pane.press({ key: 'collection' })
+    await pane.unmount()
+  })
+
+  test('the scene follows the selected biome, and a biome without one shows none', async ($, on) => {
+    await start($, on, () => [], sceneAndDunes())
+    const pane = await mountPane($, DOCK)
+    await pane.press({ key: 'biomes' })
+    // Ash Dunes lists first by name, then Whispering Forest
+    await pane.press({ key: 'biome-up' })
+    expect(await pane.find({ type: 'Raster', key: 'biomes-scene' })).toBeUndefined()
+    await pane.press({ key: 'biome-down' })
+    expect(await pane.find({ type: 'Raster', key: 'biomes-scene' })).toBeDefined()
+    await pane.press({ key: 'collection' })
+    await pane.unmount()
+  })
+
+  test('a short inline pane leaves the scene out', async ($, on) => {
+    await start($, on, () => [], sceneForest())
+    const pane = await mountPane($)
+    await pane.press({ key: 'biomes' })
+    expect(await pane.find({ type: 'Raster', key: 'biomes-scene' })).toBeUndefined()
+    expect(await pane.find({ type: 'Button', key: 'whispering-forest' })).toBeDefined()
+    await pane.press({ key: 'collection' })
+    await pane.unmount()
+  })
+
+  test('showIdleScene off leaves the Biomes tab without a scene', { options: { showIdleScene: false } }, async ($, on) => {
+    await start($, on, () => [], sceneForest())
+    const pane = await mountPane($, DOCK)
+    await pane.press({ key: 'biomes' })
+    expect(await pane.find({ type: 'Raster', key: 'biomes-scene' })).toBeUndefined()
+    await pane.press({ key: 'collection' })
     await pane.unmount()
   })
 })

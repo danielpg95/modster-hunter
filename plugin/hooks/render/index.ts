@@ -12,3 +12,6 @@ export { listRow, listWindow, moreText, type ListWindow } from './collection-lis
 export { detailLines, type DetailInput } from './collection-detail'
 export { collectionBody, type CollectionBody, type CollectionBodyInput } from './collection-body'
 export { silhouettePalette } from './silhouette'
+export { biomeEntries, type BiomeEntry, type BiomeOdds } from './biome-entries'
+export { biomeRow, oddsRow } from './biome-rows'
+export { biomesBody, type BiomesBody, type BiomesBodyInput } from './biomes-body'

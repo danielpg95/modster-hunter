@@ -304,12 +304,13 @@ Goal: `/modsters` opens a pane to browse what you've caught.
   - [x] Selecting one shows a detail view: animated sprite, biomes found in, first/last caught, and the dex (decision 0017; `???` until caught). Built as a list beside the selected Modster's detail (agreed with @danielpg95); checked by hand on 2026-10-13.
   - [x] Scrolls correctly with many Modsters. Render test with 31 Modsters; one layout per pane whatever is selected, checked by hand on 2026-10-13.
 
-#### [ ] P3-03 — Biomes tab
+#### [x] P3-03 — Biomes tab
 - **Depends on:** P3-01
 - **Size:** S
 - **Goal:** list biomes, the current one marked, each with its Modsters and their encounter %.
 - **Done when:**
-  - [ ] Percentages match the P2-05 resolver.
+  - [x] Percentages match the P2-05 resolver.
+  - [x] The selected biome's idle scene shows above the list, animated, and is left out when it doesn't fit (decision 0028).
 
 #### [ ] P3-04 — Stats tab
 - **Depends on:** P3-01

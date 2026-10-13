@@ -15,7 +15,6 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P3-03 | @danielpg95 | in-progress | p3-03-biomes-tab | 2026-10-13 | 2026-10-13 | Replace the Biomes tab placeholder with a list of biomes, percentages from the P2-05 resolver |
 
 ## Up next
 
