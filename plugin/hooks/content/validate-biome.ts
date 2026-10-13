@@ -6,16 +6,29 @@ import {
   checkPattern,
   checkSchemaVersion,
   checkString,
+  describe,
   fieldPath,
   isObject,
 } from './fields'
 import { IssueList } from './issue-list'
 import type { Biome, Validation } from './types'
 
-const KEYS = ['schemaVersion', 'id', 'name', 'description', 'accentColor', 'background', 'encounterEverySec', 'modsters']
+const KEYS = [
+  'schemaVersion',
+  'id',
+  'name',
+  'description',
+  'accentColor',
+  'background',
+  'backgroundFps',
+  'particles',
+  'encounterEverySec',
+  'modsters',
+]
 const REQUIRED = ['schemaVersion', 'id', 'name', 'modsters']
 const ENTRY_KEYS = ['id', 'weight', 'maxAttempts', 'catchRate']
 const ENTRY_REQUIRED = ['id', 'weight']
+const PARTICLE_KEYS = ['style', 'color', 'density']
 
 /**
  * Checks a parsed `biome.json` against CONTENT_FORMAT.md. `folder` is the name
@@ -36,6 +49,9 @@ export function validateBiome(input: unknown, where: { file: string; folder: str
   checkString(input, 'description', { min: 0, max: CONTENT.descriptionMaxChars }, issues)
   checkPattern(input, 'accentColor', CONTENT.rgbColorPattern, 'a color like "#4caf50"', issues)
   checkPattern(input, 'background', CONTENT.spriteFilePattern, 'a .sprite.json file in this folder', issues)
+  const { backgroundFpsMin, backgroundFpsMax } = CONTENT.biome
+  checkNumber(input, 'backgroundFps', { min: backgroundFpsMin, max: backgroundFpsMax, integer: true }, issues)
+  checkParticles(input.particles, issues)
   checkEncounterEverySec(input.encounterEverySec, issues)
   checkEntries(input.modsters, issues)
 
@@ -56,6 +72,22 @@ function checkEncounterEverySec(value: unknown, issues: IssueList): void {
   if (typeof min === 'number' && typeof max === 'number' && min > max) {
     issues.error('encounterEverySec', `min must not be above max (it is [${min}, ${max}])`)
   }
+}
+
+// Decision 0026 point 3
+function checkParticles(value: unknown, issues: IssueList): void {
+  if (value === undefined) return
+  if (!isObject(value)) {
+    issues.error('particles', 'must be an object like { "style": "sparkle" }')
+    return
+  }
+  const { particleStyles, particleDensityMin, particleDensityMax } = CONTENT.biome
+  checkKeys(value, PARTICLE_KEYS, ['style'], issues, 'particles')
+  if (Object.hasOwn(value, 'style') && !(particleStyles as readonly unknown[]).includes(value.style)) {
+    issues.error('particles.style', `must be one of ${particleStyles.join(', ')} (it is ${describe(value.style)})`)
+  }
+  checkPattern(value, 'color', CONTENT.rgbColorPattern, 'a color like "#4caf50"', issues, 'particles')
+  checkNumber(value, 'density', { min: particleDensityMin, max: particleDensityMax, integer: true }, issues, 'particles')
 }
 
 function checkEntries(value: unknown, issues: IssueList): void {

@@ -30,6 +30,17 @@ const INVALID: [string, (biome: Biome) => void, string][] = [
   ['an accentColor with alpha is an error', (b) => (b.accentColor = '#4caf50ff'), 'accentColor'],
   ['a background that is not a .sprite.json is an error', (b) => (b.background = 'background.png'), 'background'],
   ['a background in another folder is an error', (b) => (b.background = '../x/background.sprite.json'), 'background'],
+  ['backgroundFps of 0 is an error', (b) => (b.backgroundFps = 0), 'backgroundFps'],
+  ['backgroundFps over 12 is an error', (b) => (b.backgroundFps = 13), 'backgroundFps'],
+  ['fractional backgroundFps is an error', (b) => (b.backgroundFps = 1.5), 'backgroundFps'],
+  ['particles that are not an object is an error', (b) => (b.particles = 'sparkle'), 'particles'],
+  ['particles without a style is an error', (b) => (b.particles = { density: 2 }), 'particles.style'],
+  ['an unknown particle style is an error', (b) => (b.particles = { style: 'rain' }), 'particles.style'],
+  ['a particle color without # is an error', (b) => (b.particles = { style: 'leaf', color: 'a5d6a7' }), 'particles.color'],
+  ['a particle density of 0 is an error', (b) => (b.particles = { style: 'leaf', density: 0 }), 'particles.density'],
+  ['a particle density over 5 is an error', (b) => (b.particles = { style: 'leaf', density: 6 }), 'particles.density'],
+  ['a fractional particle density is an error', (b) => (b.particles = { style: 'leaf', density: 2.5 }), 'particles.density'],
+  ['an unknown particles field is an error', (b) => (b.particles = { style: 'leaf', speed: 3 }), 'particles.speed'],
   ['encounterEverySec that is not a pair is an error', (b) => (b.encounterEverySec = [8]), 'encounterEverySec'],
   ['encounterEverySec below 3 s is an error', (b) => (b.encounterEverySec = [2, 20]), 'encounterEverySec[0]'],
   ['encounterEverySec above 600 s is an error', (b) => (b.encounterEverySec = [8, 601]), 'encounterEverySec[1]'],
@@ -80,6 +91,23 @@ describe('validateBiome', () => {
     entries(biome)[0] = { id: 'sproutling', weight: 10_000, maxAttempts: 10, catchRate: 0.01 }
     entries(biome)[1] = { id: 'mossbeast', weight: 1, maxAttempts: 1, catchRate: 1 }
     expect(validateBiome(biome, where).issues).toEqual([])
+  })
+
+  test('the scene fields and their bounds are valid (decision 0026)', () => {
+    for (const style of ['sparkle', 'leaf', 'sand', 'bubble', 'snow']) {
+      for (const [fps, density] of [[1, 1], [12, 5]]) {
+        const biome = validBiome()
+        biome.backgroundFps = fps
+        biome.particles = { style, color: '#a5d6a7', density }
+        expect(validateBiome(biome, where).issues).toEqual([])
+      }
+    }
+  })
+
+  test('particles need only a style', () => {
+    const biome = validBiome()
+    biome.particles = { style: 'snow' }
+    expect(validateBiome(biome, where).ok).toBe(true)
   })
 
   test('min and max of encounterEverySec may be equal', () => {
@@ -135,7 +163,7 @@ describe('validateBiome', () => {
     const odd = [null, {}, [], 'x', -1, Number.NaN, true]
     for (const value of odd) {
       const biome: Biome = { schemaVersion: value, id: value, name: value, description: value, accentColor: value }
-      Object.assign(biome, { background: value, encounterEverySec: value, modsters: [value, { id: value, weight: value }] })
+      Object.assign(biome, { background: value, backgroundFps: value, particles: value, encounterEverySec: value, modsters: [value, { id: value, weight: value }] })
       expect(validateBiome(biome, where).ok).toBe(false)
     }
   })

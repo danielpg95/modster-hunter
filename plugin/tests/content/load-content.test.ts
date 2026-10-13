@@ -127,16 +127,26 @@ describe('loadContent', () => {
     expect(content.issues).toEqual([])
   })
 
-  test('a bad background is listed and the biome loads without it', async () => {
+  test('a background may have up to 4 frames (decision 0026)', async () => {
     const files = forest()
     files[`${ROOT}/biomes/whispering-forest/biome.json`] = JSON.stringify(validBiome())
     files[`${ROOT}/biomes/whispering-forest/background.sprite.json`] = JSON.stringify(validSprite()) // 2 frames
+    const content = await loadContent(memoryReader(files), ROOT)
+    expect(content.biomes.get('whispering-forest')?.background?.frames.length).toBe(2)
+    expect(content.issues).toEqual([])
+  })
+
+  test('a bad background is listed and the biome loads without it', async () => {
+    const files = forest()
+    files[`${ROOT}/biomes/whispering-forest/biome.json`] = JSON.stringify(validBiome())
+    const frame = (validSprite().frames as string[])[0]
+    files[`${ROOT}/biomes/whispering-forest/background.sprite.json`] = JSON.stringify({ ...validSprite(), frames: Array(5).fill(frame) })
     const content = await loadContent(memoryReader(files), ROOT)
     const loaded = content.biomes.get('whispering-forest')
     expect(loaded?.background).toBeUndefined()
     expect(loaded?.biome.background).toBeUndefined()
     expect(lines(content.issues)).toEqual([
-      'biomes/whispering-forest/background.sprite.json: frames must have exactly 1 frame for a background (it has 2)',
+      'biomes/whispering-forest/background.sprite.json: frames must have 1–4 frames (it has 5)',
     ])
   })
 

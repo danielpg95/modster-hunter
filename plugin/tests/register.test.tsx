@@ -2,6 +2,7 @@ import { describe, expect, mock, test } from 'claude-code/testing'
 import type { On } from 'claude-code'
 import { encodePng } from './fixtures/encode-png'
 import { oneModsterForest } from './fixtures/one-modster-forest'
+import { sceneForest } from './fixtures/scene-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
 import { validBiome } from './fixtures/valid-biome'
 import { validModster } from './fixtures/valid-modster'
@@ -200,6 +201,94 @@ describe('register', () => {
     await ui.unmount()
   })
 
+  // The biome idle scene (decision 0026)
+  test('between encounters the band draws the biome scene above the idle line', async ($, on) => {
+    const { ui } = await startBand($, on, sceneForest())
+    expect(await ui.find({ type: 'Raster', key: 'scene' })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeDefined()
+    await ui.unmount()
+  })
+
+  test('the scene moves only while Claude works, and holds still between turns', async ($, on) => {
+    const blits = sceneBlits(on)
+    const { ui, clock } = await startBand($, on, sceneForest())
+    await clock.advance(2_000)
+    expect(blits.length).toBe(0)
+
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(2_000) // under the 3 s before the Modster appears
+    expect(blits.length).toBeGreaterThan(8)
+
+    await $.turn.complete({ reason: 'answer', answer: 'ok', durationMs: 1 } as any)
+    const stopped = blits.length
+    await clock.advance(2_000)
+    expect(blits.length).toBe(stopped)
+    expect(await ui.find({ type: 'Raster', key: 'scene' })).toBeDefined()
+    await ui.unmount()
+  })
+
+  test('a background subagent moves the scene too (0018)', async ($, on) => {
+    on('classic.SubagentStart', () => ({}))
+    const blits = sceneBlits(on)
+    const { ui, clock } = await startBand($, on, sceneForest())
+    await $.classic.SubagentStart({ agent_id: 'a1', agent_type: 'general-purpose' } as any)
+    await clock.advance(1_000)
+    expect(blits.length).toBeGreaterThan(0)
+    await ui.unmount()
+  })
+
+  test('an encounter replaces the scene and stops it; the scene comes back after', async ($, on) => {
+    const blits = sceneBlits(on)
+    const { ui, clock } = await startBand($, on, sceneForest())
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(3_000 + BAND_TICK)
+    expect(await ui.find({ type: 'Raster', key: 'scene' })).toBeUndefined()
+    expect(await ui.find({ type: 'Raster', key: 'sprite' })).toBeDefined()
+    const during = blits.length
+    await clock.advance(1_000)
+    expect(blits.length).toBe(during)
+
+    await $.turn.complete({ reason: 'answer', answer: 'ok', durationMs: 1 } as any)
+    await ui.press({ key: 'throw' })
+    await clock.advance(1_500 + 4_000 + BAND_TICK)
+    expect(await ui.find({ type: 'Raster', key: 'scene' })).toBeDefined()
+    await ui.unmount()
+  })
+
+  test('a band too short for the scene shows the idle line alone', async ($, on) => {
+    const { ui } = await startBand($, on, sceneForest())
+    await ui.redraw({ ...BAND_PROPS, maxRows: 4 } as any) // 4 scene rows + the line need 5
+    expect(await ui.find({ type: 'Raster' })).toBeUndefined()
+    expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeDefined()
+    await ui.redraw({ ...BAND_PROPS, maxRows: 5 } as any)
+    expect(await ui.find({ type: 'Raster', key: 'scene' })).toBeDefined()
+    await ui.unmount()
+  })
+
+  test('the idle scene can be turned off, leaving the idle line', { options: { showIdleScene: false } }, async ($, on) => {
+    const blits = sceneBlits(on)
+    const { ui, clock } = await startBand($, on, sceneForest())
+    expect(await ui.find({ type: 'Raster' })).toBeUndefined()
+    expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeDefined()
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(2_000)
+    expect(blits.length).toBe(0)
+    await ui.unmount()
+  })
+
+  test('the scene stops at session end', async ($, on) => {
+    on('session.end', () => ({ sessionId: 's1' }))
+    const blits = sceneBlits(on)
+    const { ui, clock } = await startBand($, on, sceneForest())
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(1_000)
+    await $.session.end({ reason: 'exit' } as any)
+    const ended = blits.length
+    await clock.advance(2_000)
+    expect(blits.length).toBe(ended)
+    await ui.unmount()
+  })
+
   test('a catch is saved to the collection on top of what another session saved (0009)', async ($, on) => {
     // The store, answered from a map the test can read back. mock.store keeps its map to itself,
     // and the test engine has no $.store, so this stands in for it with the same get/set/keys.
@@ -299,11 +388,21 @@ const HINT = ' · Change where the game shows in /config'
 const BAND_TICK = 250
 const BAND_PROPS = { hasSurvey: false, isWorking: true, maxRows: 7, bodyColumns: 120 }
 
+/** Records the scene's blits as the engine would take them. */
+function sceneBlits(on: On): unknown[] {
+  const blits: unknown[] = []
+  on('ui.blit', ($, e) => {
+    if (e.key === 'scene') blits.push(e)
+    return { value: {} }
+  })
+  return blits
+}
+
 /** Starts a session on the one-Modster forest with a fake clock, and mounts the band. */
-async function startBand($: any, on: On) {
+async function startBand($: any, on: On, files = oneModsterForest()) {
   on('session.start', ($, e) => ({ cwd: e.cwd }))
   on('command.register', ($, e) => ({ value: { command: e.name } }))
-  stubContentFs(on, oneModsterForest())
+  stubContentFs(on, files)
   // What Claude Code itself would answer beneath the mod
   on('turn.start', ($, e) => ({ turnId: e.turnId }))
   on('turn.complete', () => ({ text: '' }))

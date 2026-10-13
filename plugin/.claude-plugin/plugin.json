@@ -29,6 +29,12 @@
       "description": "Show the current biome in the band between encounters",
       "default": true
     },
+    "showIdleScene": {
+      "type": "boolean",
+      "title": "Show idle scene",
+      "description": "Draw the biome as a small animated scene between encounters, in the band or the encounter pane, when the biome has one. It moves only while Claude works",
+      "default": true
+    },
     "showInBand": {
       "type": "boolean",
       "title": "Show in the band",

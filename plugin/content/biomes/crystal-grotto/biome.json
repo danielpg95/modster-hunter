@@ -4,6 +4,9 @@
   "name": "Crystal Grotto",
   "description": "Whisper here and the crystals whisper back, a little out of tune.",
   "accentColor": "#f48fb1",
+  "background": "background.sprite.json",
+  "backgroundFps": 2,
+  "particles": { "style": "sparkle", "color": "#ffd6e8", "density": 2 },
   "encounterEverySec": [10, 30],
   "modsters": [
     { "id": "shardling", "weight": 100 },

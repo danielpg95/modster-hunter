@@ -1,6 +1,6 @@
 # 0026 — Between encounters the band shows the biome as an animated scene with particles
 
-- **Status:** Accepted
+- **Status:** Accepted (point 7 amended by 0027)
 - **Date:** 2026-10-12
 - **Decided by:** @danielpg95 (choices made in the P5-13 planning session; details drafted by Claude)
 

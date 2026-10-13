@@ -1,3 +1,4 @@
+import { CONTENT } from '../constants'
 import { checkBiomeReferences } from './check-biome-references'
 import type { Biome, ContentIssue, Modster, Sprite, Validation } from './types'
 import { validateBiome } from './validate-biome'
@@ -150,7 +151,7 @@ async function loadBiome(at: Folder, folder: string): Promise<LoadedBiome | unde
   const backgroundFile = `biomes/${folder}/${biome.background}`
   const backgroundJson = await readJson(at, backgroundFile)
   const background =
-    backgroundJson && keep(validateSprite(backgroundJson.value, { file: at.label + backgroundFile, singleFrame: true }), at.issues)
+    backgroundJson && keep(validateSprite(backgroundJson.value, { file: at.label + backgroundFile, maxFrames: CONTENT.biome.backgroundFramesMax }), at.issues)
   if (background) return { biome, background, file: shownFile }
   // The background is optional: the biome still loads, drawn without it
   const { background: _dropped, ...withoutBackground } = biome

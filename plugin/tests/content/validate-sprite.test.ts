@@ -115,14 +115,18 @@ describe('validateSprite', () => {
     expect(issuesAt(result, 'shinyPalette[1]')[0]?.severity).toBe('warning')
   })
 
-  test('a background must have exactly one frame', () => {
-    const background = { file: 'biomes/whispering-forest/background.sprite.json', singleFrame: true }
-    expect(validateSprite(validSprite(), background).ok).toBe(false)
-    expect(issuesAt(validateSprite(validSprite(), background), 'frames')[0]?.problem).toBe(
-      'must have exactly 1 frame for a background (it has 2)',
-    )
-    const sprite = { ...validSprite(), frames: [blank(8, 8)] }
-    expect(validateSprite(sprite, background).ok).toBe(true)
+  test('a background has 1–4 frames (decision 0026)', () => {
+    const background = { file: 'biomes/whispering-forest/background.sprite.json', maxFrames: 4 }
+    const withFrames = (count: number) => ({ ...validSprite(), frames: Array.from({ length: count }, () => blank(8, 8)) })
+    expect(validateSprite(withFrames(1), background).ok).toBe(true)
+    expect(validateSprite(withFrames(4), background).ok).toBe(true)
+    expect(issuesAt(validateSprite(withFrames(5), background), 'frames')[0]?.problem).toBe('must have 1–4 frames (it has 5)')
+  })
+
+  test('maxFrames never raises the sprite limit of 8', () => {
+    const sprite = { ...validSprite(), frames: Array.from({ length: 9 }, () => blank(8, 8)) }
+    const where9 = { file: 'x.sprite.json', maxFrames: 20 }
+    expect(issuesAt(validateSprite(sprite, where9), 'frames')[0]?.problem).toBe('must have 1–8 frames (it has 9)')
   })
 
   test('frames are not decoded when the size is already wrong, so errors are not repeated', () => {

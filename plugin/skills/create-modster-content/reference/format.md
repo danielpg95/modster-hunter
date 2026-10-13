@@ -54,7 +54,9 @@ errors, and a file with an error is skipped.
 | `name` | yes | 1–32 chars |
 | `description` | no | ≤ 120 chars |
 | `accentColor` | no | `#rrggbb` |
-| `background` | no | A `.sprite.json` in this folder with a single frame (convert a one-frame PNG with the helper) |
+| `background` | no | A `.sprite.json` in this folder with 1–4 frames (convert a PNG with the helper). Shown as a scene above the idle line, tiled left to right |
+| `backgroundFps` | no | 1–12. Default 2 |
+| `particles` | no | `{ "style": "sparkle" \| "leaf" \| "sand" \| "bubble" \| "snow", "color": "#rrggbb", "density": 1–5 }`; only `style` is required |
 | `encounterEverySec` | no | `[min, max]` seconds between encounters while Claude works; 3 ≤ min ≤ max ≤ 600. Default `[10, 30]` |
 | `modsters` | yes | 1–50 entries, ids unique within the biome |
 | `modsters[].id` | yes | A Modster that exists (built-in or user). A missing one drops only that entry |

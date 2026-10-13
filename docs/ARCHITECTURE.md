@@ -54,8 +54,8 @@ plugin/
 | `classic.SessionStart` (`clear`, `resume`, `fork`) | Re-copy stored values into `$.state` (reset by those commands); open the encounter pane as at `session.start` (0019, 0023) |
 | `turn.start` / `turn.complete` | Tell the scheduler a turn is running / ended |
 | `classic.SubagentStart` / `classic.SubagentStop` | Tell the scheduler a subagent is running / stopped, by `agent_id`; work time includes it (0018) |
-| `ui.render` `{ component: 'AbovePrompt' }` | Draw the encounter or idle line; one row during encounters only with `showInBand` off (0023) |
-| `ui.render` `{ component: 'Pane' }` (our id) | Draw the collection pane (P3), or the encounter pane `modster-hunt` (0015) |
+| `ui.render` `{ component: 'AbovePrompt' }` | Draw the encounter, or the idle line with the biome's scene above it (0026); one row during encounters only with `showInBand` off (0023) |
+| `ui.render` `{ component: 'Pane' }` (our id) | Draw the collection pane (P3), or the encounter pane `modster-hunt` (0015), with the biome's scene between encounters (0027) |
 | `ui.render` `{ component: 'Spinner' }` | Name the Modster in the main turn's spinner while an encounter is up (`showInSpinner`, 0023) |
 | `ui.close` | The encounter pane closed: redraw so the band takes the encounter back (0015); a close by hand stores `prefs:huntPane` `open: false` (0019) |
 | `command.run` `{ command: 'modsters' }` | Open the pane; `hunt` opens the encounter pane (0015) and stores `prefs:huntPane` `open: true` (0019); answers that it's off with `encounterPane: off` (0023); subcommands like `reload` |
@@ -78,6 +78,7 @@ plugin/
 
 - A hook's own time: 10 s per event. Content loading must stay well below it.
 - Redraws: throttled to 10/s (30/s for the visible band in the terminal). Use
-  `$.ui.blit` for animation frames.
+  `$.ui.blit` for animation frames. The idle scene blits only while Claude
+  works, and its timer stops between turns (0026 point 5).
 - `$.store`: 4 MiB total. `$.fs.read`: 4 MiB per file.
 - `session.end` hooks: 1.5 s total.

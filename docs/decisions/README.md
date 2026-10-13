@@ -39,4 +39,5 @@ settled questions and avoid making assumptions about open ones.
 | [0023](0023-display-settings.md) | Display settings: one toggle per place, a pane picker, and a one-line band that keeps Throw | Accepted |
 | [0024](0024-encounter-pane-focus.md) | `/modsters hunt` gives the encounter pane the keys, and the pane says how to switch | Accepted |
 | [0025](0025-user-content-helper.md) | The content skill ships a Node helper that converts, draws, previews and checks | Accepted |
-| [0026](0026-biome-idle-scene.md) | Between encounters the band shows the biome as an animated scene with particles | Accepted |
+| [0026](0026-biome-idle-scene.md) | Between encounters the band shows the biome as an animated scene with particles | Accepted (amended by 0027) |
+| [0027](0027-pane-idle-scene.md) | Between encounters the encounter pane shows the biome's idle scene | Accepted |

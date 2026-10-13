@@ -175,6 +175,48 @@ describe('bandView', () => {
     expect(bandView(noBiome).kind).toBe('none')
   })
 
+  // The idle scene (decision 0026)
+  test('between encounters, the scene shows above the idle line when both fit', () => {
+    const { encounter: _none, ...rest } = input()
+    expect(bandView({ ...rest, sceneRows: 6 })).toEqual({
+      kind: 'scene',
+      sceneRows: 6,
+      line: [{ text: 'Whispering Forest', color: '#4caf50' }, { text: ' · listening for Modsters', dim: true }],
+    })
+    expect(bandRows(bandView({ ...rest, sceneRows: 6 }))).toBe(7)
+  })
+
+  test('a scene that does not fit, or off the terminal, falls back to the idle line', () => {
+    const { encounter: _none, ...rest } = input()
+    expect(bandView({ ...rest, sceneRows: 7 }).kind).toBe('idle')
+    expect(bandView({ ...rest, sceneRows: 3, canDrawSprite: false }).kind).toBe('idle')
+    expect(bandView({ ...rest, sceneRows: 0 }).kind).toBe('idle')
+  })
+
+  test('the scene never takes more rows than maxRows', () => {
+    const { encounter: _none, ...rest } = input()
+    for (const maxRows of [0, 1, 2, 5, 7, 15]) {
+      for (const sceneRows of [1, 3, 4, 6, 12, 24]) {
+        const view = bandView({ ...rest, maxRows, sceneRows })
+        expect([maxRows, sceneRows, bandRows(view) <= maxRows]).toEqual([maxRows, sceneRows, true])
+      }
+    }
+    expect(bandView({ ...rest, maxRows: 2, sceneRows: 1 }).kind).toBe('scene')
+    expect(bandView({ ...rest, maxRows: 1, sceneRows: 1 }).kind).toBe('idle')
+  })
+
+  test('the scene follows the idle line: off, no biome or the band off show nothing', () => {
+    const { encounter: _none, ...rest } = input()
+    expect(bandView({ ...rest, sceneRows: 3, showIdleLine: false }).kind).toBe('none')
+    expect(bandView({ ...rest, sceneRows: 3, oneRow: true }).kind).toBe('none')
+    const { biome: _noBiome, ...noBiome } = rest
+    expect(bandView({ ...noBiome, sceneRows: 3 }).kind).toBe('none')
+  })
+
+  test('an encounter replaces the scene', () => {
+    expect(bandView(input({ sceneRows: 3 })).kind).toBe('full')
+  })
+
   // The band turned off (0023 point 3)
   test('with the band off, nothing shows between encounters, even with the idle line on', () => {
     const { encounter: _none, ...rest } = input()
