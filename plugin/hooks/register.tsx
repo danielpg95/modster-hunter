@@ -77,6 +77,8 @@ const sceneSites = new Map<string, number>() // requestId → columns
 let sceneTimer: Timer | undefined
 let sceneTick = 0
 let isBlittingScene = false
+// Why the band last skipped the scene, so the debug log notes each change once
+let loggedSceneSkip: string | undefined
 
 // The opt-in encounter pane (decision 0015), opened with `/modsters hunt`; it
 // reopens at session start for people who opened it (0019), or every session (0023)
@@ -184,6 +186,13 @@ export const register: Register = (on, options) => {
 
     if (view.kind !== 'full') removeSite(e.requestId)
     if (view.kind !== 'scene') removeSceneSite(e.requestId)
+    if (scene && showIdleScene && view.kind === 'idle') {
+      const skip = `idle scene: not drawn (surface ${e.surface}, band ${e.props.maxRows} rows, scene needs ${scene.rows + 1})`
+      if (skip !== loggedSceneSkip) {
+        loggedSceneSkip = skip
+        $.ui.log(skip, { to: 'debug' })
+      }
+    }
     if (view.kind === 'none') return next(e)
 
     const { Box, Text, Button } = $.ui.resolve(e)
@@ -442,6 +451,8 @@ function startMachine($: EngineInterface, idleTimeoutSec: number): void {
   cellsByModster.clear()
   const loaded = biomeId === undefined ? undefined : content?.biomes.get(biomeId)
   scene = loaded && idleScene(loaded.biome, loaded.background)
+  loggedSceneSkip = undefined
+  if (loaded) $.ui.log(scene ? `idle scene: ${loaded.biome.id}, ${scene.rows} rows, timer ${scene.timerFps} fps` : `idle scene: ${loaded.biome.id} has none`, { to: 'debug' })
   particlesByColumns.clear()
   sceneTick = 0
   const biome = loaded?.biome
