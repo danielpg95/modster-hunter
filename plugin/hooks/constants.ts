@@ -87,6 +87,8 @@ export const COLLECTION = {
   oddsColumns: 44,
   /** A biome list under nothing but the odds (a narrow dock) shows at most this many rows */
   biomeStackRows: 3,
+  /** The selected biome's scene shows only when the list still gets this many rows (0028 point 3) */
+  biomeSceneListRows: 3,
 } as const
 
 /** Content file bounds: docs/CONTENT_FORMAT.md (schema version 1), decisions 0004, 0007 and 0012. */

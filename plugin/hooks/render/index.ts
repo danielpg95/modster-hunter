@@ -14,4 +14,4 @@ export { collectionBody, type CollectionBody, type CollectionBodyInput } from '.
 export { silhouettePalette } from './silhouette'
 export { biomeEntries, type BiomeEntry, type BiomeOdds } from './biome-entries'
 export { biomeRow, oddsRow } from './biome-rows'
-export { biomesBody, type BiomesBody } from './biomes-body'
+export { biomesBody, type BiomesBody, type BiomesBodyInput } from './biomes-body'

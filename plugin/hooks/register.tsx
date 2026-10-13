@@ -7,6 +7,7 @@ import {
   noBiomesMessage,
   type ContentReader,
   type ContentRegistry,
+  type LoadedBiome,
   type LoadedModster,
   type SheetFiles,
 } from './content'
@@ -142,6 +143,14 @@ let collectionSpriteModster: LoadedModster | undefined
 let collectionFrame = 0
 let collectionTimer: Timer | undefined
 let isBlittingCollection = false
+// The Biomes tab's scene (0028): the selected biome's, on a timer of its own that
+// runs whenever the tab draws it, apart from the band's (0026 point 5)
+const BIOMES_SCENE_KEY = 'biomes-scene'
+const biomeScenes = new Map<string, IdleScene | undefined>()
+let biomesSceneSite: { requestId: string; biomeId: string; scene: IdleScene; columns: number; particles: Particle[] } | undefined
+let biomesSceneTimer: Timer | undefined
+let biomesSceneTick = 0
+let isBlittingBiomesScene = false
 
 export const register: Register = (on, options) => {
   const idleTimeoutSec = typeof options.encounterIdleTimeoutSec === 'number' ? options.encounterIdleTimeoutSec : 90
@@ -152,6 +161,7 @@ export const register: Register = (on, options) => {
 
   on('session.start', async ($, e, next) => {
     content = await loadGameContent($, includeBuiltins)
+    biomeScenes.clear()
     if (content.biomes.size === 0) $.ui.toast(`Modster Hunter: ${noBiomesMessage(includeBuiltins, USER_FOLDER_LABEL)}`)
     sessionId = await $.session.id().catch(() => 'unknown')
     // Keep the biome if session.start ever repeats in this process; pick only when there's none yet
@@ -507,6 +517,7 @@ export const register: Register = (on, options) => {
     // Header, tabs, the blank line, and the no-biome note when there's no biome
     const usedRows = 1 + tabRows + 1 + (biome ? 0 : 1)
     if (collectionTab !== 'collection') dropCollectionSite(e.requestId)
+    if (collectionTab !== 'biomes') dropBiomesSceneSite(e.requestId)
     return (
       <Box flexDirection="column">
         {header}
@@ -544,9 +555,23 @@ export const register: Register = (on, options) => {
           <Button key="biome-down" label="Down" hotkey="j" plain dimColor onPress={() => select(entries[index + 1])} />
         </Box>
       )
-      if (!selected) return <Box key="biomes" flexDirection="column">{summary}</Box>
+      if (!selected) {
+        dropBiomesSceneSite(e.requestId)
+        return <Box key="biomes" flexDirection="column">{summary}</Box>
+      }
+      // Raster is terminal only (0012); 0028 point 3
+      const loadedBiome = content?.biomes.get(selected.id)
+      const scene = showIdleScene && e.surface === 'terminal' && loadedBiome ? biomeScene(loadedBiome) : undefined
       // Less the summary line
-      const plan = biomesBody(e.props.bodyColumns, rows - 1)
+      const plan = biomesBody({ columns: e.props.bodyColumns, rows: rows - 1, ...(scene ? { sceneRows: scene.rows } : {}) })
+      let sceneView = null
+      if (scene && plan.showScene && e.surface === 'terminal') {
+        const { Raster } = $.ui.resolve(e)
+        const site = setBiomesSceneSite($, e.requestId, selected.id, scene, e.props.bodyColumns)
+        sceneView = <Raster key={BIOMES_SCENE_KEY} columns={site.columns} rows={scene.rows} cells={sceneCells(scene, site.columns, site.particles, biomesSceneTick)} />
+      } else {
+        dropBiomesSceneSite(e.requestId)
+      }
       const window = listWindow(entries.length, index, plan.listRows)
       const more = moreText(window)
       const list = (
@@ -572,6 +597,7 @@ export const register: Register = (on, options) => {
       return (
         <Box key="biomes" flexDirection="column">
           {summary}
+          {sceneView}
           {plan.split === 'side' ? (
             <Box key="split" flexDirection="row" columnGap={COLLECTION.gapColumns}>
               {list}
@@ -704,6 +730,7 @@ export const register: Register = (on, options) => {
   on('ui.close', async ($, e, next) => {
     const result = await next(e)
     if (e.id === COLLECTION_PANE_ID) dropCollectionSite(COLLECTION_PANE_ID)
+    if (e.id === COLLECTION_PANE_ID) dropBiomesSceneSite(COLLECTION_PANE_ID)
     const pref = e.id === PANE_ID ? prefAfterClose(e.origin.kind) : undefined
     if (pref) queueWrite($, (store) => store.set(HUNT_PANE_KEY, pref))
     $.ui.invalidate('ui.render')
@@ -948,6 +975,7 @@ function stopTimers(): void {
   sceneSites.clear()
   stopCollectionFrames()
   collectionSite = undefined
+  dropBiomesSceneSite(COLLECTION_PANE_ID)
 }
 
 /** The scene's cells now, for a band `columns` wide; particles are made once per width. */
@@ -1081,6 +1109,49 @@ function dropCollectionSite(requestId: string): void {
 function stopCollectionFrames(): void {
   collectionTimer?.cancel()
   collectionTimer = undefined
+}
+
+/** A biome's idle scene, made once per content load (0028 point 1). */
+function biomeScene(loaded: LoadedBiome): IdleScene | undefined {
+  if (!biomeScenes.has(loaded.biome.id)) biomeScenes.set(loaded.biome.id, idleScene(loaded.biome, loaded.background))
+  return biomeScenes.get(loaded.biome.id)
+}
+
+/** Draws `scene` in the Biomes tab and animates it; another biome or width starts it over (0028 point 4). */
+function setBiomesSceneSite($: EngineInterface, requestId: string, biomeId: string, scene: IdleScene, columns: number) {
+  const site = biomesSceneSite
+  if (site && site.requestId === requestId && site.biomeId === biomeId && site.columns === columns) return site
+  stopBiomesScene()
+  biomesSceneTick = 0
+  const next = { requestId, biomeId, scene, columns, particles: makeParticles(scene, columns, Math.random) }
+  biomesSceneSite = next
+  if (!isAnimated(scene)) return next
+  biomesSceneTimer = $.clock.every(Math.max(1, Math.round(1000 / scene.timerFps)), () => {
+    const current = biomesSceneSite
+    // Skip a tick while the last blit is in flight (P1-03)
+    if (!current || isBlittingBiomesScene) return
+    isBlittingBiomesScene = true
+    biomesSceneTick++
+    void $.ui
+      .blit({ requestId: current.requestId, key: BIOMES_SCENE_KEY, cells: sceneCells(current.scene, current.columns, current.particles, biomesSceneTick) })
+      .catch(() => undefined)
+      .finally(() => {
+        isBlittingBiomesScene = false
+      })
+  })
+  return next
+}
+
+/** The Biomes tab stopped drawing its scene: another tab, no room, or closed. */
+function dropBiomesSceneSite(requestId: string): void {
+  if (biomesSceneSite?.requestId !== requestId) return
+  biomesSceneSite = undefined
+  stopBiomesScene()
+}
+
+function stopBiomesScene(): void {
+  biomesSceneTimer?.cancel()
+  biomesSceneTimer = undefined
 }
 
 /**
