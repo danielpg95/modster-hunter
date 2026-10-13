@@ -14,7 +14,7 @@ const BAND_PROPS = { hasSurvey: false, isWorking: true, maxRows: 7, bodyColumns:
 
 type Open = { id: string; title?: string; focus?: boolean; closeOnEscape?: boolean }
 
-async function start($: any, on: On, panes: () => UiPane[] = () => [], files = oneModsterForest(), stored: Record<string, unknown> = {}) {
+async function start($: any, on: On, panes: () => UiPane[] = () => [], files = oneModsterForest(), stored: Record<string, unknown> = {}, now = 0) {
   on('session.start', ($, e) => ({ cwd: e.cwd }))
   on('command.register', ($, e) => ({ value: { command: e.name } }))
   on('turn.start', ($, e) => ({ turnId: e.turnId }))
@@ -41,7 +41,12 @@ async function start($: any, on: On, panes: () => UiPane[] = () => [], files = o
     store[e.key] = structuredClone(e.value)
     return { value: undefined }
   })
-  const clock = mock.clock(on)
+  on('store.delete', ($, e) => {
+    delete store[e.key]
+    return { value: undefined }
+  })
+  on('store.keys', () => ({ value: Object.keys(store) }))
+  const clock = mock.clock(on, { now })
   await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' })
   return { clock, opens }
 }
@@ -94,6 +99,27 @@ function biomesSceneBlits(on: On): string[] {
 /** Two biomes; only Whispering Forest has a scene (4 rows, animated). */
 const sceneAndDunes = () => ({ ...twoBiomes(), ...sceneForest() })
 
+/** A `stats:` session value (decision 0009): one forest encounter, caught, in one turn, last written at `at`. */
+const sessionStats = (at: number) => ({
+  v: 1,
+  encounters: 1,
+  catches: 1,
+  flees: 0,
+  runs: 0,
+  turns: 1,
+  startedAt: at,
+  updatedAt: at,
+  biomes: { 'whispering-forest': { encounters: 1, catches: 1, flees: 0, runs: 0 } },
+})
+
+const DAY = 24 * 60 * 60 * 1000
+
+/** The Stats tab's rows as plain text, one string per row (P3-04). */
+async function statsRows(pane: any): Promise<string[]> {
+  const rows = (await pane.findAll({ type: 'Box' })).filter((box: any) => /^stats-\d+$/.test(box.key ?? ''))
+  return rows.map((row: any) => row.text)
+}
+
 /** Whether the header row holds the tabs (inline and wide), found by their keys in its children. */
 async function tabsInHeader(pane: any): Promise<boolean> {
   const header = await pane.find({ type: 'Box', key: 'header' })
@@ -139,7 +165,7 @@ describe('register: collection pane', () => {
     await start($, on)
     const pane = await mountPane($)
     await pane.press({ key: 'stats' })
-    expect(await pane.find({ type: 'Text', text: 'Your hunting stats will show here.' })).toBeDefined()
+    expect(await pane.find({ type: 'Text', text: 'No hunts yet. Modsters show up while Claude works.' })).toBeDefined()
     expect((await pane.find({ type: 'Button', key: 'stats' }))?.props.dimColor).toBeUndefined()
     expect((await pane.find({ type: 'Button', key: 'collection' }))?.props.dimColor).toBe(true)
     await pane.press({ key: 'settings' })
@@ -462,6 +488,31 @@ describe('register: collection pane', () => {
     await pane.press({ key: 'biomes' })
     expect(await pane.find({ type: 'Raster', key: 'biomes-scene' })).toBeUndefined()
     await pane.press({ key: 'collection' })
+    await pane.unmount()
+  })
+
+  test('the Stats tab sums every session and folds ones idle 24 hours into stats:total (0029)', async ($, on) => {
+    const stored: Record<string, unknown> = { 'stats:old': sessionStats(0), 'stats:recent': sessionStats(3 * DAY - 1000) }
+    await start($, on, () => [], oneModsterForest(), stored, 3 * DAY)
+    const pane = await mountPane($, DOCK)
+    await pane.press({ key: 'stats' })
+    const rows = await statsRows(pane)
+    expect(rows.slice(0, 2)).toEqual(['Encounters 2  Caught 2  Fled 0  Ran 0', 'Catch ratio 100%  Turns 2'])
+    expect(rows.at(-1)).toBe('Whispering Forest      2      2      0      0   100%')
+    expect(Object.keys(stored).sort()).toEqual(['stats:recent', 'stats:total'])
+    await pane.unmount()
+  })
+
+  test('this session\'s turns show when the Stats tab opens again', async ($, on) => {
+    await start($, on)
+    const pane = await mountPane($)
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await pane.press({ key: 'stats' })
+    expect((await statsRows(pane))[1]).toBe('Catch ratio —  Turns 1')
+    await pane.press({ key: 'collection' })
+    await $.turn.start({ text: 'again', turnId: 't2' } as any)
+    await pane.press({ key: 'stats' })
+    expect((await statsRows(pane))[1]).toBe('Catch ratio —  Turns 2')
     await pane.unmount()
   })
 })

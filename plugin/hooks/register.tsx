@@ -43,6 +43,7 @@ import {
   readDisplaySettings,
   sceneCells,
   spriteCells,
+  statsLines,
   type BandEncounter,
   type BandLine,
   type BiomeEntry,
@@ -55,6 +56,7 @@ import {
 import {
   HUNT_PANE_KEY,
   caughtKey,
+  compactStats,
   huntPanePref,
   isCaught,
   prefAfterClose,
@@ -63,7 +65,8 @@ import {
   recordEncounterEvents,
   recordStat,
   type CaughtRecord,
-  type StorePort,
+  type SessionStats,
+  type StatsStorePort,
 } from './store'
 
 // Rebuilt at every session start; cheap, so it isn't kept in $.state (ARCHITECTURE.md)
@@ -135,6 +138,9 @@ const collectionRecords = new Map<string, CaughtRecord>()
 let collectionSelected: string | undefined
 // The Biomes tab's selection (P3-03); none yet means the session's biome
 let biomesSelected: string | undefined
+// The Stats tab (P3-04): every session's counts summed, read when the tab shows.
+// Undefined until the first read finishes
+let statsShown: { stats: SessionStats | undefined } | undefined
 // Its sprite animates on a loop of its own: the encounter's loop follows the encounter's Modster
 const COLLECTION_SPRITE_KEY = 'collection-sprite'
 const silhouettes = new Map<string, string>()
@@ -469,6 +475,7 @@ export const register: Register = (on, options) => {
         plain
         {...(tab.id === collectionTab ? {} : { dimColor: true })}
         onPress={() => {
+          if (tab.id === 'stats' && collectionTab !== 'stats') loadStats($)
           collectionTab = tab.id
           $.ui.invalidate('ui.render')
         }}
@@ -532,9 +539,32 @@ export const register: Register = (on, options) => {
           ? collectionView(e.props.scroll.bodyRows - usedRows)
           : collectionTab === 'biomes'
             ? biomesView(e.props.scroll.bodyRows - usedRows)
-            : <Text key="body">{tab?.placeholder}</Text>}
+            : collectionTab === 'stats'
+              ? statsView()
+              : <Text key="body">{tab?.placeholder}</Text>}
       </Box>
     )
+
+    /** The Stats tab: the totals and a row per biome (P3-04). */
+    function statsView() {
+      if (!statsShown) {
+        return (
+          <Text key="stats" dimColor>
+            Counting…
+          </Text>
+        )
+      }
+      const biomes = new Map([...(content?.biomes.values() ?? [])].map(({ biome: loaded }) => [loaded.id, { name: loaded.name, ...(loaded.accentColor ? { accentColor: loaded.accentColor } : {}) }]))
+      return (
+        <Box key="stats" flexDirection="column">
+          {statsLines(statsShown.stats, biomes).map((line, at) => (
+            <Box key={`stats-${at}`} flexDirection="row">
+              {texts(line, 'truncate')}
+            </Box>
+          ))}
+        </Box>
+      )
+    }
 
     /** The Biomes tab: a summary line with k/j, the biome list, and the selected biome's odds (P3-03). */
     function biomesView(rows: number) {
@@ -751,6 +781,7 @@ export const register: Register = (on, options) => {
     }
     // Catches from other sessions show up when the pane opens
     loadCollectionRecords($)
+    if (collectionTab === 'stats') loadStats($)
     await pendingWrites
     // The person asked for it, so the pane takes the keys over an empty composer (0024)
     const opened = await $.ui.open({ id: COLLECTION_PANE_ID, title: 'Modster collection', focus: true, closeOnEscape: true })
@@ -876,10 +907,12 @@ function checkAlreadyCaught($: EngineInterface, modsterId: string): void {
 }
 
 /** Runs a store write after the ones before it; a failure is logged, never thrown at the game. */
-function queueWrite($: EngineInterface, write: (store: StorePort) => Promise<void>): void {
-  const store: StorePort = {
+function queueWrite($: EngineInterface, write: (store: StatsStorePort) => Promise<void>): void {
+  const store: StatsStorePort = {
     get: (key) => $.store.get(key),
     set: (key, value) => $.store.set(key, value),
+    keys: () => $.store.keys(),
+    delete: (key) => $.store.delete(key),
   }
   pendingWrites = pendingWrites
     .then(() => write(store))
@@ -1034,6 +1067,15 @@ function loadCollectionRecords($: EngineInterface): void {
     const records = await Promise.all(ids.map(async (id) => [id, readCaughtRecord(await store.get(caughtKey(id)))] as const))
     collectionRecords.clear()
     for (const [id, record] of records) if (record) collectionRecords.set(id, record)
+    $.ui.invalidate('ui.render')
+  })
+}
+
+/** Sums every session's stats, folding idle ones into `stats:total` first (0029), after the writes before it. */
+function loadStats($: EngineInterface): void {
+  queueWrite($, async (store) => {
+    const now = await $.clock.now()
+    statsShown = { stats: await compactStats(store, { sessionId, now }) }
     $.ui.invalidate('ui.render')
   })
 }
