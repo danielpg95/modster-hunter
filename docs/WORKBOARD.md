@@ -15,13 +15,13 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
+| P3-02 | @danielpg95 | in-progress | p3-02-collection-grid | 2026-10-13 | 2026-10-13 | Build the Collection tab as a list (left, `j`/`k` to move) beside the selected Modster's sprite and dex (right) |
 
 ## Up next
 
 Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
-- **P3-02** — Collection grid
 - **P3-03** — Biomes tab
 - **P3-04** — Stats tab
 - **P4-02** — `/modsters reload` and error reporting
