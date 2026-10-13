@@ -4,6 +4,9 @@
   "name": "Dustwind Expanse",
   "description": "Endless sand where the wind never stops talking.",
   "accentColor": "#e0a040",
+  "background": "background.sprite.json",
+  "backgroundFps": 2,
+  "particles": { "style": "sand", "color": "#b47c34", "density": 3 },
   "encounterEverySec": [10, 30],
   "modsters": [
     { "id": "dunebun", "weight": 100 },

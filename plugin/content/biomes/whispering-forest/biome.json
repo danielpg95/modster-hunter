@@ -4,6 +4,9 @@
   "name": "Whispering Forest",
   "description": "Tall pines, soft moss, something rustling.",
   "accentColor": "#4caf50",
+  "background": "background.sprite.json",
+  "backgroundFps": 2,
+  "particles": { "style": "leaf", "color": "#9ccc65", "density": 2 },
   "encounterEverySec": [10, 30],
   "modsters": [
     { "id": "hootlet", "weight": 100 },

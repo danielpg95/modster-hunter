@@ -493,7 +493,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Size:** M
 - **Goal:** every built-in biome gets an idle scene and particles (decision 0026).
 - **Done when:**
-  - [ ] Whispering Forest, Saltbreeze Bay, Dustwind Expanse and Crystal Grotto each have a `background` (about 12 px tall, edges that tile) and a `particles` style.
-  - [ ] A credits row in `plugin/content/CREDITS.md` for every scene.
-  - [ ] `npm run check:content` passes.
-  - [ ] A preview of every scene in the PR description (enlarged, every frame, dark and light).
+  - [x] Whispering Forest, Saltbreeze Bay, Dustwind Expanse and Crystal Grotto each have a `background` (about 12 px tall, edges that tile) and a `particles` style.
+  - [x] A credits row in `plugin/content/CREDITS.md` for every scene.
+  - [x] `npm run check:content` passes.
+  - [x] A preview of every scene in the PR description (enlarged, every frame, dark and light).
