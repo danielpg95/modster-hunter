@@ -310,6 +310,7 @@ Goal: `/modsters` opens a pane to browse what you've caught.
 - **Goal:** list biomes, the current one marked, each with its Modsters and their encounter %.
 - **Done when:**
   - [ ] Percentages match the P2-05 resolver.
+  - [ ] The selected biome's idle scene shows above the list, animated, and is left out when it doesn't fit (decision 0028).
 
 #### [ ] P3-04 — Stats tab
 - **Depends on:** P3-01

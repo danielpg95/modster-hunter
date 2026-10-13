@@ -41,3 +41,4 @@ settled questions and avoid making assumptions about open ones.
 | [0025](0025-user-content-helper.md) | The content skill ships a Node helper that converts, draws, previews and checks | Accepted |
 | [0026](0026-biome-idle-scene.md) | Between encounters the band shows the biome as an animated scene with particles | Accepted (amended by 0027) |
 | [0027](0027-pane-idle-scene.md) | Between encounters the encounter pane shows the biome's idle scene | Accepted |
+| [0028](0028-biomes-tab-scene.md) | The Biomes tab shows the selected biome's idle scene | Accepted |
