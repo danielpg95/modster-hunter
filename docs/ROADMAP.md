@@ -354,13 +354,13 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] Edits write valid JSON into the user folder; editing a built-in creates a user override.
   - [ ] Every edit is validated before writing.
 
-#### [ ] P4-04 — User-facing content skill
+#### [x] P4-04 — User-facing content skill
 - **Depends on:** P4-01, P2-02, P4-06
 - **Size:** M
 - **Goal:** `plugin/skills/create-modster-content/SKILL.md`: users ask Claude to create a biome or Modster (including pixel art), and it writes valid files into the user folder.
 - **Done when:**
-  - [ ] Claude converts PNG/GIF sprites through the converter (or the runtime path from 0016).
-  - [ ] Tested end to end by someone who didn't write it.
+  - [x] Claude converts PNG/GIF sprites through the converter (or the runtime path from 0016). The helper's `convert` (P4-06, 0025) for GIFs and PNGs, the runtime path for PNG sheets.
+  - [x] Tested end to end by someone who didn't write it. Waived by @danielpg95 on 2026-10-12: tested end to end by @danielpg95 (Crystal Grotto, 10 Modsters, now built-in as P5-12), not by someone else.
 
 #### [x] P4-06 — Content helper for users
 - **Depends on:** P4-01, P2-02
