@@ -1,5 +1,5 @@
 import type { EngineInterface, Register, Timer } from 'claude-code'
-import { BAND, USER_CONTENT } from './constants'
+import { BAND, COLLECTION, USER_CONTENT } from './constants'
 import {
   cachedSheetLoader,
   formatIssue,
@@ -20,7 +20,9 @@ import {
 } from './game'
 import {
   BAND_BUTTONS,
+  COLLECTION_TABS,
   bandView,
+  collectionLayout,
   displayPlan,
   idleScene,
   isAnimated,
@@ -31,6 +33,7 @@ import {
   spriteCells,
   type BandEncounter,
   type BandLine,
+  type CollectionTab,
   type DisplayPlan,
   type IdleScene,
   type Particle,
@@ -94,8 +97,11 @@ let alreadyCaught = false
 /** Bumped on every appearance, so a slow read never marks a later encounter */
 let caughtCheck = 0
 
-// Points people to the settings until the collection pane has its own (0023 point 7)
-const CONFIG_HINT = ' · Change where the game shows in /config'
+// The collection pane (decision 0002, P3-01), opened with `/modsters`. Separate from
+// the encounter pane (0015); Esc closes it
+const COLLECTION_PANE_ID = 'modster-collection'
+// The tab it shows; kept while the module lives, so a reopened pane shows the last one
+let collectionTab: CollectionTab = 'collection'
 
 export const register: Register = (on, options) => {
   const idleTimeoutSec = typeof options.encounterIdleTimeoutSec === 'number' ? options.encounterIdleTimeoutSec : 90
@@ -390,6 +396,73 @@ export const register: Register = (on, options) => {
     )
   })
 
+  // The collection pane (P3-01): tabs on hotkeys 1–4, which fire while the pane
+  // holds the keys. Inline the tabs share the header row when they fit; docked
+  // they get a row, or a row each when the dock is narrow
+  on('ui.render', { component: 'Pane' }, ($, e, next) => {
+    if (e.requestId !== COLLECTION_PANE_ID) return next(e)
+    const { Box, Text, Button } = $.ui.resolve(e)
+    const biome = biomeId === undefined ? undefined : content?.biomes.get(biomeId)?.biome
+    const title = biome ? biome.name : 'No biome'
+    const layout = collectionLayout({
+      placement: e.props.placement,
+      isFocused: e.props.isFocused,
+      columns: e.props.bodyColumns,
+      titleColumns: title.length,
+    })
+    const tabButtons = COLLECTION_TABS.map((tab) => (
+      <Button
+        key={tab.id}
+        label={tab.label}
+        hotkey={tab.hotkey}
+        plain
+        {...(tab.id === collectionTab ? {} : { dimColor: true })}
+        onPress={() => {
+          collectionTab = tab.id
+          $.ui.invalidate('ui.render')
+        }}
+      />
+    ))
+    const tabs =
+      layout.tabs === 'column' ? (
+        <Box key="tabs" flexDirection="column">
+          {tabButtons}
+        </Box>
+      ) : (
+        <Box key="tabs" flexDirection="row" columnGap={COLLECTION.tabGapColumns}>
+          {tabButtons}
+        </Box>
+      )
+    const header = (
+      <Box key="header" flexDirection="row">
+        <Text key="title" bold {...(biome?.accentColor ? { color: biome.accentColor } : {})}>
+          {title}
+        </Text>
+        {layout.tabs === 'beside' ? <Text key="tabs-gap">{' '.repeat(COLLECTION.tabGapColumns)}</Text> : null}
+        {layout.tabs === 'beside' ? tabs : null}
+        {layout.hint ? (
+          <Text key="hint" dimColor>
+            {layout.hint}
+          </Text>
+        ) : null}
+      </Box>
+    )
+    const tab = COLLECTION_TABS.find((info) => info.id === collectionTab) ?? COLLECTION_TABS[0]
+    return (
+      <Box flexDirection="column">
+        {header}
+        {layout.tabs === 'beside' ? null : tabs}
+        <Text key="gap"> </Text>
+        {biome ? null : (
+          <Text key="no-biome" dimColor>
+            {noBiomesMessage(includeBuiltins, USER_FOLDER_LABEL)}
+          </Text>
+        )}
+        <Text key="body">{tab?.placeholder}</Text>
+      </Box>
+    )
+  })
+
   // The spinner names the Modster while Claude works (0023 point 5). Subagents'
   // rows keep their own words; their requestId is the agent id
   on('ui.render', { component: 'Spinner' }, ($, e, next) => {
@@ -421,13 +494,9 @@ export const register: Register = (on, options) => {
       $.ui.invalidate('ui.render')
       return opened.isPlaced ? {} : { text: 'Modster Hunter: the pane is waiting for more room (widen the terminal)' }
     }
-    // Until the collection pane (P3-01), the command says where you are
-    const biome = biomeId === undefined ? undefined : content?.biomes.get(biomeId)?.biome
-    return {
-      text: biome
-        ? `Modster Hunter is loaded · You're in ${biome.name}${CONFIG_HINT}`
-        : `Modster Hunter is loaded · ${noBiomesMessage(includeBuiltins, USER_FOLDER_LABEL)}${CONFIG_HINT}`,
-    }
+    // The person asked for it, so the pane takes the keys over an empty composer (0024)
+    const opened = await $.ui.open({ id: COLLECTION_PANE_ID, title: 'Modster collection', focus: true, closeOnEscape: true })
+    return opened.isPlaced ? {} : { text: 'Modster Hunter: the collection is waiting for more room (widen the terminal)' }
   })
 }
 
