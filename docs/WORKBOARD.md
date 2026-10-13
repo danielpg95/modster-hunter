@@ -21,5 +21,8 @@ this file lists only tasks someone has claimed.
 Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
-- **P2-10** — Phase 2 playtest
+- **P3-01** — Pane shell and tabs
+- **P5-01** — Shiny variants
+- **P5-02** — Sounds
+- **P5-05** — Light skill catch experiment
 - **P5-09** — Sprite miniatures (spike)
