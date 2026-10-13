@@ -15,6 +15,8 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
+| P5-13 | @danielpg95 | in-progress | p5-13-idle-scene | 2026-10-12 | 2026-10-12 | Extend the biome validator for multi-frame `background`, `backgroundFps` and `particles` (0026), with tests |
+| P5-14 | @danielpg95 | in-progress | p5-14-biome-scenes | 2026-10-12 | 2026-10-12 | Started before P5-13 is done (accepted by @danielpg95); stacked on p5-13-idle-scene. Draw the four 48×12 painted scenes |
 
 ## Up next
 
