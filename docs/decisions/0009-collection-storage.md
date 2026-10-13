@@ -1,6 +1,6 @@
 # 0009 — One `$.store` key per Modster
 
-- **Status:** Accepted
+- **Status:** Accepted (compaction detailed by 0029)
 - **Date:** 2026-10-07
 - **Decided by:** @danielpg95
 

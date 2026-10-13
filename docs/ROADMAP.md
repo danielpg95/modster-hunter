@@ -317,7 +317,7 @@ Goal: `/modsters` opens a pane to browse what you've caught.
 - **Size:** S
 - **Goal:** totals: encounters, catches, flees, catch ratio, turns played, by biome.
 - **Done when:**
-  - [ ] Aggregates `stats:*` keys and compacts old ones (decision 0009).
+  - [ ] Aggregates `stats:*` keys and compacts old ones (decisions 0009, 0029).
 
 #### [ ] P3-05 — Phase 3 review
 - **Depends on:** P3-02, P3-03, P3-04
