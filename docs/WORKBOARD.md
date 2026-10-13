@@ -15,13 +15,13 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
+| P3-01 | @danielpg95 | in-progress | p3-01-pane-shell | 2026-10-12 | 2026-10-12 | Replace the `/modsters` reply with a focused pane (Esc closes) and four tab stubs on hotkeys `1`–`4` |
 
 ## Up next
 
 Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
-- **P3-01** — Pane shell and tabs
 - **P5-01** — Shiny variants
 - **P5-02** — Sounds
 - **P5-05** — Light skill catch experiment
