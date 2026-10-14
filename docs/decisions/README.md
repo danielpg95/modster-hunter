@@ -36,7 +36,7 @@ settled questions and avoid making assumptions about open ones.
 | [0020](0020-run-from-an-encounter.md) | The player can run from an encounter with `2: Run` | Accepted |
 | [0021](0021-sprites-up-to-48x48.md) | Sprites up to 48×48; the compact band shows when they don't fit | Accepted |
 | [0022](0022-up-to-two-types.md) | A Modster has one or two types, the first one primary | Accepted |
-| [0023](0023-display-settings.md) | Display settings: one toggle per place, a pane picker, and a one-line band that keeps Throw | Accepted |
+| [0023](0023-display-settings.md) | Display settings: one toggle per place, a pane picker, and a one-line band that keeps Throw | Accepted (point 7 amended by P3-01) |
 | [0024](0024-encounter-pane-focus.md) | `/modsters hunt` gives the encounter pane the keys, and the pane says how to switch | Accepted |
 | [0025](0025-user-content-helper.md) | The content skill ships a Node helper that converts, draws, previews and checks | Accepted |
 | [0026](0026-biome-idle-scene.md) | Between encounters the band shows the biome as an animated scene with particles | Accepted (amended by 0027) |
