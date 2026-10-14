@@ -29,4 +29,5 @@ list when you finish a task.
 - **P5-05** — Light skill catch experiment
 - **P5-06** — Desktop app support
 - **P5-09** — Sprite miniatures (spike)
+- **P5-15** — Keep the game running after `/clear`
 - **P5-16** — Tier-first encounters
