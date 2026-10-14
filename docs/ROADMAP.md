@@ -319,12 +319,12 @@ Goal: `/modsters` opens a pane to browse what you've caught.
 - **Done when:**
   - [x] Aggregates `stats:*` keys and compacts old ones (decisions 0009, 0029).
 
-#### [ ] P3-05 — Phase 3 review
+#### [x] P3-05 — Phase 3 review
 - **Depends on:** P3-02, P3-03, P3-04
 - **Size:** S
 - **Goal:** phase review written.
 - **Done when:**
-  - [ ] Review in `docs/sessions/`.
+  - [x] Review in `docs/sessions/`.
 
 ---
 
@@ -346,14 +346,18 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Goal:** reload content without restarting; Settings tab lists every content error.
 - **Done when:**
   - [ ] An in-progress encounter is unaffected by reload.
+  - [ ] The Settings tab lists every content error, each formatted with `formatIssue`, with a test.
+  - [ ] After a reload, the collection pane re-reads caught records (`loadCollectionRecords`) and drops the cached `silhouettes`, `cellsByModster` and `biomeScenes`, and the Biomes scene site, with a test (from the phase 3 review).
+  - [ ] The unused tab `placeholder` entries in `plugin/hooks/render/collection-tabs.ts` are removed.
 
-#### [ ] P4-03 — In-pane editor
+#### [ ] P4-03 — In-pane enable, disable and delete
 - **Depends on:** P4-02
-- **Size:** L
-- **Goal:** edit a biome's or Modster's name, weights, catch rate, attempts; enable/disable; delete user items (with confirmation).
+- **Size:** S
+- **Goal:** enable or disable a biome or Modster, and delete user items (with confirmation), from the collection pane. Field editing moved to P4-07 (phase 3 review).
 - **Done when:**
-  - [ ] Edits write valid JSON into the user folder; editing a built-in creates a user override.
-  - [ ] Every edit is validated before writing.
+  - [ ] Enable and disable write the user folder's disable lists (0007); disabling a built-in never touches `plugin/content/`.
+  - [ ] Delete asks for confirmation, removes only user files, and is offered only for user items.
+  - [ ] The result is validated before writing, with tests.
 
 #### [x] P4-04 — User-facing content skill
 - **Depends on:** P4-01, P2-02, P4-06
@@ -377,8 +381,17 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Writes only the files it's asked to; a Node too old to run it gets one clear message.
   - [x] Unit tests under `plugin/tests/` for the GIF decoder, `draw` and `check`.
 
+#### [ ] P4-07 — In-pane field editor
+- **Depends on:** P4-03, P5-17
+- **Size:** M
+- **Goal:** edit a biome's or Modster's name, tier, throws and catch rate from the collection pane, using the tier model P5-17 settles (0030 or its successor).
+- **Done when:**
+  - [ ] Edits write valid JSON into the user folder; editing a built-in creates a user override (0007).
+  - [ ] Every edit is validated before writing, with tests.
+- **Why:** split from P4-03 in the phase 3 review. Tier-first encounters (0030) replaced weights, and P5-17 may change which tier fields a player can set.
+
 #### [ ] P4-05 — Phase 4 review
-- **Depends on:** P4-02, P4-03, P4-04, P4-06
+- **Depends on:** P4-02, P4-03, P4-04, P4-06, P4-07
 - **Size:** S
 - **Goal:** phase review written.
 - **Done when:**
@@ -529,3 +542,12 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] A spike looks at three options for user content: new named tiers (e.g. `mythic`) with their own weight, throws and catch rate; tier weights set per user biome; and retuning the four built-in tiers for all of a player's content. For each: the file shape, how it merges with built-in content (0007), what the stored `bestTier`, the Biomes tab and the lopsided-tier warning (0030 point 6) do with it, and whether band text still fits (0012).
   - [ ] The findings go in a Proposed decision in `docs/decisions/` that picks one or more options, or none, for @danielpg95 to settle.
   - [ ] If an option is picked, roadmap tasks implement it, each with validator and pick tests.
+
+#### [ ] P5-18 — Live Stats tab
+- **Depends on:** P3-04
+- **Size:** S
+- **Goal:** the Stats tab refreshes while it's open, after each encounter ends, instead of only when `3` is pressed.
+- **Done when:**
+  - [ ] An encounter that ends while the Stats tab is shown updates its totals and biome table, with a register test.
+  - [ ] No extra `$.store` reads while another tab is shown or the pane is closed.
+- **Why:** found during P3-04 (2026-10-13), recorded in the phase 3 review.

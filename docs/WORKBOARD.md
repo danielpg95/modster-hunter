@@ -15,7 +15,6 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P3-05 | @danielpg95 | in-progress | p3-05-phase-review | 2026-10-13 | 2026-10-13 | Run the phase-review skill and write the phase 3 review |
 
 ## Up next
 
@@ -30,3 +29,4 @@ list when you finish a task.
 - **P5-06** — Desktop app support
 - **P5-09** — Sprite miniatures (spike)
 - **P5-17** — Player-defined tiers (spike)
+- **P5-18** — Live Stats tab
