@@ -520,3 +520,12 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] The content check warns when a Modster appears less often than one in a rarer tier of the same biome (0030 point 6), with a test.
   - [x] The Biomes tab and `formatOddsTable` show the tier share and each Modster's share (0030 point 7).
   - [x] `docs/CONTENT_FORMAT.md`, the `add-biome` and `add-modster` skills, and `plugin/skills/create-modster-content/` (with `reference/format.md`) describe tiers instead of weights.
+
+#### [ ] P5-17 — Player-defined tiers (spike)
+- **Depends on:** P5-16
+- **Size:** S
+- **Goal:** decide whether players may define their own rarity tiers in user content, and how (asked by @danielpg95 after P5-16).
+- **Done when:**
+  - [ ] A spike looks at three options for user content: new named tiers (e.g. `mythic`) with their own weight, throws and catch rate; tier weights set per user biome; and retuning the four built-in tiers for all of a player's content. For each: the file shape, how it merges with built-in content (0007), what the stored `bestTier`, the Biomes tab and the lopsided-tier warning (0030 point 6) do with it, and whether band text still fits (0012).
+  - [ ] The findings go in a Proposed decision in `docs/decisions/` that picks one or more options, or none, for @danielpg95 to settle.
+  - [ ] If an option is picked, roadmap tasks implement it, each with validator and pick tests.
