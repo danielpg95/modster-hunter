@@ -63,12 +63,14 @@ mod's `create-modster-content` skill in `plugin/skills/`.)
 4. **Convert:** `npm run sprite -- plugin/content/modsters/<id>/sprite.png --frames N`.
    Never hand-edit the output.
 5. **Write `modster.json`** from `docs/templates/content/modster.json`. Leave
-   `rarity`, `maxAttempts`, `catchRate` as `null` unless the user asks for an
-   override (decision 0004). Fill in every `dex` field; `dex.number` is the
+   `rarity` to the intended tier (required, decision 0030). Leave `maxAttempts`
+   and `catchRate` as `null` unless the user asks for an override (decision 0004). Fill in every `dex` field; `dex.number` is the
    next free number among the official built-in Modsters (decision 0017).
    Placeholder Modsters use numbers from 901 up.
-6. **Add it to a biome:** an entry with a `weight` in that biome's `biome.json`.
-   Show the user the biome's resulting odds table (percent per Modster).
+6. **Add it to a biome:** an entry `{ "id": "<id>" }` in that biome's
+   `biome.json`, with its own `"rarity"` only if it belongs to another tier
+   there. Show the user the biome's resulting odds table (tier share and
+   percent per Modster).
 7. **Credit it** in `plugin/content/CREDITS.md`.
 8. **Validate:** `npm run check:content` (prints the biome's odds table) and
    `claude plugin test ./plugin`.

@@ -3,7 +3,7 @@
   "id": "crabbit",
   "name": "Crabbit",
   "description": "Lives in a shell three sizes too big. Says it'll grow into it.",
-  "rarity": null,
+  "rarity": "common",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,

@@ -13,6 +13,7 @@ export {
 } from './encounter-machine'
 export { formatOddsTable, oddsTable, type OddsRow } from './odds-table'
 export { pickBiome } from './pick-biome'
+export { encounterPool, pickEncounter, tierChances, type PoolMember } from './pick-encounter'
 export { pickWeighted } from './pick-weighted'
 export type { RandomSource } from './random-source'
 export { rarityTier } from './rarity-tier'

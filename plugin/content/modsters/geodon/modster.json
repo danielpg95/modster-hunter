@@ -3,7 +3,7 @@
   "id": "geodon",
   "name": "Geodon",
   "description": "Its shell is a geode. Tap it and you'll hear the crystals inside ring.",
-  "rarity": null,
+  "rarity": "rare",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,

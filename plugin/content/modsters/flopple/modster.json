@@ -3,7 +3,7 @@
   "id": "flopple",
   "name": "Flopple",
   "description": "Naps on warm rocks until the tide carries it off. Then naps in the water.",
-  "rarity": null,
+  "rarity": "uncommon",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,

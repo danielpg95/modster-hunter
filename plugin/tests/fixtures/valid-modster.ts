@@ -5,7 +5,7 @@ export function validModster(): Record<string, unknown> {
     id: 'sproutling',
     name: 'Sproutling',
     description: 'A seed that learned to walk. Very proud of it.',
-    rarity: null,
+    rarity: 'common',
     maxAttempts: null,
     catchRate: null,
     shinyChance: null,

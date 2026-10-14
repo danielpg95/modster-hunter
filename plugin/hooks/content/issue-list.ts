@@ -34,7 +34,7 @@ export class IssueList {
   }
 }
 
-/** One line for logs and the Settings tab: `biomes/forest/biome.json: modsters[1].weight must be …` */
+/** One line for logs and the Settings tab: `biomes/forest/biome.json: modsters[1].rarity must be …` */
 export function formatIssue(issue: ContentIssue): string {
   const where = issue.field ? `${issue.file}: ${issue.field}` : issue.file
   const tag = issue.severity === 'warning' ? ' (warning)' : ''

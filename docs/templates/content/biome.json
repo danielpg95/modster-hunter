@@ -6,8 +6,8 @@
   "accentColor": "#4caf50",
   "encounterEverySec": [10, 30],
   "modsters": [
-    { "id": "common-modster-id", "weight": 60 },
-    { "id": "uncommon-modster-id", "weight": 15 },
-    { "id": "rare-modster-id", "weight": 4 }
+    { "id": "common-modster-id" },
+    { "id": "uncommon-modster-id" },
+    { "id": "rare-modster-id" }
   ]
 }

@@ -11,7 +11,7 @@ const LABEL = '~/.claude/modster-hunter/content/'
 /** One biome listing one Modster, written under `root`. */
 function biomeWith(root: string, biomeId: string, modsterId: string, name = modsterId): Record<string, string> {
   return {
-    [`${root}/biomes/${biomeId}/biome.json`]: JSON.stringify({ schemaVersion: 1, id: biomeId, name: biomeId, modsters: [{ id: modsterId, weight: 1 }] }),
+    [`${root}/biomes/${biomeId}/biome.json`]: JSON.stringify({ schemaVersion: 1, id: biomeId, name: biomeId, modsters: [{ id: modsterId }] }),
     [`${root}/modsters/${modsterId}/modster.json`]: JSON.stringify({ ...validUserModster(), id: modsterId, name }),
     [`${root}/modsters/${modsterId}/sprite.sprite.json`]: JSON.stringify(validSprite()),
   }

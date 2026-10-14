@@ -4,7 +4,7 @@ import { validSprite } from './valid-sprite'
 
 /**
  * Content files (for stubContentFs) of oneModsterForest plus "Ash Dunes":
- * Sproutling (weight 3, 75%, common) and Emberkit (#002, weight 1, 25%, common).
+ * Sproutling and Emberkit (#002), both common, so 50% each.
  */
 export function twoBiomes(): Record<string, string> {
   const modster = validModster()
@@ -16,8 +16,8 @@ export function twoBiomes(): Record<string, string> {
       name: 'Ash Dunes',
       encounterEverySec: [3, 3],
       modsters: [
-        { id: 'sproutling', weight: 3 },
-        { id: 'emberkit', weight: 1 },
+        { id: 'sproutling' },
+        { id: 'emberkit' },
       ],
     }),
     'modsters/emberkit/modster.json': JSON.stringify({

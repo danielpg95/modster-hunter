@@ -23,6 +23,8 @@ const INVALID: [string, (modster: Modster) => void, string][] = [
   ['a description over 120 characters is an error', (m) => (m.description = 'd'.repeat(121)), 'description'],
   ['an unknown rarity is an error', (m) => (m.rarity = 'epic'), 'rarity'],
   ['a rarity with capitals is an error', (m) => (m.rarity = 'Rare'), 'rarity'],
+  ['a missing rarity is an error (decision 0030)', (m) => delete m.rarity, 'rarity'],
+  ['a null rarity is an error (decision 0030)', (m) => (m.rarity = null), 'rarity'],
   ['maxAttempts of 0 is an error', (m) => (m.maxAttempts = 0), 'maxAttempts'],
   ['maxAttempts over 10 is an error', (m) => (m.maxAttempts = 11), 'maxAttempts'],
   ['fractional maxAttempts is an error', (m) => (m.maxAttempts = 3.5), 'maxAttempts'],
@@ -71,7 +73,7 @@ describe('validateModster', () => {
   })
 
   test('only the required fields are enough', () => {
-    const modster = { schemaVersion: 1, id: 'sproutling', name: 'S', sprite: { file: 'sprite.sprite.json' } }
+    const modster = { schemaVersion: 1, id: 'sproutling', name: 'S', rarity: 'common', sprite: { file: 'sprite.sprite.json' } }
     expect(validateModster(modster, where).ok).toBe(true)
   })
 

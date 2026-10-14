@@ -1,13 +1,12 @@
 import { CONTENT, MODSTER_TYPES } from '../constants'
-import { checkKeys, checkNumber, checkPattern, checkSchemaVersion, checkString, describe, fieldPath, isObject, type JsonObject } from './fields'
+import { checkKeys, checkNumber, checkPattern, checkRarity, checkSchemaVersion, checkString, describe, fieldPath, isObject, type JsonObject } from './fields'
 import { IssueList } from './issue-list'
-import type { Modster, Rarity, Validation } from './types'
+import type { Modster, Validation } from './types'
 
 const KEYS = ['schemaVersion', 'id', 'name', 'description', 'rarity', 'maxAttempts', 'catchRate', 'shinyChance', 'dex', 'sprite']
-const REQUIRED = ['schemaVersion', 'id', 'name', 'sprite']
+const REQUIRED = ['schemaVersion', 'id', 'name', 'rarity', 'sprite']
 const SPRITE_KEYS = ['file', 'frames', 'fps']
 const SPRITE_REQUIRED = ['file']
-const RARITIES: readonly Rarity[] = ['common', 'uncommon', 'rare', 'legendary']
 // `type` is listed only so its rename error isn't doubled by "not a known field" (decision 0022)
 const DEX_KEYS = ['number', 'types', 'type', 'category', 'heightM', 'weightKg', 'entry']
 const TYPES = Object.keys(MODSTER_TYPES)
@@ -30,7 +29,7 @@ export function validateModster(input: unknown, where: { file: string; folder: s
   }
   checkString(input, 'name', { min: 1, max: CONTENT.modster.nameMaxChars }, issues)
   checkString(input, 'description', { min: 0, max: CONTENT.descriptionMaxChars }, issues)
-  checkRarity(input.rarity, issues)
+  checkRarity(input, issues)
   // null means "use the tier default" (decision 0004)
   checkNumber(input, 'maxAttempts', { min: CONTENT.maxAttemptsMin, max: CONTENT.maxAttemptsMax, integer: true, nullable: true }, issues)
   checkNumber(input, 'catchRate', { min: CONTENT.catchRateMin, max: CONTENT.catchRateMax, nullable: true }, issues)
@@ -39,13 +38,6 @@ export function validateModster(input: unknown, where: { file: string; folder: s
   checkSprite(input.sprite, where.userContent === true, issues)
 
   return issues.result(input as unknown as Modster)
-}
-
-function checkRarity(value: unknown, issues: IssueList): void {
-  if (value === undefined || value === null) return
-  if (!RARITIES.some((rarity) => rarity === value)) {
-    issues.error('rarity', `must be ${RARITIES.join(', ')} or null (it is ${describe(value)})`)
-  }
 }
 
 function checkDex(value: unknown, userContent: boolean, issues: IssueList): void {

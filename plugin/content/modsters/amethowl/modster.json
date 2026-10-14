@@ -3,7 +3,7 @@
   "id": "amethowl",
   "name": "Amethowl",
   "description": "Its eyes glow like amethyst. It sees in the dark and remembers every tunnel.",
-  "rarity": null,
+  "rarity": "rare",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,

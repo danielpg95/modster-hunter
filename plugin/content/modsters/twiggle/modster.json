@@ -3,7 +3,7 @@
   "id": "twiggle",
   "name": "Twiggle",
   "description": "Rolls wherever the wind goes. Peeks out only when it thinks nobody is looking.",
-  "rarity": null,
+  "rarity": "uncommon",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,

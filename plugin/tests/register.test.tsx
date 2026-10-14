@@ -11,7 +11,7 @@ import { validSprite } from './fixtures/valid-sprite'
 
 /** A user folder (paths under ~/.claude/modster-hunter/) with one biome whose Modster is a 2-frame PNG sheet. */
 function userPngMeadow(): Record<string, string> {
-  const biome = { schemaVersion: 1, id: 'pixel-meadow', name: 'Pixel Meadow', modsters: [{ id: 'blobby', weight: 1 }] }
+  const biome = { schemaVersion: 1, id: 'pixel-meadow', name: 'Pixel Meadow', modsters: [{ id: 'blobby' }] }
   const modster = { ...validUserModster(), id: 'blobby', name: 'Blobby', sprite: { file: 'sprite.png', frames: 2 } }
   const samples = Array.from({ length: 16 * 8 }, (_, i) => (i % 5 === 0 ? 1 : 0))
   const png = encodePng({ width: 16, height: 8, colorType: 3, bitDepth: 1, samples, palette: [0, 0, 0, 46, 125, 50], transparency: [0] })
@@ -26,7 +26,7 @@ function userPngMeadow(): Record<string, string> {
 function twoBiomes(): Record<string, string> {
   const files: Record<string, string> = {}
   for (const [biome, name] of [['whispering-forest', 'Whispering Forest'], ['tidepool-shallows', 'Tidepool Shallows']] as const) {
-    const json: Record<string, unknown> = { ...validBiome(), id: biome, name, modsters: [{ id: 'sproutling', weight: 1 }] }
+    const json: Record<string, unknown> = { ...validBiome(), id: biome, name, modsters: [{ id: 'sproutling' }] }
     delete json.background
     files[`biomes/${biome}/biome.json`] = JSON.stringify(json)
   }

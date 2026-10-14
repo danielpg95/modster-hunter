@@ -1,5 +1,6 @@
 export { cachedSheetLoader, type SheetFiles } from './cached-sheet-loader'
 export { checkBiomeReferences } from './check-biome-references'
+export { checkTierBalance } from './check-tier-balance'
 export { formatIssue } from './issue-list'
 export { loadAllContent, type ContentFolders } from './load-all-content'
 export {

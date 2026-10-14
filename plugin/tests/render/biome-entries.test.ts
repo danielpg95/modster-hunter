@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'claude-code/testing'
 import { validateBiome, type Biome, type LoadedBiome, type LoadedModster, type Sprite } from '../../hooks/content'
 import { formatOddsTable, oddsTable } from '../../hooks/game'
-import { biomeEntries } from '../../hooks/render'
+import { biomeEntries, tierSections } from '../../hooks/render'
 import type { CaughtRecord } from '../../hooks/store'
 import { modsterNamed } from '../fixtures/modster-named'
 import { validBiome } from '../fixtures/valid-biome'
@@ -27,7 +27,7 @@ const modsters = new Map<string, LoadedModster>([
 ])
 const forest: LoadedBiome = { biome: exampleBiome(), file: 'biome.json' }
 const dunes: LoadedBiome = {
-  biome: { schemaVersion: 1, id: 'ash-dunes', name: 'Ash Dunes', encounterEverySec: [8, 20], modsters: [{ id: 'mossbeast', weight: 1 }] } as Biome,
+  biome: { schemaVersion: 1, id: 'ash-dunes', name: 'Ash Dunes', encounterEverySec: [8, 20], modsters: [{ id: 'mossbeast' }] } as Biome,
   file: 'biome.json',
 }
 const record: CaughtRecord = { v: 1, count: 2, shinyCount: 0, firstCaughtAt: 0, lastCaughtAt: 0, bestTier: 'common', biomes: { 'ash-dunes': 2 } }
@@ -64,8 +64,19 @@ describe('biomeEntries', () => {
     ])
   })
 
-  test('an entry whose Modster did not load is left out, and its weight with it', () => {
+  test('an entry whose Modster did not load is left out, and its share with it', () => {
     const [entry] = biomeEntries([forest], new Map([['sproutling', loaded('sproutling', 'Sproutling', 1)]]), new Map(), undefined)
     expect(entry?.odds.map((row) => [row.id, row.encounterChance])).toEqual([['sproutling', 1]])
+  })
+
+  test('tierSections groups the odds by tier, most common first, each in the biome order', () => {
+    const dunesFirst: LoadedBiome = { ...forest, biome: { ...forest.biome, modsters: [{ id: 'pinewraith' }, { id: 'mossbeast' }, { id: 'sproutling', rarity: 'legendary' }] } }
+    const [entry] = biomeEntries([dunesFirst], modsters, new Map(), undefined)
+    const sections = tierSections(entry?.odds ?? [])
+    expect(sections.map((section) => [section.tier, section.odds.map((row) => row.id)])).toEqual([
+      ['common', ['pinewraith', 'mossbeast']],
+      ['legendary', ['sproutling']],
+    ])
+    expect(sections.map((section) => section.tierChance)).toEqual([76 / 76.5, 0.5 / 76.5])
   })
 })

@@ -20,7 +20,7 @@ paths:
 - **Readability at terminal size:** strong outline, ≤ 16 colors per Modster,
   recognizable silhouette (the collection shows silhouettes for uncaught ones).
 - **Balance:** each built-in biome follows the tier mix in ROADMAP P2-09. Check
-  the computed odds table before committing weights.
+  the odds table before committing tier changes (decision 0030).
 - **Text fits the band:** names ≤ 24 chars, descriptions ≤ 120, friendly and
   family-safe.
 - Use the `add-modster` / `add-biome` skills; they run the validator.

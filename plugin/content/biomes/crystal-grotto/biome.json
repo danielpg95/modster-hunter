@@ -9,15 +9,15 @@
   "particles": { "style": "sparkle", "color": "#ffd6e8", "density": 2 },
   "encounterEverySec": [10, 30],
   "modsters": [
-    { "id": "shardling", "weight": 100 },
-    { "id": "glowcap", "weight": 100 },
-    { "id": "mossmole", "weight": 100 },
-    { "id": "echobat", "weight": 30 },
-    { "id": "prismite", "weight": 30 },
-    { "id": "quartzclaw", "weight": 30 },
-    { "id": "geodon", "weight": 8 },
-    { "id": "gemsnake", "weight": 8 },
-    { "id": "amethowl", "weight": 8 },
-    { "id": "geolem", "weight": 2 }
+    { "id": "shardling" },
+    { "id": "glowcap" },
+    { "id": "mossmole" },
+    { "id": "echobat" },
+    { "id": "prismite" },
+    { "id": "quartzclaw" },
+    { "id": "geodon" },
+    { "id": "gemsnake" },
+    { "id": "amethowl" },
+    { "id": "geolem" }
   ]
 }

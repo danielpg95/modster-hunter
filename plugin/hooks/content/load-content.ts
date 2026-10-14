@@ -1,5 +1,6 @@
 import { CONTENT } from '../constants'
 import { checkBiomeReferences } from './check-biome-references'
+import { checkTierBalance } from './check-tier-balance'
 import type { Biome, ContentIssue, Modster, Sprite, Validation } from './types'
 import { validateBiome } from './validate-biome'
 import { validateModster } from './validate-modster'
@@ -78,15 +79,19 @@ export async function loadFolder(reader: ContentReader, root: string, options: L
 
 /**
  * Drops biome entries whose Modster isn't in the registry, and biomes left
- * with none (CONTENT_FORMAT.md). Runs once all content is merged (decision 0007).
+ * with none (CONTENT_FORMAT.md), then warns about lopsided tiers (decision
+ * 0030 point 6). Runs once all content is merged (decision 0007).
  */
 export function resolveReferences(registry: ContentRegistry): ContentRegistry {
   const issues = [...registry.issues]
   const modsterIds = new Set(registry.modsters.keys())
+  const modsters = new Map([...registry.modsters].map(([id, loaded]) => [id, loaded.modster]))
   const biomes = new Map<string, LoadedBiome>()
   for (const [id, loaded] of registry.biomes) {
     const biome = keep(checkBiomeReferences(loaded.biome, modsterIds, loaded.file), issues)
-    if (biome) biomes.set(id, { ...loaded, biome })
+    if (!biome) continue
+    issues.push(...checkTierBalance(biome, modsters, loaded.file))
+    biomes.set(id, { ...loaded, biome })
   }
   return { biomes, modsters: registry.modsters, issues }
 }

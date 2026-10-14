@@ -3,7 +3,7 @@
   "id": "echobat",
   "name": "Echobat",
   "description": "Its quartz ears hum back whatever you say, only a little higher.",
-  "rarity": null,
+  "rarity": "uncommon",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,

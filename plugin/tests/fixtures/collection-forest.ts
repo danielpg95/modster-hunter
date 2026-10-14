@@ -32,7 +32,7 @@ export function collectionForest(count = 3, bigMon02 = false): Record<string, st
     schemaVersion: 1,
     id: 'whispering-forest',
     name: 'Whispering Forest',
-    modsters: [...ids, 'aardvark'].map((id) => ({ id, weight: 1 })),
+    modsters: [...ids, 'aardvark'].map((id) => ({ id })),
   })
   return files
 }

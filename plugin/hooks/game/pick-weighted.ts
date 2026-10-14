@@ -1,7 +1,7 @@
 import type { RandomSource } from './random-source'
 
 /**
- * One item, with chance weight ÷ total weight (decision 0007). Undefined when
+ * One item, with chance weight ÷ total weight (the tier draw, decision 0030). Undefined when
  * the list is empty or no weight is positive.
  */
 export function pickWeighted<T extends { weight: number }>(items: readonly T[], random: RandomSource): T | undefined {

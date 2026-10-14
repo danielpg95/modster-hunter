@@ -3,7 +3,7 @@
   "id": "sporrow",
   "name": "Sporrow",
   "description": "A bright orange mushroom that walks on its own threads, looking for something to grow on.",
-  "rarity": null,
+  "rarity": "rare",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,

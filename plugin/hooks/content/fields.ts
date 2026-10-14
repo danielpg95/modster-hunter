@@ -2,7 +2,9 @@
 // and returns the value only when it's valid. A missing key returns undefined
 // without a report; `checkKeys` reports missing required keys once.
 
+import { TIERS } from '../constants'
 import type { IssueList } from './issue-list'
+import type { Rarity } from './types'
 
 export type JsonObject = Record<string, unknown>
 
@@ -123,6 +125,17 @@ export function checkNumberValue(
     return undefined
   }
   return value
+}
+
+/** `common`, `uncommon`, `rare` or `legendary` (decision 0030 point 3) */
+export function checkRarity(obj: JsonObject, issues: IssueList, prefix = ''): Rarity | undefined {
+  if (!Object.hasOwn(obj, 'rarity')) return undefined
+  const value = obj.rarity
+  const tier = TIERS.find((row) => row.tier === value)?.tier
+  if (tier === undefined) {
+    issues.error(fieldPath(prefix, 'rarity'), `must be one of ${TIERS.map((row) => row.tier).join(', ')} (it is ${describe(value)})`)
+  }
+  return tier
 }
 
 export function checkSchemaVersion(obj: JsonObject, expected: number, issues: IssueList): void {

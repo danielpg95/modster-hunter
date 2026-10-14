@@ -3,7 +3,7 @@
   "id": "gemsnake",
   "name": "Gemsnake",
   "description": "Its scales are cut gems. When it slithers, the whole cave chimes.",
-  "rarity": null,
+  "rarity": "rare",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,

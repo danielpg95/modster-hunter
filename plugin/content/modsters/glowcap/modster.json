@@ -3,7 +3,7 @@
   "id": "glowcap",
   "name": "Glowcap",
   "description": "It dims its cap when someone looks. Stay still and it lights up again.",
-  "rarity": null,
+  "rarity": "common",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,

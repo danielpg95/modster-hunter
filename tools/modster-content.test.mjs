@@ -183,10 +183,10 @@ test('check: a user folder loads like the mod loads it, with every issue', () =>
   mkdirSync(join(sheet, '..'), { recursive: true })
   run('draw', writeJson('blobby.json', GRID), '--out', sheet)
   writeJson('content/modsters/blobby/modster.json', {
-    schemaVersion: 1, id: 'blobby', name: 'Blobby', sprite: { file: 'sprite.png', frames: 2 },
+    schemaVersion: 1, id: 'blobby', name: 'Blobby', rarity: 'uncommon', sprite: { file: 'sprite.png', frames: 2 },
   })
   writeJson('content/biomes/test-meadow/biome.json', {
-    schemaVersion: 1, id: 'test-meadow', name: 'Test Meadow', modsters: [{ id: 'blobby', weight: 10 }, { id: 'sproutling', weight: 50 }],
+    schemaVersion: 1, id: 'test-meadow', name: 'Test Meadow', modsters: [{ id: 'blobby' }, { id: 'sproutling' }],
   })
   const clean = run('check', root)
   assert.equal(clean.code, 0, clean.stdout)
@@ -201,4 +201,11 @@ test('check: a user folder loads like the mod loads it, with every issue', () =>
   assert.match(alone.stdout, /1 biome and 1 Modster load; 1 error, 0 warnings/)
 
   assert.match(run('check', join(dir, 'nowhere')).stderr, /no content folder here yet/)
+
+  // Decision 0030 point 6: five commons (16% each) next to Blobby, uncommon in its file (20%)
+  const commons = ['sproutling', 'mossbeast', 'acornsprite', 'hootlet', 'crabbit'].map((id) => ({ id, rarity: 'common' }))
+  writeJson('content/biomes/test-meadow/biome.json', { schemaVersion: 1, id: 'test-meadow', name: 'Test Meadow', modsters: [...commons, { id: 'blobby' }] })
+  const lopsided = run('check', root)
+  assert.match(lopsided.stdout, /test-meadow\/biome\.json: modsters each common Modster appears 16\.0% of the time, less than each uncommon one \(20\.0%\)/)
+  assert.match(lopsided.stdout, /0 errors, 1 warning/)
 })

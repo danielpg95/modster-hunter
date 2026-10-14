@@ -27,6 +27,8 @@ import {
   biomeRow,
   biomesBody,
   oddsRow,
+  tierRow,
+  tierSections,
   collectionBody,
   collectionEntries,
   collectionLayout,
@@ -628,9 +630,17 @@ export const register: Register = (on, options) => {
       const odds = (
         <Box key="odds" flexDirection="column">
           {selected.odds.length === 0 ? <Text dimColor>No Modsters loaded.</Text> : null}
-          {selected.odds.map((row) => (
-            <Box key={`odds-${row.id}`} flexDirection="row">
-              {texts(oddsRow(row, selected.id), 'truncate')}
+          {tierSections(selected.odds).map((section, index) => (
+            <Box key={`tier-${section.tier}`} flexDirection="column">
+              {index > 0 ? <Text key="gap"> </Text> : null}
+              <Box key="tier-header" flexDirection="row">
+                {texts(tierRow(section), 'truncate')}
+              </Box>
+              {section.odds.map((row) => (
+                <Box key={`odds-${row.id}`} flexDirection="row">
+                  {texts(oddsRow(row, selected.id), 'truncate')}
+                </Box>
+              ))}
             </Box>
           ))}
         </Box>

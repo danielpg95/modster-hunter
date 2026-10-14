@@ -40,9 +40,9 @@ errors, and a file with an error is skipped.
   "accentColor": "#4fc3f7",
   "encounterEverySec": [10, 30],
   "modsters": [
-    { "id": "blobby", "weight": 60 },
-    { "id": "sproutling", "weight": 15 },
-    { "id": "glimmerbat", "weight": 4, "maxAttempts": 5 }
+    { "id": "blobby" },
+    { "id": "sproutling", "rarity": "uncommon" },
+    { "id": "glimmerbat", "maxAttempts": 5 }
   ]
 }
 ```
@@ -60,7 +60,7 @@ errors, and a file with an error is skipped.
 | `encounterEverySec` | no | `[min, max]` seconds between encounters while Claude works; 3 ≤ min ≤ max ≤ 600. Default `[10, 30]` |
 | `modsters` | yes | 1–50 entries, ids unique within the biome |
 | `modsters[].id` | yes | A Modster that exists (built-in or user). A missing one drops only that entry |
-| `modsters[].weight` | yes | Integer 1–10,000. Chance = weight ÷ sum of weights |
+| `modsters[].rarity` | no | `common`, `uncommon`, `rare` or `legendary`; overrides the Modster's own in this biome |
 | `modsters[].maxAttempts` | no | Integer 1–10; overrides the Modster and its tier |
 | `modsters[].catchRate` | no | 0.01–1.0; overrides the Modster and its tier |
 
@@ -72,7 +72,7 @@ errors, and a file with an error is skipped.
   "id": "blobby",
   "name": "Blobby",
   "description": "A wobbly green blob that hums when happy.",
-  "rarity": null,
+  "rarity": "common",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,
@@ -93,7 +93,7 @@ errors, and a file with an error is skipped.
 | `id` | yes | See Ids |
 | `name` | yes | 1–24 chars |
 | `description` | no | ≤ 120 chars |
-| `rarity` | no | `common`, `uncommon`, `rare`, `legendary`, or `null` to compute it from the biome weight |
+| `rarity` | yes | `common`, `uncommon`, `rare` or `legendary`. A biome entry may set another |
 | `maxAttempts` | no | Integer 1–10, or `null` for the tier default |
 | `catchRate` | no | 0.01–1.0, or `null` for the tier default |
 | `shinyChance` | no | 0–1, or `null` |
@@ -125,15 +125,20 @@ errors, and a file with an error is skipped.
 
 ## Rarity tiers
 
-Unless `rarity` is set, a Modster's share of its biome's total weight sets its
-tier.
+An encounter picks a tier by its share, then one Modster of that tier in the
+biome, each equally likely. A Modster's tier is its biome entry's `rarity`,
+else its own. Tiers with no Modster in the biome are left out; the others keep
+their proportions. Biome entries have no `weight` (it's an error).
 
-| Tier | Share | Default throws | Default catch rate |
+| Tier | Tier share | Default throws | Default catch rate |
 | --- | --- | --- | --- |
-| common | ≥ 20% | 3 | 0.50 |
-| uncommon | 5% to < 20% | 3 | 0.35 |
-| rare | 1% to < 5% | 4 | 0.20 |
-| legendary | < 1% | 5 | 0.08 |
+| common | 76% | 3 | 0.50 |
+| uncommon | 19% | 3 | 0.35 |
+| rare | 4.5% | 4 | 0.20 |
+| legendary | 0.5% | 5 | 0.08 |
+
+`check` warns when a tier's Modsters each appear less often than a rarer
+tier's in the same biome.
 
 Precedence, highest first: biome entry → Modster file → tier default.
 
