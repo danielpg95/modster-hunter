@@ -17,4 +17,4 @@ export { biomeEntries, tierSections, type BiomeEntry, type BiomeOdds, type TierS
 export { biomeRow, oddsRow, tierRow } from './biome-rows'
 export { biomesBody, type BiomesBody, type BiomesBodyInput } from './biomes-body'
 export { NO_STATS_TEXT, ratio, statsLines, type StatsBiome } from './stats-lines'
-export { CONFIG_TEXT, NO_ISSUES_TEXT, RELOAD_TEXT, settingsLines } from './settings-lines'
+export { CONFIG_TEXT, NO_ISSUES_TEXT, RELOAD_TEXT, TOGGLE_TEXT, settingsLines } from './settings-lines'

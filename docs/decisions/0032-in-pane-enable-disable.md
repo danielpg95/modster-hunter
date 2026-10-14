@@ -39,7 +39,9 @@ over letting the game stop until a reload.
 
 1. **A key turns the selected item off and on.** In the Collection tab and the
    Biomes tab, `o` turns the selected Modster or biome off (`o: Turn off`) or
-   back on (`o: Turn on`). It works for built-in and user items alike.
+   back on (`o: Turn on`). It works for built-in and user items alike. The
+   Settings tab says so too: `Press o in Collection or Biomes to turn one off
+   or on.`
 2. **It writes only the user folder's `settings.json`** (0007 point 4): the id
    is added to or removed from `disabledModsters` or `disabledBiomes`. The file
    is created when missing; a list left empty is removed. Nothing under
