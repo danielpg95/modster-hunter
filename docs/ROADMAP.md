@@ -355,9 +355,9 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Size:** S
 - **Goal:** enable or disable a biome or Modster, and delete user items (with confirmation), from the collection pane. Field editing moved to P4-07 (phase 3 review). The mods API can't delete files, so delete goes through the content skill (decision 0032).
 - **Done when:**
-  - [ ] Enable and disable write the user folder's disable lists (0007); disabling a built-in never touches `plugin/content/`.
+  - [x] Enable and disable write the user folder's disable lists (0007); disabling a built-in never touches `plugin/content/`.
   - [ ] Delete asks for confirmation, removes only user files, and is offered only for user items: the pane shows the hint for user items, and `create-modster-content` does the delete (0032 point 7).
-  - [ ] The result is validated before writing, with tests.
+  - [x] The result is validated before writing, with tests.
 
 #### [x] P4-04 — User-facing content skill
 - **Depends on:** P4-01, P2-02, P4-06
