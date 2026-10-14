@@ -15,13 +15,13 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
+| P3-05 | @danielpg95 | in-progress | p3-05-phase-review | 2026-10-13 | 2026-10-13 | Run the phase-review skill and write the phase 3 review |
 
 ## Up next
 
 Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
-- **P3-05** — Phase 3 review
 - **P4-02** — `/modsters reload` and error reporting
 - **P5-01** — Shiny variants
 - **P5-02** — Sounds
