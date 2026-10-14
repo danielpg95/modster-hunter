@@ -15,7 +15,6 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P4-03 | @danielpg95 | in-review | p4-03-enable-disable-delete | 2026-10-14 | 2026-10-14 | Try `o` in a real session (`claude --plugin-dir ./plugin`) and the skill's delete hand-off, then tick the delete item |
 
 ## Up next
 
