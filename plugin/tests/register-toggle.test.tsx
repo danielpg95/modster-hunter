@@ -97,10 +97,23 @@ describe('register: toggle', () => {
     await pane.unmount()
   })
 
+  test('the last biome, or a Modster it depends on alone, is never turned off (0032 point 8)', async ($, on) => {
+    const user: Record<string, string> = {}
+    const { toasts } = await start($, on, oneModsterForest(), user, { 'caught:sproutling': caught() })
+    const pane = await paneOn($, 'collection')
+    expect(await pressForToast(pane, 'toggle', toasts)).toBe("Modster Hunter: can't turn off Sproutling: no biome would be left to play")
+    await pane.press({ key: 'biomes' })
+    expect(await pressForToast(pane, 'biome-toggle', toasts)).toBe("Modster Hunter: can't turn off Whispering Forest: no biome would be left to play")
+    expect(user[SETTINGS]).toBeUndefined()
+    expect(await pane.find({ type: 'Text', text: ' off' })).toBeUndefined()
+    await pane.unmount()
+  })
+
   test('a settings.json that is not valid is left alone', async ($, on) => {
     const user: Record<string, string> = { [SETTINGS]: '{ not json' }
-    const { toasts } = await start($, on, oneModsterForest(), user)
+    const { toasts } = await start($, on, twoBiomes(), user)
     const pane = await paneOn($, 'collection')
+    await pane.press({ key: 'down' })
     expect(await pressForToast(pane, 'toggle', toasts)).toBe(
       'Modster Hunter: fix ~/.claude/modster-hunter/content/settings.json first (see /modsters → 4: Settings)',
     )

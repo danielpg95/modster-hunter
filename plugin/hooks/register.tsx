@@ -3,6 +3,7 @@ import { BAND, COLLECTION, USER_CONTENT } from './constants'
 import {
   cachedSheetLoader,
   formatIssue,
+  leavesNoBiome,
   loadAllContent,
   noBiomesMessage,
   toggleDisabled,
@@ -1386,6 +1387,11 @@ function toggle($: EngineInterface, change: ToggleChange, name: string, includeB
  * folder is ever written, never `plugin/content/` (point 2).
  */
 async function toggleContent($: EngineInterface, change: ToggleChange, name: string, includeBuiltins: boolean, idleTimeoutSec: number): Promise<void> {
+  // The pane never stops the game by itself; settings.json by hand still can (0032 point 8)
+  if (content && leavesNoBiome(content, change)) {
+    $.ui.toast(`Modster Hunter: can't turn off ${name}: no biome would be left to play`)
+    return
+  }
   const file = `${USER_FOLDER_LABEL}settings.json`
   const home = await homeFolder($)
   if (home === undefined) {

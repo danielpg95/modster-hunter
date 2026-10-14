@@ -32,7 +32,8 @@ For where disabled items show:
 1. **Dimmed in their own tab**, marked `off`, with the same key to turn them on.
 2. **A "Turned off" list in the Settings tab.**
 
-Option 1 was chosen for both.
+Option 1 was chosen for both. Blocking the last biome (point 8) was chosen
+over letting the game stop until a reload.
 
 ## Decision
 
@@ -64,6 +65,11 @@ Option 1 was chosen for both.
    `~/.claude/modster-hunter/content/`, removes the id from `settings.json`,
    warns about user biomes that list a deleted Modster, and asks the player to
    run `/modsters reload`. Caught records stay in the store (0009).
+8. **The pane never leaves the game without a biome.** `o` refuses to turn off
+   the last playable biome, or a Modster that every remaining biome depends on
+   alone, with a toast: `Modster Hunter: can't turn off <name>: no biome would
+   be left to play`. Nothing is written. Editing `settings.json` by hand can
+   still do it; then 0031 point 4 applies.
 
 ## Consequences
 
