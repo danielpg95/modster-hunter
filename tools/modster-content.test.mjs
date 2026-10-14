@@ -201,4 +201,11 @@ test('check: a user folder loads like the mod loads it, with every issue', () =>
   assert.match(alone.stdout, /1 biome and 1 Modster load; 1 error, 0 warnings/)
 
   assert.match(run('check', join(dir, 'nowhere')).stderr, /no content folder here yet/)
+
+  // Decision 0030 point 6: five commons (16% each) next to Blobby, uncommon in its file (20%)
+  const commons = ['sproutling', 'mossbeast', 'acornsprite', 'hootlet', 'crabbit'].map((id) => ({ id, rarity: 'common' }))
+  writeJson('content/biomes/test-meadow/biome.json', { schemaVersion: 1, id: 'test-meadow', name: 'Test Meadow', modsters: [...commons, { id: 'blobby' }] })
+  const lopsided = run('check', root)
+  assert.match(lopsided.stdout, /test-meadow\/biome\.json: modsters each common Modster appears 16\.0% of the time, less than each uncommon one \(20\.0%\)/)
+  assert.match(lopsided.stdout, /0 errors, 1 warning/)
 })
