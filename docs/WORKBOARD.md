@@ -15,7 +15,6 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P5-15 | @danielpg95 | in-progress | p5-15-clear-restart | 2026-10-13 | 2026-10-13 | Write the failing register test: throw after `/clear` and turn end must settle |
 
 ## Up next
 
