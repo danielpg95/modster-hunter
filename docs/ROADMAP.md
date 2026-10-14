@@ -500,14 +500,14 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `npm run check:content` passes.
   - [x] A preview of every scene in the PR description (enlarged, every frame, dark and light).
 
-#### [ ] P5-15 — Keep the game running after `/clear`
+#### [x] P5-15 — Keep the game running after `/clear`
 - **Depends on:** P2-06
 - **Size:** S
 - **Goal:** after `/clear` (or a resume), encounters tick, throws settle and stats go to the new session, as after a fresh start.
 - **Done when:**
-  - [ ] `classic.SessionStart` for `clear`, `resume` and `fork` restarts the game: the tick and sprite timers, `sessionId`, and a fresh encounter machine on the same biome. An encounter that was up is dropped, uncounted (0005).
-  - [ ] Regression test in `plugin/tests/`: after `session.end` (reason `clear`) and `classic.SessionStart` (source `clear`), a throw after the turn ends settles, a miss offers Throw again, and a new Modster still appears during a turn.
-  - [ ] Checked by hand: `/clear`, then throw more than once after Claude stops.
+  - [x] `classic.SessionStart` for `clear`, `resume` and `fork` restarts the game: the tick and sprite timers, `sessionId`, and a fresh encounter machine on the same biome. An encounter that was up is dropped, uncounted (0005).
+  - [x] Regression test in `plugin/tests/`: after `session.end` (reason `clear`) and `classic.SessionStart` (source `clear`), a throw after the turn ends settles, a miss offers Throw again, and a new Modster still appears during a turn.
+  - [x] Checked by hand: `/clear`, then throw more than once after Claude stops.
 - **Why:** found during P3-04 (2026-10-13). `/clear` fires `session.end`, whose hook calls `stopTimers()`, but no `session.start` follows, so the 250 ms tick never restarts. After one throw the band stays on "wobble…" until the next prompt, and stats keep going to the ended session's key.
 
 #### [ ] P5-16 — Tier-first encounters
