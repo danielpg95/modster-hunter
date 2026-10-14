@@ -340,15 +340,15 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Merge rules unit tested; zero-biome case shows one clear message.
   - [x] User PNG sprites decode in the mod and are cached (0016), starting from `spikes/p1-05-sprite-pipeline/lib/inflate.ts` and `lib/png.ts` moved to `plugin/` with unit tests; 1-, 2- and 4-bit palette PNGs decode too (PIL and optimizers write ≤ 16-color palettes that way).
 
-#### [ ] P4-02 — `/modsters reload` and error reporting
+#### [x] P4-02 — `/modsters reload` and error reporting
 - **Depends on:** P4-01, P3-01
 - **Size:** S
 - **Goal:** reload content without restarting; Settings tab lists every content error.
 - **Done when:**
-  - [ ] An in-progress encounter is unaffected by reload.
-  - [ ] The Settings tab lists every content error, each formatted with `formatIssue`, with a test.
-  - [ ] After a reload, the collection pane re-reads caught records (`loadCollectionRecords`) and drops the cached `silhouettes`, `cellsByModster` and `biomeScenes`, and the Biomes scene site, with a test (from the phase 3 review).
-  - [ ] The unused tab `placeholder` entries in `plugin/hooks/render/collection-tabs.ts` are removed.
+  - [x] An in-progress encounter is unaffected by reload.
+  - [x] The Settings tab lists every content error, each formatted with `formatIssue`, with a test.
+  - [x] After a reload, the collection pane re-reads caught records (`loadCollectionRecords`) and drops the cached `silhouettes`, `cellsByModster` and `biomeScenes`, and the Biomes scene site, with a test (from the phase 3 review).
+  - [x] The unused tab `placeholder` entries in `plugin/hooks/render/collection-tabs.ts` are removed.
 
 #### [ ] P4-03 — In-pane enable, disable and delete
 - **Depends on:** P4-02
