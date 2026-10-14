@@ -371,7 +371,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('the Biomes tab opens on the session biome, marked here, with each Modster\'s encounter %', async ($, on) => {
+  test('the Biomes tab opens on the session biome, marked here, with each Modster\'s encounter % under its tier', async ($, on) => {
     await start($, on, () => [], twoBiomes())
     const pane = await mountPane($)
     await pane.press({ key: 'biomes' })
@@ -382,7 +382,8 @@ describe('register: collection pane', () => {
     const row = await pane.find({ type: 'Button', key: current })
     expect(JSON.stringify(row)).toContain(' here')
     expect(JSON.stringify(row)).toContain('▸ ')
-    expect(await pane.find({ type: 'Text', text: current === 'ash-dunes' ? '  50.0%  common' : ' 100.0%  common' })).toBeDefined()
+    expect(await pane.find({ type: 'Text', text: current === 'ash-dunes' ? '  50.0%' : ' 100.0%' })).toBeDefined()
+    expect(JSON.stringify(await pane.find({ type: 'Box', key: 'tier-common' }))).toContain('100.0%')
     await pane.press({ key: 'collection' })
     await pane.unmount()
   })
@@ -394,10 +395,10 @@ describe('register: collection pane', () => {
     // Ash Dunes lists first by name
     await pane.press({ key: 'biome-up' })
     expect(await pane.find({ type: 'Box', key: 'odds-emberkit' })).toBeDefined()
-    expect(await pane.find({ type: 'Text', text: '  50.0%  common' })).toBeDefined()
+    expect(await pane.find({ type: 'Text', text: '  50.0%' })).toBeDefined()
     await pane.press({ key: 'biome-down' })
     expect(await pane.find({ type: 'Box', key: 'odds-emberkit' })).toBeUndefined()
-    expect(await pane.find({ type: 'Text', text: ' 100.0%  common' })).toBeDefined()
+    expect(await pane.find({ type: 'Text', text: ' 100.0%' })).toBeDefined()
     await pane.press({ key: 'biome-up' })
     await pane.press({ key: 'collection' })
     await pane.unmount()

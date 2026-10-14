@@ -1,8 +1,9 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { biomeRow, oddsRow, type BiomeEntry, type BiomeOdds } from '../../hooks/render'
+import { biomeRow, oddsRow, tierRow, type BiomeEntry, type BiomeOdds } from '../../hooks/render'
 
 // P3-03: a biome row shows caught of total and marks the session's biome; an
-// odds row reads `???` until caught, but its % and tier always show.
+// odds row reads `???` until caught, but its % always shows, under its tier's
+// header and share (decision 0030 point 7).
 
 const text = (line: ReturnType<typeof oddsRow>) => line.map((segment) => ('text' in segment ? segment.text : '')).join('')
 
@@ -33,20 +34,27 @@ describe('biomeRows', () => {
     expect(text(biomeRow({ ...forest, name: 'The Very Long Biome Name' }, false))).toBe('  The Very Long Bi… 1/1 here')
   })
 
-  test('a caught row has the name in its type color, % and tier, and its catches in this biome', () => {
+  test('a caught row has the name in its type color, its %, and its catches in this biome', () => {
     const row = oddsRow(sproutling, 'whispering-forest')
-    expect(text(row)).toBe('#001 Sproutling      75.9%  common    ×3')
+    expect(text(row)).toBe('#001 Sproutling      75.9%  ×3')
     expect(row[1]).toMatchObject({ color: '#4caf50' })
   })
 
   test('caught only elsewhere: the name shows, with no count', () => {
-    expect(text(oddsRow(sproutling, 'tide-pools'))).toBe('#001 Sproutling      75.9%  common')
+    expect(text(oddsRow(sproutling, 'tide-pools'))).toBe('#001 Sproutling      75.9%')
   })
 
-  test('an uncaught row reads ??? but keeps its % and tier', () => {
+  test('an uncaught row reads ??? but keeps its %', () => {
     const { record, ...uncaught } = sproutling
     expect(text(oddsRow({ ...uncaught, tier: 'legendary', encounterChance: 0.025, number: 7 }, 'whispering-forest'))).toBe(
-      '#007 ???              2.5%  legendary',
+      '#007 ???              2.5%',
     )
+  })
+
+  test("a tier header shows the tier's share, lined up with its Modsters' own", () => {
+    const header = text(tierRow({ tier: 'common', tierChance: 0.764, odds: [sproutling] }))
+    expect(header).toBe('common               76.4%')
+    expect(header.length).toBe(text(oddsRow(sproutling, 'tide-pools')).length)
+    expect(text(tierRow({ tier: 'legendary', tierChance: 1, odds: [] }))).toBe('legendary           100.0%')
   })
 })

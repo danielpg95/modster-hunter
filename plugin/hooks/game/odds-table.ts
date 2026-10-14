@@ -32,13 +32,14 @@ export function oddsTable(biome: Biome, modsters: ReadonlyMap<string, Modster>):
 
 const percent = (value: number): string => `${(value * 100).toFixed(1)}%`
 
-/** Plain-text table for contributors balancing a biome (add-biome / add-modster skills). */
+/** Plain-text table for contributors balancing a biome: each tier's share and each Modster's own (decision 0030 point 7). */
 export function formatOddsTable(rows: readonly OddsRow[]): string {
-  const header = ['Modster', 'Appears', 'Tier', 'Throws', 'Per throw', 'Caught']
+  const header = ['Modster', 'Tier', 'Tier share', 'Appears', 'Throws', 'Per throw', 'Caught']
   const body = rows.map((row) => [
     row.name,
-    percent(row.encounterChance),
     row.tier,
+    percent(row.tierChance),
+    percent(row.encounterChance),
     String(row.maxAttempts),
     percent(row.catchRate),
     percent(row.catchChance),

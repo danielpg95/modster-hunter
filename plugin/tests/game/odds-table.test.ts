@@ -56,10 +56,10 @@ describe('oddsTable', () => {
   test('the printed table for the CONTENT_FORMAT example biome', () => {
     expect(formatOddsTable(oddsTable(exampleBiome(), modsters))).toBe(
       [
-        'Modster     Appears  Tier      Throws  Per throw  Caught',
-        'Sproutling  76.4%    common    3       50.0%      87.5%',
-        'Mossbeast   19.1%    uncommon  3       35.0%      72.5%',
-        'Pinewraith  4.5%     rare      5       20.0%      67.2%',
+        'Modster     Tier      Tier share  Appears  Throws  Per throw  Caught',
+        'Sproutling  common    76.4%       76.4%    3       50.0%      87.5%',
+        'Mossbeast   uncommon  19.1%       19.1%    3       35.0%      72.5%',
+        'Pinewraith  rare      4.5%        4.5%     5       20.0%      67.2%',
       ].join('\n'),
     )
   })

@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'claude-code/testing'
 import { validateBiome, type Biome, type LoadedBiome, type LoadedModster, type Sprite } from '../../hooks/content'
 import { formatOddsTable, oddsTable } from '../../hooks/game'
-import { biomeEntries } from '../../hooks/render'
+import { biomeEntries, tierSections } from '../../hooks/render'
 import type { CaughtRecord } from '../../hooks/store'
 import { modsterNamed } from '../fixtures/modster-named'
 import { validBiome } from '../fixtures/valid-biome'
@@ -67,5 +67,16 @@ describe('biomeEntries', () => {
   test('an entry whose Modster did not load is left out, and its share with it', () => {
     const [entry] = biomeEntries([forest], new Map([['sproutling', loaded('sproutling', 'Sproutling', 1)]]), new Map(), undefined)
     expect(entry?.odds.map((row) => [row.id, row.encounterChance])).toEqual([['sproutling', 1]])
+  })
+
+  test('tierSections groups the odds by tier, most common first, each in the biome order', () => {
+    const dunesFirst: LoadedBiome = { ...forest, biome: { ...forest.biome, modsters: [{ id: 'pinewraith' }, { id: 'mossbeast' }, { id: 'sproutling', rarity: 'legendary' }] } }
+    const [entry] = biomeEntries([dunesFirst], modsters, new Map(), undefined)
+    const sections = tierSections(entry?.odds ?? [])
+    expect(sections.map((section) => [section.tier, section.odds.map((row) => row.id)])).toEqual([
+      ['common', ['pinewraith', 'mossbeast']],
+      ['legendary', ['sproutling']],
+    ])
+    expect(sections.map((section) => section.tierChance)).toEqual([76 / 76.5, 0.5 / 76.5])
   })
 })

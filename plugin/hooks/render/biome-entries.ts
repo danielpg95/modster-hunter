@@ -2,7 +2,8 @@
 // one marked, each with its Modsters' odds straight from the P2-05 resolver
 // (`oddsTable`), in the biome's own order.
 
-import type { LoadedBiome, LoadedModster, ModsterType } from '../content'
+import { TIERS } from '../constants'
+import type { LoadedBiome, LoadedModster, ModsterType, Rarity } from '../content'
 import { oddsTable, type OddsRow } from '../game'
 import type { CaughtRecord } from '../store'
 
@@ -11,6 +12,13 @@ export interface BiomeOdds extends OddsRow {
   types: ModsterType[]
   /** Undefined until the first catch, in any biome */
   record?: CaughtRecord
+}
+
+/** One tier's Modsters in a biome, under its share (decision 0030 point 7) */
+export interface TierSection {
+  tier: Rarity
+  tierChance: number
+  odds: BiomeOdds[]
 }
 
 export interface BiomeEntry {
@@ -47,4 +55,13 @@ export function biomeEntries(
     }
   })
   return entries.sort((a, b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id))
+}
+
+/** A biome's odds grouped by tier, most common first, each keeping the biome's order; empty tiers are left out. */
+export function tierSections(odds: readonly BiomeOdds[]): TierSection[] {
+  return TIERS.flatMap(({ tier }) => {
+    const rows = odds.filter((row) => row.tier === tier)
+    const first = rows[0]
+    return first ? [{ tier, tierChance: first.tierChance, odds: rows }] : []
+  })
 }
