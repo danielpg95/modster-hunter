@@ -15,13 +15,13 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
+| P4-03 | @danielpg95 | in-progress | p4-03-enable-disable-delete | 2026-10-14 | 2026-10-14 | Add a pure disable-list and delete planner with tests, then wire keys into the Biomes and Modsters tabs |
 
 ## Up next
 
 Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
-- **P4-03** — In-pane enable, disable and delete
 - **P5-01** — Shiny variants
 - **P5-02** — Sounds
 - **P5-03** — Extended stats and milestones
