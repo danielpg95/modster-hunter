@@ -181,8 +181,9 @@ off in `/config` for Modster Hunter. Then run `check` with `--without-builtins`.
    `0 errors`. Warnings are fine, but mention them.
 2. Tell the player:
    - which files you wrote, and the odds of each changed biome;
-   - content loads when a session starts, so their changes show from their
-     next session;
+   - `/modsters reload` loads their changes now (an encounter in progress
+     finishes first); the Settings tab (`/modsters`, then `4`) lists any
+     problems;
    - each session picks one biome at random, so a new biome may take a few
      sessions to come up.
 
