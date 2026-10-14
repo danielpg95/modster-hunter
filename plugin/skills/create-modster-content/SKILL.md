@@ -54,8 +54,9 @@ which the mod loads at the start of every session next to the built-in content.
      `description` (≤ 120).
    - Dex: one or two `types` (the first is the main one), a `category` like
      "Seed Modster", `heightM`, `weightKg`, and the dex `entry` (≤ 240).
-   - Leave `rarity`, `maxAttempts`, `catchRate` and `shinyChance` as `null`
-     unless they ask. Rarity then comes from the biome weights.
+   - `rarity`: how rare it is, `common`, `uncommon`, `rare` or `legendary`
+     (required; suggest one and let them choose). Leave `maxAttempts`,
+     `catchRate` and `shinyChance` as `null` unless they ask.
 2. **Sprite.** Make `modsters/<id>/` and pick one way in:
    - **They have a PNG sheet** (frames side by side, same size each): copy it
      in as `sprite.png`, and ask how many frames it holds.
@@ -72,7 +73,8 @@ which the mod loads at the start of every session next to the built-in content.
    so the player can open it, then wait for their reply before asking whether
    to keep it.
 4. **Put it in a biome.** A Modster only appears in a biome that lists it:
-   - **Their own biome:** add `{ "id": "<id>", "weight": W }` to its `modsters`.
+   - **Their own biome:** add `{ "id": "<id>" }` to its `modsters`. Add
+     `"rarity"` to the entry only to give it another tier in that biome.
    - **A built-in biome:** copy its `biome.json` into
      `biomes/<biome-id>/biome.json` in the content folder and add the entry.
      That copy replaces the built-in biome (say so, see Rules).
@@ -96,18 +98,25 @@ which the mod loads at the start of every session next to the built-in content.
 
 ## Odds
 
-The chance of each Modster is `weight ÷ sum of the biome's weights`. Unless the
-Modster sets `rarity`, its share gives its tier, which sets how hard it is to
-catch:
+An encounter first picks a tier, then one Modster of that tier in the biome,
+each equally likely. A Modster's tier is the `rarity` on its biome entry, else
+its own. The tier also sets how hard it is to catch:
 
-| Tier | Share | Throws | Catch chance |
+| Tier | Tier share | Throws | Catch chance |
 | --- | --- | --- | --- |
-| common | ≥ 20% | 3 | 50% |
-| uncommon | 5% to < 20% | 3 | 35% |
-| rare | 1% to < 5% | 4 | 20% |
-| legendary | < 1% | 5 | 8% |
+| common | 76% | 3 | 50% |
+| uncommon | 19% | 3 | 35% |
+| rare | 4.5% | 4 | 20% |
+| legendary | 0.5% | 5 | 8% |
 
-Show a table of each Modster's percent and tier whenever weights change.
+A tier with no Modster in the biome is left out, and the others grow to fill
+100% in the same proportions. Each Modster's chance is its tier's share split
+evenly: three commons get about 25.3% each. Adding a Modster only thins its
+own tier. If one tier's Modsters each appear less often than a rarer tier's,
+`check` warns: suggest moving some to another tier.
+
+Show a table of each tier's share and each Modster's percent whenever tiers or
+rosters change.
 
 ## Drawing
 

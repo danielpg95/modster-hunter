@@ -3,7 +3,7 @@
   "id": "modster-id",
   "name": "Modster Name",
   "description": "One short, friendly line of personality.",
-  "rarity": null,
+  "rarity": "common",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,

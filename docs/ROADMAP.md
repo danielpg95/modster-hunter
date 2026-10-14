@@ -519,4 +519,4 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Biome entries have no `weight`; every built-in Modster has the `rarity` it computed to before; `npm run check:content` passes.
   - [x] The content check warns when a Modster appears less often than one in a rarer tier of the same biome (0030 point 6), with a test.
   - [x] The Biomes tab and `formatOddsTable` show the tier share and each Modster's share (0030 point 7).
-  - [ ] `docs/CONTENT_FORMAT.md`, the `add-biome` and `add-modster` skills, and `plugin/skills/create-modster-content/` (with `reference/format.md`) describe tiers instead of weights.
+  - [x] `docs/CONTENT_FORMAT.md`, the `add-biome` and `add-modster` skills, and `plugin/skills/create-modster-content/` (with `reference/format.md`) describe tiers instead of weights.

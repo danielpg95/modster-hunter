@@ -4,23 +4,25 @@ How biomes, Modsters and sprites are described on disk. This is the contract
 between the game, the built-in content, user content, the editor and the
 content skills. Rules come from decisions [0004](decisions/0004-attempts-and-catch-rate.md),
 [0007](decisions/0007-content-model.md), [0016](decisions/0016-user-png-sprites.md),
-[0017](decisions/0017-modster-dex-fields.md) and [0025](decisions/0025-user-content-helper.md).
+[0017](decisions/0017-modster-dex-fields.md), [0025](decisions/0025-user-content-helper.md) and
+[0030](decisions/0030-tier-first-encounters.md).
 
 > **Status:** schema version `1`, implemented by the validator in
 > `plugin/hooks/content/` (P2-01). Changing a field now needs a new decision
-> and a `schemaVersion` bump.
+> and a `schemaVersion` bump. Decision 0030 (tiers instead of weights) stayed
+> at version `1`, a one-time exception made before there were players.
 
 ## Validation
 
 The validator never throws. For each file it returns a list of issues, each
-with the file, the field (e.g. `modsters[2].weight`) and the problem.
+with the file, the field (e.g. `modsters[2].rarity`) and the problem.
 
 - **Errors** skip the file. The exception is a biome entry naming a Modster
   that doesn't exist: only that entry is dropped, and the biome only if no
   entries are left.
 - **Warnings** are reported, but the file still loads. Only the "should"
-  rules below are warnings: an opaque palette index 0, and alpha other than
-  `00` or `ff`.
+  rules below are warnings: an opaque palette index 0, alpha other than
+  `00` or `ff`, and a lopsided biome (see [Encounter odds](#encounter-odds)).
 - **Unknown fields are errors**, so typos like `"wieght"` are caught. The
   format is closed; a new field needs a decision.
 - Every bound in the tables below is inclusive. `null` is accepted only where
@@ -68,9 +70,9 @@ content/
   "particles": { "style": "leaf", "color": "#a5d6a7", "density": 2 },
   "encounterEverySec": [8, 20],
   "modsters": [
-    { "id": "sproutling", "weight": 60 },
-    { "id": "mossbeast", "weight": 15 },
-    { "id": "pinewraith", "weight": 4, "maxAttempts": 5 }
+    { "id": "sproutling" },
+    { "id": "mossbeast" },
+    { "id": "pinewraith", "rarity": "rare", "maxAttempts": 5 }
   ]
 }
 ```
@@ -91,9 +93,32 @@ content/
 | `encounterEverySec` | no | `[min, max]` seconds between encounters while a turn runs; 3 ≤ min ≤ max ≤ 600. Default `[10, 30]` |
 | `modsters` | yes | 1–50 entries, ids unique within the biome |
 | `modsters[].id` | yes | A Modster that exists after merging. A missing id is an error for that entry only |
-| `modsters[].weight` | yes | Integer 1–10,000. Chance = weight ÷ sum of weights |
+| `modsters[].rarity` | no | `common`, `uncommon`, `rare` or `legendary`; overrides the Modster's `rarity` in this biome |
 | `modsters[].maxAttempts` | no | Integer 1–10; overrides the Modster and the tier default |
 | `modsters[].catchRate` | no | 0.01–1.0; overrides the Modster and the tier default |
+
+There is no `weight`: an entry with one is an error (unknown field).
+
+### Encounter odds
+
+An encounter first draws a tier, then one Modster of that tier in the biome,
+each equally likely (decision 0030). The tier weights are the same in every
+biome; a tier with no Modster in the biome is left out and the others keep
+their proportions.
+
+| Tier | Weight | Default throws | Default catch rate |
+| --- | --- | --- | --- |
+| `common` | 76 | 3 | 0.50 |
+| `uncommon` | 19 | 3 | 0.35 |
+| `rare` | 4.5 | 4 | 0.20 |
+| `legendary` | 0.5 | 5 | 0.08 |
+
+A Modster's tier is its biome entry's `rarity`, else its own. Adding a Modster
+only thins its own tier: three commons share 76%, about 25.3% each. When a
+tier's Modsters each appear less often than those of a rarer tier in the same
+biome (100 commons at 0.8% each next to a lone uncommon at 20%), the check
+warns. Throws and catch rate: biome entry, then Modster file, then the tier
+default (decision 0004).
 
 ## `modster.json`
 
@@ -103,7 +128,7 @@ content/
   "id": "sproutling",
   "name": "Sproutling",
   "description": "A seed that learned to walk. Very proud of it.",
-  "rarity": null,
+  "rarity": "common",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,
@@ -128,7 +153,7 @@ content/
 | `id` | yes | See IDs |
 | `name` | yes | 1–24 chars (it has to fit in the band) |
 | `description` | no | ≤ 120 chars; shown in the collection detail view |
-| `rarity` | no | `common`, `uncommon`, `rare`, `legendary`, or `null` to compute it from weight (decision 0004) |
+| `rarity` | yes | `common`, `uncommon`, `rare` or `legendary`: its tier, unless a biome entry sets another (see [Encounter odds](#encounter-odds)) |
 | `maxAttempts` | no | Integer 1–10, or `null` for the tier default |
 | `catchRate` | no | 0.01–1.0, or `null` for the tier default |
 | `shinyChance` | no | 0–1, or `null` for the default (P5-01) |
