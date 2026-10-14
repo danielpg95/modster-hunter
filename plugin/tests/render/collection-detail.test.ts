@@ -50,4 +50,12 @@ describe('collectionDetail', () => {
   test('missing dex fields are left out, not shown empty', () => {
     expect(texts(detailLines({ entry: { ...entry, types: [] }, habitat: [] }))).toEqual(['Twiggle  #007', 'Caught ×3 · best rare', 'First 2026-10-08 · last 2026-10-12'])
   })
+
+  test('a Modster that is off and the user\'s own says so before the dex entry, caught or not (decision 0032)', () => {
+    const marked = { ...entry, isOff: true as const, isYours: true as const }
+    const caught = texts(detailLines({ entry: marked, dex: { ...dex, types: [...dex.types] }, habitat: [] }))
+    expect(caught.slice(-3)).toEqual(['Turned off', 'Yours · to delete it, ask Claude: "delete my Modster twiggle"', 'It hides as a branch.'])
+    const { record: _record, ...uncaught } = marked
+    expect(texts(detailLines({ entry: uncaught, habitat: [] })).slice(-2)).toEqual(['Turned off', 'Yours · to delete it, ask Claude: "delete my Modster twiggle"'])
+  })
 })

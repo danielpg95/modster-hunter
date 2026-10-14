@@ -2,11 +2,13 @@
 // (decision 0017, both types primary first per 0022), where it lives, and its
 // catches. Until the first catch only the number shows; the rest reads `???`.
 // The dex entry comes last: the text has a fixed height, so a long one is cut.
+// Before it, whether it's off and how to delete the user's own (decision 0032).
 
 import { MODSTER_TYPES } from '../constants'
 import type { ModsterDex } from '../content'
 import type { BandLine, BandSegment } from './band-view'
 import { dexNumber, type CollectionEntry } from './collection-entries'
+import { itemNotes } from './item-notes'
 
 export interface DetailInput {
   entry: CollectionEntry
@@ -26,6 +28,7 @@ export function detailLines(input: DetailInput): BandLine[] {
       [{ text: UNKNOWN, bold: true }, number],
       [{ text: UNKNOWN, dim: true }],
       [{ text: 'Not caught yet', dim: true }],
+      ...itemNotes('Modster', entry.id, entry),
     ]
   }
   const primary = entry.types[0]
@@ -41,6 +44,7 @@ export function detailLines(input: DetailInput): BandLine[] {
   lines.push([{ text: `Caught ×${record.count} · best ${record.bestTier}` }])
   lines.push([{ text: `First ${day(record.firstCaughtAt)} · last ${day(record.lastCaughtAt)}`, dim: true }])
   if (input.habitat.length > 0) lines.push([{ text: `Lives in ${input.habitat.join(', ')}`, dim: true }])
+  lines.push(...itemNotes('Modster', entry.id, entry))
   if (dex?.entry) lines.push([{ text: dex.entry }])
   return lines
 }

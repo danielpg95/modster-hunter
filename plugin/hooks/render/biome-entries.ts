@@ -6,6 +6,8 @@ import { TIERS } from '../constants'
 import type { LoadedBiome, LoadedModster, ModsterType, Rarity } from '../content'
 import { oddsTable, type OddsRow } from '../game'
 import type { CaughtRecord } from '../store'
+import { entryMarks, type EntryMarks } from './collection-entries'
+import type { ItemMarks } from './item-notes'
 
 export interface BiomeOdds extends OddsRow {
   number?: number
@@ -21,7 +23,7 @@ export interface TierSection {
   odds: BiomeOdds[]
 }
 
-export interface BiomeEntry {
+export interface BiomeEntry extends ItemMarks {
   id: string
   name: string
   accentColor?: string
@@ -37,6 +39,7 @@ export function biomeEntries(
   modsters: ReadonlyMap<string, LoadedModster>,
   records: ReadonlyMap<string, CaughtRecord>,
   currentId: string | undefined,
+  marks: EntryMarks = {},
 ): BiomeEntry[] {
   const plain = new Map([...modsters].map(([id, loaded]) => [id, loaded.modster]))
   const entries = [...biomes].map(({ biome }): BiomeEntry => {
@@ -52,6 +55,7 @@ export function biomeEntries(
       isCurrent: biome.id === currentId,
       caught: odds.filter((row) => row.record).length,
       odds,
+      ...entryMarks(biome.id, marks),
     }
   })
   return entries.sort((a, b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id))
