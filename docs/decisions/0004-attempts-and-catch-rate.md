@@ -1,6 +1,6 @@
 # 0004 — Attempts and catch rate per Modster, derived from rarity unless overridden
 
-- **Status:** Accepted
+- **Status:** Accepted (point 1 superseded by 0030)
 - **Date:** 2026-10-07
 - **Decided by:** @danielpg95 (rarity thresholds and default numbers proposed by Claude; tune freely in P2-05)
 
