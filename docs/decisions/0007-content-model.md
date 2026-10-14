@@ -1,6 +1,6 @@
 # 0007 — Weights instead of percentages; built-in and user content merged by id
 
-- **Status:** Accepted
+- **Status:** Accepted (point 1 superseded by 0030)
 - **Date:** 2026-10-07
 - **Decided by:** @danielpg95
 
