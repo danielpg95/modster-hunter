@@ -85,12 +85,33 @@ describe('mergeContent', () => {
     const settings = { schemaVersion: 1 as const, disabledBiomes: ['forest'], disabledModsters: ['crablet'] }
     const content = mergeContent({ builtIn: builtIn(), user: registry({}, {}), settings, settingsFile: SETTINGS })
     expect(names(content)).toEqual(['Sproutling', 'Mossbeast'])
-    // forest is disabled; shore's only Modster is disabled
+    // forest is disabled; shore's only Modster is disabled, which drops its entry quietly (0032 point 6)
     expect(content.biomes.size).toBe(0)
-    expect(content.issues.map(formatIssue)).toEqual([
-      'biomes/shore/biome.json: modsters[0].id names a Modster that doesn\'t exist: "crablet"',
-      'biomes/shore/biome.json: modsters has no Modsters left that exist',
-    ])
+    expect(content.issues.map(formatIssue)).toEqual(['biomes/shore/biome.json: modsters has no Modsters left that exist'])
+  })
+
+  test('a biome entry naming a disabled Modster is dropped without an issue (decision 0032)', () => {
+    const settings = { schemaVersion: 1 as const, disabledModsters: ['mossbeast'] }
+    const content = mergeContent({ builtIn: builtIn(), user: registry({}, {}), settings, settingsFile: SETTINGS })
+    expect(content.biomes.get('forest')?.biome.modsters.map((entry) => entry.id)).toEqual(['sproutling'])
+    expect(content.issues).toEqual([])
+  })
+
+  test('disabled items are kept aside in off, without the Modsters that are off', () => {
+    const settings = { schemaVersion: 1 as const, disabledBiomes: ['forest'], disabledModsters: ['mossbeast'] }
+    const content = mergeContent({ builtIn: builtIn(), user: registry({}, {}), settings, settingsFile: SETTINGS })
+    expect([...content.off.biomes.keys()]).toEqual(['forest'])
+    expect([...content.off.modsters.keys()]).toEqual(['mossbeast'])
+    expect(content.off.biomes.get('forest')?.biome.modsters.map((entry) => entry.id)).toEqual(['sproutling'])
+    expect(content.modsters.has('mossbeast')).toBe(false)
+  })
+
+  test('userIds names what loaded from the user folder, overrides included, on or off', () => {
+    const user = registry({ meadow: ['blobby'] }, { sproutling: 'Sprout II', blobby: 'Blobby' }, '~/')
+    const settings = { schemaVersion: 1 as const, disabledModsters: ['blobby'] }
+    const content = mergeContent({ builtIn: builtIn(), user, settings, settingsFile: SETTINGS })
+    expect([...content.userIds.modsters].sort()).toEqual(['blobby', 'sproutling'])
+    expect([...content.userIds.biomes]).toEqual(['meadow'])
   })
 
   test('disabling an id that is not loaded is a warning', () => {

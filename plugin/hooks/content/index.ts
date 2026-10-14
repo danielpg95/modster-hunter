@@ -14,11 +14,12 @@ export {
   type LoadOptions,
   type SheetLoader,
 } from './load-content'
-export { mergeContent, type ContentSources } from './merge-content'
+export { mergeContent, type ContentSources, type MergedContent } from './merge-content'
 export { noBiomesMessage } from './no-biomes-message'
 export { spriteFromGif } from './sprite-from-gif'
 export { spriteFromPng } from './sprite-from-png'
 export { spriteFromSheet, type RgbaImage } from './sprite-from-sheet'
+export { toggleDisabled, type ToggleChange, type TogglePlan } from './toggle-disabled'
 export type { Biome, BiomeModsterEntry, BiomeParticles, ContentIssue, Modster, ModsterDex, ModsterType, ParticleStyle, Rarity, Sprite, UserSettings, Validation } from './types'
 export { validateBiome } from './validate-biome'
 export { validateModster } from './validate-modster'
