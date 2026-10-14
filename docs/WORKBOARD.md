@@ -15,6 +15,7 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
+| P5-15 | @danielpg95 | in-progress | p5-15-clear-restart | 2026-10-13 | 2026-10-13 | Write the failing register test: throw after `/clear` and turn end must settle |
 
 ## Up next
 
@@ -29,5 +30,4 @@ list when you finish a task.
 - **P5-05** — Light skill catch experiment
 - **P5-06** — Desktop app support
 - **P5-09** — Sprite miniatures (spike)
-- **P5-15** — Keep the game running after `/clear`
 - **P5-16** — Tier-first encounters
