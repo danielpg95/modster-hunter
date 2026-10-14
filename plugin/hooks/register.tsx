@@ -185,7 +185,18 @@ export const register: Register = (on, options) => {
 
   // /clear, /resume and /branch don't fire session.start; keep the pane for them too (0019)
   on('classic.SessionStart', async ($, e, next) => {
-    if (e.source !== 'startup') await openHuntPaneAtStart($)
+    if (e.source !== 'startup') {
+      // They do fire session.end, which stopped the timers: start the game again
+      // on the same biome, under the new session id (P5-15)
+      if (!tickTimer && content) {
+        sessionId = await $.session.id().catch(() => 'unknown')
+        startMachine($, idleTimeoutSec)
+        shownStatus = undefined
+        $.ui.status(undefined)
+        $.ui.invalidate('ui.render')
+      }
+      await openHuntPaneAtStart($)
+    }
     return next(e)
   })
 

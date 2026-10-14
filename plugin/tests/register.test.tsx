@@ -273,8 +273,71 @@ describe('register', () => {
     await ui.unmount()
   })
 
+  // /clear fires session.end, which stops the timers, and no session.start (P5-15)
+  test('after /clear, a throw once Claude stops settles, and Modsters keep coming', async ($, on) => {
+    const { ui, clock } = await startBand($, on)
+    await clearSession($)
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(4_000 + BAND_TICK)
+    await $.turn.complete({ reason: 'answer', answer: 'ok', durationMs: 1 } as any)
+    await ui.press({ key: 'throw' })
+    await clock.advance(1_500 + BAND_TICK)
+    expect(await ui.find({ type: 'Text', text: 'Caught Sproutling!' })).toBeDefined()
+    await clock.advance(4_000)
+    expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeDefined()
+
+    // A new Modster still appears mid-turn, with no event but the tick to bring it
+    await $.turn.start({ text: 'again', turnId: 't2' } as any)
+    await clock.advance(3_000 + BAND_TICK)
+    expect(await ui.find({ type: 'Text', text: 'appeared!' })).toBeDefined()
+    await ui.unmount()
+  })
+
+  test('after /clear, a throw once Claude stops never stays on the wobble: a miss offers Throw again', async ($, on) => {
+    // The test engine can't script Math.random: at a 1% catch rate the throw misses
+    // 99 times in 100, and either way the wobble must settle
+    const files = oneModsterForest()
+    files['modsters/sproutling/modster.json'] = JSON.stringify({ ...validModster(), catchRate: 0.01 })
+    const { ui, clock } = await startBand($, on, files)
+    await clearSession($)
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(4_000 + BAND_TICK)
+    await $.turn.complete({ reason: 'answer', answer: 'ok', durationMs: 1 } as any)
+    await ui.press({ key: 'throw' })
+    await clock.advance(1_500 + BAND_TICK)
+    expect(await ui.find({ type: 'Text', text: 'wobble… wobble…' })).toBeUndefined()
+    if (!(await ui.find({ type: 'Text', text: 'Caught Sproutling!' }))) {
+      expect(await ui.find({ type: 'Text', text: '2 throws left' })).toBeDefined()
+      expect(await ui.find({ type: 'Button', key: 'throw' })).toBeDefined()
+    }
+    await ui.unmount()
+  })
+
+  test('after /clear, an encounter that was up is dropped and stats go to the new session', async ($, on) => {
+    const store: Record<string, unknown> = {}
+    on('store.get', ($, e) => ({ value: structuredClone(store[e.key]) }))
+    on('store.set', ($, e) => {
+      store[e.key] = structuredClone(e.value)
+      return { value: undefined }
+    })
+    let id = 'first'
+    on('session.id', () => ({ value: id }))
+    const { ui, clock } = await startBand($, on)
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(4_000 + BAND_TICK)
+    id = 'second'
+    await clearSession($)
+    expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeDefined()
+    expect(await ui.find({ type: 'Button', key: 'throw' })).toBeUndefined()
+
+    await $.turn.start({ text: 'again', turnId: 't2' } as any)
+    await clock.advance(BAND_TICK)
+    expect(store['stats:first']).toMatchObject({ turns: 1, encounters: 1, catches: 0, flees: 0 })
+    expect(store['stats:second']).toMatchObject({ turns: 1, encounters: 0 })
+    await ui.unmount()
+  })
+
   test('the scene stops at session end', async ($, on) => {
-    on('session.end', () => ({ sessionId: 's1' }))
     const blits = sceneBlits(on)
     const { ui, clock } = await startBand($, on, sceneForest())
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
@@ -408,6 +471,12 @@ function sceneBlits(on: On): unknown[] {
   return blits
 }
 
+/** What Claude Code does on /clear: ends the session, then starts a new one without session.start. */
+async function clearSession($: any): Promise<void> {
+  await $.session.end({ reason: 'clear' } as any)
+  await $.classic.SessionStart({ source: 'clear' })
+}
+
 /** Starts a session on the one-Modster forest with a fake clock, and mounts the band. */
 async function startBand($: any, on: On, files = oneModsterForest()) {
   on('session.start', ($, e) => ({ cwd: e.cwd }))
@@ -416,6 +485,8 @@ async function startBand($: any, on: On, files = oneModsterForest()) {
   // What Claude Code itself would answer beneath the mod
   on('turn.start', ($, e) => ({ turnId: e.turnId }))
   on('turn.complete', () => ({ text: '' }))
+  on('session.end', () => ({ sessionId: 's1' }))
+  on('classic.SessionStart', () => ({}))
   on('ui.render', ($, e) => {
     const { Box } = $.ui.resolve(e)
     return <Box />
