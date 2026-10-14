@@ -44,6 +44,7 @@ import {
   paneHint,
   readDisplaySettings,
   sceneCells,
+  settingsLines,
   spriteCells,
   statsLines,
   type BandEncounter,
@@ -76,12 +77,19 @@ let content: ContentRegistry | undefined
 // The session's biome (decision 0006). /clear, /resume and /branch don't start a
 // new process or reload the module, so it survives them as a module variable.
 let biomeId: string | undefined
+// After a reload that dropped the session's biome, its old copy plays on until the
+// encounter in progress ends; then a new biome is picked (P4-02)
+let retiredBiome: LoadedBiome | undefined
+// A reload in progress, so a second /modsters reload waits on it instead of racing it
+let reloading: Promise<string> | undefined
 
 // The encounter loop (decisions 0005, 0014). Not persisted: a reload or a new
 // session drops an encounter in progress without counting it (0005).
 let machine: EncounterState | undefined
 let machineContext: EncounterContext | undefined
 let tickTimer: Timer | undefined
+// The Modster as it loaded when it appeared, so a reload leaves the encounter as it was (P4-02)
+let encounterModster: LoadedModster | undefined
 
 // Collection and stats (decision 0009). Writes run one after another so this
 // session never races itself; each one re-reads its key first.
@@ -95,7 +103,8 @@ const USER_FOLDER_LABEL = `~/${USER_CONTENT.contentFolder}/`
 // The band and the encounter pane (0015) are "sites"; each frame is blitted to every
 // site drawing the sprite right now.
 const SPRITE_KEY = 'sprite'
-const cellsByModster = new Map<string, string[]>()
+// Keyed by id, checked against the sprite it was made from: a reload may change a sprite
+const cellsByModster = new Map<string, { sprite: LoadedModster['sprite']; cells: string[] }>()
 const spriteSites = new Set<string>() // requestIds
 let frameTimer: Timer | undefined
 let frameModster: LoadedModster | undefined
@@ -121,6 +130,8 @@ const PANE_ID = 'modster-hunt'
 // Where the game shows (0023). A change in /config reloads the module, so this is
 // read once per load
 let display = readDisplaySettings({})
+// The `includeBuiltins` option, for messages outside register's closure
+let builtinsIncluded = true
 // What the status line shows now, so a tick that changes nothing doesn't re-pin it
 let shownStatus: string | undefined
 /** The collection had the current Modster when it appeared (P5-10); read once per encounter */
@@ -165,6 +176,7 @@ export const register: Register = (on, options) => {
   const showIdleLine = options.showIdleLine !== false
   const showIdleScene = options.showIdleScene !== false
   const includeBuiltins = options.includeBuiltins !== false
+  builtinsIncluded = includeBuiltins
   display = readDisplaySettings(options)
 
   on('session.start', async ($, e, next) => {
@@ -246,7 +258,7 @@ export const register: Register = (on, options) => {
       return next(e)
     }
     const modster = currentModster()
-    const biome = biomeId === undefined ? undefined : content?.biomes.get(biomeId)?.biome
+    const biome = sessionBiome()?.biome
     const band = markedEncounter()
     const view = bandView({
       maxRows: e.props.maxRows,
@@ -338,7 +350,7 @@ export const register: Register = (on, options) => {
     const { Box, Text, Button } = $.ui.resolve(e)
     const modster = currentModster()
     const encounter = markedEncounter()
-    const biome = biomeId === undefined ? undefined : content?.biomes.get(biomeId)?.biome
+    const biome = sessionBiome()?.biome
     const rows = Math.max(0, e.props.scroll.bodyRows - 2) // header and a blank line
     const columns = e.props.bodyColumns
 
@@ -472,7 +484,7 @@ export const register: Register = (on, options) => {
   on('ui.render', { component: 'Pane' }, ($, e, next) => {
     if (e.requestId !== COLLECTION_PANE_ID) return next(e)
     const { Box, Text, Button } = $.ui.resolve(e)
-    const biome = biomeId === undefined ? undefined : content?.biomes.get(biomeId)?.biome
+    const biome = sessionBiome()?.biome
     const title = biome ? biome.name : 'No biome'
     const layout = collectionLayout({
       placement: e.props.placement,
@@ -518,7 +530,6 @@ export const register: Register = (on, options) => {
         ) : null}
       </Box>
     )
-    const tab = COLLECTION_TABS.find((info) => info.id === collectionTab) ?? COLLECTION_TABS[0]
     const texts = (line: BandLine, wrap: 'wrap' | 'truncate') =>
       line.map((segment, at) =>
         'text' in segment ? (
@@ -554,9 +565,22 @@ export const register: Register = (on, options) => {
             ? biomesView(e.props.scroll.bodyRows - usedRows)
             : collectionTab === 'stats'
               ? statsView()
-              : <Text key="body">{tab?.placeholder}</Text>}
+              : settingsView()}
       </Box>
     )
+
+    /** The Settings tab: every content issue from the last load, and how to reload (P4-02). */
+    function settingsView() {
+      return (
+        <Box key="settings" flexDirection="column">
+          {settingsLines(content?.issues ?? []).map((line, at) => (
+            <Box key={`settings-${at}`} flexDirection="row">
+              {texts(line, 'wrap')}
+            </Box>
+          ))}
+        </Box>
+      )
+    }
 
     /** The Stats tab: the totals and a row per biome (P3-04). */
     function statsView() {
@@ -800,6 +824,12 @@ export const register: Register = (on, options) => {
       $.ui.invalidate('ui.render')
       return opened.isPlaced ? {} : { text: 'Modster Hunter: the pane is waiting for more room (widen the terminal)' }
     }
+    if (verb === 'reload') {
+      reloading ??= reloadContent($, includeBuiltins, idleTimeoutSec).finally(() => {
+        reloading = undefined
+      })
+      return { text: await reloading }
+    }
     // Catches from other sessions show up when the pane opens
     loadCollectionRecords($)
     if (collectionTab === 'stats') loadStats($)
@@ -811,17 +841,22 @@ export const register: Register = (on, options) => {
 }
 
 function cellsFor(loaded: LoadedModster): string[] {
-  let cells = cellsByModster.get(loaded.modster.id)
-  if (!cells) {
-    cells = spriteCells(loaded.sprite)
-    cellsByModster.set(loaded.modster.id, cells)
-  }
+  const cached = cellsByModster.get(loaded.modster.id)
+  if (cached?.sprite === loaded.sprite) return cached.cells
+  const cells = spriteCells(loaded.sprite)
+  cellsByModster.set(loaded.modster.id, { sprite: loaded.sprite, cells })
   return cells
 }
 
 function currentModster(): LoadedModster | undefined {
   const encounter = machine?.encounter
-  return encounter && content?.modsters.get(encounter.modsterId)
+  if (!encounter) return undefined
+  return encounterModster?.modster.id === encounter.modsterId ? encounterModster : content?.modsters.get(encounter.modsterId)
+}
+
+/** The biome being played: the session's, or the one a reload dropped while its encounter finishes. */
+function sessionBiome(): LoadedBiome | undefined {
+  return retiredBiome ?? (biomeId === undefined ? undefined : content?.biomes.get(biomeId))
 }
 
 /** The encounter as the band, pane, spinner and status line draw it. */
@@ -861,26 +896,38 @@ function startMachine($: EngineInterface, idleTimeoutSec: number): void {
   machine = undefined
   machineContext = undefined
   alreadyCaught = false
+  encounterModster = undefined
+  retiredBiome = undefined
   cellsByModster.clear()
   const loaded = biomeId === undefined ? undefined : content?.biomes.get(biomeId)
-  scene = loaded && idleScene(loaded.biome, loaded.background)
-  loggedSceneSkip = undefined
-  if (loaded) $.ui.log(scene ? `idle scene: ${loaded.biome.id}, ${scene.rows} rows, timer ${scene.timerFps} fps` : `idle scene: ${loaded.biome.id} has none`, { to: 'debug' })
-  particlesByColumns.clear()
-  sceneTick = 0
-  const biome = loaded?.biome
-  if (!content || !biome) return
-  machineContext = {
-    biome,
-    modsters: new Map([...content.modsters].map(([id, loaded]) => [id, loaded.modster])),
-    random: Math.random,
-    idleTimeoutMs: idleTimeoutSec * 1000,
-  }
+  setScene($, loaded)
+  if (!content || !loaded) return
+  machineContext = playContext(content, loaded, idleTimeoutSec)
   machine = startEncounters(machineContext)
   // Timers start in session.start, never at module top level (mod-code rule)
   tickTimer = $.clock.every(BAND.tickMs, () => {
     void advanceMachine($, { type: 'tick' })
   })
+}
+
+/** Shows `loaded`'s idle scene in the band, from its first frame. */
+function setScene($: EngineInterface, loaded: LoadedBiome | undefined): void {
+  stopScene()
+  scene = loaded && idleScene(loaded.biome, loaded.background)
+  loggedSceneSkip = undefined
+  if (loaded) $.ui.log(scene ? `idle scene: ${loaded.biome.id}, ${scene.rows} rows, timer ${scene.timerFps} fps` : `idle scene: ${loaded.biome.id} has none`, { to: 'debug' })
+  particlesByColumns.clear()
+  sceneTick = 0
+}
+
+/** What the encounter machine plays from: `loaded`'s biome and every loaded Modster. */
+function playContext(registry: ContentRegistry, loaded: LoadedBiome, idleTimeoutSec: number): EncounterContext {
+  return {
+    biome: loaded.biome,
+    modsters: new Map([...registry.modsters].map(([id, modster]) => [id, modster.modster])),
+    random: Math.random,
+    idleTimeoutMs: idleTimeoutSec * 1000,
+  }
 }
 
 /** The pane header's note on what's running; ticks drop agents past their cap within `BAND.tickMs`. */
@@ -908,7 +955,14 @@ async function advanceMachine($: EngineInterface, action: MachineAction): Promis
   if (step.events.length > 0) queueWrite($, (store) => recordEncounterEvents(store, where, step.events, now))
   for (const event of step.events) if (event.type === 'caught') refreshCollectionRecord($, event.modsterId)
   const appeared = step.events.find((event) => event.type === 'appeared')
-  if (appeared) checkAlreadyCaught($, appeared.modsterId)
+  if (appeared) {
+    encounterModster = content?.modsters.get(appeared.modsterId)
+    checkAlreadyCaught($, appeared.modsterId)
+  }
+  if (retiredBiome && !machine.encounter) {
+    const loaded = moveToNewBiome($, machineContext.idleTimeoutMs / 1000)
+    $.ui.toast(loaded ? `Modster Hunter: now in ${loaded.biome.name}` : `Modster Hunter: ${noBiomesMessage(builtinsIncluded, USER_FOLDER_LABEL)}`)
+  }
 }
 
 /**
@@ -1218,8 +1272,79 @@ function stopBiomesScene(): void {
 }
 
 /**
+ * `/modsters reload` (P4-02, decision 0031): loads content again without a restart.
+ * An encounter in progress keeps its Modster, odds and biome; the next one plays the new content.
+ */
+async function reloadContent($: EngineInterface, includeBuiltins: boolean, idleTimeoutSec: number): Promise<string> {
+  const played = sessionBiome()
+  content = await loadGameContent($, includeBuiltins)
+  // Sprites and backgrounds may have changed, and Modsters come or go
+  cellsByModster.clear()
+  silhouettes.clear()
+  biomeScenes.clear()
+  dropCollectionSite(COLLECTION_PANE_ID)
+  dropBiomesSceneSite(COLLECTION_PANE_ID)
+  loadCollectionRecords($)
+
+  const kept = biomeId === undefined ? undefined : content.biomes.get(biomeId)
+  let note = ''
+  if (kept && machine) {
+    retiredBiome = undefined
+    machineContext = playContext(content, kept, idleTimeoutSec)
+    setScene($, kept)
+    updateSceneTimer($)
+  } else if (kept) {
+    startMachine($, idleTimeoutSec)
+  } else if (machine?.encounter && played) {
+    // The encounter finishes in the old biome; advanceMachine moves on after it
+    retiredBiome = played
+    note = ` · ${played.biome.name} is gone; a new biome after this encounter`
+  } else {
+    const loaded = moveToNewBiome($, idleTimeoutSec)
+    note = loaded ? ` · now in ${loaded.biome.name}` : ''
+  }
+  $.ui.invalidate('ui.render')
+  // Reply once the caught records are read, so the pane opened next shows them
+  await pendingWrites
+
+  const issues = content.issues.length
+  const loaded = `${content.biomes.size} biome${content.biomes.size === 1 ? '' : 's'}, ${content.modsters.size} Modster${content.modsters.size === 1 ? '' : 's'}`
+  const problems = issues === 0 ? 'no problems' : `${issues} problem${issues === 1 ? '' : 's'}, see /modsters → 4: Settings`
+  if (content.biomes.size === 0) return `Modster Hunter: reloaded · ${noBiomesMessage(includeBuiltins, USER_FOLDER_LABEL)} · ${problems}`
+  return `Modster Hunter: reloaded · ${loaded} · ${problems}${note}`
+}
+
+/**
+ * Picks a new biome after the session's stopped loading (P4-02), keeping the
+ * machine's turn and agent state; with none left the game stops until a reload.
+ */
+function moveToNewBiome($: EngineInterface, idleTimeoutSec: number): LoadedBiome | undefined {
+  retiredBiome = undefined
+  biomeId = content ? pickBiome(content.biomes.keys(), Math.random) : undefined
+  const loaded = biomeId === undefined ? undefined : content?.biomes.get(biomeId)
+  if (!machine) {
+    startMachine($, idleTimeoutSec)
+    return loaded
+  }
+  setScene($, loaded)
+  if (!content || !loaded) {
+    tickTimer?.cancel()
+    tickTimer = undefined
+    stopFrames()
+    machine = undefined
+    machineContext = undefined
+    encounterModster = undefined
+    updateStatus($)
+    return undefined
+  }
+  machineContext = playContext(content, loaded, idleTimeoutSec)
+  updateSceneTimer($)
+  return loaded
+}
+
+/**
  * Loads built-in and user content, merged by id (decision 0007). Problems go
- * to the debug log, not the transcript; the Settings tab will list them (P4-02).
+ * to the debug log, not the transcript; the Settings tab lists them (P4-02).
  */
 async function loadGameContent($: EngineInterface, includeBuiltins: boolean): Promise<ContentRegistry> {
   const started = performance.now()
