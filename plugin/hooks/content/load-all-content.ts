@@ -1,5 +1,5 @@
 import { loadFolder, type ContentReader, type ContentRegistry, type SheetLoader } from './load-content'
-import { mergeContent } from './merge-content'
+import { mergeContent, type MergedContent } from './merge-content'
 import type { ContentIssue, UserSettings } from './types'
 import { validateSettings } from './validate-settings'
 
@@ -16,7 +16,7 @@ export interface ContentFolders {
  * Loads built-in and user content and merges them by id (decision 0007).
  * The user folder and its `settings.json` are optional; never rejects.
  */
-export async function loadAllContent(folders: ContentFolders): Promise<ContentRegistry> {
+export async function loadAllContent(folders: ContentFolders): Promise<MergedContent> {
   const { reader, builtInRoot, includeBuiltins, user } = folders
   const [builtIn, userContent] = await Promise.all([
     includeBuiltins ? loadFolder(reader, builtInRoot) : undefined,

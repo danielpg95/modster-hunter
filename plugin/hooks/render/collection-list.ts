@@ -5,6 +5,7 @@
 import { COLLECTION, MODSTER_TYPES } from '../constants'
 import type { BandLine } from './band-view'
 import { dexNumber, type CollectionEntry } from './collection-entries'
+import { offRow } from './item-notes'
 
 export interface ListWindow {
   start: number
@@ -29,8 +30,12 @@ export function moreText(window: ListWindow): string | undefined {
   return parts.length > 0 ? `${parts.join(' · ')} more` : undefined
 }
 
-/** One row: marker, number, name in its primary type's color, count and best tier; `???` until caught (0017 point 7). */
+/** One row: marker, number, name in its primary type's color, count and best tier; `???` until caught (0017 point 7). Dimmed with `off` when off (0032). */
 export function listRow(entry: CollectionEntry, isSelected: boolean): BandLine {
+  return offRow(plainRow(entry, isSelected), entry)
+}
+
+function plainRow(entry: CollectionEntry, isSelected: boolean): BandLine {
   const marker = isSelected ? '▸ ' : '  '
   const number = dexNumber(entry).padEnd(5)
   if (!entry.record) return [{ text: marker, bold: true }, { text: `${number}???`, dim: true }]

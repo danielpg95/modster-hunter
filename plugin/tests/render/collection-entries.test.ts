@@ -32,4 +32,12 @@ describe('collectionEntries', () => {
     const [numbered, plain] = collectionEntries([loaded('a', 'Ay', 7), loaded('b', 'Bee')], new Map())
     expect([dexNumber(numbered!), dexNumber(plain!)]).toEqual(['#007', '#—'])
   })
+
+  test('Modsters that are off or the user\'s own carry those marks (decision 0032)', () => {
+    const entries = collectionEntries([loaded('a', 'Ay', 1), loaded('b', 'Bee', 2)], new Map(), { off: new Set(['a']), yours: new Set(['b']) })
+    expect(entries.map(({ id, isOff, isYours }) => ({ id, isOff, isYours }))).toEqual([
+      { id: 'a', isOff: true, isYours: undefined },
+      { id: 'b', isOff: undefined, isYours: true },
+    ])
+  })
 })

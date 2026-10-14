@@ -4,8 +4,15 @@
 
 import type { LoadedModster, ModsterType } from '../content'
 import type { CaughtRecord } from '../store'
+import type { ItemMarks } from './item-notes'
 
-export interface CollectionEntry {
+/** Which listed ids are off or the user's own (decision 0032) */
+export interface EntryMarks {
+  off?: ReadonlySet<string>
+  yours?: ReadonlySet<string>
+}
+
+export interface CollectionEntry extends ItemMarks {
   id: string
   name: string
   number?: number
@@ -14,7 +21,7 @@ export interface CollectionEntry {
   record?: CaughtRecord
 }
 
-export function collectionEntries(modsters: Iterable<LoadedModster>, records: ReadonlyMap<string, CaughtRecord>): CollectionEntry[] {
+export function collectionEntries(modsters: Iterable<LoadedModster>, records: ReadonlyMap<string, CaughtRecord>, marks: EntryMarks = {}): CollectionEntry[] {
   const entries: CollectionEntry[] = []
   for (const { modster } of modsters) {
     const record = records.get(modster.id)
@@ -24,6 +31,7 @@ export function collectionEntries(modsters: Iterable<LoadedModster>, records: Re
       ...(modster.dex?.number === undefined ? {} : { number: modster.dex.number }),
       types: modster.dex?.types ?? [],
       ...(record ? { record } : {}),
+      ...entryMarks(modster.id, marks),
     })
   }
   return entries.sort((a, b) => {
@@ -32,6 +40,11 @@ export function collectionEntries(modsters: Iterable<LoadedModster>, records: Re
     if (b.number !== undefined) return 1
     return a.name.localeCompare(b.name) || a.id.localeCompare(b.id)
   })
+}
+
+/** The marks for one id, set only when true (an optional `true`-only field). */
+export function entryMarks(id: string, marks: EntryMarks): ItemMarks {
+  return { ...(marks.off?.has(id) ? { isOff: true } : {}), ...(marks.yours?.has(id) ? { isYours: true } : {}) }
 }
 
 /** `#001`, or `#—` for a Modster without a number. */

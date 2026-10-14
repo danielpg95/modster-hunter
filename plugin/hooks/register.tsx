@@ -3,13 +3,17 @@ import { BAND, COLLECTION, USER_CONTENT } from './constants'
 import {
   cachedSheetLoader,
   formatIssue,
+  leavesNoBiome,
   loadAllContent,
   noBiomesMessage,
+  toggleDisabled,
   type ContentReader,
   type ContentRegistry,
   type LoadedBiome,
   type LoadedModster,
+  type MergedContent,
   type SheetFiles,
+  type ToggleChange,
 } from './content'
 import {
   pickBiome,
@@ -47,6 +51,9 @@ import {
   settingsLines,
   spriteCells,
   statsLines,
+  TOGGLE_HOTKEY,
+  itemNotes,
+  toggleLabel,
   type BandEncounter,
   type BandLine,
   type BiomeEntry,
@@ -73,7 +80,7 @@ import {
 } from './store'
 
 // Rebuilt at every session start; cheap, so it isn't kept in $.state (ARCHITECTURE.md)
-let content: ContentRegistry | undefined
+let content: MergedContent | undefined
 // The session's biome (decision 0006). /clear, /resume and /branch don't start a
 // new process or reload the module, so it survives them as a module variable.
 let biomeId: string | undefined
@@ -81,7 +88,9 @@ let biomeId: string | undefined
 // encounter in progress ends; then a new biome is picked (P4-02)
 let retiredBiome: LoadedBiome | undefined
 // A reload in progress, so a second /modsters reload waits on it instead of racing it
-let reloading: Promise<string> | undefined
+let reloading: Promise<Reloaded> | undefined
+// Turning items off and on (decision 0032), one at a time: each reads settings.json after the last wrote it
+let toggling: Promise<void> = Promise.resolve()
 
 // The encounter loop (decisions 0005, 0014). Not persisted: a reload or a new
 // session drops an encounter in progress without counting it (0005).
@@ -591,7 +600,7 @@ export const register: Register = (on, options) => {
           </Text>
         )
       }
-      const biomes = new Map([...(content?.biomes.values() ?? [])].map(({ biome: loaded }) => [loaded.id, { name: loaded.name, ...(loaded.accentColor ? { accentColor: loaded.accentColor } : {}) }]))
+      const biomes = new Map([...(content?.biomes.values() ?? []), ...(content?.off.biomes.values() ?? [])].map(({ biome: loaded }) => [loaded.id, { name: loaded.name, ...(loaded.accentColor ? { accentColor: loaded.accentColor } : {}) }]))
       return (
         <Box key="stats" flexDirection="column">
           {statsLines(statsShown.stats, biomes).map((line, at) => (
@@ -605,7 +614,13 @@ export const register: Register = (on, options) => {
 
     /** The Biomes tab: a summary line with k/j, the biome list, and the selected biome's odds (P3-03). */
     function biomesView(rows: number) {
-      const entries = content ? biomeEntries(content.biomes.values(), content.modsters, collectionRecords, biomeId) : []
+      // Off biomes stay listed, dimmed, so `o` can turn them back on (0032 point 5)
+      const entries = content
+        ? biomeEntries([...content.biomes.values(), ...content.off.biomes.values()], content.modsters, collectionRecords, biomeId, {
+            off: new Set(content.off.biomes.keys()),
+            yours: content.userIds.biomes,
+          })
+        : []
       // A selected biome that no longer loads falls back to the session's
       const at = (id: string | undefined) => entries.findIndex((entry) => entry.id === id)
       const index = Math.max(0, at(biomesSelected) >= 0 ? at(biomesSelected) : at(biomeId))
@@ -620,6 +635,16 @@ export const register: Register = (on, options) => {
           <Text bold>{`Biomes ${entries.length}`}</Text>
           <Button key="biome-up" label="Up" hotkey="k" plain dimColor onPress={() => select(entries[index - 1])} />
           <Button key="biome-down" label="Down" hotkey="j" plain dimColor onPress={() => select(entries[index + 1])} />
+          {selected ? (
+            <Button
+              key="biome-toggle"
+              label={toggleLabel(selected)}
+              hotkey={TOGGLE_HOTKEY}
+              plain
+              dimColor
+              onPress={() => toggle($, { kind: 'biome', id: selected.id, off: !selected.isOff }, selected.name, includeBuiltins, idleTimeoutSec)}
+            />
+          ) : null}
         </Box>
       )
       if (!selected) {
@@ -627,7 +652,7 @@ export const register: Register = (on, options) => {
         return <Box key="biomes" flexDirection="column">{summary}</Box>
       }
       // Raster is terminal only (0012); 0028 point 3
-      const loadedBiome = content?.biomes.get(selected.id)
+      const loadedBiome = content?.biomes.get(selected.id) ?? content?.off.biomes.get(selected.id)
       const scene = showIdleScene && e.surface === 'terminal' && loadedBiome ? biomeScene(loadedBiome) : undefined
       // Less the summary line
       const plan = biomesBody({ columns: e.props.bodyColumns, rows: rows - 1, ...(scene ? { sceneRows: scene.rows } : {}) })
@@ -653,6 +678,11 @@ export const register: Register = (on, options) => {
       )
       const odds = (
         <Box key="odds" flexDirection="column">
+          {itemNotes('biome', selected.id, selected).map((line, at) => (
+            <Box key={`note-${at}`} flexDirection="row">
+              {texts(line, 'wrap')}
+            </Box>
+          ))}
           {selected.odds.length === 0 ? <Text dimColor>No Modsters loaded.</Text> : null}
           {tierSections(selected.odds).map((section, index) => (
             <Box key={`tier-${section.tier}`} flexDirection="column">
@@ -691,7 +721,13 @@ export const register: Register = (on, options) => {
 
     /** The Collection tab: a summary line with k/j, the list, and the selected Modster (P3-02). */
     function collectionView(rows: number) {
-      const entries = collectionEntries(content ? content.modsters.values() : [], collectionRecords)
+      // Off Modsters stay listed, dimmed, so `o` can turn them back on (0032 point 5)
+      const entries = content
+        ? collectionEntries([...content.modsters.values(), ...content.off.modsters.values()], collectionRecords, {
+            off: new Set(content.off.modsters.keys()),
+            yours: content.userIds.modsters,
+          })
+        : []
       const caught = entries.filter((entry) => entry.record).length
       const index = Math.max(0, entries.findIndex((entry) => entry.id === collectionSelected))
       const selected = entries[index]
@@ -705,6 +741,19 @@ export const register: Register = (on, options) => {
           <Text bold>{`Caught ${caught}/${entries.length}`}</Text>
           <Button key="up" label="Up" hotkey="k" plain dimColor onPress={() => select(entries[index - 1])} />
           <Button key="down" label="Down" hotkey="j" plain dimColor onPress={() => select(entries[index + 1])} />
+          {selected ? (
+            <Button
+              key="toggle"
+              label={toggleLabel(selected)}
+              hotkey={TOGGLE_HOTKEY}
+              plain
+              dimColor
+              // An uncaught Modster's name stays a secret (0032 point 4)
+              onPress={() =>
+                toggle($, { kind: 'modster', id: selected.id, off: !selected.isOff }, selected.record ? selected.name : 'That Modster', includeBuiltins, idleTimeoutSec)
+              }
+            />
+          ) : null}
         </Box>
       )
       if (!selected) {
@@ -716,7 +765,7 @@ export const register: Register = (on, options) => {
           </Box>
         )
       }
-      const loaded = content?.modsters.get(selected.id)
+      const loaded = content?.modsters.get(selected.id) ?? content?.off.modsters.get(selected.id)
       const habitat = content
         ? [...content.biomes.values()].filter(({ biome }) => biome.modsters.some((entry) => entry.id === selected.id)).map(({ biome }) => biome.name)
         : []
@@ -828,7 +877,7 @@ export const register: Register = (on, options) => {
       reloading ??= reloadContent($, includeBuiltins, idleTimeoutSec).finally(() => {
         reloading = undefined
       })
-      return { text: await reloading }
+      return { text: (await reloading).reply }
     }
     // Catches from other sessions show up when the pane opens
     loadCollectionRecords($)
@@ -1137,7 +1186,8 @@ function stopScene(): void {
 
 /** Reads every loaded Modster's `caught:` record into memory, after the writes before it (P3-02). */
 function loadCollectionRecords($: EngineInterface): void {
-  const ids = content ? [...content.modsters.keys()] : []
+  // Off Modsters stay listed (0032 point 5), so their records are read too
+  const ids = content ? [...content.modsters.keys(), ...content.off.modsters.keys()] : []
   queueWrite($, async (store) => {
     const records = await Promise.all(ids.map(async (id) => [id, readCaughtRecord(await store.get(caughtKey(id)))] as const))
     collectionRecords.clear()
@@ -1169,7 +1219,7 @@ function refreshCollectionRecord($: EngineInterface, modsterId: string): void {
 function spriteBox(): { columns: number; rows: number } {
   let columns = 0
   let rows = 0
-  for (const { sprite } of content?.modsters.values() ?? []) {
+  for (const { sprite } of [...(content?.modsters.values() ?? []), ...(content?.off.modsters.values() ?? [])]) {
     columns = Math.max(columns, sprite.width)
     rows = Math.max(rows, Math.ceil(sprite.height / 2))
   }
@@ -1275,7 +1325,7 @@ function stopBiomesScene(): void {
  * `/modsters reload` (P4-02, decision 0031): loads content again without a restart.
  * An encounter in progress keeps its Modster, odds and biome; the next one plays the new content.
  */
-async function reloadContent($: EngineInterface, includeBuiltins: boolean, idleTimeoutSec: number): Promise<string> {
+async function reloadContent($: EngineInterface, includeBuiltins: boolean, idleTimeoutSec: number): Promise<Reloaded> {
   const played = sessionBiome()
   content = await loadGameContent($, includeBuiltins)
   // Sprites and backgrounds may have changed, and Modsters come or go
@@ -1310,8 +1360,65 @@ async function reloadContent($: EngineInterface, includeBuiltins: boolean, idleT
   const issues = content.issues.length
   const loaded = `${content.biomes.size} biome${content.biomes.size === 1 ? '' : 's'}, ${content.modsters.size} Modster${content.modsters.size === 1 ? '' : 's'}`
   const problems = issues === 0 ? 'no problems' : `${issues} problem${issues === 1 ? '' : 's'}, see /modsters → 4: Settings`
-  if (content.biomes.size === 0) return `Modster Hunter: reloaded · ${noBiomesMessage(includeBuiltins, USER_FOLDER_LABEL)} · ${problems}`
-  return `Modster Hunter: reloaded · ${loaded} · ${problems}${note}`
+  if (content.biomes.size === 0) {
+    const none = noBiomesMessage(includeBuiltins, USER_FOLDER_LABEL)
+    return { reply: `Modster Hunter: reloaded · ${none} · ${problems}`, note: ` · ${none}` }
+  }
+  return { reply: `Modster Hunter: reloaded · ${loaded} · ${problems}${note}`, note }
+}
+
+/** A reload's reply to `/modsters reload`, and what changed for the game (a new biome, or none left). */
+interface Reloaded {
+  reply: string
+  note: string
+}
+
+/** Queues turning an item off or on (decision 0032), after any toggle still running. */
+function toggle($: EngineInterface, change: ToggleChange, name: string, includeBuiltins: boolean, idleTimeoutSec: number): void {
+  toggling = toggling
+    .then(() => toggleContent($, change, name, includeBuiltins, idleTimeoutSec))
+    // A failure never blocks the next press
+    .catch((error: unknown) => $.ui.log(`toggle: ${error instanceof Error ? error.message : String(error)}`, { to: 'debug' }))
+}
+
+/**
+ * Turns a biome or Modster off or on in the user's `settings.json`, then
+ * reloads (decision 0032). A file that isn't valid is left alone; only the user
+ * folder is ever written, never `plugin/content/` (point 2).
+ */
+async function toggleContent($: EngineInterface, change: ToggleChange, name: string, includeBuiltins: boolean, idleTimeoutSec: number): Promise<void> {
+  // The pane never stops the game by itself; settings.json by hand still can (0032 point 8)
+  if (content && leavesNoBiome(content, change)) {
+    $.ui.toast(`Modster Hunter: can't turn off ${name}: no biome would be left to play`)
+    return
+  }
+  const file = `${USER_FOLDER_LABEL}settings.json`
+  const home = await homeFolder($)
+  if (home === undefined) {
+    $.ui.toast(`Modster Hunter: no home folder, so ${file} can't be written`)
+    return
+  }
+  const path = `${home}/${USER_CONTENT.contentFolder}/settings.json`
+  try {
+    const current = (await $.fs.exists(path)) ? await $.fs.read(path) : undefined
+    const plan = toggleDisabled(typeof current === 'string' ? current : undefined, change, file)
+    if (!plan.ok) {
+      $.ui.toast(`Modster Hunter: ${plan.problem}`)
+      return
+    }
+    await $.fs.write(path, plan.text)
+  } catch (error) {
+    $.ui.log(`settings: ${path}: ${error instanceof Error ? error.message : String(error)}`, { to: 'debug' })
+    $.ui.toast(`Modster Hunter: couldn't change ${file}`)
+    return
+  }
+  // A reload that started before the write wouldn't see it, so wait it out and start one
+  await reloading?.catch(() => undefined)
+  reloading = reloadContent($, includeBuiltins, idleTimeoutSec).finally(() => {
+    reloading = undefined
+  })
+  const { note } = await reloading
+  $.ui.toast(`Modster Hunter: ${name} is ${change.off ? 'off' : 'on'}${note}`)
 }
 
 /**
@@ -1346,7 +1453,7 @@ function moveToNewBiome($: EngineInterface, idleTimeoutSec: number): LoadedBiome
  * Loads built-in and user content, merged by id (decision 0007). Problems go
  * to the debug log, not the transcript; the Settings tab lists them (P4-02).
  */
-async function loadGameContent($: EngineInterface, includeBuiltins: boolean): Promise<ContentRegistry> {
+async function loadGameContent($: EngineInterface, includeBuiltins: boolean): Promise<MergedContent> {
   const started = performance.now()
   const home = await homeFolder($)
   if (home === undefined) $.ui.log('content: no HOME or USERPROFILE, so user content is skipped', { to: 'debug' })

@@ -15,7 +15,6 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P4-03 | @danielpg95 | in-progress | p4-03-enable-disable-delete | 2026-10-14 | 2026-10-14 | Add a pure disable-list and delete planner with tests, then wire keys into the Biomes and Modsters tabs |
 
 ## Up next
 

@@ -1,6 +1,6 @@
 ---
 name: create-modster-content
-description: Create your own Modsters and biomes for the Modster Hunter mod, pixel art included, written to ~/.claude/modster-hunter/content/. Use when someone playing Modster Hunter wants to make, draw, import (PNG or GIF) or change their own Modster or biome, add a Modster to a biome, or hide built-in ones. Not for contributing built-in content to the Modster Hunter repo.
+description: Create your own Modsters and biomes for the Modster Hunter mod, pixel art included, written to ~/.claude/modster-hunter/content/. Use when someone playing Modster Hunter wants to make, draw, import (PNG or GIF) or change their own Modster or biome, add a Modster to a biome, delete one of their own, or hide built-in ones. Not for contributing built-in content to the Modster Hunter repo.
 ---
 
 # Create Modster Hunter content
@@ -45,6 +45,8 @@ which the mod loads at the start of every session next to the built-in content.
 - **Follow the format exactly**: [reference/format.md](reference/format.md).
   Unknown fields are errors. User Modsters have no `dex.number`.
 - **Write only in the content folder**, and only the files below.
+- **Delete only the player's own items**, one at a time, after they confirm
+  ([Delete your own](#delete-your-own)). Never delete built-in content.
 
 ## Make a Modster
 
@@ -164,8 +166,10 @@ rosters change.
 
 ## Hide built-ins
 
-`settings.json` in the content folder can list ids to switch off without
-deleting anything:
+The player can press `o` on a biome or Modster in `/modsters` (Collection or
+Biomes tab) to turn it off or back on. That writes `settings.json` in the
+content folder, which can also be edited by hand to list ids to switch off
+without deleting anything:
 
 ```json
 { "schemaVersion": 1, "disabledBiomes": ["saltbreeze-bay"], "disabledModsters": ["mossbeast"] }
@@ -173,6 +177,24 @@ deleting anything:
 
 To turn off all built-in content, the player sets **Include built-in content**
 off in `/config` for Modster Hunter. Then run `check` with `--without-builtins`.
+
+## Delete your own
+
+The pane can't delete files, so for a player's own item it says to ask you:
+"delete my Modster <id>" or "delete my biome <id>" (decision 0032).
+
+1. Check `modsters/<id>/` or `biomes/<id>/` exists in the content folder. If the
+   id is only built in, say it can't be deleted, only turned off (`o` in
+   `/modsters`). If the player's item replaces a built-in, say the built-in
+   comes back after the delete.
+2. List the files you'll remove, and for a Modster any of the player's biomes
+   that list it (those entries will be dropped, and a biome left with none
+   won't load). Ask the player to confirm. Do nothing without a yes.
+3. Remove only that folder. Remove the id from `settings.json` if it's there.
+   Offer to remove the dropped entries from the player's biomes too.
+4. Their caught record stays in the collection's save, so making the same id
+   again brings it back.
+5. Tell them to run `/modsters reload` (or start a new session).
 
 ## Check and finish
 

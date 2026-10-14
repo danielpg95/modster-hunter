@@ -1,8 +1,9 @@
 import { describe, expect, test } from 'claude-code/testing'
 import type { ContentIssue } from '../../hooks/content'
-import { CONFIG_TEXT, NO_ISSUES_TEXT, RELOAD_TEXT, settingsLines } from '../../hooks/render'
+import { CONFIG_TEXT, NO_ISSUES_TEXT, RELOAD_TEXT, TOGGLE_TEXT, settingsLines } from '../../hooks/render'
 
-// P4-02: every content issue, formatted as formatIssue writes it (0025), then how to reload.
+// P4-02: every content issue, formatted as formatIssue writes it (0025), then how to
+// turn content off (P4-03, 0032) and how to reload.
 
 const text = (line: ReturnType<typeof settingsLines>[number]) => line.map((segment) => ('text' in segment ? segment.text : '')).join('')
 
@@ -10,8 +11,12 @@ const error = (file: string, field: string, problem: string): ContentIssue => ({
 const warning = (file: string, field: string, problem: string): ContentIssue => ({ severity: 'warning', file, field, problem })
 
 describe('settingsLines', () => {
-  test('with no issues it says so, then how to reload and where the settings are', () => {
-    expect(settingsLines([]).map(text)).toEqual([NO_ISSUES_TEXT, '', RELOAD_TEXT, CONFIG_TEXT])
+  test('with no issues it says so, then how to turn content off, how to reload and where the settings are', () => {
+    expect(settingsLines([]).map(text)).toEqual([NO_ISSUES_TEXT, '', TOGGLE_TEXT, RELOAD_TEXT, CONFIG_TEXT])
+  })
+
+  test('the toggle hint names the key the tabs use', () => {
+    expect(TOGGLE_TEXT).toBe('Press o in Collection or Biomes to turn one off or on.')
   })
 
   test('every issue gets a line, as formatIssue writes it, errors before warnings', () => {
@@ -26,6 +31,7 @@ describe('settingsLines', () => {
       'modsters/zap/modster.json is not valid JSON',
       'biomes/forest/biome.json: modsters has no rare Modster (warning)',
       '',
+      TOGGLE_TEXT,
       RELOAD_TEXT,
       CONFIG_TEXT,
     ])

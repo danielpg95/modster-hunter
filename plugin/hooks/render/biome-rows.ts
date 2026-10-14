@@ -8,15 +8,17 @@ import type { BandLine } from './band-view'
 import type { BiomeEntry, BiomeOdds, TierSection } from './biome-entries'
 import { dexNumber } from './collection-entries'
 import { fit } from './collection-list'
+import { offRow } from './item-notes'
 
-/** `▸ Whispering Forest 2/5 here`: the name in its accent color, caught of total, and the session's biome marked. */
+/** `▸ Whispering Forest 2/5 here`: the name in its accent color, caught of total, and the session's biome marked; dimmed with `off` when off (0032). */
 export function biomeRow(entry: BiomeEntry, isSelected: boolean): BandLine {
-  return [
+  const row: BandLine = [
     { text: isSelected ? '▸ ' : '  ', bold: true },
     { text: fit(entry.name, COLLECTION.biomeNameColumns), ...(isSelected ? { bold: true } : {}), ...(entry.accentColor ? { color: entry.accentColor } : {}) },
     { text: ` ${entry.caught}/${entry.odds.length}`, dim: true },
     ...(entry.isCurrent ? [{ text: ' here', bold: true } as const] : []),
   ]
+  return offRow(row, entry)
 }
 
 /** `common     76.4%`: a tier section's header, its share right-aligned under the Modsters' own. */

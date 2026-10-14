@@ -45,3 +45,4 @@ settled questions and avoid making assumptions about open ones.
 | [0029](0029-stats-compaction.md) | The Stats tab folds session stats idle for 24 hours into `stats:total` | Accepted |
 | [0030](0030-tier-first-encounters.md) | An encounter picks a tier first, then a Modster from that tier | Accepted |
 | [0031](0031-content-reload.md) | `/modsters reload` keeps the encounter and moves on from a dropped biome | Accepted |
+| [0032](0032-in-pane-enable-disable.md) | The pane turns content on and off; deleting is the content skill's job | Accepted |

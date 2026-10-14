@@ -227,6 +227,10 @@ as `tools/sprite.mjs`, and caches the result in
 
 Built-in on/off is the plugin option `includeBuiltins`, not this file.
 
+`o` in the collection pane's Collection and Biomes tabs adds or removes an id
+here (decision 0032). Disabled items stay listed in the pane, dimmed, and a
+biome entry naming a disabled Modster is dropped without an issue.
+
 ## Plugin options (`userConfig`)
 
 | Key | Type | Default | What it does |
