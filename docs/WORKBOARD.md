@@ -15,13 +15,13 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
+| P4-02 | @danielpg95 | in-progress | p4-02-reload-errors | 2026-10-14 | 2026-10-14 | Add a `/modsters reload` path that reloads content and keeps a running encounter |
 
 ## Up next
 
 Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
-- **P4-02** — `/modsters reload` and error reporting
 - **P5-01** — Shiny variants
 - **P5-02** — Sounds
 - **P5-03** — Extended stats and milestones
