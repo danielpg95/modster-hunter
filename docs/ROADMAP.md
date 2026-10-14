@@ -510,7 +510,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Checked by hand: `/clear`, then throw more than once after Claude stops.
 - **Why:** found during P3-04 (2026-10-13). `/clear` fires `session.end`, whose hook calls `stopTimers()`, but no `session.start` follows, so the 250 ms tick never restarts. After one throw the band stays on "wobble…" until the next prompt, and stats keep going to the ended session's key.
 
-#### [ ] P5-16 — Tier-first encounters
+#### [x] P5-16 — Tier-first encounters
 - **Depends on:** P2-06
 - **Size:** M
 - **Goal:** an encounter draws a tier, then a Modster of that tier, each equally likely (decision 0030).

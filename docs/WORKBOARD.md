@@ -15,7 +15,6 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P5-16 | @danielpg95 | in-progress | p5-16-tier-first | 2026-10-13 | 2026-10-13 | Add tier weights to constants.ts and a tier-first pick with scripted-random tests |
 
 ## Up next
 
