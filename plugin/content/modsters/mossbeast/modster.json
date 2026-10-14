@@ -3,7 +3,7 @@
   "id": "mossbeast",
   "name": "Mossbeast",
   "description": "A fuzzy loaf of moss. Mostly naps. Sometimes blinks.",
-  "rarity": null,
+  "rarity": "uncommon",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,

@@ -1,6 +1,6 @@
 import { CONTENT, ENCOUNTER } from '../constants'
 import type { Biome, Modster, Rarity } from '../content'
-import { pickWeighted } from './pick-weighted'
+import { encounterPool, pickEncounter } from './pick-encounter'
 import type { RandomSource } from './random-source'
 import { resolveCatchOdds } from './resolve-catch-odds'
 
@@ -251,14 +251,10 @@ function withoutEncounter(state: EncounterState): EncounterState {
 function maybeSpawn(state: EncounterState, now: number, ctx: EncounterContext, events: EncounterEvent[]): EncounterState {
   // Only one encounter at a time, and new ones only during work time (0005, 0018)
   if (state.encounter || !isWorking(state, now) || workTime(state, now) < state.nextSpawnAtWork) return state
-  const totalWeight = ctx.biome.modsters.reduce((sum, entry) => sum + entry.weight, 0)
-  const entry = pickWeighted(
-    ctx.biome.modsters.filter((candidate) => ctx.modsters.has(candidate.id)),
-    ctx.random,
-  )
-  const modster = entry && ctx.modsters.get(entry.id)
-  if (!entry || !modster) return state
-  const odds = resolveCatchOdds(entry, modster, totalWeight)
+  const picked = pickEncounter(encounterPool(ctx.biome, ctx.modsters), ctx.random)
+  if (!picked) return state
+  const { modster } = picked
+  const odds = resolveCatchOdds(picked.entry, modster)
   events.push({ type: 'appeared', modsterId: modster.id, tier: odds.tier })
   return {
     ...state,

@@ -9,7 +9,7 @@ const text = (line: ReturnType<typeof oddsRow>) => line.map((segment) => ('text'
 const sproutling: BiomeOdds = {
   id: 'sproutling',
   name: 'Sproutling',
-  weight: 60,
+  tierChance: 60 / 79,
   tier: 'common',
   maxAttempts: 3,
   catchRate: 0.5,

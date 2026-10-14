@@ -3,8 +3,8 @@ import { formatIssue } from '../../hooks/content'
 
 describe('formatIssue', () => {
   test('an error reads file, field and problem', () => {
-    const line = formatIssue({ severity: 'error', file: 'biomes/f/biome.json', field: 'modsters[1].weight', problem: 'must be …' })
-    expect(line).toBe('biomes/f/biome.json: modsters[1].weight must be …')
+    const line = formatIssue({ severity: 'error', file: 'biomes/f/biome.json', field: 'modsters[1].rarity', problem: 'must be …' })
+    expect(line).toBe('biomes/f/biome.json: modsters[1].rarity must be …')
   })
 
   test('a whole-file problem has no field', () => {

@@ -3,7 +3,7 @@
   "id": "geolem",
   "name": "Geolem",
   "description": "A sleepy giant of stacked stone. The crystal in its chest glows brighter when it's about to wake.",
-  "rarity": null,
+  "rarity": "legendary",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,

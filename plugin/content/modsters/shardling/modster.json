@@ -3,7 +3,7 @@
   "id": "shardling",
   "name": "Shardling",
   "description": "A lump of grotto rock with crystals breaking through. It blinks when the light hits them.",
-  "rarity": null,
+  "rarity": "common",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,

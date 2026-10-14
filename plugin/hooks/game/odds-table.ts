@@ -1,28 +1,32 @@
 import type { Biome, Modster } from '../content'
+import { encounterPool, tierChances } from './pick-encounter'
 import { resolveCatchOdds, type CatchOdds } from './resolve-catch-odds'
 
 export interface OddsRow extends CatchOdds {
   id: string
   name: string
-  weight: number
+  /** Chance an encounter here draws this Modster's tier */
+  tierChance: number
+  /** Chance this Modster is the one that appears: its tier's chance ÷ the Modsters in that tier */
+  encounterChance: number
   /** Chance of catching it before it flees: 1 − (1 − catchRate) ^ maxAttempts */
   catchChance: number
 }
 
 /**
- * The odds of every Modster in a biome, in the biome's order. Entries whose
- * Modster isn't in `modsters` are left out, and their weight with them,
- * the same as `checkBiomeReferences` does.
+ * The odds of every Modster in a biome, in the biome's order (decision 0030).
+ * Entries whose Modster isn't in `modsters` are left out, the same as
+ * `checkBiomeReferences` does, and so is a tier left with no Modster.
  */
 export function oddsTable(biome: Biome, modsters: ReadonlyMap<string, Modster>): OddsRow[] {
-  const present = biome.modsters.filter((entry) => modsters.has(entry.id))
-  const totalWeight = present.reduce((sum, entry) => sum + entry.weight, 0)
-  return present.flatMap((entry) => {
-    const modster = modsters.get(entry.id)
-    if (!modster) return []
-    const odds = resolveCatchOdds(entry, modster, totalWeight)
+  const pool = encounterPool(biome, modsters)
+  const chances = tierChances(pool)
+  return pool.map(({ entry, modster, tier }) => {
+    const odds = resolveCatchOdds(entry, modster)
+    const tierChance = chances.get(tier) ?? 0
+    const inTier = pool.filter((member) => member.tier === tier).length
     const catchChance = 1 - (1 - odds.catchRate) ** odds.maxAttempts
-    return [{ id: entry.id, name: modster.name, weight: entry.weight, ...odds, catchChance }]
+    return { id: entry.id, name: modster.name, ...odds, tierChance, encounterChance: tierChance / inTier, catchChance }
   })
 }
 
@@ -30,10 +34,9 @@ const percent = (value: number): string => `${(value * 100).toFixed(1)}%`
 
 /** Plain-text table for contributors balancing a biome (add-biome / add-modster skills). */
 export function formatOddsTable(rows: readonly OddsRow[]): string {
-  const header = ['Modster', 'Weight', 'Appears', 'Tier', 'Throws', 'Per throw', 'Caught']
+  const header = ['Modster', 'Appears', 'Tier', 'Throws', 'Per throw', 'Caught']
   const body = rows.map((row) => [
     row.name,
-    String(row.weight),
     percent(row.encounterChance),
     row.tier,
     String(row.maxAttempts),

@@ -49,18 +49,16 @@ const INVALID: [string, (biome: Biome) => void, string][] = [
   ['an empty modsters list is an error', (b) => (b.modsters = []), 'modsters'],
   [
     'more than 50 modsters is an error',
-    (b) => (b.modsters = Array.from({ length: 51 }, (_, i) => ({ id: `m${i}`, weight: 1 }))),
+    (b) => (b.modsters = Array.from({ length: 51 }, (_, i) => ({ id: `m${i}` }))),
     'modsters',
   ],
   ['an entry that is not an object is an error', (b) => setEntry(b, 1, 'mossbeast'), 'modsters[1]'],
   ['an entry without an id is an error', (b) => delete entries(b)[1]!.id, 'modsters[1].id'],
   ['an entry with a bad id is an error', (b) => (entries(b)[1]!.id = 'Moss Beast'), 'modsters[1].id'],
   ['a repeated entry id is an error', (b) => (entries(b)[2]!.id = 'sproutling'), 'modsters[2].id'],
-  ['an entry without a weight is an error', (b) => delete entries(b)[0]!.weight, 'modsters[0].weight'],
-  ['a weight of 0 is an error', (b) => (entries(b)[0]!.weight = 0), 'modsters[0].weight'],
-  ['a weight over 10,000 is an error', (b) => (entries(b)[0]!.weight = 10_001), 'modsters[0].weight'],
-  ['a fractional weight is an error', (b) => (entries(b)[0]!.weight = 2.5), 'modsters[0].weight'],
-  ['a weight given as text is an error', (b) => (entries(b)[0]!.weight = '60'), 'modsters[0].weight'],
+  ['an unknown rarity on an entry is an error', (b) => (entries(b)[0]!.rarity = 'epic'), 'modsters[0].rarity'],
+  ['a null rarity on an entry is an error', (b) => (entries(b)[0]!.rarity = null), 'modsters[0].rarity'],
+  ['a weight on an entry is an unknown field (decision 0030)', (b) => (entries(b)[0]!.weight = 60), 'modsters[0].weight'],
   ['maxAttempts of 0 is an error', (b) => (entries(b)[0]!.maxAttempts = 0), 'modsters[0].maxAttempts'],
   ['maxAttempts over 10 is an error', (b) => (entries(b)[0]!.maxAttempts = 11), 'modsters[0].maxAttempts'],
   ['fractional maxAttempts is an error', (b) => (entries(b)[0]!.maxAttempts = 2.5), 'modsters[0].maxAttempts'],
@@ -79,7 +77,7 @@ describe('validateBiome', () => {
   })
 
   test('only the required fields are enough', () => {
-    const biome = { schemaVersion: 1, id: 'whispering-forest', name: 'W', modsters: [{ id: 'sproutling', weight: 1 }] }
+    const biome = { schemaVersion: 1, id: 'whispering-forest', name: 'W', modsters: [{ id: 'sproutling' }] }
     expect(validateBiome(biome, where).ok).toBe(true)
   })
 
@@ -88,8 +86,8 @@ describe('validateBiome', () => {
     biome.encounterEverySec = [3, 600]
     biome.name = 'n'.repeat(32)
     biome.description = 'd'.repeat(120)
-    entries(biome)[0] = { id: 'sproutling', weight: 10_000, maxAttempts: 10, catchRate: 0.01 }
-    entries(biome)[1] = { id: 'mossbeast', weight: 1, maxAttempts: 1, catchRate: 1 }
+    entries(biome)[0] = { id: 'sproutling', maxAttempts: 10, catchRate: 0.01 }
+    entries(biome)[1] = { id: 'mossbeast', maxAttempts: 1, catchRate: 1 }
     expect(validateBiome(biome, where).issues).toEqual([])
   })
 
@@ -139,16 +137,16 @@ describe('validateBiome', () => {
     const biome = validBiome()
     biome.name = ''
     biome.accentColor = 'green'
-    entries(biome)[0]!.weight = -1
+    entries(biome)[0]!.maxAttempts = -1
     const fields = validateBiome(biome, where).issues.map((issue) => issue.field)
-    expect(fields).toEqual(['name', 'accentColor', 'modsters[0].weight'])
+    expect(fields).toEqual(['name', 'accentColor', 'modsters[0].maxAttempts'])
   })
 
   test('messages say what is expected and what was found', () => {
     const biome = validBiome()
-    entries(biome)[0]!.weight = 0
-    const [issue] = issuesAt(validateBiome(biome, where), 'modsters[0].weight')
-    expect(issue?.problem).toBe('must be a whole number from 1 to 10000 (it is 0)')
+    entries(biome)[0]!.rarity = 'epic'
+    const [issue] = issuesAt(validateBiome(biome, where), 'modsters[0].rarity')
+    expect(issue?.problem).toBe('must be one of common, uncommon, rare, legendary (it is "epic")')
   })
 
   test('input that is not an object is one error, never a throw', () => {
@@ -163,7 +161,7 @@ describe('validateBiome', () => {
     const odd = [null, {}, [], 'x', -1, Number.NaN, true]
     for (const value of odd) {
       const biome: Biome = { schemaVersion: value, id: value, name: value, description: value, accentColor: value }
-      Object.assign(biome, { background: value, backgroundFps: value, particles: value, encounterEverySec: value, modsters: [value, { id: value, weight: value }] })
+      Object.assign(biome, { background: value, backgroundFps: value, particles: value, encounterEverySec: value, modsters: [value, { id: value, rarity: value }] })
       expect(validateBiome(biome, where).ok).toBe(false)
     }
   })

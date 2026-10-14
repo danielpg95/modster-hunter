@@ -15,15 +15,15 @@ import { scriptedRandom } from '../fixtures/scripted-random'
 // Time is a fake clock: every input carries `now` in ms, and nothing reads real time.
 const S = 1000
 
-// Sproutling 75% (common: 3 throws, 0.5 per throw), Mossbeast 25% (common too: 25 ≥ 20%)
+// Both common, so each draws a tier (0 → common) then one of the two: < 0.5 Sproutling (3 throws, 0.5 per throw), else Mossbeast
 const biome: Biome = {
   schemaVersion: 1,
   id: 'whispering-forest',
   name: 'Whispering Forest',
   encounterEverySec: [10, 30],
   modsters: [
-    { id: 'sproutling', weight: 75 },
-    { id: 'mossbeast', weight: 25 },
+    { id: 'sproutling' },
+    { id: 'mossbeast' },
   ],
 }
 const modsters = new Map<string, Modster>([
@@ -75,7 +75,7 @@ describe('encounter machine', () => {
   })
 
   test('a Modster appears once the turn has run for the drawn delay', () => {
-    const game = setup(0, 0.1)
+    const game = setup(0, 0, 0.1)
     game.at(0).turnStart()
     game.at(10 * S - 1).tick()
     expect(game.phase).toBe('idle')
@@ -85,7 +85,7 @@ describe('encounter machine', () => {
   })
 
   test('the delay is drawn from the biome encounterEverySec range', () => {
-    const game = setup(1, 0.1) // r = 1 → 30 s
+    const game = setup(1, 0, 0.1) // r = 1 → 30 s
     game.at(0).turnStart()
     game.at(30 * S - 1).tick()
     expect(game.phase).toBe('idle')
@@ -94,7 +94,7 @@ describe('encounter machine', () => {
   })
 
   test('the countdown pauses between turns and carries over (0014)', () => {
-    const game = setup(0, 0.1)
+    const game = setup(0, 0, 0.1)
     game.at(0).turnStart()
     game.at(6 * S).turnEnd() // 6 s of work
     game.at(100 * S).tick()
@@ -107,7 +107,7 @@ describe('encounter machine', () => {
   })
 
   test('appearing turns into waiting after 1 s', () => {
-    const game = setup(0, 0.1)
+    const game = setup(0, 0, 0.1)
     game.at(0).turnStart()
     game.at(10 * S).tick()
     game.at(11 * S - 1).tick()
@@ -117,7 +117,7 @@ describe('encounter machine', () => {
   })
 
   test('a throw that lands: wobble for 1.5 s, then caught, then the card for 4 s', () => {
-    const game = setup(0, 0.1, 0.49, 0) // 0.49 < 0.5 lands
+    const game = setup(0, 0, 0.1, 0.49, 0) // 0.49 < 0.5 lands
     game.at(0).turnStart()
     game.at(10 * S).tick()
     game.at(11 * S).throw()
@@ -134,7 +134,7 @@ describe('encounter machine', () => {
   })
 
   test('a throw that misses goes back to waiting with one attempt fewer', () => {
-    const game = setup(0, 0.1, 0.5) // 0.5 is not < 0.5: miss
+    const game = setup(0, 0, 0.1, 0.5) // 0.5 is not < 0.5: miss
     game.at(0).turnStart()
     game.at(10 * S).tick()
     game.at(11 * S).throw()
@@ -143,7 +143,7 @@ describe('encounter machine', () => {
   })
 
   test('missing every attempt makes it flee', () => {
-    const game = setup(0, 0.1, 0.9, 0.9, 0.9, 0)
+    const game = setup(0, 0, 0.1, 0.9, 0.9, 0.9, 0)
     game.at(0).turnStart()
     game.at(10 * S).tick()
     for (const t of [11, 13, 15]) {
@@ -155,7 +155,7 @@ describe('encounter machine', () => {
   })
 
   test('throws during appearing or the wobble are ignored and cost nothing (0014)', () => {
-    const game = setup(0, 0.1, 0.9)
+    const game = setup(0, 0, 0.1, 0.9)
     game.at(0).turnStart()
     game.at(10 * S).tick()
     game.at(10.5 * S).throw() // appearing
@@ -166,7 +166,7 @@ describe('encounter machine', () => {
   })
 
   test('an idle encounter wanders off after the timeout, counted as fled', () => {
-    const game = setup(0, 0.1, 0)
+    const game = setup(0, 0, 0.1, 0)
     game.at(0).turnStart()
     game.at(10 * S).tick()
     game.at(100 * S - 1).tick()
@@ -176,7 +176,7 @@ describe('encounter machine', () => {
   })
 
   test('the idle timer restarts after each throw', () => {
-    const game = setup(0, 0.1, 0.9)
+    const game = setup(0, 0, 0.1, 0.9)
     game.at(0).turnStart()
     game.at(10 * S).tick()
     game.at(50 * S).throw()
@@ -188,7 +188,7 @@ describe('encounter machine', () => {
   })
 
   test('a new turn resets the idle timer', () => {
-    const game = setup(0, 0.1)
+    const game = setup(0, 0, 0.1)
     game.at(0).turnStart()
     game.at(10 * S).tick()
     game.at(20 * S).turnEnd()
@@ -200,7 +200,7 @@ describe('encounter machine', () => {
   })
 
   test('an encounter keeps going after the turn ends (0005)', () => {
-    const game = setup(0, 0.1, 0.1, 0)
+    const game = setup(0, 0, 0.1, 0.1, 0)
     game.at(0).turnStart()
     game.at(10 * S).tick()
     game.at(10.5 * S).turnEnd()
@@ -209,7 +209,7 @@ describe('encounter machine', () => {
   })
 
   test('only one encounter at a time, however long the turn runs', () => {
-    const game = setup(0, 0.1)
+    const game = setup(0, 0, 0.1)
     game.at(0).turnStart()
     game.at(10 * S).tick()
     game.at(60 * S).tick()
@@ -218,7 +218,7 @@ describe('encounter machine', () => {
   })
 
   test('the next countdown starts when the result card ends', () => {
-    const game = setup(0, 0.1, 0, 0, 0.1) // caught; next delay 10 s
+    const game = setup(0, 0, 0.1, 0, 0, 0, 0.1) // caught; next delay 10 s
     game.at(0).turnStart()
     game.at(10 * S).tick()
     game.at(11 * S).throw()
@@ -230,7 +230,7 @@ describe('encounter machine', () => {
   })
 
   test('a late tick runs every timer that came due, in order', () => {
-    const game = setup(0, 0.1, 0.1, 0, 0.8)
+    const game = setup(0, 0, 0.1, 0.1, 0, 0, 0.8)
     game.at(0).turnStart()
     game.at(10 * S).tick()
     game.at(11 * S).throw()
@@ -240,15 +240,15 @@ describe('encounter machine', () => {
     expect(game.phase).toBe('appearing')
   })
 
-  test('which Modster appears follows the weights', () => {
-    const game = setup(0, 0.8) // 0.8 ≥ 0.75 → Mossbeast
+  test('which Modster appears follows the tier-first pick', () => {
+    const game = setup(0, 0, 0.8) // common, then 0.8 ≥ 0.5 → Mossbeast
     game.at(0).turnStart()
     game.at(10 * S).tick()
     expect(game.state.encounter?.modsterId).toBe('mossbeast')
   })
 
   test('attempts and catch rate come from the resolver (Modster overrides here)', () => {
-    const game = setup(0, 0.8, 0.85) // Mossbeast catches at 0.9
+    const game = setup(0, 0, 0.8, 0.85) // Mossbeast catches at 0.9
     game.at(0).turnStart()
     game.at(10 * S).tick()
     expect([game.state.encounter?.maxAttempts, game.state.encounter?.catchRate]).toEqual([2, 0.9])
@@ -267,7 +267,7 @@ describe('encounter machine', () => {
   // The player can run (decision 0020)
 
   test('running while waiting ends the encounter as ran, with the usual card', () => {
-    const game = setup(0, 0.1, 0) // the last number is the next delay, drawn when the card ends
+    const game = setup(0, 0, 0.1, 0) // the last number is the next delay, drawn when the card ends
     game.at(0).turnStart()
     game.at(10 * S).tick()
     game.at(11 * S).tick() // waiting
@@ -280,7 +280,7 @@ describe('encounter machine', () => {
   })
 
   test('after a run, the next countdown starts when the card ends, like any result', () => {
-    const game = setup(0, 0.1, 0, 0.1) // next delay 10 s
+    const game = setup(0, 0, 0.1, 0, 0, 0.1) // next delay 10 s
     game.at(0).turnStart()
     game.at(10 * S).tick()
     game.at(11 * S).run() // card until 15 s
@@ -291,7 +291,7 @@ describe('encounter machine', () => {
   })
 
   test('runs during appearing or the wobble are ignored, so a rolled throw still resolves', () => {
-    const game = setup(0, 0.1, 0.1)
+    const game = setup(0, 0, 0.1, 0.1)
     game.at(0).turnStart()
     game.at(10 * S).tick()
     expect(game.at(10.5 * S).run()).toEqual([]) // appearing
@@ -310,7 +310,7 @@ describe('encounter machine', () => {
   // Background subagents count as work time (decision 0018)
 
   test('a Modster appears while only a subagent runs', () => {
-    const game = setup(0, 0.1)
+    const game = setup(0, 0, 0.1)
     game.at(0).agentStart('a1')
     game.at(10 * S - 1).tick()
     expect(game.phase).toBe('idle')
@@ -318,7 +318,7 @@ describe('encounter machine', () => {
   })
 
   test('the countdown pauses when the last subagent stops and carries over', () => {
-    const game = setup(0, 0.1)
+    const game = setup(0, 0, 0.1)
     game.at(0).agentStart('a1')
     game.at(6 * S).agentStop('a1') // 6 s of work
     game.at(100 * S).tick()
@@ -331,7 +331,7 @@ describe('encounter machine', () => {
   })
 
   test('overlapping turns and subagents count once', () => {
-    const game = setup(0, 0.1)
+    const game = setup(0, 0, 0.1)
     game.at(0).turnStart()
     game.at(1 * S).agentStart('a1')
     game.at(2 * S).agentStart('a2')
@@ -347,7 +347,7 @@ describe('encounter machine', () => {
 
   test('a subagent with no stop event stops counting after 30 minutes', () => {
     const MIN = 60 * S
-    const game = setup(0, 0.1)
+    const game = setup(0, 0, 0.1)
     game.at(0).agentStart('lost')
     expect(isWorking(game.state, 30 * MIN - 1)).toBe(true)
     expect(isWorking(game.state, 30 * MIN)).toBe(false)
@@ -369,7 +369,7 @@ describe('encounter machine', () => {
   })
 
   test('session end clears every running subagent and the turn', () => {
-    const game = setup(0, 0.1)
+    const game = setup(0, 0, 0.1)
     game.at(0).turnStart()
     game.at(1 * S).agentStart('a1')
     game.at(5 * S).sessionEnd()
@@ -380,7 +380,7 @@ describe('encounter machine', () => {
   })
 
   test('the state is never changed in place', () => {
-    const game = setup(0, 0.1)
+    const game = setup(0, 0, 0.1)
     game.at(0).turnStart()
     const before = game.state
     const copy = JSON.stringify(before)

@@ -3,7 +3,7 @@
   "id": "elderbark",
   "name": "Elderbark",
   "description": "Older than the forest. Its amber eyes have seen every season.",
-  "rarity": null,
+  "rarity": "legendary",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,

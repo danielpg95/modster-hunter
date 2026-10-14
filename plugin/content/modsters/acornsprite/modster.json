@@ -3,7 +3,7 @@
   "id": "acornsprite",
   "name": "Acornsprite",
   "description": "Shy and quick. Its tiny leaf-wings buzz like a bee.",
-  "rarity": null,
+  "rarity": "rare",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,

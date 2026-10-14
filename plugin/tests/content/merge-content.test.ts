@@ -11,14 +11,14 @@ function registry(biomes: Record<string, string[]>, modsters: Record<string, str
       Object.entries(biomes).map(([id, entries]) => [
         id,
         {
-          biome: { schemaVersion: 1, id, name: id, modsters: entries.map((entry) => ({ id: entry, weight: 1 })) },
+          biome: { schemaVersion: 1, id, name: id, modsters: entries.map((entry) => ({ id: entry })) },
           file: `${label}biomes/${id}/biome.json`,
         },
       ]),
     ),
     modsters: new Map(
       Object.entries(modsters).map(([id, name]) => {
-        const modster: Modster = { schemaVersion: 1, id, name, sprite: { file: 'sprite.sprite.json' } }
+        const modster: Modster = { schemaVersion: 1, id, name, rarity: 'common', sprite: { file: 'sprite.sprite.json' } }
         return [id, { modster, sprite: validSprite() as unknown as Sprite }]
       }),
     ),

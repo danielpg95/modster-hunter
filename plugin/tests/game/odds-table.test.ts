@@ -12,7 +12,7 @@ function exampleBiome(): Biome {
 
 const modsters = new Map<string, Modster>([
   ['sproutling', modsterNamed('sproutling', { name: 'Sproutling' })],
-  ['mossbeast', modsterNamed('mossbeast', { name: 'Mossbeast' })],
+  ['mossbeast', modsterNamed('mossbeast', { name: 'Mossbeast', rarity: 'uncommon' })],
   ['pinewraith', modsterNamed('pinewraith', { name: 'Pinewraith' })],
 ])
 
@@ -27,8 +27,8 @@ describe('oddsTable', () => {
     expect(rows.map((row) => [row.id, row.tier, row.maxAttempts])).toEqual([
       ['sproutling', 'common', 3],
       ['mossbeast', 'uncommon', 3],
-      // 4 of 79 is 5.1%: uncommon by weight; the biome entry gives it 5 throws
-      ['pinewraith', 'uncommon', 5],
+      // Common in its file, rare by the biome entry, which also gives it 5 throws
+      ['pinewraith', 'rare', 5],
     ])
   })
 
@@ -37,19 +37,29 @@ describe('oddsTable', () => {
     expect(sproutling?.catchChance).toBe(1 - 0.5 ** 3)
   })
 
-  test('a Modster that does not exist is left out, and its weight with it', () => {
+  test("a tier's chance is split evenly among its Modsters", () => {
+    const biome = { ...exampleBiome(), modsters: [{ id: 'sproutling' }, { id: 'pinewraith' }, { id: 'mossbeast' }] }
+    const rows = oddsTable(biome, modsters)
+    expect(rows.map((row) => [row.id, row.tierChance, row.encounterChance])).toEqual([
+      ['sproutling', 76 / 95, 76 / 95 / 2],
+      ['pinewraith', 76 / 95, 76 / 95 / 2],
+      ['mossbeast', 19 / 95, 19 / 95],
+    ])
+  })
+
+  test('a Modster that does not exist is left out, and a tier left empty with it', () => {
     const rows = oddsTable(exampleBiome(), new Map([...modsters].filter(([id]) => id !== 'mossbeast')))
     expect(rows.map((row) => row.id)).toEqual(['sproutling', 'pinewraith'])
-    expect(rows[0]?.encounterChance).toBe(60 / 64)
+    expect(rows[0]?.encounterChance).toBe(76 / 80.5)
   })
 
   test('the printed table for the CONTENT_FORMAT example biome', () => {
     expect(formatOddsTable(oddsTable(exampleBiome(), modsters))).toBe(
       [
-        'Modster     Weight  Appears  Tier      Throws  Per throw  Caught',
-        'Sproutling  60      75.9%    common    3       50.0%      87.5%',
-        'Mossbeast   15      19.0%    uncommon  3       35.0%      72.5%',
-        'Pinewraith  4       5.1%     uncommon  5       35.0%      88.4%',
+        'Modster     Appears  Tier      Throws  Per throw  Caught',
+        'Sproutling  76.4%    common    3       50.0%      87.5%',
+        'Mossbeast   19.1%    uncommon  3       35.0%      72.5%',
+        'Pinewraith  4.5%     rare      5       20.0%      67.2%',
       ].join('\n'),
     )
   })

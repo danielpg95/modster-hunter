@@ -11,9 +11,9 @@ export function validBiome(): Record<string, unknown> {
     particles: { style: 'leaf', color: '#a5d6a7', density: 2 },
     encounterEverySec: [8, 20],
     modsters: [
-      { id: 'sproutling', weight: 60 },
-      { id: 'mossbeast', weight: 15 },
-      { id: 'pinewraith', weight: 4, maxAttempts: 5 },
+      { id: 'sproutling' },
+      { id: 'mossbeast' },
+      { id: 'pinewraith', rarity: 'rare', maxAttempts: 5 },
     ],
   }
 }

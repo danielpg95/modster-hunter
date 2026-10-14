@@ -3,7 +3,7 @@
   "id": "quartzclaw",
   "name": "Quartzclaw",
   "description": "It polishes its one giant quartz claw all day. Compliment it and it'll follow you anywhere.",
-  "rarity": null,
+  "rarity": "uncommon",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,

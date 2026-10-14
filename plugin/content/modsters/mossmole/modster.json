@@ -3,7 +3,7 @@
   "id": "mossmole",
   "name": "Mossmole",
   "description": "It can't see a thing, so it wears a glowing crystal on its head like a headlamp.",
-  "rarity": null,
+  "rarity": "common",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,

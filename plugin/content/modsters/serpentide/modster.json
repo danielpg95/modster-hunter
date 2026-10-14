@@ -3,7 +3,7 @@
   "id": "serpentide",
   "name": "Serpentide",
   "description": "Small now, but sailors still steer around the ripples it makes.",
-  "rarity": null,
+  "rarity": "rare",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,

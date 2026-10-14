@@ -4,6 +4,7 @@ import {
   checkNumber,
   checkNumberValue,
   checkPattern,
+  checkRarity,
   checkSchemaVersion,
   checkString,
   describe,
@@ -26,8 +27,8 @@ const KEYS = [
   'modsters',
 ]
 const REQUIRED = ['schemaVersion', 'id', 'name', 'modsters']
-const ENTRY_KEYS = ['id', 'weight', 'maxAttempts', 'catchRate']
-const ENTRY_REQUIRED = ['id', 'weight']
+const ENTRY_KEYS = ['id', 'rarity', 'maxAttempts', 'catchRate']
+const ENTRY_REQUIRED = ['id']
 const PARTICLE_KEYS = ['style', 'color', 'density']
 
 /**
@@ -101,7 +102,7 @@ function checkEntries(value: unknown, issues: IssueList): void {
   value.forEach((entry: unknown, index) => {
     const prefix = fieldPath('modsters', index)
     if (!isObject(entry)) {
-      issues.error(prefix, 'must be an object like { "id": "sproutling", "weight": 60 }')
+      issues.error(prefix, 'must be an object like { "id": "sproutling" }')
       return
     }
     checkKeys(entry, ENTRY_KEYS, ENTRY_REQUIRED, issues, prefix)
@@ -111,8 +112,7 @@ function checkEntries(value: unknown, issues: IssueList): void {
       if (first === undefined) seen.set(id, index)
       else issues.error(fieldPath(prefix, 'id'), `repeats "${id}" (already at modsters[${first}])`)
     }
-    const { weightMin, weightMax } = CONTENT.biome
-    checkNumber(entry, 'weight', { min: weightMin, max: weightMax, integer: true }, issues, prefix)
+    checkRarity(entry, issues, prefix)
     checkNumber(entry, 'maxAttempts', { min: CONTENT.maxAttemptsMin, max: CONTENT.maxAttemptsMax, integer: true }, issues, prefix)
     checkNumber(entry, 'catchRate', { min: CONTENT.catchRateMin, max: CONTENT.catchRateMax }, issues, prefix)
   })

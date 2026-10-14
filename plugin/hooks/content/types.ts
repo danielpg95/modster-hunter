@@ -23,7 +23,8 @@ export interface ModsterDex {
 
 export interface BiomeModsterEntry {
   id: string
-  weight: number
+  /** Wins over the Modster's own `rarity` (decision 0030 point 3) */
+  rarity?: Rarity
   maxAttempts?: number
   catchRate?: number
 }
@@ -57,7 +58,7 @@ export interface Modster {
   id: string
   name: string
   description?: string
-  rarity?: Rarity | null
+  rarity: Rarity
   maxAttempts?: number | null
   catchRate?: number | null
   shinyChance?: number | null
@@ -93,7 +94,7 @@ export interface ContentIssue {
   severity: 'error' | 'warning'
   /** The file's path as the loader names it, e.g. `modsters/sproutling/modster.json` */
   file: string
-  /** Path to the field, e.g. `modsters[2].weight`; empty for the file as a whole */
+  /** Path to the field, e.g. `modsters[2].rarity`; empty for the file as a whole */
   field: string
   problem: string
 }

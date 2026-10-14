@@ -3,7 +3,7 @@
   "id": "sunmane",
   "name": "Sunmane",
   "description": "It only appears at noon, when the dunes have no shadows to hide in.",
-  "rarity": null,
+  "rarity": "rare",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,

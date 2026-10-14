@@ -382,7 +382,7 @@ describe('register: collection pane', () => {
     const row = await pane.find({ type: 'Button', key: current })
     expect(JSON.stringify(row)).toContain(' here')
     expect(JSON.stringify(row)).toContain('▸ ')
-    expect(await pane.find({ type: 'Text', text: current === 'ash-dunes' ? '  75.0%  common' : ' 100.0%  common' })).toBeDefined()
+    expect(await pane.find({ type: 'Text', text: current === 'ash-dunes' ? '  50.0%  common' : ' 100.0%  common' })).toBeDefined()
     await pane.press({ key: 'collection' })
     await pane.unmount()
   })
@@ -394,7 +394,7 @@ describe('register: collection pane', () => {
     // Ash Dunes lists first by name
     await pane.press({ key: 'biome-up' })
     expect(await pane.find({ type: 'Box', key: 'odds-emberkit' })).toBeDefined()
-    expect(await pane.find({ type: 'Text', text: '  25.0%  common' })).toBeDefined()
+    expect(await pane.find({ type: 'Text', text: '  50.0%  common' })).toBeDefined()
     await pane.press({ key: 'biome-down' })
     expect(await pane.find({ type: 'Box', key: 'odds-emberkit' })).toBeUndefined()
     expect(await pane.find({ type: 'Text', text: ' 100.0%  common' })).toBeDefined()

@@ -3,7 +3,7 @@
   "id": "hootlet",
   "name": "Hootlet",
   "description": "Sleeps all day with one eye open. The open eye is also asleep.",
-  "rarity": null,
+  "rarity": "common",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,

@@ -3,7 +3,7 @@
   "id": "dunebun",
   "name": "Dunebun",
   "description": "Hears you coming from three dunes away. Pretends it didn't.",
-  "rarity": null,
+  "rarity": "common",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,

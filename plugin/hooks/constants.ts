@@ -1,15 +1,15 @@
 // Tunable numbers, in one place. Each group names the decision or doc it comes from.
 
 /**
- * Rarity tiers, decision 0004 point 1, checked in this order. A Modster whose
- * share of its biome's total weight is at least `minPercent` gets the tier;
- * the defaults apply unless the biome entry or the Modster overrides them.
+ * Rarity tiers, most common first. An encounter draws a tier by `weight`, the
+ * same in every biome (decision 0030 point 2); the catch defaults apply unless
+ * the biome entry or the Modster overrides them (decision 0004).
  */
 export const TIERS = [
-  { tier: 'common', minPercent: 20, maxAttempts: 3, catchRate: 0.5 },
-  { tier: 'uncommon', minPercent: 5, maxAttempts: 3, catchRate: 0.35 },
-  { tier: 'rare', minPercent: 1, maxAttempts: 4, catchRate: 0.2 },
-  { tier: 'legendary', minPercent: 0, maxAttempts: 5, catchRate: 0.08 },
+  { tier: 'common', weight: 76, maxAttempts: 3, catchRate: 0.5 },
+  { tier: 'uncommon', weight: 19, maxAttempts: 3, catchRate: 0.35 },
+  { tier: 'rare', weight: 4.5, maxAttempts: 4, catchRate: 0.2 },
+  { tier: 'legendary', weight: 0.5, maxAttempts: 5, catchRate: 0.08 },
 ] as const
 
 /** Encounter phase lengths, decision 0014. The idle timeout is the `encounterIdleTimeoutSec` user option. */
@@ -116,8 +116,6 @@ export const CONTENT = {
     defaultEncounterEverySec: [10, 30] as const,
     modstersMin: 1,
     modstersMax: 50,
-    weightMin: 1,
-    weightMax: 10_000,
     // Decision 0026 points 1 and 3: the idle scene and its particles
     backgroundFramesMax: 4,
     backgroundFpsMin: 1,

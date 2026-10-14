@@ -12,7 +12,7 @@ export function oneModsterForest(): Record<string, string> {
     name: 'Whispering Forest',
     accentColor: '#4caf50',
     encounterEverySec: [3, 3],
-    modsters: [{ id: 'sproutling', weight: 1 }],
+    modsters: [{ id: 'sproutling' }],
   }
   return {
     'biomes/whispering-forest/biome.json': JSON.stringify(biome),

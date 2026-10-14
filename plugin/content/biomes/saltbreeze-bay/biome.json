@@ -9,8 +9,8 @@
   "particles": { "style": "bubble", "color": "#e3f2fd", "density": 1 },
   "encounterEverySec": [10, 30],
   "modsters": [
-    { "id": "crabbit", "weight": 100 },
-    { "id": "flopple", "weight": 20 },
-    { "id": "serpentide", "weight": 4 }
+    { "id": "crabbit" },
+    { "id": "flopple" },
+    { "id": "serpentide" }
   ]
 }

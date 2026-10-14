@@ -183,10 +183,10 @@ test('check: a user folder loads like the mod loads it, with every issue', () =>
   mkdirSync(join(sheet, '..'), { recursive: true })
   run('draw', writeJson('blobby.json', GRID), '--out', sheet)
   writeJson('content/modsters/blobby/modster.json', {
-    schemaVersion: 1, id: 'blobby', name: 'Blobby', sprite: { file: 'sprite.png', frames: 2 },
+    schemaVersion: 1, id: 'blobby', name: 'Blobby', rarity: 'uncommon', sprite: { file: 'sprite.png', frames: 2 },
   })
   writeJson('content/biomes/test-meadow/biome.json', {
-    schemaVersion: 1, id: 'test-meadow', name: 'Test Meadow', modsters: [{ id: 'blobby', weight: 10 }, { id: 'sproutling', weight: 50 }],
+    schemaVersion: 1, id: 'test-meadow', name: 'Test Meadow', modsters: [{ id: 'blobby' }, { id: 'sproutling' }],
   })
   const clean = run('check', root)
   assert.equal(clean.code, 0, clean.stdout)

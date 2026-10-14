@@ -3,7 +3,7 @@
   "id": "prismite",
   "name": "Prismite",
   "description": "A floating sliver of crystal. Wherever it drifts, little rainbows follow.",
-  "rarity": null,
+  "rarity": "uncommon",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,

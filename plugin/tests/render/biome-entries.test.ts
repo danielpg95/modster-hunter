@@ -27,7 +27,7 @@ const modsters = new Map<string, LoadedModster>([
 ])
 const forest: LoadedBiome = { biome: exampleBiome(), file: 'biome.json' }
 const dunes: LoadedBiome = {
-  biome: { schemaVersion: 1, id: 'ash-dunes', name: 'Ash Dunes', encounterEverySec: [8, 20], modsters: [{ id: 'mossbeast', weight: 1 }] } as Biome,
+  biome: { schemaVersion: 1, id: 'ash-dunes', name: 'Ash Dunes', encounterEverySec: [8, 20], modsters: [{ id: 'mossbeast' }] } as Biome,
   file: 'biome.json',
 }
 const record: CaughtRecord = { v: 1, count: 2, shinyCount: 0, firstCaughtAt: 0, lastCaughtAt: 0, bestTier: 'common', biomes: { 'ash-dunes': 2 } }
@@ -64,7 +64,7 @@ describe('biomeEntries', () => {
     ])
   })
 
-  test('an entry whose Modster did not load is left out, and its weight with it', () => {
+  test('an entry whose Modster did not load is left out, and its share with it', () => {
     const [entry] = biomeEntries([forest], new Map([['sproutling', loaded('sproutling', 'Sproutling', 1)]]), new Map(), undefined)
     expect(entry?.odds.map((row) => [row.id, row.encounterChance])).toEqual([['sproutling', 1]])
   })
