@@ -18,8 +18,8 @@ settled questions and avoid making assumptions about open ones.
 | [0002](0002-where-the-game-is-drawn.md) | Encounters in the band above the prompt, collection in a pane | Accepted (amended by 0015, 0019, 0023) |
 | [0003](0003-catch-mechanic.md) | Pure-luck catching for v1; light skill element as a later experiment | Accepted |
 | [0004](0004-attempts-and-catch-rate.md) | Attempts and catch rate per Modster, derived from rarity unless overridden | Accepted (point 1 superseded by 0030) |
-| [0005](0005-encounter-lifetime.md) | An encounter lingers after the turn ends, until resolved or idle timeout | Accepted (amended by 0018, 0020) |
-| [0006](0006-biome-selection.md) | One random biome per session | Accepted |
+| [0005](0005-encounter-lifetime.md) | An encounter lingers after the turn ends, until resolved or idle timeout | Accepted (amended by 0018, 0020, 0031) |
+| [0006](0006-biome-selection.md) | One random biome per session | Accepted (amended by 0031) |
 | [0007](0007-content-model.md) | Weights instead of percentages; built-in and user content merged by id | Accepted (point 1 superseded by 0030) |
 | [0008](0008-sprite-pipeline.md) | PNG sprite sheets in, `.sprite.json` at runtime | Superseded by 0016 |
 | [0009](0009-collection-storage.md) | One `$.store` key per Modster | Accepted (amended by 0029) |
@@ -44,3 +44,4 @@ settled questions and avoid making assumptions about open ones.
 | [0028](0028-biomes-tab-scene.md) | The Biomes tab shows the selected biome's idle scene | Accepted |
 | [0029](0029-stats-compaction.md) | The Stats tab folds session stats idle for 24 hours into `stats:total` | Accepted |
 | [0030](0030-tier-first-encounters.md) | An encounter picks a tier first, then a Modster from that tier | Accepted |
+| [0031](0031-content-reload.md) | `/modsters reload` keeps the encounter and moves on from a dropped biome | Accepted |
