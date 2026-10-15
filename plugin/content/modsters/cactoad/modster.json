@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "cactoad",
+  "name": "Cactoad",
+  "description": "It was napping. You are not welcome.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 28,
+    "types": ["grass", "ground"],
+    "category": "Spine Modster",
+    "heightM": 0.4,
+    "weightKg": 2,
+    "entry": "A Cactoad's back cactus only blooms when it is truly annoyed, which is most days. It sits in the same spot for weeks and sighs at passing travelers."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 3
+  }
+}

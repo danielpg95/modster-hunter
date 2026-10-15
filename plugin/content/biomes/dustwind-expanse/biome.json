@@ -10,6 +10,7 @@
   "encounterEverySec": [10, 30],
   "modsters": [
     { "id": "dunebun" },
+    { "id": "cactoad" },
     { "id": "twiggle" },
     { "id": "sunmane" },
     { "id": "thirstwalker" }
