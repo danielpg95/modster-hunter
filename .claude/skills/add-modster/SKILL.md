@@ -32,11 +32,12 @@ mod's `create-modster-content` skill in `plugin/skills/`.)
      primary one, decision 0022), category ("Seed Modster"),
      height, weight, and the entry text (≤ 240 chars).
    - Look: color scheme (≤ 16 colors), size, and a 2–4 frame idle animation.
-     Sizes go up to 48×48, height even (decision 0021). Tell the user where
-     each size shows: up to 14 px tall shows in the band of an 80×24 terminal;
-     taller sprites show the compact text band there, and in full only in
-     bigger terminals or the encounter pane (`/modsters hunt`). Recommend
-     ≤ 24×14 unless the Modster needs more room (a legendary, a big beast).
+     Every Modster, any tier, is at most 32 px tall (even) and 48 px wide
+     (decision 0033). Pick the size the design needs within that. Tell the
+     user where each size shows: up to 14 px tall in the band of an 80×24
+     terminal, up to 30 px at 140×40, and the full 32 px in the encounter pane
+     (`/modsters hunt`) and the collection. Taller than the band shows the
+     compact text band there.
 
    Check `plugin/content/modsters/` so the id and look are new. If the user
    shares a reference image, take ideas from it, not its look: the art must be
@@ -47,8 +48,8 @@ mod's `create-modster-content` skill in `plugin/skills/`.)
    script to the scratchpad, not the repo. Look at the result (open the PNG,
    enlarged, on a dark and a light background) and show it to the user before
    continuing. What reads at this size:
-   - A concept with 2–3 bold features. Squat or wide creatures fit 24×14;
-     tall, detailed or winged ones need a bigger size.
+   - A concept with 2–3 bold features. Small canvases (under ~20 px tall)
+     leave little room for a face; give detailed designs the room, up to 32 tall.
    - For round bodies, build from shaded ellipses (lit from the top left, with
      an automatic outline) and place eyes and details by hand; typing big
      shapes pixel by pixel comes out stiff.
