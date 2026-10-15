@@ -31,7 +31,7 @@ mod's `create-modster-content` skill in `plugin/skills/`.)
    - Dex: one or two types (from the 18 in decision 0017; the first is the
      primary one, decision 0022), category ("Seed Modster"),
      height, weight, and the entry text (≤ 240 chars).
-   - Look: color scheme (≤ 16 colors), size, and a 2–4 frame idle animation.
+   - Look: color scheme (≤ 24 colors, decision 0034), size, and a 2–4 frame idle animation.
      Every Modster, any tier, is at most 32 px tall (even) and 48 px wide
      (decision 0033). Pick the size the design needs within that. Tell the
      user where each size shows: up to 14 px tall in the band of an 80×24
