@@ -11,7 +11,6 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/elderbark/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
 | `modsters/cactoad/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
 | `modsters/cinderstinger/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
-| `modsters/duneviathan/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Drawn as smooth shapes, then reduced to a pixel palette |
 | `modsters/sunhorn/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Rendered from a small 3D model, then reduced to a pixel palette |
 | `modsters/thirstwalker/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
 | `modsters/dunebun/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
