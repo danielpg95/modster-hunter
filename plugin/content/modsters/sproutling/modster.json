@@ -1,22 +1,22 @@
 {
   "schemaVersion": 1,
   "id": "sproutling",
-  "name": "Sproutling",
-  "description": "A seed that learned to walk. Very proud of it.",
+  "name": "Shellsprout",
+  "description": "Its shell is an old seed that never stopped growing. The sprout waves when it's happy.",
   "rarity": "common",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,
   "dex": {
-    "number": 901,
+    "number": 21,
     "types": ["grass"],
-    "category": "Seed Modster",
-    "heightM": 0.3,
-    "weightKg": 1.2,
-    "entry": "It sprouted from a seed that refused to stay buried. On sunny days it stands perfectly still, pretending to be a houseplant."
+    "category": "Seed Snail Modster",
+    "heightM": 0.4,
+    "weightKg": 2,
+    "entry": "It leaves a damp trail that makes moss grow. Forest paths full of fresh green often have a Shellsprout at the end."
   },
   "sprite": {
     "file": "sprite.sprite.json",
-    "fps": 6
+    "fps": 4
   }
 }
