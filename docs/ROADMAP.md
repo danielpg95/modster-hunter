@@ -569,7 +569,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Size:** M
 - **Goal:** give Dustwind Expanse a fuller roster, with one creepy Modster (asked by @victor-aguilars, 2026-10-14). Dunebun, Twiggle and Sunmane stay; 5 new Modsters join them.
 - **Done when:**
-  - [ ] Cactoad (common), Scarabit (common), Mirage Fox (uncommon), Thirstwalker (rare, creepy) and Sandstormwhale (legendary), with dex numbers #027–#031, each with `sprite.png` and a `sprite.sprite.json` converted with `npm run sprite`.
+  - [ ] Cactoad (common), Scarabit (common), Cinderstinger (uncommon, bug / fire), Thirstwalker (rare, creepy) and Sandstormwhale (legendary), with dex numbers #027–#031, each with `sprite.png` and a `sprite.sprite.json` converted with `npm run sprite`.
   - [ ] Thirstwalker's sprite is 32×32 or smaller (decisions 0008 and 0021) and reads as menacing on a dark and a light background.
   - [ ] `dustwind-expanse/biome.json` lists all 8, and the odds table (3 common, 1 uncommon, 2 rare, 1 legendary, or as the final tiers fall) is checked.
   - [ ] A credits row in `plugin/content/CREDITS.md` for every new sprite.

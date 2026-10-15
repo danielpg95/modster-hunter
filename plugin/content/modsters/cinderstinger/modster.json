@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "cinderstinger",
+  "name": "Cinderstinger",
+  "description": "Its shell never stops glowing, and its tail is always on fire.",
+  "rarity": "uncommon",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 29,
+    "types": ["bug", "fire"],
+    "category": "Ember Modster",
+    "heightM": 0.5,
+    "weightKg": 6,
+    "entry": "The cracks in a Cinderstinger's shell glow until it falls asleep. Travelers follow the red light at night, thinking it is a camp, and learn their mistake when the tail swings."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 4
+  }
+}
