@@ -563,3 +563,26 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] A credits row in `plugin/content/CREDITS.md` for every new or redrawn sprite.
   - [ ] `npm run check:content` passes.
   - [ ] A preview of every new or redrawn Modster in the PR description (enlarged, every frame, dark and light).
+
+#### [ ] P5-20 — Fill Dustwind Expanse
+- **Depends on:** P2-09, P2-16, P5-16
+- **Size:** M
+- **Goal:** give Dustwind Expanse a fuller roster, with one creepy Modster (asked by @victor-aguilars, 2026-10-14). Dunebun, Twiggle and Sunmane stay; 5 new Modsters join them.
+- **Done when:**
+  - [ ] Cactoad (common), Scarabit (common), Mirage Fox (uncommon), Dustwraith (rare, creepy) and Sandstormwhale (legendary), with dex numbers #027–#031, each with `sprite.png` and a `sprite.sprite.json` converted with `npm run sprite`.
+  - [ ] Dustwraith's look fits one sprite up to 48×48 (decisions 0008 and 0021), with no particle tricks.
+  - [ ] `dustwind-expanse/biome.json` lists all 8, and the odds table (3 common, 1 uncommon, 2 rare, 1 legendary, or as the final tiers fall) is checked.
+  - [ ] A credits row in `plugin/content/CREDITS.md` for every new sprite.
+  - [ ] `npm run check:content` passes.
+  - [ ] A preview of every new Modster in the PR description (enlarged, every frame, dark and light).
+
+#### [ ] P5-21 — Fill Saltbreeze Bay
+- **Depends on:** P2-09, P2-16, P5-16
+- **Size:** M
+- **Goal:** give Saltbreeze Bay a fuller roster (asked by @victor-aguilars, 2026-10-14). Crabbit, Flopple and Serpentide stay; 5 new Modsters join them.
+- **Done when:**
+  - [ ] Toastle (common), Gullet (common), Puffloaf (uncommon), Lanternmaw (rare) and Tidecrown (legendary), with dex numbers #032–#036, each with `sprite.png` and a `sprite.sprite.json` converted with `npm run sprite`.
+  - [ ] `saltbreeze-bay/biome.json` lists all 8, and the odds table is checked.
+  - [ ] A credits row in `plugin/content/CREDITS.md` for every new sprite.
+  - [ ] `npm run check:content` passes.
+  - [ ] A preview of every new Modster in the PR description (enlarged, every frame, dark and light).
