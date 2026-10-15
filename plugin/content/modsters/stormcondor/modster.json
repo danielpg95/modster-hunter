@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "stormcondor",
+  "name": "Stormcondor",
+  "description": "The sandstorm is its cloak. When it stands still, the wind does too.",
+  "rarity": "legendary",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 31,
+    "types": ["flying", "ground"],
+    "category": "Storm Modster",
+    "heightM": 4.5,
+    "weightKg": 120,
+    "entry": "It rules the dunes from a mound of sand, crowned in gold and wrapped in a cloak of wings. Lightning crackles around it and the sand circles it, and the dunes go quiet when it looks up."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 3
+  }
+}
