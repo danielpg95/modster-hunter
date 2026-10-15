@@ -562,4 +562,4 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `whispering-forest/biome.json` lists all 10, and the odds table (3 common, 3 uncommon, 3 rare, 1 legendary) is checked.
   - [x] A credits row in `plugin/content/CREDITS.md` for every new or redrawn sprite.
   - [x] `npm run check:content` passes.
-  - [ ] A preview of every new or redrawn Modster in the PR description (enlarged, every frame, dark and light).
+  - [x] A preview of every new or redrawn Modster in the PR description (enlarged, every frame, dark and light).

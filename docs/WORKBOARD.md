@@ -15,7 +15,7 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P5-19 | @danielpg95 | in-review | p5-19-forest-roster | 2026-10-14 | 2026-10-14 | Attach the roster preview to the PR and check the forest live with `/modsters hunt` |
+| P5-19 | @danielpg95 | in-review | p5-19-forest-roster | 2026-10-14 | 2026-10-14 | Check the forest live with `/modsters hunt`, then merge PR #112 |
 
 ## Up next
 
