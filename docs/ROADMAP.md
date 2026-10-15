@@ -564,17 +564,17 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] `npm run check:content` passes.
   - [ ] A preview of every new or redrawn Modster in the PR description (enlarged, every frame, dark and light).
 
-#### [ ] P5-20 — Fill Dustwind Expanse
+#### [x] P5-20 — Fill Dustwind Expanse
 - **Depends on:** P2-09, P2-16, P5-16
 - **Size:** M
 - **Goal:** give Dustwind Expanse a fuller roster, with one creepy Modster (asked by @victor-aguilars, 2026-10-14). Dunebun, Twiggle and Sunmane stay; 5 new Modsters join them.
 - **Done when:**
-  - [ ] Cactoad (common), Sunhorn (common), Cinderstinger (uncommon, bug / fire), Thirstwalker (rare, creepy) and Stormcondor (legendary, flying / ground), with dex numbers #027–#031, each with `sprite.png` and a `sprite.sprite.json` converted with `npm run sprite`.
-  - [ ] Thirstwalker's sprite is 32×32 or smaller (decisions 0008 and 0021) and reads as menacing on a dark and a light background.
-  - [ ] `dustwind-expanse/biome.json` lists all 8, and the odds table (3 common, 2 uncommon, 2 rare, 1 legendary) is checked.
-  - [ ] A credits row in `plugin/content/CREDITS.md` for every new sprite.
-  - [ ] `npm run check:content` passes.
-  - [ ] A preview of every new Modster in the PR description (enlarged, every frame, dark and light).
+  - [x] Cactoad (common), Sunhorn (common), Cinderstinger (uncommon, bug / fire), Thirstwalker (rare, creepy) and Stormcondor (legendary, flying / ground), with dex numbers #027–#031, each with `sprite.png` and a `sprite.sprite.json` converted with `npm run sprite`.
+  - [x] Thirstwalker's sprite is 32×32 or smaller (decisions 0008 and 0021) and reads as menacing on a dark and a light background.
+  - [x] `dustwind-expanse/biome.json` lists all 8, and the odds table (3 common, 2 uncommon, 2 rare, 1 legendary) is checked.
+  - [x] A credits row in `plugin/content/CREDITS.md` for every new sprite.
+  - [x] `npm run check:content` passes.
+  - [x] A preview of every new Modster in the PR description (enlarged, every frame, dark and light).
 
 #### [ ] P5-21 — Fill Saltbreeze Bay
 - **Depends on:** P2-09, P2-16, P5-16
