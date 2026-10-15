@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "musketail",
+  "name": "Musketail",
+  "description": "A brave mouse with a leaf cloak, a feathered hat and a pine-needle sword. All for one acorn.",
+  "rarity": "rare",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 26,
+    "types": ["fighting", "grass"],
+    "category": "Swordsmouse Modster",
+    "heightM": 0.25,
+    "weightKg": 0.4,
+    "entry": "It picks a fresh leaf cloak each season. Autumn ones are its favorite, because red looks heroic."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 4
+  }
+}

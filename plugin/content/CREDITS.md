@@ -30,6 +30,7 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/geolem/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Crystal Grotto |
 | `modsters/pinekin/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | P5-19 |
 | `modsters/hollowmask/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | P5-19 |
+| `modsters/musketail/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | P5-19 |
 | `biomes/whispering-forest/background.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Idle scene (decision 0026) |
 | `biomes/saltbreeze-bay/background.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Idle scene (decision 0026) |
 | `biomes/dustwind-expanse/background.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Idle scene (decision 0026) |
