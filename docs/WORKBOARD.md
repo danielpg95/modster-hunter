@@ -15,7 +15,7 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P5-19 | @danielpg95 | in-progress | p5-19-forest-roster | 2026-10-14 | 2026-10-14 | Redesign Sproutling, Mossbeast and Acornsprite |
+| P5-19 | @danielpg95 | in-review | p5-19-forest-roster | 2026-10-14 | 2026-10-14 | Attach the roster preview to the PR and check the forest live with `/modsters hunt` |
 
 ## Up next
 

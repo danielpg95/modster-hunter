@@ -557,9 +557,9 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Size:** M
 - **Goal:** give Whispering Forest a full roster of 3 common, 3 uncommon, 3 rare and its legendary Elderbark (asked by @danielpg95, 2026-10-14). The unused placeholders Sproutling, Mossbeast and Acornsprite are redesigned and join it, and 3 new Modsters fill the rest.
 - **Done when:**
-  - [ ] Sproutling (common), Mossbeast (uncommon) and Acornsprite (rare) have new sprites and complete dex entries, with official numbers #021–#023 in place of #901–#903 (decision 0017).
-  - [ ] One new common, one new uncommon and one new rare, with dex numbers #024–#026, each with `sprite.png` and a `sprite.sprite.json` converted with `npm run sprite`.
-  - [ ] `whispering-forest/biome.json` lists all 10, and the odds table (3 common, 3 uncommon, 3 rare, 1 legendary) is checked.
-  - [ ] A credits row in `plugin/content/CREDITS.md` for every new or redrawn sprite.
-  - [ ] `npm run check:content` passes.
+  - [x] Sproutling (common), Mossbeast (uncommon) and Acornsprite (rare) have new sprites and complete dex entries, with official numbers #021–#023 in place of #901–#903 (decision 0017).
+  - [x] One new common, one new uncommon and one new rare, with dex numbers #024–#026, each with `sprite.png` and a `sprite.sprite.json` converted with `npm run sprite`.
+  - [x] `whispering-forest/biome.json` lists all 10, and the odds table (3 common, 3 uncommon, 3 rare, 1 legendary) is checked.
+  - [x] A credits row in `plugin/content/CREDITS.md` for every new or redrawn sprite.
+  - [x] `npm run check:content` passes.
   - [ ] A preview of every new or redrawn Modster in the PR description (enlarged, every frame, dark and light).
