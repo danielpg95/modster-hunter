@@ -122,7 +122,8 @@ rosters change.
 
 ## Drawing
 
-1. Agree on size and colors first. Up to 48×48 px; the height must be even.
+1. Agree on size and colors first. Keep it at most 32 px tall and 48 wide (the
+   game accepts up to 48 tall, but 32 is the standard); the height must be even.
    Match the built-ins: read the `width` and `height` of a few built-in
    `.sprite.json` files. Most are 16–33 px wide and 14–32 tall, and the
    biggest are rares and legendaries. Sizes of 16×14 or less leave little room

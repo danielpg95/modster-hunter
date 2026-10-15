@@ -34,7 +34,7 @@ settled questions and avoid making assumptions about open ones.
 | [0018](0018-background-agents-count-as-work.md) | Background subagents count as work time for the spawn countdown | Accepted |
 | [0019](0019-reopen-encounter-pane.md) | The encounter pane reopens for people who opened it, until they close it by hand | Accepted (amended by 0023) |
 | [0020](0020-run-from-an-encounter.md) | The player can run from an encounter with `2: Run` | Accepted |
-| [0021](0021-sprites-up-to-48x48.md) | Sprites up to 48×48; the compact band shows when they don't fit | Accepted |
+| [0021](0021-sprites-up-to-48x48.md) | Sprites up to 48×48; the compact band shows when they don't fit | Accepted (point 5 superseded by 0033) |
 | [0022](0022-up-to-two-types.md) | A Modster has one or two types, the first one primary | Accepted |
 | [0023](0023-display-settings.md) | Display settings: one toggle per place, a pane picker, and a one-line band that keeps Throw | Accepted (point 7 amended by P3-01) |
 | [0024](0024-encounter-pane-focus.md) | `/modsters hunt` gives the encounter pane the keys, and the pane says how to switch | Accepted |
@@ -46,3 +46,4 @@ settled questions and avoid making assumptions about open ones.
 | [0030](0030-tier-first-encounters.md) | An encounter picks a tier first, then a Modster from that tier | Accepted |
 | [0031](0031-content-reload.md) | `/modsters reload` keeps the encounter and moves on from a dropped biome | Accepted |
 | [0032](0032-in-pane-enable-disable.md) | The pane turns content on and off; deleting is the content skill's job | Accepted |
+| [0033](0033-standard-sprite-size.md) | Every Modster's sprite is at most 32 px tall and 48 px wide | Accepted |
