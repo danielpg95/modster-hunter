@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "thirstwalker",
+  "name": "Thirstwalker",
+  "description": "It walks on all fours, though it was a person once. It never stops being thirsty.",
+  "rarity": "rare",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 27,
+    "types": ["ghost", "ground"],
+    "category": "Omen Modster",
+    "heightM": 1.2,
+    "weightKg": 9,
+    "entry": "Thirstwalkers follow travelers for days, always just out of sight, always on all fours. They never attack. They wait. Whoever finds one beside their camp at dawn should turn back; the dunes are done with them."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 3
+  }
+}
