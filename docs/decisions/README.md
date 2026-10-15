@@ -47,3 +47,4 @@ settled questions and avoid making assumptions about open ones.
 | [0031](0031-content-reload.md) | `/modsters reload` keeps the encounter and moves on from a dropped biome | Accepted |
 | [0032](0032-in-pane-enable-disable.md) | The pane turns content on and off; deleting is the content skill's job | Accepted |
 | [0033](0033-standard-sprite-size.md) | Every Modster's sprite is at most 32 px tall and 48 px wide | Accepted |
+| [0034](0034-color-limit.md) | A Modster's sprite uses at most 24 colors | Accepted |

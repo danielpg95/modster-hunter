@@ -129,7 +129,7 @@ rosters change.
    biggest are rares and legendaries. Sizes of 16×14 or less leave little room
    for detail. Tell the player that up to 14 px tall shows in the band of an
    80×24 terminal; taller sprites show in full in bigger terminals or the
-   encounter pane (`/modsters hunt`), and as text there. Use ≤ 16 colors and a
+   encounter pane (`/modsters hunt`), and as text there. Use ≤ 24 colors and a
    4-frame idle animation.
 2. Write a grid file in the scratch folder: one character per pixel, every row
    and frame the same size.
