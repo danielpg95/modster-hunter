@@ -1,22 +1,22 @@
 {
   "schemaVersion": 1,
   "id": "mossbeast",
-  "name": "Mossbeast",
-  "description": "A fuzzy loaf of moss. Mostly naps. Sometimes blinks.",
+  "name": "Mossmaul",
+  "description": "Its moss is greenest in spring. By winter it turns brown, and Mossmaul naps until it grows back.",
   "rarity": "uncommon",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,
   "dex": {
-    "number": 902,
-    "types": ["grass"],
-    "category": "Moss Modster",
-    "heightM": 0.6,
-    "weightKg": 14.5,
-    "entry": "It naps on fallen logs until moss grows over it. Travelers sit on it by mistake, and it does not mind."
+    "number": 22,
+    "types": ["grass", "rock"],
+    "category": "Moss Bear Modster",
+    "heightM": 0.7,
+    "weightKg": 48,
+    "entry": "At the first rustle it curls into a ball. Its mossy back is so convincing that birds nest on it, and it is too polite to move."
   },
   "sprite": {
     "file": "sprite.sprite.json",
-    "fps": 3
+    "fps": 4
   }
 }
