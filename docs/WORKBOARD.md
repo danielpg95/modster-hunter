@@ -18,6 +18,7 @@ this file lists only tasks someone has claimed.
 | P5-19 | @danielpg95 | in-review | p5-19-forest-roster | 2026-10-14 | 2026-10-16 | Check the forest live with `/modsters hunt`, then merge PR #112 |
 | P5-20 | @victor-aguilars | in-progress | p5-20-dustwind-roster | 2026-10-14 | 2026-10-14 | Design the 5 Dustwind Modsters, starting with Dustwraith |
 | P5-21 | @victor-aguilars | in-progress | p5-21-saltbreeze-roster | 2026-10-14 | 2026-10-14 | Design the 5 Saltbreeze Modsters, starting with Lanternmaw |
+| P5-23 | @danielpg95 | in-progress | p5-23-hootlet-redraw | 2026-10-16 | 2026-10-16 | Get frame 1 approved, animate 4 frames, convert with `npm run sprite` |
 
 ## Up next
 
