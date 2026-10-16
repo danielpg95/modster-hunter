@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "ranactus",
   "name": "Ranactus",
-  "description": "Every croak launches a needle. Please don't keep it indoors.",
+  "description": "Its tongue is faster than its temper. Its temper is very fast.",
   "rarity": "common",
   "maxAttempts": null,
   "catchRate": null,
@@ -10,10 +10,10 @@
   "dex": {
     "number": 28,
     "types": ["grass", "ground"],
-    "category": "Spine Modster",
+    "category": "Lure Modster",
     "heightM": 0.4,
     "weightKg": 2,
-    "entry": "Each croak fires a needle from its back cactus, and it croaks when startled, annoyed or bored. The flower only blooms when the needles run out."
+    "entry": "It sits under its cactus for hours, perfectly still. Bugs come for the flower on its back, and the tongue gets them before they land."
   },
   "sprite": {
     "file": "sprite.sprite.json",
