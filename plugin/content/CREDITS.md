@@ -11,8 +11,8 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/elderbark/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
 | `modsters/ranactus/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
 | `modsters/fuescorpion/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
-| `modsters/stormcondor/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
-| `modsters/zumbino/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
+| `modsters/reyrayo/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
+| `modsters/torbellin/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
 | `modsters/lamparito/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
 | `modsters/dunebun/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
 | `modsters/hootlet/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |

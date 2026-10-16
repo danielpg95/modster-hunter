@@ -9,7 +9,7 @@
   "shinyChance": null,
   "dex": {
     "number": 28,
-    "types": ["grass", "ground"],
+    "types": ["grass"],
     "category": "Lure Modster",
     "heightM": 0.4,
     "weightKg": 2,

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "id": "stormcondor",
-  "name": "Stormcondor",
+  "id": "reyrayo",
+  "name": "Reyrayo",
   "description": "The sandstorm is its cloak. When it stands still, the wind does too.",
   "rarity": "legendary",
   "maxAttempts": null,
@@ -9,7 +9,7 @@
   "shinyChance": null,
   "dex": {
     "number": 31,
-    "types": ["flying", "ground"],
+    "types": ["flying", "electric"],
     "category": "Storm Modster",
     "heightM": 4.5,
     "weightKg": 120,
