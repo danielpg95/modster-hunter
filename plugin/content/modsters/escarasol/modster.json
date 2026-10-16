@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "escarasol",
+  "name": "Escarasol",
+  "description": "It carries a piece of the sun on its back and never puts it down.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 30,
+    "types": ["bug", "ground"],
+    "category": "Sunback Modster",
+    "heightM": 0.4,
+    "weightKg": 3,
+    "entry": "The sun on an Escarasol's back stores daylight, and it spends the night working by that glow. It hauls stones, bones and the occasional boot across the dunes, and it does not stop until the sun goes dark."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 4
+  }
+}

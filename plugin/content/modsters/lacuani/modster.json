@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "lacuani",
+  "name": "Lacuani",
+  "description": "It drinks what the desert couldn't. Sleep with one eye open.",
+  "rarity": "rare",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 27,
+    "types": ["dark"],
+    "category": "Omen Modster",
+    "heightM": 1.2,
+    "weightKg": 9,
+    "entry": "It trails travelers for days on all fours, just out of sight. It never attacks while you're awake. Whoever wakes with a dry throat should leave the camp before dawn."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 3
+  }
+}

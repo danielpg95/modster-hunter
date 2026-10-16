@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "id": "cactoad",
-  "name": "Cactoad",
-  "description": "It was napping. You are not welcome.",
+  "id": "ranactus",
+  "name": "Ranactus",
+  "description": "Every croak launches a needle. Please don't keep it indoors.",
   "rarity": "common",
   "maxAttempts": null,
   "catchRate": null,
@@ -13,7 +13,7 @@
     "category": "Spine Modster",
     "heightM": 0.4,
     "weightKg": 2,
-    "entry": "A Cactoad's back cactus only blooms when it is truly annoyed, which is most days. It sits in the same spot for weeks and sighs at passing travelers."
+    "entry": "Each croak fires a needle from its back cactus, and it croaks when startled, annoyed or bored. The flower only blooms when the needles run out."
   },
   "sprite": {
     "file": "sprite.sprite.json",
