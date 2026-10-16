@@ -39,13 +39,18 @@ mod's `create-modster-content` skill in `plugin/skills/`.)
      (`/modsters hunt`) and the collection. Taller than the band shows the
      compact text band there.
 
-   Check `plugin/content/modsters/` so the id and look are new. If the user
-   shares a reference image, take ideas from it, not its look: the art must be
-   original and not recognizable as an existing game's creature.
+   Check `plugin/content/modsters/` so the id and look are new. A reference
+   the contributor made themselves (drawn or generated) can be converted as
+   is, see [From a reference image](#from-a-reference-image). Any other image
+   (an existing game's creature, someone else's art) is for ideas only: the
+   art must be original and not recognizable as an existing creature.
 2. **Create the folder** `plugin/content/modsters/<id>/`.
 3. **Make the sprite sheet** `sprite.png`: frames side by side, equal size,
-   transparent background. If you draw it programmatically, write the drawing
-   script to the scratchpad, not the repo. Look at the result (open the PNG,
+   transparent background. Prefer [From a reference image](#from-a-reference-image):
+   it gives the most detail and keeps the roster's style consistent. Draw from
+   scratch only for small, simple Modsters or when the contributor has no
+   reference. If you draw it programmatically, write the drawing script to the
+   scratchpad, not the repo. Look at the result (open the PNG,
    enlarged, on a dark and a light background) and show it to the user before
    continuing. What reads at this size:
    - A concept with 2–3 bold features. Small canvases (under ~20 px tall)
@@ -84,3 +89,128 @@ mod's `create-modster-content` skill in `plugin/skills/`.)
     background (the PR template's "Content and art" checklist). Save the
     preview from step 3 and ask the user to attach it to the description, or
     attach it yourself if you can upload images.
+
+## From a reference image
+
+The contributor makes a detailed reference of their own design (drawing or
+image generator), `npm run ref-sprite` shrinks it to sprite size, and you
+finish the parts that don't survive the shrink by hand (P5-22). This is how the
+P5-19 Whispering Forest roster was made.
+
+1. **Write the reference prompt** from the agreed design, in the house style,
+   and give it to the contributor. Fill every slot from the design the user
+   approved in step 1; don't invent features they didn't pick. Draw on all of
+   its fields, so the art matches what the game says about the Modster:
+   - **Concept and look:** body, colors, size, view, the 2–3 bold features.
+   - **`description` and `dex.entry`:** visible details and personality they
+     mention (Acornsprite's wings "glow when it hums", Shellsprout's sprout
+     that "waves when it's happy"). Turn behavior into a pose or expression.
+   - **`dex.types`:** palette hints (grass greens, rock greys, fairy pinks) and
+     what the creature is made of.
+   - **`dex.category`, height and weight:** proportions and heft (a "Moss Bear"
+     is round and heavy; a 0.15 m fairy is tiny and light).
+
+   ```
+   Pixel art game sprite of "<Name>", <concept in one line>, <view: front, or
+   three-quarter / side facing left or right>, <pose>.
+   <Body: shape, main colors, texture (fur, bark, scales, moss)>.
+   <2–3 bold features that make it this Modster: what they are, their colors>.
+   <Face: eye shape and color, nose, mouth, expression>.
+   <Props or accessories, if any: what, where, how they're held>.
+   Clean dark outline around the whole character, flat pixel shading,
+   readable at small size. Full body visible, centered, with space around
+   it, nothing touching the edges. Simple soft background.
+   ```
+
+   Rules that make the reference convert well:
+   - **Keep the dark outline and the space around it.** The cut-out follows the
+     outline; anything touching the image edge leaks.
+   - **Big head, big eyes, a clear face.** At 32 px tall a face gets about
+     8–12 px; small faces turn to mush and have to be redrawn.
+   - **Compact shapes.** Very long parts (a long log, a wide canopy) force the
+     sprite to shrink to fit 48 px wide. Ask for a shorter version.
+   - **Few thin parts.** Needles, whiskers, thin swords and legs vanish at
+     sprite size; expect to redraw them, or ask for chunkier ones.
+   - **Name every color that matters** (eye color, accent, the color a part
+     must not share with another), so the palette comes out right.
+
+   Two P5-19 prompts as examples. A creature:
+
+   ```
+   Pixel art game sprite of "Hollowmask", a raccoon creature peeking out of
+   a hollow log, side view of the log with the open end facing the viewer
+   on the left. The raccoon's head and front paws come out of the log's
+   round opening (pale wood ring around a dark hollow). Its face looks
+   straight at the viewer: grey fur, pointed ears with dark insides, and
+   instead of a normal raccoon mask it wears a dark green leaf as a bandit
+   mask across its eyes, with pointed leaf tips sticking out past both
+   sides of its head. Big clear ice-blue eyes inside the leaf mask, a white
+   muzzle, a small dark nose and a cat-like "w" mouth.
+   A bushy tail comes out of the back of the log and curls up, ringed in
+   light grey and the same dark leaf green as the mask.
+   The log is brown bark with grain lines and knots; moss grows only on the
+   front half of the log's top, near the raccoon.
+   Clean dark outline around everything, flat pixel shading, readable at
+   small size. Whole log and tail visible, centered, with space around it.
+   Simple soft background.
+   ```
+
+   A character with a prop:
+
+   ```
+   Pixel art game sprite of "Musketail", a small brave mouse swordsman,
+   three-quarter view facing left, standing on its hind legs. Grey-brown
+   fur with a cream belly, a pointed snout with a pink nose, big round
+   ears with pink insides (one ear visible above the hat), one big shiny
+   dark eye.
+   It wears a dark brown musketeer hat with a wide brim and a long cream
+   feather sweeping back. Over its shoulders hangs a cape made from a big
+   red autumn leaf: draped with soft folds, a lighter center vein, and the
+   leaf's pointed tip at the hem.
+   In its raised paw it holds a sword made from a long green pine needle,
+   with an acorn cap as the hand guard, held up and to the side with a
+   proud pose. A thin pink tail curls behind it.
+   Clean dark outline around the whole character, flat pixel shading,
+   readable at small size. Full body visible, centered, with space around
+   it, nothing touching the edges. Simple soft background.
+   ```
+
+   What happened with these: Hollowmask's log was long, so the sprite came
+   out width-limited and its face small; the log was shortened and the face
+   redrawn. Musketail's thin pine-needle sword vanished and was redrawn by
+   hand. Both are the expected finishing work.
+2. **Keep the reference out of the repo.** Save it outside the repo (Downloads,
+   the scratchpad). Credits name the contributor as the artist; don't name the
+   tool they used.
+3. **Convert it to PNG** if needed (`sips -s format png ref.jpeg --out ref.png`
+   on macOS, or any image editor), look at it, and pick a crop with a margin
+   around the subject.
+4. **Shrink it:**
+
+   ```bash
+   npm run ref-sprite -- ref.png --crop X,Y,W,H --size WxH --colors 24 --grid --out base.png
+   ```
+
+   Choose `--size` so the subject is at most 32 px tall and 48 wide (0033);
+   wide subjects are limited by width. If the subject touches an edge of the
+   reference, leave that edge out: `--edges left,right,bottom`. Raise or lower
+   `--dark` (default 70) if the cut-out leaks into the subject or keeps
+   background. Show the result enlarged on dark and light.
+5. **Finish by hand.** The shrink keeps outlines, big shapes, textures and
+   palette; it loses small things. Expect to redraw:
+   - **Faces:** eyes (2×2 to 3×3 with a shine, high contrast against what's
+     around them), nose, mouth. Never let a muzzle and a body part of the same
+     color touch without an edge between them.
+   - **Thin parts:** swords, stems, needles, legs, antennae.
+   - **Strays:** background specks, ground under the feet.
+   - **Parts that crowd the face** when the canvas is small.
+
+   Edit `base.grid.txt` (one letter per pixel) and rebuild with
+   `npm run ref-sprite -- --from-grid base.grid.txt`, or draw over `base.png`
+   in a script or pixel editor. Keep ≤ 24 colors (0034).
+6. **Animate.** Build the 2–4 frames from the finished base. Move whole parts
+   1–2 px (a head peek, a cape hem, a sword poke), rotate parts around a joint
+   for wings or arms instead of sliding them, and keep a blink. Redraw
+   outlines after moving a part so they stay closed.
+7. Continue with step 4 (convert) above.
+
