@@ -17,7 +17,7 @@ paths:
   author (GitHub handle), license (CC BY 4.0 by default, decision 0011).
 - **Sprites:** commit both the source PNG sheet and the converted
   `.sprite.json`. Regenerate the JSON with the converter; never hand-edit it.
-- **Readability at terminal size:** strong outline, ≤ 16 colors per Modster,
+- **Readability at terminal size:** strong outline, ≤ 24 colors per Modster (decision 0034),
   recognizable silhouette (the collection shows silhouettes for uncaught ones).
 - **Balance:** each built-in biome follows the tier mix in ROADMAP P2-09. Check
   the odds table before committing tier changes (decision 0030).

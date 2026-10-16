@@ -455,7 +455,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 #### [ ] P5-09 — Sprite miniatures (spike)
 - **Depends on:** P2-16
 - **Size:** S
-- **Goal:** when a sprite doesn't fit the band or pane, show a miniature instead of the text-only layout (issue #54, accepted by @danielpg95). Only matters once decision 0021 is accepted.
+- **Goal:** when a sprite doesn't fit the band or pane, show a miniature instead of the text-only layout (issue #54, accepted by @danielpg95). Decision 0033 makes this the way small terminals get a picture: sprites are up to 32 px tall, so almost none fit an 80×24 band.
 - **Done when:**
   - [ ] A spike checks whether `Raster` takes quadrant characters (`▘▝▖▗▚▞▙▛▜▟▌▐`), how they render in Ghostty, iTerm2, kitty and Windows Terminal, and whether a 2× downscale still reads as the Modster; screenshots of a 2× downscale and quadrant blocks for Sunmane in an 80×24 band.
   - [ ] A decision picks an approach (2× downscale, quadrants, a hand-drawn mini sprite, a mix, or none).
@@ -586,3 +586,13 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] A credits row in `plugin/content/CREDITS.md` for every new sprite.
   - [ ] `npm run check:content` passes.
   - [ ] A preview of every new Modster in the PR description (enlarged, every frame, dark and light).
+
+#### [x] P5-22 — Reference-image sprite workflow
+- **Depends on:** P2-02
+- **Size:** M
+- **Goal:** a repeatable way to make built-in sprites from a contributor's own reference image (asked by @danielpg95, 2026-10-15), so quality and art style stay consistent across biomes. In P5-19 this lifted every Modster: the contributor makes a detailed reference, the tool shrinks it to sprite size, and faces and thin parts are finished by hand.
+- **Done when:**
+  - [x] `tools/ref-sprite.mjs` (`npm run ref-sprite`) cuts the background out of a reference along its dark outline, shrinks it to a target size by majority colour per cell (keeps thin lines), caps the palette (≤ 24, decision 0034), keeps the largest shape, and writes a PNG plus an optional letter-grid dump for hand edits; with tests in `tools/ref-sprite.test.mjs`.
+  - [x] The `add-modster` skill has a "From a reference image" path: a prompt template with the house style (dark outline, flat shading, plain space around the creature, nothing touching the edges), the conversion command, and a finishing checklist (faces, eyes, thin parts, strays, ≤ 32 px tall per 0033, ≤ 24 colours, 2–4 frames, previews on dark and light).
+  - [x] Reference images stay out of the repo; credits name the contributor as the artist.
+  - [x] `docs/DEVELOPMENT.md` lists the new command.
