@@ -103,7 +103,7 @@ P5-19 Whispering Forest roster was made.
    ```
    Pixel art game sprite of "<Name>", <one-line concept>, <view: front /
    three-quarter facing left or right>. <Body, colors, 2–3 bold features>.
-   <Face: eyes, mouth>. No blush, no cheeks.
+   <Face: eyes, mouth>.
    Clean dark outline around the whole character, flat pixel shading,
    readable at small size. Full body visible, centered, with space around
    it, nothing touching the edges. Simple soft background.
@@ -134,7 +134,7 @@ P5-19 Whispering Forest roster was made.
      around them), nose, mouth. Never let a muzzle and a body part of the same
      color touch without an edge between them.
    - **Thin parts:** swords, stems, needles, legs, antennae.
-   - **Strays:** background specks, ground under the feet, cheeks or blush.
+   - **Strays:** background specks, ground under the feet.
    - **Parts that crowd the face** when the canvas is small.
 
    Edit `base.grid.txt` (one letter per pixel) and rebuild with
