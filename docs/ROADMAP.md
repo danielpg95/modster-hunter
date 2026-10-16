@@ -563,4 +563,4 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] A credits row in `plugin/content/CREDITS.md` for every new or redrawn sprite.
   - [x] `npm run check:content` passes.
   - [x] A preview of every new or redrawn Modster in the PR description (enlarged, every frame, dark and light).
-  - [ ] Elderbark (#010, legendary) is redrawn to match the upgraded roster (up to 32 px tall, decision 0033), keeping its dex entry; its credits row notes it replaces @victor-aguilars' design (asked by @danielpg95, 2026-10-15).
+  - [x] Elderbark (#010, legendary) is redrawn to match the upgraded roster (up to 32 px tall, decision 0033), keeping its dex entry; its credits row notes it replaces @victor-aguilars' design (asked by @danielpg95, 2026-10-15).
