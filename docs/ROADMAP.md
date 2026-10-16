@@ -565,3 +565,4 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] A preview of every new or redrawn Modster in the PR description (enlarged, every frame, dark and light).
   - [x] Elderbark (#010, legendary) is redrawn to match the upgraded roster (up to 32 px tall, decision 0033), keeping its dex entry; its credits row notes it replaces @victor-aguilars' design (asked by @danielpg95, 2026-10-15).
   - [x] Fernox (#009, uncommon) is redrawn to match the upgraded roster, keeping its dex entry; credited to @danielpg95 and @victor-aguilars, since it keeps his design (asked by @danielpg95, 2026-10-16).
+  - [x] Sporrow (#008, rare) is redrawn to match the upgraded roster, keeping its dex entry; co-credited to @danielpg95 and @victor-aguilars (asked by @danielpg95, 2026-10-16).
