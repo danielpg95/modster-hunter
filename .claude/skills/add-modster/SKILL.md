@@ -99,7 +99,16 @@ P5-19 Whispering Forest roster was made.
 
 1. **Write the reference prompt** from the agreed design, in the house style,
    and give it to the contributor. Fill every slot from the design the user
-   approved in step 1; don't invent features they didn't pick.
+   approved in step 1; don't invent features they didn't pick. Draw on all of
+   its fields, so the art matches what the game says about the Modster:
+   - **Concept and look:** body, colors, size, view, the 2–3 bold features.
+   - **`description` and `dex.entry`:** visible details and personality they
+     mention (Acornsprite's wings "glow when it hums", Shellsprout's sprout
+     that "waves when it's happy"). Turn behavior into a pose or expression.
+   - **`dex.types`:** palette hints (grass greens, rock greys, fairy pinks) and
+     what the creature is made of.
+   - **`dex.category`, height and weight:** proportions and heft (a "Moss Bear"
+     is round and heavy; a 0.15 m fairy is tiny and light).
 
    ```
    Pixel art game sprite of "<Name>", <concept in one line>, <view: front, or
