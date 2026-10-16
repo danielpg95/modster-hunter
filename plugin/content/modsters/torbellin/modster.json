@@ -9,7 +9,7 @@
   "shinyChance": null,
   "dex": {
     "number": 30,
-    "types": ["flying", "ground"],
+    "types": ["ground", "normal"],
     "category": "Whirlwind Modster",
     "heightM": 0.9,
     "weightKg": 0.3,

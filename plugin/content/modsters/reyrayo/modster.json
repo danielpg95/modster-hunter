@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "reyrayo",
   "name": "Reyrayo",
-  "description": "The sandstorm is its cloak. When it stands still, the wind does too.",
+  "description": "Every storm in the desert answers to it. Most of them are afraid to.",
   "rarity": "legendary",
   "maxAttempts": null,
   "catchRate": null,
@@ -13,7 +13,7 @@
     "category": "Storm Modster",
     "heightM": 4.5,
     "weightKg": 120,
-    "entry": "It rules the dunes from a mound of sand, crowned in gold and wrapped in a cloak of wings. Lightning crackles around it and the sand circles it, and the dunes go quiet when it looks up."
+    "entry": "It rules the dunes from the highest rock, crowned in gold and wrapped in a cloak of wings. When it raises its head the sky goes dark, and lightning falls wherever it looks."
   },
   "sprite": {
     "file": "sprite.sprite.json",

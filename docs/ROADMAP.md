@@ -569,7 +569,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Size:** M
 - **Goal:** give Dustwind Expanse a fuller roster, with one creepy Modster (asked by @victor-aguilars, 2026-10-14). Dunebun, Twiggle and Sunmane stay; 5 new Modsters join them.
 - **Done when:**
-  - [x] Ranactus (common, grass, was Cactoad), Torbellín (common, flying / ground, was Sunhorn), Fuescorpion (uncommon, bug / fire, was Cinderstinger), Lamparito (rare, ghost / fire, was Thirstwalker) and Reyrayo (legendary, flying / electric, was Stormcondor), with dex numbers #027–#031, each with `sprite.png` and a `sprite.sprite.json` converted with `npm run sprite`.
+  - [x] Ranactus (common, grass, was Cactoad), Torbellín (common, ground / normal, was Sunhorn), Fuescorpion (uncommon, bug / fire, was Cinderstinger), Lamparito (rare, ghost / fire, was Thirstwalker) and Reyrayo (legendary, flying / electric, was Stormcondor), with dex numbers #027–#031, each with `sprite.png` and a `sprite.sprite.json` converted with `npm run sprite`.
   - [x] Lamparito's sprite is at most 32 px tall (decision 0033) and reads clearly on a dark and a light background.
   - [x] `dustwind-expanse/biome.json` lists all 8, and the odds table (3 common, 2 uncommon, 2 rare, 1 legendary) is checked.
   - [x] A credits row in `plugin/content/CREDITS.md` for every new sprite.
