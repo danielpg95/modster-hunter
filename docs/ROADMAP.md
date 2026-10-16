@@ -596,3 +596,16 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] The `add-modster` skill has a "From a reference image" path: a prompt template with the house style (dark outline, flat shading, plain space around the creature, nothing touching the edges), the conversion command, and a finishing checklist (faces, eyes, thin parts, strays, ≤ 32 px tall per 0033, ≤ 24 colours, 2–4 frames, previews on dark and light).
   - [x] Reference images stay out of the repo; credits name the contributor as the artist.
   - [x] `docs/DEVELOPMENT.md` lists the new command.
+
+#### [ ] P5-23 — Unknown habitat and Claudio (experiment)
+- **Depends on:** P2-09, P2-16, P5-16, P5-22
+- **Size:** M
+- **Goal:** an experimental "Unknown" biome with a single legendary Modster, Claudio (asked by @victor-aguilars, 2026-10-15), to see whether a biome can hold just one Modster. Claudio's "does anything you ask" is flavor text only: a joke description and dex entry, no behavior, no model calls (golden rules 6 and 7 stay).
+- **Done when:**
+  - [ ] A decision (0035) says an experimental biome may skip the common / uncommon / rare mix of P2-09, and how it is flagged.
+  - [ ] `tools/check-content.mjs` (and the validator, if the flag needs it) honours the flag, with tests; a biome without the flag still needs the full mix.
+  - [ ] `plugin/content/biomes/unknown/biome.json` (id `unknown`, name "Unknown") lists only Claudio, legendary, and the odds table is checked.
+  - [ ] Claudio, dex #037: an original design (not the Claude Code mascot art), at most 32 px tall (0033) and 24 colors (0034), 2–4 frames, `modster.json` with a short joke description and dex entry, `sprite.png` and the converted `sprite.sprite.json`.
+  - [ ] A credits row in `plugin/content/CREDITS.md` for Claudio's sprite.
+  - [ ] `npm run check:content` passes.
+  - [ ] A preview of Claudio in the PR description (enlarged, every frame, dark and light).
