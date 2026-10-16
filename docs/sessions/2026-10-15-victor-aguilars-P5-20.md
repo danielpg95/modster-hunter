@@ -22,6 +22,7 @@ revisit every name and description, one Modster at a time.
   - `stormcondor`: 40×32, 17 colors (name unchanged)
 - Updated names, descriptions and dex entries, `dustwind-expanse/biome.json`, `plugin/content/CREDITS.md`, `docs/previews/` (one PNG per Modster plus `dustwind-expanse-p5-20.gif`) and the P5-20 roadmap lines.
 - Verified: `npm run check:content` clean (28 Modsters), `claude plugin test ./plugin` 670 pass, `node tools/check-tracking.mjs` passes.
+- Second pass on faces: Fuescorpion and Stormcondor got outlined 3×3 eyes with a pale fill, a dark slit pupil and a shine pixel (like Hootlet's), after the user said Daniel's eyes are clearer. The animated preview GIF now uses one shared palette (a per-frame palette made the whole GIF flicker).
 - Not verified: a real interactive session (`claude --plugin-dir ./plugin`, `/modsters hunt`); sprites were only checked as enlarged previews on dark and light.
 
 ## Decisions made
@@ -44,7 +45,7 @@ revisit every name and description, one Modster at a time.
 ## Next steps
 
 1. Have @danielpg95 review PR #113 and look at the five Modsters live with `claude --plugin-dir ./plugin` and `/modsters hunt` (the checklist box in the PR is still open).
-2. Revisit weak spots if wanted: Lacuani's head sits tight against the front leg; Fuescorpion's eyes are about 3×3 px; Stormcondor's feet are two small claws.
+2. Revisit weak spots if wanted: Lacuani's head sits tight against the front leg; Stormcondor's feet are two small claws.
 3. P5-21 (Saltbreeze Bay) is claimed and not started; apply the same reference workflow there.
 
 ## Open questions
