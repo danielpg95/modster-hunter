@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "zumbino",
+  "name": "Zumbino",
+  "description": "It spins so fast it forgot which way it was going.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 30,
+    "types": ["flying", "ground"],
+    "category": "Whirlwind Modster",
+    "heightM": 0.9,
+    "weightKg": 0.3,
+    "entry": "A dust devil that woke up one day and decided to stay. It chases travelers in circles for fun and keeps whatever it picks up: pebbles, twigs, the occasional boot. It never gives anything back."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 8
+  }
+}
