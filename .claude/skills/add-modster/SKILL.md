@@ -98,19 +98,78 @@ finish the parts that don't survive the shrink by hand (P5-22). This is how the
 P5-19 Whispering Forest roster was made.
 
 1. **Write the reference prompt** from the agreed design, in the house style,
-   and give it to the contributor:
+   and give it to the contributor. Fill every slot from the design the user
+   approved in step 1; don't invent features they didn't pick.
 
    ```
-   Pixel art game sprite of "<Name>", <one-line concept>, <view: front /
-   three-quarter facing left or right>. <Body, colors, 2–3 bold features>.
-   <Face: eyes, mouth>.
+   Pixel art game sprite of "<Name>", <concept in one line>, <view: front, or
+   three-quarter / side facing left or right>, <pose>.
+   <Body: shape, main colors, texture (fur, bark, scales, moss)>.
+   <2–3 bold features that make it this Modster: what they are, their colors>.
+   <Face: eye shape and color, nose, mouth, expression>.
+   <Props or accessories, if any: what, where, how they're held>.
    Clean dark outline around the whole character, flat pixel shading,
    readable at small size. Full body visible, centered, with space around
    it, nothing touching the edges. Simple soft background.
    ```
 
-   The dark outline matters: the cut-out follows it. "Nothing touching the
-   edges" keeps the background fill from leaking into the subject.
+   Rules that make the reference convert well:
+   - **Keep the dark outline and the space around it.** The cut-out follows the
+     outline; anything touching the image edge leaks.
+   - **Big head, big eyes, a clear face.** At 32 px tall a face gets about
+     8–12 px; small faces turn to mush and have to be redrawn.
+   - **Compact shapes.** Very long parts (a long log, a wide canopy) force the
+     sprite to shrink to fit 48 px wide. Ask for a shorter version.
+   - **Few thin parts.** Needles, whiskers, thin swords and legs vanish at
+     sprite size; expect to redraw them, or ask for chunkier ones.
+   - **Name every color that matters** (eye color, accent, the color a part
+     must not share with another), so the palette comes out right.
+
+   Two P5-19 prompts as examples. A creature:
+
+   ```
+   Pixel art game sprite of "Hollowmask", a raccoon creature peeking out of
+   a hollow log, side view of the log with the open end facing the viewer
+   on the left. The raccoon's head and front paws come out of the log's
+   round opening (pale wood ring around a dark hollow). Its face looks
+   straight at the viewer: grey fur, pointed ears with dark insides, and
+   instead of a normal raccoon mask it wears a dark green leaf as a bandit
+   mask across its eyes, with pointed leaf tips sticking out past both
+   sides of its head. Big clear ice-blue eyes inside the leaf mask, a white
+   muzzle, a small dark nose and a cat-like "w" mouth.
+   A bushy tail comes out of the back of the log and curls up, ringed in
+   light grey and the same dark leaf green as the mask.
+   The log is brown bark with grain lines and knots; moss grows only on the
+   front half of the log's top, near the raccoon.
+   Clean dark outline around everything, flat pixel shading, readable at
+   small size. Whole log and tail visible, centered, with space around it.
+   Simple soft background.
+   ```
+
+   A character with a prop:
+
+   ```
+   Pixel art game sprite of "Musketail", a small brave mouse swordsman,
+   three-quarter view facing left, standing on its hind legs. Grey-brown
+   fur with a cream belly, a pointed snout with a pink nose, big round
+   ears with pink insides (one ear visible above the hat), one big shiny
+   dark eye.
+   It wears a dark brown musketeer hat with a wide brim and a long cream
+   feather sweeping back. Over its shoulders hangs a cape made from a big
+   red autumn leaf: draped with soft folds, a lighter center vein, and the
+   leaf's pointed tip at the hem.
+   In its raised paw it holds a sword made from a long green pine needle,
+   with an acorn cap as the hand guard, held up and to the side with a
+   proud pose. A thin pink tail curls behind it.
+   Clean dark outline around the whole character, flat pixel shading,
+   readable at small size. Full body visible, centered, with space around
+   it, nothing touching the edges. Simple soft background.
+   ```
+
+   What happened with these: Hollowmask's log was long, so the sprite came
+   out width-limited and its face small; the log was shortened and the face
+   redrawn. Musketail's thin pine-needle sword vanished and was redrawn by
+   hand. Both are the expected finishing work.
 2. **Keep the reference out of the repo.** Save it outside the repo (Downloads,
    the scratchpad). Credits name the contributor as the artist; don't name the
    tool they used.
