@@ -39,13 +39,18 @@ mod's `create-modster-content` skill in `plugin/skills/`.)
      (`/modsters hunt`) and the collection. Taller than the band shows the
      compact text band there.
 
-   Check `plugin/content/modsters/` so the id and look are new. If the user
-   shares a reference image, take ideas from it, not its look: the art must be
-   original and not recognizable as an existing game's creature.
+   Check `plugin/content/modsters/` so the id and look are new. A reference
+   the contributor made themselves (drawn or generated) can be converted as
+   is, see [From a reference image](#from-a-reference-image). Any other image
+   (an existing game's creature, someone else's art) is for ideas only: the
+   art must be original and not recognizable as an existing creature.
 2. **Create the folder** `plugin/content/modsters/<id>/`.
 3. **Make the sprite sheet** `sprite.png`: frames side by side, equal size,
-   transparent background. If you draw it programmatically, write the drawing
-   script to the scratchpad, not the repo. Look at the result (open the PNG,
+   transparent background. Prefer [From a reference image](#from-a-reference-image):
+   it gives the most detail and keeps the roster's style consistent. Draw from
+   scratch only for small, simple Modsters or when the contributor has no
+   reference. If you draw it programmatically, write the drawing script to the
+   scratchpad, not the repo. Look at the result (open the PNG,
    enlarged, on a dark and a light background) and show it to the user before
    continuing. What reads at this size:
    - A concept with 2–3 bold features. Small canvases (under ~20 px tall)
@@ -84,3 +89,60 @@ mod's `create-modster-content` skill in `plugin/skills/`.)
     background (the PR template's "Content and art" checklist). Save the
     preview from step 3 and ask the user to attach it to the description, or
     attach it yourself if you can upload images.
+
+## From a reference image
+
+The contributor makes a detailed reference of their own design (drawing or
+image generator), `npm run ref-sprite` shrinks it to sprite size, and you
+finish the parts that don't survive the shrink by hand (P5-22). This is how the
+P5-19 Whispering Forest roster was made.
+
+1. **Write the reference prompt** from the agreed design, in the house style,
+   and give it to the contributor:
+
+   ```
+   Pixel art game sprite of "<Name>", <one-line concept>, <view: front /
+   three-quarter facing left or right>. <Body, colors, 2–3 bold features>.
+   <Face: eyes, mouth>. No blush, no cheeks.
+   Clean dark outline around the whole character, flat pixel shading,
+   readable at small size. Full body visible, centered, with space around
+   it, nothing touching the edges. Simple soft background.
+   ```
+
+   The dark outline matters: the cut-out follows it. "Nothing touching the
+   edges" keeps the background fill from leaking into the subject.
+2. **Keep the reference out of the repo.** Save it outside the repo (Downloads,
+   the scratchpad). Credits name the contributor as the artist; don't name the
+   tool they used.
+3. **Convert it to PNG** if needed (`sips -s format png ref.jpeg --out ref.png`
+   on macOS, or any image editor), look at it, and pick a crop with a margin
+   around the subject.
+4. **Shrink it:**
+
+   ```bash
+   npm run ref-sprite -- ref.png --crop X,Y,W,H --size WxH --colors 24 --grid --out base.png
+   ```
+
+   Choose `--size` so the subject is at most 32 px tall and 48 wide (0033);
+   wide subjects are limited by width. If the subject touches an edge of the
+   reference, leave that edge out: `--edges left,right,bottom`. Raise or lower
+   `--dark` (default 70) if the cut-out leaks into the subject or keeps
+   background. Show the result enlarged on dark and light.
+5. **Finish by hand.** The shrink keeps outlines, big shapes, textures and
+   palette; it loses small things. Expect to redraw:
+   - **Faces:** eyes (2×2 to 3×3 with a shine, high contrast against what's
+     around them), nose, mouth. Never let a muzzle and a body part of the same
+     color touch without an edge between them.
+   - **Thin parts:** swords, stems, needles, legs, antennae.
+   - **Strays:** background specks, ground under the feet, cheeks or blush.
+   - **Parts that crowd the face** when the canvas is small.
+
+   Edit `base.grid.txt` (one letter per pixel) and rebuild with
+   `npm run ref-sprite -- --from-grid base.grid.txt`, or draw over `base.png`
+   in a script or pixel editor. Keep ≤ 24 colors (0034).
+6. **Animate.** Build the 2–4 frames from the finished base. Move whole parts
+   1–2 px (a head peek, a cape hem, a sword poke), rotate parts around a joint
+   for wings or arms instead of sliding them, and keep a blink. Redraw
+   outlines after moving a part so they stay closed.
+7. Continue with step 4 (convert) above.
+
