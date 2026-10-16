@@ -67,6 +67,7 @@ Run from the repo root (`npm install` first):
 | `npm test` | `claude plugin test ./plugin` |
 | `npm run validate` | `claude plugin validate ./plugin --strict` |
 | `npm run sprite -- <file>` | `tools/sprite.mjs`, see [Sprites](#sprites) (Node 22.18+) |
+| `npm run ref-sprite -- <ref.png> …` | `tools/ref-sprite.mjs`: a reference image to a sprite-sized base, see [Sprites](#sprites) |
 | `npm run test:tools` | The tools' tests, `tools/*.test.mjs` (Node 22.18+) |
 | `npm run check:content` | Loads `plugin/content/` with the mod's loader, prints each biome's odds table, fails on any issue (Node 22.18+) |
 
@@ -99,6 +100,18 @@ into equal frames, or the art has more than 63 colors. Any PNG works (pngjs);
 alpha is snapped to transparent below 128 and opaque from 128. The conversion is
 `spriteFromSheet` in `plugin/hooks/content/`, the same code the mod uses for
 user PNGs (`spriteFromPng`, decision 0016). Never hand-edit the output.
+
+`tools/ref-sprite.mjs` turns a contributor's reference image into a sprite-sized
+base to finish by hand (P5-22; the `add-modster` skill has the full workflow):
+
+```bash
+npm run ref-sprite -- ref.png --crop X,Y,W,H --size WxH --colors 24 --grid --out base.png
+npm run ref-sprite -- --from-grid base.grid.txt                            # after hand edits
+```
+
+It cuts the background away along the reference's dark outline, shrinks by the
+most common color per cell, caps the palette and drops stray specks. Input is
+PNG; convert JPEGs first.
 
 `npm run test:tools` runs the tool's tests (`tools/*.test.mjs`, Node's test runner).
 

@@ -455,7 +455,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 #### [ ] P5-09 — Sprite miniatures (spike)
 - **Depends on:** P2-16
 - **Size:** S
-- **Goal:** when a sprite doesn't fit the band or pane, show a miniature instead of the text-only layout (issue #54, accepted by @danielpg95). Only matters once decision 0021 is accepted.
+- **Goal:** when a sprite doesn't fit the band or pane, show a miniature instead of the text-only layout (issue #54, accepted by @danielpg95). Decision 0033 makes this the way small terminals get a picture: sprites are up to 32 px tall, so almost none fit an 80×24 band.
 - **Done when:**
   - [ ] A spike checks whether `Raster` takes quadrant characters (`▘▝▖▗▚▞▙▛▜▟▌▐`), how they render in Ghostty, iTerm2, kitty and Windows Terminal, and whether a 2× downscale still reads as the Modster; screenshots of a 2× downscale and quadrant blocks for Sunmane in an 80×24 band.
   - [ ] A decision picks an approach (2× downscale, quadrants, a hand-drawn mini sprite, a mix, or none).
@@ -566,3 +566,36 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Elderbark (#010, legendary) is redrawn to match the upgraded roster (up to 32 px tall, decision 0033), keeping its dex entry; its credits row notes it replaces @victor-aguilars' design (asked by @danielpg95, 2026-10-15).
   - [x] Fernox (#009, uncommon) is redrawn to match the upgraded roster, keeping its dex entry; credited to @danielpg95 and @victor-aguilars, since it keeps his design (asked by @danielpg95, 2026-10-16).
   - [x] Sporrow (#008, rare) is redrawn to match the upgraded roster, keeping its dex entry; co-credited to @danielpg95 and @victor-aguilars (asked by @danielpg95, 2026-10-16).
+
+#### [ ] P5-20 — Fill Dustwind Expanse
+- **Depends on:** P2-09, P2-16, P5-16
+- **Size:** M
+- **Goal:** give Dustwind Expanse a fuller roster, with one creepy Modster (asked by @victor-aguilars, 2026-10-14). Dunebun, Twiggle and Sunmane stay; 5 new Modsters join them.
+- **Done when:**
+  - [ ] Cactoad (common), Scarabit (common), Mirage Fox (uncommon), Dustwraith (rare, creepy) and Sandstormwhale (legendary), with dex numbers #027–#031, each with `sprite.png` and a `sprite.sprite.json` converted with `npm run sprite`.
+  - [ ] Dustwraith's look fits one sprite up to 48×48 (decisions 0008 and 0021), with no particle tricks.
+  - [ ] `dustwind-expanse/biome.json` lists all 8, and the odds table (3 common, 1 uncommon, 2 rare, 1 legendary, or as the final tiers fall) is checked.
+  - [ ] A credits row in `plugin/content/CREDITS.md` for every new sprite.
+  - [ ] `npm run check:content` passes.
+  - [ ] A preview of every new Modster in the PR description (enlarged, every frame, dark and light).
+
+#### [ ] P5-21 — Fill Saltbreeze Bay
+- **Depends on:** P2-09, P2-16, P5-16
+- **Size:** M
+- **Goal:** give Saltbreeze Bay a fuller roster (asked by @victor-aguilars, 2026-10-14). Crabbit, Flopple and Serpentide stay; 5 new Modsters join them.
+- **Done when:**
+  - [ ] Toastle (common), Gullet (common), Puffloaf (uncommon), Lanternmaw (rare) and Tidecrown (legendary), with dex numbers #032–#036, each with `sprite.png` and a `sprite.sprite.json` converted with `npm run sprite`.
+  - [ ] `saltbreeze-bay/biome.json` lists all 8, and the odds table is checked.
+  - [ ] A credits row in `plugin/content/CREDITS.md` for every new sprite.
+  - [ ] `npm run check:content` passes.
+  - [ ] A preview of every new Modster in the PR description (enlarged, every frame, dark and light).
+
+#### [x] P5-22 — Reference-image sprite workflow
+- **Depends on:** P2-02
+- **Size:** M
+- **Goal:** a repeatable way to make built-in sprites from a contributor's own reference image (asked by @danielpg95, 2026-10-15), so quality and art style stay consistent across biomes. In P5-19 this lifted every Modster: the contributor makes a detailed reference, the tool shrinks it to sprite size, and faces and thin parts are finished by hand.
+- **Done when:**
+  - [x] `tools/ref-sprite.mjs` (`npm run ref-sprite`) cuts the background out of a reference along its dark outline, shrinks it to a target size by majority colour per cell (keeps thin lines), caps the palette (≤ 24, decision 0034), keeps the largest shape, and writes a PNG plus an optional letter-grid dump for hand edits; with tests in `tools/ref-sprite.test.mjs`.
+  - [x] The `add-modster` skill has a "From a reference image" path: a prompt template with the house style (dark outline, flat shading, plain space around the creature, nothing touching the edges), the conversion command, and a finishing checklist (faces, eyes, thin parts, strays, ≤ 32 px tall per 0033, ≤ 24 colours, 2–4 frames, previews on dark and light).
+  - [x] Reference images stay out of the repo; credits name the contributor as the artist.
+  - [x] `docs/DEVELOPMENT.md` lists the new command.

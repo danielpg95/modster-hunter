@@ -117,8 +117,10 @@ errors, and a file with an error is skipped.
 
 - **PNG sheet:** frames side by side, all the same size. Any valid PNG works.
   At most 63 opaque colors in the sheet.
-- **Frame size:** width 8–48 px, height 8–48 px and even. Up to 14 px tall
-  shows in the band of an 80×24 terminal; taller shows as text there.
+- **Frame size:** width 8–48 px, height 8–48 px and even. Keep it at most
+  32 px tall and 48 wide, like the built-ins. Up to 14 px tall shows in the
+  band of an 80×24 terminal and up to 30 px at 140×40; taller shows as text
+  there, and in full in the encounter pane and the collection.
 - **Transparency:** alpha below 128 is transparent, 128 and up is opaque.
 - **GIFs** aren't read by the mod: convert them to a `.sprite.json` with the
   helper, or export a PNG sheet.

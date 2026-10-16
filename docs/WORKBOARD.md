@@ -15,7 +15,9 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P5-19 | @danielpg95 | in-review | p5-19-forest-roster | 2026-10-14 | 2026-10-14 | Check the forest live with `/modsters hunt`, then merge PR #112 |
+| P5-19 | @danielpg95 | in-review | p5-19-forest-roster | 2026-10-14 | 2026-10-16 | Check the forest live with `/modsters hunt`, then merge PR #112 |
+| P5-20 | @victor-aguilars | in-progress | p5-20-dustwind-roster | 2026-10-14 | 2026-10-14 | Design the 5 Dustwind Modsters, starting with Dustwraith |
+| P5-21 | @victor-aguilars | in-progress | p5-21-saltbreeze-roster | 2026-10-14 | 2026-10-14 | Design the 5 Saltbreeze Modsters, starting with Lanternmaw |
 
 ## Up next
 
