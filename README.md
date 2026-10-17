@@ -18,29 +18,26 @@ keystrokes. Just something to catch while you wait for the tests to run.
 
 ## Meet some Modsters
 
-There are **31 Modsters** across **4 biomes**, from common critters to
+Dozens of Modsters hide across four biomes, from common critters to
 legendaries you'll be lucky to see once. Every one is hand-drawn pixel art with
-its own idle animation and dex entry.
+its own idle animation and dex entry. Here are two to get you started:
 
-<p align="center">
-  <img src="docs/previews/p5-24-redraws.gif" alt="Crabbit, Sunmane, Twiggle, Flopple and Serpentide" width="760">
-</p>
+<table align="center">
+  <tr>
+    <td align="center" width="50%">
+      <img src="docs/previews/readme-musketail.gif" alt="Musketail, a mouse in a feathered hat and leaf cloak, raising a pine-needle sword" height="160"><br>
+      <b>Musketail</b> · rare · Whispering Forest<br>
+      <sub>A brave mouse with a leaf cloak, a feathered hat and a pine-needle sword. All for one acorn.</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="docs/previews/readme-lamparito.gif" alt="Lamparito, a grinning purple smoke spirit rising from a brass lamp" height="160"><br>
+      <b>Lamparito</b> · rare · Dustwind Expanse<br>
+      <sub>Rub the lamp and it grants one wish: to be left alone.</sub>
+    </td>
+  </tr>
+</table>
 
-> **Crabbit** lives in a shell three sizes too big. Says it'll grow into it.
->
-> **Flopple** naps on warm rocks until the tide carries it off. Then naps in the water.
-
-<p align="center">
-  <img src="docs/previews/dustwind-expanse-p5-20.gif" alt="Ranactus, Lamparito, Torbellín, Fuescorpion and Reyrayo from the Dustwind Expanse" width="760">
-</p>
-
-> **Lamparito:** Rub the lamp and it grants one wish: to be left alone.
->
-> **Reyrayo:** Every storm in the desert answers to it. Most of them are afraid to.
-
-<p align="center">
-  <img src="docs/previews/whispering-forest-p5-19.gif" alt="Whispering Forest Modsters: a snail, a moss bear, an acorn fairy, a pinecone hedgehog, a cat in a log, a musketeer mouse, a sleeping tree, a leaf fox and a mushroom" width="760">
-</p>
+The rest are out there for you to find.
 
 | Biome | What you'll find |
 | --- | --- |
