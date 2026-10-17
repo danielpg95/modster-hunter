@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "peekashell",
+  "name": "Peekashell",
+  "description": "It wins every staring contest. Its eye is a pearl, so it never has to blink.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 32,
+    "types": ["water", "psychic"],
+    "category": "Pearl Modster",
+    "heightM": 0.2,
+    "weightKg": 1,
+    "entry": "Divers say if you feel watched in the shallows, look for a half-open shell. It will not look away first. It has never looked away first."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 3
+  }
+}
