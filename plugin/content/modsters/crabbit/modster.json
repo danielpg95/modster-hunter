@@ -17,6 +17,6 @@
   },
   "sprite": {
     "file": "sprite.sprite.json",
-    "fps": 4
+    "fps": 2
   }
 }

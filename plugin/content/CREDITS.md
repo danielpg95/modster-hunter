@@ -16,11 +16,11 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/lamparito/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
 | `modsters/dunebun/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
 | `modsters/hootlet/sprite.png` | @danielpg95 and @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Hootlet, redrawn in P5-23 from @danielpg95's reference, keeping @victor-aguilars' design (leafy owlet with a head sprout) |
-| `modsters/crabbit/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
-| `modsters/sunmane/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
-| `modsters/twiggle/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
-| `modsters/flopple/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
-| `modsters/serpentide/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
+| `modsters/crabbit/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Crabbit, redrawn in P5-24 from @victor-aguilars' reference |
+| `modsters/sunmane/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Sunmane, redrawn in P5-24 from @victor-aguilars' reference as a close-up (head, mane and tail) |
+| `modsters/twiggle/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Twiggle, redrawn in P5-24 from @victor-aguilars' reference |
+| `modsters/flopple/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Flopple, redrawn in P5-24 from @victor-aguilars' reference |
+| `modsters/serpentide/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Serpentide, redrawn in P5-24 from @victor-aguilars' reference as a close-up; the water ring is hand-drawn |
 | `modsters/sporrow/sprite.png` | @danielpg95 and @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Sporrow, redrawn in P5-19 from @danielpg95's reference, keeping @victor-aguilars' design (puppet fungus) |
 | `modsters/fernox/sprite.png` | @danielpg95 and @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Fernox, redrawn in P5-19 from @danielpg95's reference, keeping @victor-aguilars' design (fern-tail fox kit) |
 | `modsters/shardling/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Crystal Grotto |
