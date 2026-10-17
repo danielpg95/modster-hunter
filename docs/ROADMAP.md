@@ -584,7 +584,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Size:** M
 - **Goal:** give Saltbreeze Bay a fuller roster (asked by @victor-aguilars, 2026-10-14). Crabbit, Flopple and Serpentide stay; 5 new Modsters join them.
 - **Done when:**
-  - [ ] Toastle (common), Gullet (common), Puffloaf (uncommon), Lanternmaw (rare) and Tidecrown (legendary), with dex numbers #032–#036, each with `sprite.png` and a `sprite.sprite.json` converted with `npm run sprite`.
+  - [ ] Toastle (common), Gullet (common), Puffloaf (uncommon), Sir Kelpsie (rare, replaces Lanternmaw, which @victor-aguilars dropped on 2026-10-16) and Tidecrown (legendary), with dex numbers #032–#036, each with `sprite.png` and a `sprite.sprite.json` converted with `npm run sprite`.
   - [ ] `saltbreeze-bay/biome.json` lists all 8, and the odds table is checked.
   - [ ] A credits row in `plugin/content/CREDITS.md` for every new sprite.
   - [ ] `npm run check:content` passes.

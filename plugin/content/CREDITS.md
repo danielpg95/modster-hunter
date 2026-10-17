@@ -36,6 +36,7 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/pinekin/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | P5-19 |
 | `modsters/hollowmask/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | P5-19 |
 | `modsters/musketail/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | P5-19 |
+| `modsters/sir-kelpsie/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Sir Kelpsie, from @victor-aguilars' reference; eye, shield ridges, tail curl and plume wave are hand-drawn |
 | `biomes/whispering-forest/background.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Idle scene (decision 0026) |
 | `biomes/saltbreeze-bay/background.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Idle scene (decision 0026) |
 | `biomes/dustwind-expanse/background.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Idle scene (decision 0026) |
