@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "sir-kelpsie",
+  "name": "Sir Kelpsie",
+  "description": "Guards the tide pools from crabs, gulls and bad weather. Mostly loses, but never gives up.",
+  "rarity": "rare",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 35,
+    "types": ["water", "steel"],
+    "category": "Sea Steed Modster",
+    "heightM": 0.3,
+    "weightKg": 0.8,
+    "entry": "Fishers say the tide itself knighted it, after it stood its ground against a storm wave. It has challenged every wave since. The waves have not noticed."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 2
+  }
+}

@@ -10,7 +10,9 @@
   "encounterEverySec": [10, 30],
   "modsters": [
     { "id": "crabbit" },
+    { "id": "peekashell" },
     { "id": "flopple" },
-    { "id": "serpentide" }
+    { "id": "serpentide" },
+    { "id": "sir-kelpsie" }
   ]
 }
