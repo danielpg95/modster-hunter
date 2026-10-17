@@ -610,3 +610,14 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] The credits row in `plugin/content/CREDITS.md` names @danielpg95 and @victor-aguilars, since it keeps his design.
   - [x] `npm run check:content` passes.
   - [x] A preview in the PR description (enlarged, every frame, dark and light).
+
+#### [ ] P5-24 — Redraw the first five Modsters
+- **Depends on:** P5-22
+- **Size:** M
+- **Goal:** bring Crabbit (#003), Sunmane (#004), Twiggle (#005), Flopple (#006) and Serpentide (#007) up to the upgraded art style, with more detail and better idle animations (asked by @victor-aguilars, 2026-10-16). Each is redrawn from @victor-aguilars' reference with `npm run ref-sprite`, keeping its design, colours, types and dex entry.
+- **Done when:**
+  - [ ] Each of the five has a new `sprite.png` and `sprite.sprite.json` (converted with `npm run sprite`): up to 32 px tall and 48 px wide (decision 0033), ≤ 24 colours (decision 0034), 2–4 frames.
+  - [ ] Each idle animates a part that matches its text: Crabbit peeks from its shell, Sunmane's mane flickers, Twiggle peeks out of its tumbleweed, Flopple sleeps and breathes, Serpentide sways above a ripple.
+  - [ ] The credits rows in `plugin/content/CREDITS.md` for the five sprites are updated.
+  - [ ] `npm run check:content` passes.
+  - [ ] `docs/previews/` is regenerated for the five, and the PR description shows each one (enlarged, every frame, dark and light).
