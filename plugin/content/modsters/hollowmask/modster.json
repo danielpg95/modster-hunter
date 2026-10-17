@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "hollowmask",
+  "name": "Hollowmask",
+  "description": "Peeks out of its hollow log with a bandit mask. Whatever went missing, it's in there.",
+  "rarity": "uncommon",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 25,
+    "types": ["dark", "grass"],
+    "category": "Log Raccoon Modster",
+    "heightM": 0.6,
+    "weightKg": 9,
+    "entry": "Its hollow log is packed with buttons, keys and spoons. It trades one shiny thing for another, but never gives anything back for free."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 4
+  }
+}

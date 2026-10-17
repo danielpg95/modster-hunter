@@ -109,10 +109,17 @@ P5-19 Whispering Forest roster was made.
      what the creature is made of.
    - **`dex.category`, height and weight:** proportions and heft (a "Moss Bear"
      is round and heavy; a 0.15 m fairy is tiny and light).
+   - **The biome** (`name`, `description`, `accentColor` in its `biome.json`):
+     context that shapes the Modster itself. A mole with a crystal on its head
+     is mossy and leafy in the Whispering Forest, but pale with glowing pink
+     crystal in the Crystal Grotto. Use the first biome if it's in several.
+     It's design context only: no scenery in the image.
 
    ```
    Pixel art game sprite of "<Name>", <concept in one line>, <view: front, or
    three-quarter / side facing left or right>, <pose>.
+   It lives in <biome name> (<biome description>), so <how its home shows on
+   the creature: materials, textures, colors, adaptations>.
    <Body: shape, main colors, texture (fur, bark, scales, moss)>.
    <2–3 bold features that make it this Modster: what they are, their colors>.
    <Face: eye shape and color, nose, mouth, expression>.

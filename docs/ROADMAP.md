@@ -557,12 +557,15 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Size:** M
 - **Goal:** give Whispering Forest a full roster of 3 common, 3 uncommon, 3 rare and its legendary Elderbark (asked by @danielpg95, 2026-10-14). The unused placeholders Sproutling, Mossbeast and Acornsprite are redesigned and join it, and 3 new Modsters fill the rest.
 - **Done when:**
-  - [ ] Sproutling (common), Mossbeast (uncommon) and Acornsprite (rare) have new sprites and complete dex entries, with official numbers #021–#023 in place of #901–#903 (decision 0017).
-  - [ ] One new common, one new uncommon and one new rare, with dex numbers #024–#026, each with `sprite.png` and a `sprite.sprite.json` converted with `npm run sprite`.
-  - [ ] `whispering-forest/biome.json` lists all 10, and the odds table (3 common, 3 uncommon, 3 rare, 1 legendary) is checked.
-  - [ ] A credits row in `plugin/content/CREDITS.md` for every new or redrawn sprite.
-  - [ ] `npm run check:content` passes.
-  - [ ] A preview of every new or redrawn Modster in the PR description (enlarged, every frame, dark and light).
+  - [x] Sproutling (common), Mossbeast (uncommon) and Acornsprite (rare) have new sprites and complete dex entries, with official numbers #021–#023 in place of #901–#903 (decision 0017).
+  - [x] One new common, one new uncommon and one new rare, with dex numbers #024–#026, each with `sprite.png` and a `sprite.sprite.json` converted with `npm run sprite`.
+  - [x] `whispering-forest/biome.json` lists all 10, and the odds table (3 common, 3 uncommon, 3 rare, 1 legendary) is checked.
+  - [x] A credits row in `plugin/content/CREDITS.md` for every new or redrawn sprite.
+  - [x] `npm run check:content` passes.
+  - [x] A preview of every new or redrawn Modster in the PR description (enlarged, every frame, dark and light).
+  - [x] Elderbark (#010, legendary) is redrawn to match the upgraded roster (up to 32 px tall, decision 0033), keeping its dex entry; its credits row notes it replaces @victor-aguilars' design (asked by @danielpg95, 2026-10-15).
+  - [x] Fernox (#009, uncommon) is redrawn to match the upgraded roster, keeping its dex entry; credited to @danielpg95 and @victor-aguilars, since it keeps his design (asked by @danielpg95, 2026-10-16).
+  - [x] Sporrow (#008, rare) is redrawn to match the upgraded roster, keeping its dex entry; co-credited to @danielpg95 and @victor-aguilars (asked by @danielpg95, 2026-10-16).
 
 #### [x] P5-20 — Fill Dustwind Expanse
 - **Depends on:** P2-09, P2-16, P5-16
@@ -596,3 +599,14 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] The `add-modster` skill has a "From a reference image" path: a prompt template with the house style (dark outline, flat shading, plain space around the creature, nothing touching the edges), the conversion command, and a finishing checklist (faces, eyes, thin parts, strays, ≤ 32 px tall per 0033, ≤ 24 colours, 2–4 frames, previews on dark and light).
   - [x] Reference images stay out of the repo; credits name the contributor as the artist.
   - [x] `docs/DEVELOPMENT.md` lists the new command.
+
+#### [x] P5-23 — Redraw Hootlet
+- **Depends on:** P5-22
+- **Size:** S
+- **Goal:** bring the forest starter Hootlet (#002, common) up to the upgraded Whispering Forest roster (asked by @danielpg95, 2026-10-16). Redrawn from @danielpg95's reference with `npm run ref-sprite`, keeping its design (leafy owlet, cream face and belly, head sprout) and its dex entry. Both eyes are now half open, and the description changes to match (asked by @danielpg95, 2026-10-16).
+- **Done when:**
+  - [x] A new `sprite.png` and `sprite.sprite.json` (converted with `npm run sprite`): up to 32 px tall (decision 0033), ≤ 24 colours (decision 0034), 2–4 frames, with a slow blink and a swaying sprout.
+  - [x] `description` in `modster.json` matches the half-open eyes.
+  - [x] The credits row in `plugin/content/CREDITS.md` names @danielpg95 and @victor-aguilars, since it keeps his design.
+  - [x] `npm run check:content` passes.
+  - [x] A preview in the PR description (enlarged, every frame, dark and light).

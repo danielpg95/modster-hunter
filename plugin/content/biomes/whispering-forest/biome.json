@@ -10,8 +10,14 @@
   "encounterEverySec": [10, 30],
   "modsters": [
     { "id": "hootlet" },
+    { "id": "sproutling" },
+    { "id": "pinekin" },
     { "id": "fernox" },
+    { "id": "mossbeast" },
+    { "id": "hollowmask" },
     { "id": "sporrow" },
+    { "id": "acornsprite" },
+    { "id": "musketail" },
     { "id": "elderbark" }
   ]
 }

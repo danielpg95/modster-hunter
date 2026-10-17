@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "pinekin",
+  "name": "Pinekin",
+  "description": "A round little critter with pinecone spines. Squirrels keep trying to bury it.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 24,
+    "types": ["grass", "normal"],
+    "category": "Pinecone Modster",
+    "heightM": 0.2,
+    "weightKg": 1.1,
+    "entry": "Squirrels bury it with their winter stash. Each spring it digs itself out, a little annoyed, and waddles home."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 4
+  }
+}

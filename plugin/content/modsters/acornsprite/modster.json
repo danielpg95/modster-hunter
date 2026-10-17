@@ -2,18 +2,18 @@
   "schemaVersion": 1,
   "id": "acornsprite",
   "name": "Acornsprite",
-  "description": "Shy and quick. Its tiny leaf-wings buzz like a bee.",
+  "description": "A tiny fairy in an acorn-cap hood. Its wings glow when it hums.",
   "rarity": "rare",
   "maxAttempts": null,
   "catchRate": null,
   "shinyChance": null,
   "dex": {
-    "number": 903,
-    "types": ["bug"],
-    "category": "Acorn Modster",
-    "heightM": 0.2,
-    "weightKg": 0.4,
-    "entry": "Its leaf-wings beat so fast they hum. It hides acorns everywhere and forgets where, which is how oaks get planted."
+    "number": 23,
+    "types": ["fairy", "grass"],
+    "category": "Acorn Fairy Modster",
+    "heightM": 0.15,
+    "weightKg": 0.1,
+    "entry": "It hides acorns everywhere and forgets where. Every oak in the forest was planted by an Acornsprite that lost track."
   },
   "sprite": {
     "file": "sprite.sprite.json",
