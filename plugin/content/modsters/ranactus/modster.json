@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "ranactus",
+  "name": "Ranactus",
+  "description": "Its tongue is faster than its temper. Its temper is very fast.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 28,
+    "types": ["grass"],
+    "category": "Lure Modster",
+    "heightM": 0.4,
+    "weightKg": 2,
+    "entry": "It sits under its cactus for hours, perfectly still. Bugs come for the flower on its back, and the tongue gets them before they land."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 3
+  }
+}

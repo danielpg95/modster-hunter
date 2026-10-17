@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "fuescorpion",
+  "name": "Fuescorpion",
+  "description": "Its shell never stops glowing, and its tail is always on fire.",
+  "rarity": "uncommon",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 29,
+    "types": ["bug", "fire"],
+    "category": "Ember Modster",
+    "heightM": 0.5,
+    "weightKg": 6,
+    "entry": "Its shell glows like coals and cooks swear by it: a pot beside a Fuescorpion makes the spiciest food in the dunes. Never pet the tail."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 4
+  }
+}

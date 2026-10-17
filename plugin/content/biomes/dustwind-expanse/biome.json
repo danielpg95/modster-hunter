@@ -10,7 +10,12 @@
   "encounterEverySec": [10, 30],
   "modsters": [
     { "id": "dunebun" },
+    { "id": "ranactus" },
+    { "id": "torbellin" },
     { "id": "twiggle" },
-    { "id": "sunmane" }
+    { "id": "fuescorpion" },
+    { "id": "sunmane" },
+    { "id": "lamparito" },
+    { "id": "reyrayo" }
   ]
 }
