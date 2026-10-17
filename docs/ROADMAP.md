@@ -611,13 +611,13 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `npm run check:content` passes.
   - [x] A preview in the PR description (enlarged, every frame, dark and light).
 
-#### [ ] P5-24 — Redraw the first five Modsters
+#### [x] P5-24 — Redraw the first five Modsters
 - **Depends on:** P5-22
 - **Size:** M
-- **Goal:** bring Crabbit (#003), Sunmane (#004), Twiggle (#005), Flopple (#006) and Serpentide (#007) up to the upgraded art style, with more detail and better idle animations (asked by @victor-aguilars, 2026-10-16). Each is redrawn from @victor-aguilars' reference with `npm run ref-sprite`, keeping its design, colours, types and dex entry.
+- **Goal:** bring Crabbit (#003), Sunmane (#004), Twiggle (#005), Flopple (#006) and Serpentide (#007) up to the upgraded art style, with more detail and better idle animations (asked by @victor-aguilars, 2026-10-16). Each is redrawn from @victor-aguilars' reference with `npm run ref-sprite`, keeping its design, colours, types and dex entry. Sunmane and Serpentide are shown as close-ups so their faces read, keeping Sunmane's flame tail and Serpentide's water ring (asked by @victor-aguilars, 2026-10-16).
 - **Done when:**
-  - [ ] Each of the five has a new `sprite.png` and `sprite.sprite.json` (converted with `npm run sprite`): up to 32 px tall and 48 px wide (decision 0033), ≤ 24 colours (decision 0034), 2–4 frames.
-  - [ ] Each idle animates a part that matches its text: Crabbit peeks from its shell, Sunmane's mane flickers, Twiggle peeks out of its tumbleweed, Flopple sleeps and breathes, Serpentide sways above a ripple.
-  - [ ] The credits rows in `plugin/content/CREDITS.md` for the five sprites are updated.
-  - [ ] `npm run check:content` passes.
-  - [ ] `docs/previews/` is regenerated for the five, and the PR description shows each one (enlarged, every frame, dark and light).
+  - [x] Each of the five has a new `sprite.png` and `sprite.sprite.json` (converted with `npm run sprite`): up to 32 px tall and 48 px wide (decision 0033), ≤ 24 colours (decision 0034), 2–4 frames.
+  - [x] Each has a calm idle (2–3 fps, mostly rest frames, asked by @victor-aguilars, 2026-10-16): Crabbit waves its claw and blinks, Sunmane's mane flickers and it blinks, Twiggle glances and blinks from its hollow, Flopple breathes in its sleep with a rising Z, Serpentide blinks above a shimmering foam ring.
+  - [x] The credits rows in `plugin/content/CREDITS.md` for the five sprites are updated.
+  - [x] `npm run check:content` passes.
+  - [x] `docs/previews/` is regenerated for the five, and the PR description shows each one (enlarged, every frame, dark and light).
