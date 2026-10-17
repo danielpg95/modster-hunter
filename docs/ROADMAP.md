@@ -600,12 +600,13 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Reference images stay out of the repo; credits name the contributor as the artist.
   - [x] `docs/DEVELOPMENT.md` lists the new command.
 
-#### [ ] P5-23 — Redraw Hootlet
+#### [x] P5-23 — Redraw Hootlet
 - **Depends on:** P5-22
 - **Size:** S
-- **Goal:** bring the forest starter Hootlet (#002, common) up to the upgraded Whispering Forest roster (asked by @danielpg95, 2026-10-16). Redrawn from @danielpg95's reference with `npm run ref-sprite`, keeping its design (leafy owlet, cream face and belly, head sprout, one eye open) and its dex entry.
+- **Goal:** bring the forest starter Hootlet (#002, common) up to the upgraded Whispering Forest roster (asked by @danielpg95, 2026-10-16). Redrawn from @danielpg95's reference with `npm run ref-sprite`, keeping its design (leafy owlet, cream face and belly, head sprout) and its dex entry. Both eyes are now half open, and the description changes to match (asked by @danielpg95, 2026-10-16).
 - **Done when:**
-  - [ ] A new `sprite.png` and `sprite.sprite.json` (converted with `npm run sprite`): up to 32 px tall (decision 0033), ≤ 24 colours (decision 0034), 2–4 frames, with the open eye switching sides.
-  - [ ] The credits row in `plugin/content/CREDITS.md` names @danielpg95 and @victor-aguilars, since it keeps his design.
-  - [ ] `npm run check:content` passes.
-  - [ ] A preview in the PR description (enlarged, every frame, dark and light).
+  - [x] A new `sprite.png` and `sprite.sprite.json` (converted with `npm run sprite`): up to 32 px tall (decision 0033), ≤ 24 colours (decision 0034), 2–4 frames, with a slow blink and a swaying sprout.
+  - [x] `description` in `modster.json` matches the half-open eyes.
+  - [x] The credits row in `plugin/content/CREDITS.md` names @danielpg95 and @victor-aguilars, since it keeps his design.
+  - [x] `npm run check:content` passes.
+  - [x] A preview in the PR description (enlarged, every frame, dark and light).

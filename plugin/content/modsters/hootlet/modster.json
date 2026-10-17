@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "hootlet",
   "name": "Hootlet",
-  "description": "Sleeps all day with one eye open. The open eye is also asleep.",
+  "description": "Sleeps all day with both eyes half open. Neither half is awake.",
   "rarity": "common",
   "maxAttempts": null,
   "catchRate": null,
