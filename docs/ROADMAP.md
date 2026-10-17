@@ -622,12 +622,12 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `npm run check:content` passes.
   - [x] `docs/previews/` is regenerated for the five, and the PR description shows each one (enlarged, every frame, dark and light).
 
-#### [ ] P5-25 — README refresh
+#### [x] P5-25 — README refresh
 - **Depends on:** —
 - **Size:** S
 - **Goal:** a README that makes someone who finds the repo want to try it: what Modster Hunter is, pictures of some Modsters, how to install it from source, and how to contribute (asked by @victor-aguilars, 2026-10-16). The release-only parts (recording, marketplace install, CHANGELOG) stay in P5-07.
 - **Done when:**
-  - [ ] The README explains the game in a short pitch and shows several Modster previews from `docs/previews/`.
-  - [ ] Install explains running from source (`claude --plugin-dir ./plugin`) until v1.0, and the old "in planning" status note is gone.
-  - [ ] A Contributing section points to `CONTRIBUTING.md`, the roadmap and the contributor skills.
-  - [ ] `node tools/check-tracking.mjs` passes.
+  - [x] The README explains the game in a short pitch and shows several Modster previews from `docs/previews/`.
+  - [x] Install explains running from source (`claude --plugin-dir ./plugin`) until v1.0, and the old "in planning" status note is gone.
+  - [x] A Contributing section points to `CONTRIBUTING.md`, the roadmap and the contributor skills.
+  - [x] `node tools/check-tracking.mjs` passes.
