@@ -16,6 +16,7 @@
     "entry": "It sleeps for years in the deepest chamber, letting crystals grow on its shoulders. Miners leave it alone; it only wakes to move somewhere quieter."
   },
   "sprite": {
-    "file": "sprite.sprite.json"
+    "file": "sprite.sprite.json",
+    "fps": 3
   }
 }

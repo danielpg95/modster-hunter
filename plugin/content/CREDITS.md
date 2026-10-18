@@ -32,7 +32,7 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/geodon/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Geodon, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/gemsnake/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Gemsnake, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/amethowl/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Amethowl, redrawn in P5-26: the original body with crystal wings from @danielpg95's reference |
-| `modsters/geolem/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Crystal Grotto |
+| `modsters/geolem/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Geolem, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/pinekin/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | P5-19 |
 | `modsters/hollowmask/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | P5-19 |
 | `modsters/musketail/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | P5-19 |
