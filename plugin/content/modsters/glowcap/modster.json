@@ -16,6 +16,7 @@
     "entry": "It grows where crystal cracks leak light. When the grotto goes dark, a patch of glowcaps lights the path like tiny lanterns."
   },
   "sprite": {
-    "file": "sprite.sprite.json"
+    "file": "sprite.sprite.json",
+    "fps": 3
   }
 }
