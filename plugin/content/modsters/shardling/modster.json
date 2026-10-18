@@ -16,6 +16,7 @@
     "entry": "Shardlings break off the grotto walls when the crystals hum too loud. They spend their lives looking for the exact spot they fell from."
   },
   "sprite": {
-    "file": "sprite.sprite.json"
+    "file": "sprite.sprite.json",
+    "fps": 3
   }
 }
