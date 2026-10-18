@@ -30,7 +30,7 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/prismite/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Prismite, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/quartzclaw/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Quartzclaw, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/geodon/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Geodon, redrawn in P5-26 from @danielpg95's reference |
-| `modsters/gemsnake/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Crystal Grotto |
+| `modsters/gemsnake/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Gemsnake, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/amethowl/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Crystal Grotto |
 | `modsters/geolem/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Crystal Grotto |
 | `modsters/pinekin/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | P5-19 |
