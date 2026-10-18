@@ -631,3 +631,13 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Install explains running from source (`claude --plugin-dir ./plugin`) until v1.0, and the old "in planning" status note is gone.
   - [x] A Contributing section points to `CONTRIBUTING.md`, the roadmap and the contributor skills.
   - [x] `node tools/check-tracking.mjs` passes.
+
+#### [ ] P5-26 — Redraw the Crystal Grotto Modsters
+- **Depends on:** P5-22
+- **Size:** M
+- **Goal:** bring all 10 Crystal Grotto Modsters (#011–#020) up to the upgraded art style (asked by @danielpg95, 2026-10-18). Each is redrawn from @danielpg95's reference with `npm run ref-sprite`, keeping its design, colours, types and dex entry. The idle scene stays as it is.
+- **Done when:**
+  - [ ] Shardling, Glowcap, Mossmole, Echobat, Prismite, Quartzclaw, Geodon, Gemsnake, Amethowl and Geolem each have a new `sprite.png` and `sprite.sprite.json` (converted with `npm run sprite`): up to 32 px tall and 48 px wide (decision 0033), ≤ 24 colours (decision 0034), 2–4 frames with a calm idle.
+  - [ ] The credits rows in `plugin/content/CREDITS.md` for the ten sprites are updated.
+  - [ ] `npm run check:content` passes.
+  - [ ] `docs/previews/` is regenerated for the ten, and the PR description shows each one (enlarged, every frame, dark and light).
