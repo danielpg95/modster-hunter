@@ -29,7 +29,7 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/echobat/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Echobat, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/prismite/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Prismite, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/quartzclaw/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Quartzclaw, redrawn in P5-26 from @danielpg95's reference |
-| `modsters/geodon/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Crystal Grotto |
+| `modsters/geodon/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Geodon, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/gemsnake/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Crystal Grotto |
 | `modsters/amethowl/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Crystal Grotto |
 | `modsters/geolem/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Crystal Grotto |
