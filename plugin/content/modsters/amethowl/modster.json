@@ -16,6 +16,7 @@
     "entry": "It perches on the tallest crystal in the grotto and watches. Lost miners swear they followed two violet lights all the way back to the exit."
   },
   "sprite": {
-    "file": "sprite.sprite.json"
+    "file": "sprite.sprite.json",
+    "fps": 3
   }
 }

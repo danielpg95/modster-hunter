@@ -23,16 +23,16 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/serpentide/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Serpentide, redrawn in P5-24 from @victor-aguilars' reference as a close-up; the water ring is hand-drawn |
 | `modsters/sporrow/sprite.png` | @danielpg95 and @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Sporrow, redrawn in P5-19 from @danielpg95's reference, keeping @victor-aguilars' design (puppet fungus) |
 | `modsters/fernox/sprite.png` | @danielpg95 and @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Fernox, redrawn in P5-19 from @danielpg95's reference, keeping @victor-aguilars' design (fern-tail fox kit) |
-| `modsters/shardling/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Crystal Grotto |
-| `modsters/glowcap/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Crystal Grotto |
-| `modsters/mossmole/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Crystal Grotto |
-| `modsters/echobat/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Crystal Grotto |
-| `modsters/prismite/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Crystal Grotto |
-| `modsters/quartzclaw/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Crystal Grotto |
-| `modsters/geodon/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Crystal Grotto |
-| `modsters/gemsnake/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Crystal Grotto |
-| `modsters/amethowl/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Crystal Grotto |
-| `modsters/geolem/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Crystal Grotto |
+| `modsters/shardling/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Shardling, redrawn in P5-26 from @danielpg95's reference |
+| `modsters/glowcap/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Glowcap, redrawn in P5-26 from @danielpg95's reference |
+| `modsters/mossmole/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Mossmole, redrawn in P5-26 from @danielpg95's reference |
+| `modsters/echobat/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Echobat, redrawn in P5-26 from @danielpg95's reference |
+| `modsters/prismite/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Prismite, redrawn in P5-26 from @danielpg95's reference |
+| `modsters/quartzclaw/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Quartzclaw, redrawn in P5-26 from @danielpg95's reference |
+| `modsters/geodon/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Geodon, redrawn in P5-26 from @danielpg95's reference |
+| `modsters/gemsnake/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Gemsnake, redrawn in P5-26 from @danielpg95's reference |
+| `modsters/amethowl/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Amethowl, redrawn in P5-26 from @danielpg95's reference |
+| `modsters/geolem/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Geolem, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/pinekin/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | P5-19 |
 | `modsters/hollowmask/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | P5-19 |
 | `modsters/musketail/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | P5-19 |

@@ -632,12 +632,13 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] A Contributing section points to `CONTRIBUTING.md`, the roadmap and the contributor skills.
   - [x] `node tools/check-tracking.mjs` passes.
 
-#### [ ] P5-26 — Redraw the Crystal Grotto Modsters
+#### [x] P5-26 — Redraw the Crystal Grotto Modsters
 - **Depends on:** P5-22
 - **Size:** M
-- **Goal:** bring all 10 Crystal Grotto Modsters (#011–#020) up to the upgraded art style (asked by @danielpg95, 2026-10-18). Each is redrawn from @danielpg95's reference with `npm run ref-sprite`, keeping its design, colours, types and dex entry. The idle scene stays as it is.
+- **Goal:** bring all 10 Crystal Grotto Modsters (#011–#020) up to the upgraded art style (asked by @danielpg95, 2026-10-18). Each is redrawn from @danielpg95's reference, keeping its design, colours, types and dex entry; Gemsnake keeps its close-up pose (asked by @danielpg95, 2026-10-18). The idle scene stays as it is.
 - **Done when:**
-  - [ ] Shardling, Glowcap, Mossmole, Echobat, Prismite, Quartzclaw, Geodon, Gemsnake, Amethowl and Geolem each have a new `sprite.png` and `sprite.sprite.json` (converted with `npm run sprite`): up to 32 px tall and 48 px wide (decision 0033), ≤ 24 colours (decision 0034), 2–4 frames with a calm idle.
-  - [ ] The credits rows in `plugin/content/CREDITS.md` for the ten sprites are updated.
-  - [ ] `npm run check:content` passes.
-  - [ ] `docs/previews/` is regenerated for the ten, and the PR description shows each one (enlarged, every frame, dark and light).
+  - [x] Shardling, Glowcap, Mossmole, Echobat, Prismite, Quartzclaw, Geodon, Gemsnake, Amethowl and Geolem each have a new `sprite.png` and `sprite.sprite.json` (converted with `npm run sprite`): up to 32 px tall and 48 px wide (decision 0033), ≤ 24 colours (decision 0034), 2–4 frames with a calm idle.
+  - [x] The credits rows in `plugin/content/CREDITS.md` for the ten sprites are updated.
+  - [x] `npm run check:content` passes.
+  - [x] `docs/previews/` is regenerated for the ten, and the PR description shows each one (enlarged, every frame, dark and light).
+  - [x] The `add-modster` skill's reference prompt ends with the spec lines that made references convert cleanly: chunky blocks with minimum sizes in blocks, ≤ 24 colours, a flat background (asked by @danielpg95, 2026-10-18).

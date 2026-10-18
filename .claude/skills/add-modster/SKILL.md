@@ -116,18 +116,42 @@ P5-19 Whispering Forest roster was made.
      It's design context only: no scenery in the image.
 
    ```
-   Pixel art game sprite of "<Name>", <concept in one line>, <view: front, or
-   three-quarter / side facing left or right>, <pose>.
+   Pixel art game sprite, very low resolution: a tiny game sprite scaled up,
+   drawn on a grid of big chunky square blocks — about 30 blocks tall and at
+   most 46 blocks wide (wider than tall is fine). Every detail is single
+   blocks or 2×2 clusters; nothing smaller than one block. No anti-aliasing,
+   no gradients, no glows or reflections. Each part has at most two tones:
+   one lit, one shadow.
+
+   "<Name>", <concept in one line>, <view: front, or three-quarter / side
+   facing left or right>, <pose>.
    It lives in <biome name> (<biome description>), so <how its home shows on
    the creature: materials, textures, colors, adaptations>.
    <Body: shape, main colors, texture (fur, bark, scales, moss)>.
    <2–3 bold features that make it this Modster: what they are, their colors>.
    <Face: eye shape and color, nose, mouth, expression>.
    <Props or accessories, if any: what, where, how they're held>.
-   Clean dark outline around the whole character, flat pixel shading,
-   readable at small size. Full body visible, centered, with space around
-   it, nothing touching the edges. Simple soft background.
+
+   • Sizes in blocks: outline exactly 1 block thick, eyes at least 3 blocks
+     wide, patterns (scales, spots, facets, crystals) at least 4 blocks across.
+   • Colours: 24 at most, not counting the background.
+   • Background: one flat, solid light-grey colour — no pattern, checkerboard,
+     gradient, glow or shadow. Full body visible, centered, with space around
+     it; nothing touches the edges.
    ```
+
+   Keep the technical setup first and the spec lines last (P5-26). A
+   reference drawn on a grid close to sprite size shrinks almost pixel for
+   pixel; one drawn with fine detail turns to noise. Saying "48 × 32" alone
+   isn't enough: generators don't count pixels, so describe the look (big
+   chunky blocks) and give minimum sizes in blocks. Ask for a little under
+   the 48 × 32 limit, since generators tend to overshoot. Keep the minimum
+   sizes even though they look large: references never land exactly on the
+   grid, and tiny features are the first thing a shrink destroys. Ask for a
+   flat background, not a transparent one: some generators can't save
+   transparency and paint a checkerboard into a JPEG instead. Describe
+   features as what they are (crystals, scales), not as "colour blocks", or
+   the generator draws blocks.
 
    Rules that make the reference convert well:
    - **Keep the dark outline and the space around it.** The cut-out follows the
@@ -140,6 +164,12 @@ P5-19 Whispering Forest roster was made.
      sprite size; expect to redraw them, or ask for chunkier ones.
    - **Name every color that matters** (eye color, accent, the color a part
      must not share with another), so the palette comes out right.
+   - **One clear body shape.** Coils piled on coils, or a busy pattern over
+     the whole body, merge into a lump at 32 px. A long creature reads better
+     as a close-up (neck and head) or a curve that never overlaps itself.
+   - **If a regenerated reference gets worse, keep what worked.** Combining
+     the current sprite's body with the new reference's best part (Amethowl's
+     crystal wings) can beat both.
 
    Two P5-19 prompts as examples. A creature:
 

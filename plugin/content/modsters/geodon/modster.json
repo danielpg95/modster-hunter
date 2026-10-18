@@ -16,6 +16,7 @@
     "entry": "Each year it sleeps, another ring of crystal grows inside its shell. The oldest ones glitter like a night sky when they crack open."
   },
   "sprite": {
-    "file": "sprite.sprite.json"
+    "file": "sprite.sprite.json",
+    "fps": 3
   }
 }
