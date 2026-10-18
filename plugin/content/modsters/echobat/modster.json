@@ -16,6 +16,7 @@
     "entry": "Echobats map the grotto by humming at the crystals and listening to them answer. A whole colony humming sounds like a choir."
   },
   "sprite": {
-    "file": "sprite.sprite.json"
+    "file": "sprite.sprite.json",
+    "fps": 3
   }
 }
