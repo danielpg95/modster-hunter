@@ -16,6 +16,7 @@
     "entry": "Moss grows on its back while it naps in the tunnels. It sniffs out crystal veins and polishes the best one to wear."
   },
   "sprite": {
-    "file": "sprite.sprite.json"
+    "file": "sprite.sprite.json",
+    "fps": 3
   }
 }
