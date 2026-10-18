@@ -16,6 +16,7 @@
     "entry": "It drinks the faint light of the grotto and breaks it into colors. Cave folk say a rainbow on the wall means a Prismite is napping nearby."
   },
   "sprite": {
-    "file": "sprite.sprite.json"
+    "file": "sprite.sprite.json",
+    "fps": 3
   }
 }
