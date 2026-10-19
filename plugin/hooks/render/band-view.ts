@@ -17,6 +17,8 @@ export interface BandEncounter {
   spriteHeight: number
   /** The collection had this Modster when it appeared (P5-10) */
   alreadyCaught?: true
+  /** The throw as a dot count (decision 0035 point 7): while throwing, and while a catch's caught beat opens the result card */
+  dots?: string
 }
 
 export interface BandInput {
@@ -140,10 +142,16 @@ function fullLines(e: BandEncounter): BandLine[] {
       // `1: Throw   2: Run` is 17 columns, inside the full layout's 24-column text block
       return [title, [{ text: left(e.attemptsLeft), dim: true }], [{ button: 'throw' }, { text: '   ' }, { button: 'run' }]]
     case 'throwing':
-      return [title, [{ text: left(e.attemptsLeft), dim: true }], [{ text: 'wobble… wobble…' }]]
+      return [title, [{ text: left(e.attemptsLeft), dim: true }], [{ text: dotsOf(e) }]]
     case 'result':
-      return resultLines(e)
+      // A catch's click shows under the card while its caught beat plays
+      return e.dots ? [...resultLines(e), [{ text: e.dots }]] : resultLines(e)
   }
+}
+
+/** The dot count, or empty dots before the first one arrives. */
+function dotsOf(e: BandEncounter): string {
+  return e.dots ?? '○ ○ ○'
 }
 
 // Compact layout: no sprite, at most 2 lines
@@ -162,9 +170,12 @@ function compactLines(e: BandEncounter, columns: number): BandLine[] {
       return [wild, withRunIfFits([{ button: 'throw' }, { text: ' · ' }, { button: 'run' }, attempts], [{ button: 'throw' }, attempts], columns)]
     }
     case 'throwing':
-      return [wild, [{ text: 'wobble…' }, { text: ` · ${e.attemptsLeft} left`, dim: true }]]
-    case 'result':
-      return resultLines(e).slice(0, 2)
+      return [wild, [{ text: dotsOf(e) }, { text: ` · ${e.attemptsLeft} left`, dim: true }]]
+    case 'result': {
+      // The click takes the tier's line while the caught beat plays
+      const lines = resultLines(e).slice(0, 2)
+      return e.dots ? [lines[0] ?? [], [{ text: e.dots }]] : lines
+    }
   }
 }
 
@@ -183,7 +194,7 @@ function singleLine(e: BandEncounter, columns: number): BandLine {
       )
     }
     case 'throwing':
-      return [...who, { text: ' · wobble…' }, { text: ` · ${e.attemptsLeft} left`, dim: true }]
+      return [...who, { text: ` · ${dotsOf(e)}` }, { text: ` · ${e.attemptsLeft} left`, dim: true }]
     case 'result':
       return resultLines(e)[0] ?? []
   }

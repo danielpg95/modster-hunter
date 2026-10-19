@@ -152,8 +152,11 @@ describe('bandView', () => {
       return view.kind === 'full' ? view.lines.map(text) : []
     }
     expect(lines({ phase: 'appearing' })).toEqual(['Sproutling · common', 'appeared!'])
-    expect(lines({ phase: 'throwing', attemptsLeft: 1 })).toEqual(['Sproutling · common', '1 throw left', 'wobble… wobble…'])
+    expect(lines({ phase: 'throwing', attemptsLeft: 1 })).toEqual(['Sproutling · common', '1 throw left', '○ ○ ○'])
+    expect(lines({ phase: 'throwing', attemptsLeft: 1, dots: '● ● ○' })).toEqual(['Sproutling · common', '1 throw left', '● ● ○'])
     expect(lines({ phase: 'result', outcome: 'caught' })).toEqual(['Caught Sproutling!', 'common'])
+    // The click shows under the card while the caught beat plays (decision 0035 point 7)
+    expect(lines({ phase: 'result', outcome: 'caught', dots: '● ● ● click!' })).toEqual(['Caught Sproutling!', 'common', '● ● ● click!'])
     expect(lines({ phase: 'result', outcome: 'fled', fledBecause: 'attempts' })).toEqual(['Sproutling fled!', 'Better luck next time.'])
     expect(lines({ phase: 'result', outcome: 'fled', fledBecause: 'idle' })).toEqual(['Sproutling wandered off.'])
     expect(lines({ phase: 'result', outcome: 'ran' })).toEqual(['You ran from Sproutling.'])
@@ -277,5 +280,17 @@ describe('bandView', () => {
     expect(resultText(encounter({ phase: 'result', outcome: 'fled', fledBecause: 'attempts' }))).toBe('Sproutling fled!')
     expect(resultText(encounter({ phase: 'result', outcome: 'fled', fledBecause: 'idle' }))).toBe('Sproutling wandered off.')
     expect(resultText(encounter({ phase: 'result', outcome: 'ran' }))).toBe('You ran from Sproutling.')
+  })
+
+  test('the dot count fits every layout at 1, 2 and 7 rows, and the click takes the tier\'s line when compact', () => {
+    const text = (line: BandLine) => line.map((segment) => ('text' in segment ? segment.text : '')).join('')
+    for (const maxRows of [1, 2, 7]) {
+      const view = bandView(input({ maxRows, encounter: encounter({ phase: 'throwing', dots: '● ✕ ○ broke free!' }) }))
+      const lines = view.kind === 'full' || view.kind === 'compact' ? view.lines.map(text) : []
+      expect([maxRows, lines.some((line) => line.includes('● ✕ ○ broke free!'))]).toEqual([maxRows, true])
+      expect(bandRows(view) <= maxRows).toBe(true)
+    }
+    const compact = bandView(input({ maxRows: 2, columns: 60, encounter: encounter({ phase: 'result', outcome: 'caught', dots: '● ● ● click!' }) }))
+    expect(compact.kind === 'compact' && compact.lines.map(text)).toEqual(['Caught Sproutling!', '● ● ● click!'])
   })
 })

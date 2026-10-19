@@ -41,7 +41,7 @@ function statusText(e: BandEncounter, hasPane: boolean): string {
     case 'waiting':
       return `${who} · ${e.attemptsLeft} left · 1: Throw in the band${hasPane ? ' or pane' : ''}`
     case 'throwing':
-      return `${who} · wobble…`
+      return `${who} · ${e.dots ?? '○ ○ ○'}`
     case 'result':
       return resultText(e)
   }

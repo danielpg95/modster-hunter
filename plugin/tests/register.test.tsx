@@ -124,7 +124,7 @@ describe('register', () => {
   })
 
   // The band, drawn on the terminal surface, through every phase (P2-07)
-  test('the band walks a Modster through appearing, waiting, throw, wobble, caught, and back to idle', async ($, on) => {
+  test('the band walks a Modster through appearing, waiting, throw, the dot count, caught, and back to idle', async ($, on) => {
     const { ui, clock } = await startBand($, on)
     expect((await ui.find({ type: 'Text', text: /Whispering Forest/ }))?.type).toBe('Text')
     expect(await ui.find({ type: 'Raster' })).toBeUndefined()
@@ -141,10 +141,14 @@ describe('register', () => {
 
     await ui.press({ key: 'throw' })
     await clock.advance(BAND_TICK)
-    expect(await ui.find({ type: 'Text', text: 'wobble… wobble…' })).toBeDefined()
+    // Still in flight: no rocks yet
+    expect(await ui.find({ type: 'Text', text: '○ ○ ○' })).toBeDefined()
     expect(await ui.find({ type: 'Button', key: 'throw' })).toBeUndefined()
+    // The first rock fills a dot (decision 0035 point 7)
+    await clock.advance(1_000)
+    expect(await ui.find({ type: 'Text', text: '● ○ ○' })).toBeDefined()
 
-    await clock.advance(CATCH_THROW_MS)
+    await clock.advance(CATCH_THROW_MS - 1_000)
     expect(await ui.find({ type: 'Text', text: 'Caught Sproutling!' })).toBeDefined()
 
     await clock.advance(4_000)
@@ -298,9 +302,9 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('after /clear, a throw once Claude stops never stays on the wobble: a miss offers Throw again', async ($, on) => {
+  test('after /clear, a throw once Claude stops never stays on the throw: a miss offers Throw again', async ($, on) => {
     // The test engine can't script Math.random: at a 1% catch rate the throw misses
-    // 99 times in 100, and either way the wobble must settle
+    // 99 times in 100, and either way the throw must settle
     const files = oneModsterForest()
     files['modsters/sproutling/modster.json'] = JSON.stringify({ ...validModster(), catchRate: 0.01 })
     const { ui, clock } = await startBand($, on, files)
@@ -310,7 +314,7 @@ describe('register', () => {
     await $.turn.complete({ reason: 'answer', answer: 'ok', durationMs: 1 } as any)
     await ui.press({ key: 'throw' })
     await clock.advance(CATCH_THROW_MS + BAND_TICK)
-    expect(await ui.find({ type: 'Text', text: 'wobble… wobble…' })).toBeUndefined()
+    expect(await ui.find({ type: 'Text', text: /○/ })).toBeUndefined()
     if (!(await ui.find({ type: 'Text', text: 'Caught Sproutling!' }))) {
       expect(await ui.find({ type: 'Text', text: '2 throws left' })).toBeDefined()
       expect(await ui.find({ type: 'Button', key: 'throw' })).toBeDefined()
@@ -412,11 +416,12 @@ describe('register', () => {
     const { ui, clock } = await startBand($, on)
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await clock.advance(4_000 + BAND_TICK)
-    expect(await ui.find({ type: 'Text', text: /●/ })).toBeUndefined()
+    expect(await ui.find({ type: 'Text', text: /^ ●$/ })).toBeUndefined()
     await ui.press({ key: 'throw' })
     await clock.advance(CATCH_THROW_MS + BAND_TICK)
     expect(store['caught:sproutling']).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: /●/ })).toBeUndefined()
+    // The mark follows the name; the dot count's ● is on a line of its own
+    expect(await ui.find({ type: 'Text', text: /^ ●$/ })).toBeUndefined()
     await ui.unmount()
   })
 
