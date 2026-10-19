@@ -643,15 +643,15 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `docs/previews/` is regenerated for the ten, and the PR description shows each one (enlarged, every frame, dark and light).
   - [x] The `add-modster` skill's reference prompt ends with the spec lines that made references convert cleanly: chunky blocks with minimum sizes in blocks, ≤ 24 colours, a flat background (asked by @danielpg95, 2026-10-18).
 
-#### [ ] P5-27 — Catcher format and loader
+#### [x] P5-27 — Catcher format and loader
 - **Depends on:** P2-01, P4-03
 - **Size:** M
 - **Goal:** catchers load as content from `content/catchers/<id>/` in the built-in and the user folder (decision 0035 points 1–4).
 - **Done when:**
-  - [ ] `CONTENT_FORMAT.md` has a `catcher.json` section: every field from 0035 point 2 with exact bounds (sprite size, frame indexes, `lidRows`, `glowIndex`), the beat fields of point 3 and the presets of point 4. The folder layout shows `catchers/`.
-  - [ ] The validator checks `catcher.json` and its sprite, never throws, and reports issues like other content (file, field, problem). Unknown fields are errors. Tests cover each rule.
-  - [ ] Loading and merging include catchers: a user catcher with a built-in's id replaces it (0007), and built-in catchers load even when `includeBuiltins` is off. Tests use the injected loader ports.
-  - [ ] The helper's `check` (0025) reports catcher issues.
+  - [x] `CONTENT_FORMAT.md` has a `catcher.json` section: every field from 0035 point 2 with exact bounds (sprite size, frame indexes, `lidRows`, `glowIndex`), the beat fields of point 3 and the presets of point 4. The folder layout shows `catchers/`.
+  - [x] The validator checks `catcher.json` and its sprite, never throws, and reports issues like other content (file, field, problem). Unknown fields are errors. Tests cover each rule.
+  - [x] Loading and merging include catchers: a user catcher with a built-in's id replaces it (0007), and built-in catchers load even when `includeBuiltins` is off. Tests use the injected loader ports.
+  - [x] The helper's `check` (0025) reports catcher issues.
 
 #### [ ] P5-28 — Catch animation engine
 - **Depends on:** P5-27
