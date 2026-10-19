@@ -3,6 +3,11 @@ import type { On, UiPane } from 'claude-code'
 import { oneModsterForest } from './fixtures/one-modster-forest'
 import { sceneForest } from './fixtures/scene-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
+import { CATCH } from '../hooks/constants'
+import { throwingMs } from '../hooks/game'
+
+// A throw that lands plays the whole catch animation (decision 0035); a miss is shorter
+const CATCH_THROW_MS = throwingMs('caught', CATCH.rocksToCatch)
 
 // The encounter pane (decision 0015): `/modsters hunt`, drawn on the terminal surface.
 // The one-Modster forest spawns after 3 s of work and always catches (catchRate 1).
@@ -101,7 +106,7 @@ describe('register: encounter pane', () => {
     await pane.press({ key: 'throw' })
     await clock.advance(250)
     expect(await pane.find({ type: 'Text', text: 'wobble… wobble…' })).toBeDefined()
-    await clock.advance(1_500)
+    await clock.advance(CATCH_THROW_MS)
     expect(await pane.find({ type: 'Text', text: 'Caught Sproutling!' })).toBeDefined()
     await pane.unmount()
   })

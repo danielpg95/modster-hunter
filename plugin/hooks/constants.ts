@@ -12,10 +12,13 @@ export const TIERS = [
   { tier: 'legendary', weight: 0.5, maxAttempts: 5, catchRate: 0.08 },
 ] as const
 
-/** Encounter phase lengths, decision 0014. The idle timeout is the `encounterIdleTimeoutSec` user option. */
+/**
+ * Encounter phase lengths, decision 0014. A throw lasts as long as its catch
+ * animation (decision 0035, `CATCH`). The idle timeout is the
+ * `encounterIdleTimeoutSec` user option.
+ */
 export const ENCOUNTER = {
   appearingMs: 1000,
-  throwingMs: 1500,
   resultMs: 4000,
   /** A subagent counts as work time for at most this long after its start, in case its stop event is lost (0018 point 3, `AGENT_WORK_MAX_MIN` = 30) */
   agentWorkMaxMs: 30 * 60 * 1000,
@@ -46,6 +49,8 @@ export const CATCH = {
   /** Past this share of a `stretch` shape's radius, `rimIndex` draws the edge */
   rimFrom: 0.82,
   sparkleColors: ['#ffffff', '#fff6b0'],
+  /** Played when `prefs:catcher` is missing or names a catcher that didn't load (0035 point 10) */
+  defaultCatcher: 'jar',
   /** `glowIndex` takes the Modster's most common color with summed RGB over this (half of full brightness) */
   glowMinBrightness: 384,
 } as const

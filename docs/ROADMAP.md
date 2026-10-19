@@ -671,6 +671,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] Each has `catcher.json` and pixel art drawn as a proper sprite, not code: the jar's glow, the pod's seam and the lantern's flame use `glowIndex`, and the net is a `cover` tile with a rim. Each fits the smallest built-in Modster's sprite area (Dunebun, 22×20).
   - [ ] `plugin/content/CREDITS.md` lists each catcher.
   - [ ] `npm run check:content` passes.
+  - [ ] Checked by hand with @danielpg95 in a real terminal, on a dark and a light theme: each catcher plays in the band and the encounter pane through a catch and a miss (moved from P5-32).
   - [ ] A preview GIF of each catcher (a catch and both kinds of miss, dark and light) is in `docs/previews/catchers/`, and the PR description shows them.
 
 #### [ ] P5-30 — Catchers tab
@@ -695,15 +696,15 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] `reference/format.md` documents `catcher.json`, and "Delete your own" covers catchers.
   - [ ] Checked by hand: a new `custom` catcher made through the skill appears in the Catchers tab after `/modsters reload` and plays on a throw.
 
-#### [ ] P5-32 — Catch timeline and blits
+#### [x] P5-32 — Catch timeline and blits
 - **Depends on:** P5-28
 - **Size:** M
 - **Goal:** a throw plays the catcher in use in the band and the encounter pane, timed by decision 0035 points 5–6 (split from P5-28).
 - **Done when:**
-  - [ ] The encounter machine rolls the rock count with the throw (3 for a catch; 1 or 2 for a miss, from the injected random source) and times the throwing phase by 0035 points 5–6, replacing `ENCOUNTER.throwingMs`. The existing throw, run and `/clear` tests are updated, and new ones cover the timings.
-  - [ ] `register.tsx` blits P5-28's frames during the throw to every sprite site (band and pane), skipping a tick while blits are in flight, then goes back to the idle loop. The `caught` beat plays at the start of the result card. A register test drives it with the fake clock.
-  - [ ] `prefs:catcher` in `$.store` picks the catcher; a missing or unknown id falls back to `jar` (0035 point 10).
-  - [ ] Checked by hand in a real terminal on a dark and a light theme, noted in the handoff.
+  - [x] The encounter machine rolls the rock count with the throw (3 for a catch; 1 or 2 for a miss, from the injected random source) and times the throwing phase by 0035 points 5–6, replacing `ENCOUNTER.throwingMs`. The existing throw, run and `/clear` tests are updated, and new ones cover the timings.
+  - [x] `register.tsx` blits P5-28's frames during the throw to every sprite site (band and pane), skipping a tick while blits are in flight, then goes back to the idle loop. The `caught` beat plays at the start of the result card. A register test drives it with the fake clock.
+  - [x] `prefs:catcher` in `$.store` picks the catcher; a missing or unknown id falls back to `jar` (0035 point 10).
+  - [x] The hand check moved to P5-29, so it happens with the real catchers (agreed with @danielpg95, 2026-10-19).
 
 #### [ ] P5-33 — Catch dot count
 - **Depends on:** P5-32

@@ -1,5 +1,5 @@
 import type { EngineInterface, Register, Timer } from 'claude-code'
-import { BAND, COLLECTION, USER_CONTENT } from './constants'
+import { BAND, CATCH, COLLECTION, CONTENT, USER_CONTENT } from './constants'
 import {
   cachedSheetLoader,
   formatIssue,
@@ -10,6 +10,7 @@ import {
   type ContentReader,
   type ContentRegistry,
   type LoadedBiome,
+  type LoadedCatcher,
   type LoadedModster,
   type MergedContent,
   type SheetFiles,
@@ -19,6 +20,8 @@ import {
   pickBiome,
   startEncounters,
   stepEncounter,
+  throwingMs,
+  type CatchOutcome,
   type EncounterContext,
   type EncounterInput,
   type EncounterState,
@@ -30,6 +33,9 @@ import {
   biomeEntries,
   biomeRow,
   biomesBody,
+  catchFrame,
+  pixelsToCells,
+  prepareCatch,
   oddsRow,
   tierRow,
   tierSections,
@@ -57,6 +63,7 @@ import {
   type BandEncounter,
   type BandLine,
   type BiomeEntry,
+  type CatchArt,
   type CollectionEntry,
   type CollectionTab,
   type DisplayPlan,
@@ -64,13 +71,16 @@ import {
   type Particle,
 } from './render'
 import {
+  CATCHER_KEY,
   HUNT_PANE_KEY,
+  catcherInUse,
   caughtKey,
   compactStats,
   huntPanePref,
   isCaught,
   prefAfterClose,
   readCaughtRecord,
+  readCatcherId,
   readHuntPaneOpen,
   recordEncounterEvents,
   recordStat,
@@ -119,6 +129,19 @@ let frameTimer: Timer | undefined
 let frameModster: LoadedModster | undefined
 let frameIndex = 0
 let isBlitting = false
+
+// The catch animation (decision 0035): while a throw plays, its frames are blitted to
+// the same sprite sites at CATCH.fps, and the Modster's idle loop waits. The throw
+// keeps the catcher it started with. With no catcher loaded the throw shows the
+// idle loop and `wobble…` as before (agreed for P5-32).
+// The picked catcher's id from `prefs:catcher`, read at session start (point 9)
+let pickedCatcherId: string | undefined
+// Keyed by catcher and Modster id, checked against what they were made from: a reload may change either
+const catchArts = new Map<string, { catcher: LoadedCatcher; modster: LoadedModster; art: CatchArt }>()
+let catchPlay: { art: CatchArt; outcome: CatchOutcome; rocks: number; throwAt: number; endsAt: number } | undefined
+let catchCells: string | undefined
+let catchTimer: Timer | undefined
+let isBlittingCatch = false
 
 // The biome's idle scene between encounters (decision 0026). The band is its only
 // site; it moves only while Claude works and holds still otherwise (point 5).
@@ -195,6 +218,7 @@ export const register: Register = (on, options) => {
     sessionId = await $.session.id().catch(() => 'unknown')
     // Keep the biome if session.start ever repeats in this process; pick only when there's none yet
     if (biomeId === undefined || !content.biomes.has(biomeId)) biomeId = pickBiome(content.biomes.keys(), Math.random)
+    pickedCatcherId = readCatcherId(await $.store.get(CATCHER_KEY).catch(() => undefined))
     startMachine($, idleTimeoutSec)
     loadCollectionRecords($)
     // Clears a line left by a load that had the status line on (0023 point 6)
@@ -346,7 +370,7 @@ export const register: Register = (on, options) => {
     if (modster) addSite($, e.requestId, modster)
     return (
       <Box flexDirection="row" columnGap={BAND.gapColumns}>
-        <Raster key={SPRITE_KEY} columns={view.spriteColumns} rows={view.spriteRows} cells={cells[frameIndex] ?? cells[0] ?? ''} />
+        <Raster key={SPRITE_KEY} columns={view.spriteColumns} rows={view.spriteRows} cells={catchCells ?? cells[frameIndex] ?? cells[0] ?? ''} />
         <Box flexDirection="column">{view.lines.map(line)}</Box>
       </Box>
     )
@@ -480,7 +504,7 @@ export const register: Register = (on, options) => {
         {header}
         <Text key="gap"> </Text>
         <Box key="encounter" flexDirection="row" columnGap={BAND.gapColumns}>
-          <Raster key={SPRITE_KEY} columns={view.spriteColumns} rows={view.spriteRows} cells={cells[frameIndex] ?? cells[0] ?? ''} />
+          <Raster key={SPRITE_KEY} columns={view.spriteColumns} rows={view.spriteRows} cells={catchCells ?? cells[frameIndex] ?? cells[0] ?? ''} />
           <Box flexDirection="column">{view.lines.map(line)}</Box>
         </Box>
       </Box>
@@ -996,6 +1020,8 @@ async function advanceMachine($: EngineInterface, action: MachineAction): Promis
   const step = stepEncounter(machine, { ...action, now } as EncounterInput, machineContext)
   if (step.state === machine) return
   machine = step.state
+  // Before the redraw, so a throw's first frame is what the band draws
+  updateCatch($, now)
   // Before the redraw, so a scene that stops is drawn still
   updateSceneTimer($)
   $.ui.invalidate('ui.render')
@@ -1057,8 +1083,8 @@ function addSite($: EngineInterface, requestId: string, loaded: LoadedModster): 
   if (frameTimer || loaded.sprite.frames.length < 2) return
   frameTimer = $.clock.every(Math.max(1, Math.round(1000 / (loaded.modster.sprite.fps ?? 6))), () => {
     const current = frameModster
-    // Skip a tick while the last blits are in flight (P1-03)
-    if (!current || isBlitting || spriteSites.size === 0) return
+    // Skip a tick while the last blits are in flight (P1-03), or while a throw plays
+    if (!current || isBlitting || spriteSites.size === 0 || catchPlay) return
     isBlitting = true
     frameIndex = (frameIndex + 1) % current.sprite.frames.length
     const blits = [...spriteSites].map((site) =>
@@ -1068,6 +1094,82 @@ function addSite($: EngineInterface, requestId: string, loaded: LoadedModster): 
       isBlitting = false
     })
   })
+}
+
+/**
+ * Starts or stops the catch animation to match the machine (decision 0035): a
+ * throw, and a catch's result card while its `caught` beat plays. A throw
+ * already playing keeps its catcher; a new one takes the catcher in use.
+ */
+function updateCatch($: EngineInterface, now: number): void {
+  const encounter = machine?.encounter
+  const throwAt = encounter?.throwAt
+  const rocks = encounter?.rocks
+  const playing = encounter && throwAt !== undefined && rocks !== undefined && (encounter.phase === 'throwing' || encounter.outcome === 'caught')
+  if (!playing) {
+    if (catchPlay) endCatch($)
+    return
+  }
+  if (catchPlay?.throwAt === throwAt) return
+  const modster = currentModster()
+  const catcher = content && catcherInUse(content.catchers, pickedCatcherId, CATCH.defaultCatcher)
+  if (!modster || !catcher) return
+  const art = catchArtFor(catcher, modster)
+  // A catcher that doesn't fit the sprite area isn't drawn (0035 point 8; P5-33 shows the dot count)
+  if (!art.fits) return
+  const outcome: CatchOutcome = encounter.throwLands || encounter.outcome === 'caught' ? 'caught' : 'missed'
+  const endsAt = throwAt + throwingMs(outcome, rocks) + (outcome === 'caught' ? CATCH.beatMs.caught : 0)
+  catchPlay = { art, outcome, rocks, throwAt, endsAt }
+  catchCells = pixelsToCells(catchFrame(art, outcome, rocks, now - throwAt))
+  catchTimer?.cancel()
+  catchTimer = $.clock.every(Math.round(1000 / CATCH.fps), () => {
+    // Skip a tick while the last blits are in flight (P1-03)
+    if (!catchPlay || isBlittingCatch) return
+    isBlittingCatch = true
+    void blitCatchFrame($).finally(() => {
+      isBlittingCatch = false
+    })
+  })
+}
+
+/** Blits the frame for the clock's now to every sprite site, or ends the animation once it's over. */
+async function blitCatchFrame($: EngineInterface): Promise<void> {
+  const at = await $.clock.now()
+  const play = catchPlay
+  if (!play) return
+  if (at >= play.endsAt) {
+    endCatch($)
+    return
+  }
+  const cells = pixelsToCells(catchFrame(play.art, play.outcome, play.rocks, at - play.throwAt))
+  catchCells = cells
+  await Promise.all([...spriteSites].map((site) => $.ui.blit({ requestId: site, key: SPRITE_KEY, cells }).catch(() => undefined)))
+}
+
+/** Ends the animation and puts the Modster's idle frame back where it played. */
+function endCatch($: EngineInterface): void {
+  stopCatch()
+  const current = frameModster
+  if (!current) return
+  const cells = cellsFor(current)[frameIndex] ?? ''
+  for (const site of spriteSites) void $.ui.blit({ requestId: site, key: SPRITE_KEY, cells }).catch(() => undefined)
+}
+
+function stopCatch(): void {
+  catchTimer?.cancel()
+  catchTimer = undefined
+  catchPlay = undefined
+  catchCells = undefined
+}
+
+/** The decoded art for a catcher on a Modster, made once and remade when either changed. */
+function catchArtFor(catcher: LoadedCatcher, modster: LoadedModster): CatchArt {
+  const key = `${catcher.catcher.id}/${modster.modster.id}`
+  const cached = catchArts.get(key)
+  if (cached && cached.catcher === catcher && cached.modster === modster) return cached.art
+  const art = prepareCatch(catcher.catcher, catcher.sprite, modster.sprite, modster.modster.sprite.fps ?? CONTENT.modster.defaultFps)
+  catchArts.set(key, { catcher, modster, art })
+  return art
 }
 
 /** Pins the status line the plan asks for (0023 point 6); undefined clears it. */
@@ -1127,6 +1229,7 @@ function stopFrames(): void {
 function stopTimers(): void {
   tickTimer?.cancel()
   tickTimer = undefined
+  stopCatch()
   stopFrames()
   stopScene()
   sceneSites.clear()
@@ -1328,8 +1431,9 @@ function stopBiomesScene(): void {
 async function reloadContent($: EngineInterface, includeBuiltins: boolean, idleTimeoutSec: number): Promise<Reloaded> {
   const played = sessionBiome()
   content = await loadGameContent($, includeBuiltins)
-  // Sprites and backgrounds may have changed, and Modsters come or go
+  // Sprites and backgrounds may have changed, and Modsters and catchers come or go
   cellsByModster.clear()
+  catchArts.clear()
   silhouettes.clear()
   biomeScenes.clear()
   dropCollectionSite(COLLECTION_PANE_ID)

@@ -1,12 +1,16 @@
 import { describe, expect, mock, test } from 'claude-code/testing'
 import type { On } from 'claude-code'
-import { CONTENT } from '../hooks/constants'
+import { CATCH, CONTENT } from '../hooks/constants'
+import { throwingMs } from '../hooks/game'
 import { encodeFrame } from './fixtures/encode-frame'
 import { oneModsterForest } from './fixtures/one-modster-forest'
 import { sceneForest } from './fixtures/scene-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
 import { twoBiomes } from './fixtures/two-biomes'
 import { validModster } from './fixtures/valid-modster'
+
+// A throw that lands plays the whole catch animation (decision 0035); a miss is shorter
+const CATCH_THROW_MS = throwingMs('caught', CATCH.rocksToCatch)
 
 // `/modsters reload` (P4-02): content loads again without a restart, an encounter
 // in progress plays on as it was, and the Settings tab lists every content issue.
@@ -133,7 +137,7 @@ describe('register: reload', () => {
     expect(await band.find({ type: 'Text', text: /Sproutling/ })).toBeDefined()
     expect((await band.find({ type: 'Raster', key: 'sprite' }))?.props.cells).toBe(cells)
     await band.press({ key: 'throw' })
-    await clock.advance(BAND_TICK + 1_500)
+    await clock.advance(BAND_TICK + CATCH_THROW_MS)
     expect(await band.find({ type: 'Text', text: 'Caught Sproutling!' })).toBeDefined()
 
     await clock.advance(4_000 + 3_000 + BAND_TICK)
@@ -152,7 +156,7 @@ describe('register: reload', () => {
     forestToDunes(files)
     expect(await reload($)).toBe('Modster Hunter: reloaded · 1 biome, 1 Modster · no problems · Whispering Forest is gone; a new biome after this encounter')
     await band.press({ key: 'throw' })
-    await clock.advance(BAND_TICK + 1_500)
+    await clock.advance(BAND_TICK + CATCH_THROW_MS)
     expect(await band.find({ type: 'Text', text: 'Caught Sproutling!' })).toBeDefined()
     expect(toasts).toEqual([])
 

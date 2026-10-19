@@ -5,6 +5,11 @@ import { oneModsterForest } from './fixtures/one-modster-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
 import { sceneForest } from './fixtures/scene-forest'
 import { twoBiomes } from './fixtures/two-biomes'
+import { CATCH } from '../hooks/constants'
+import { throwingMs } from '../hooks/game'
+
+// A throw that lands plays the whole catch animation (decision 0035); a miss is shorter
+const CATCH_THROW_MS = throwingMs('caught', CATCH.rocksToCatch)
 
 // The collection pane (decision 0002, P3-01): `/modsters` opens it focused, Esc
 // closes it, tabs switch on 1–4. The one-Modster forest is "Whispering Forest".
@@ -354,7 +359,7 @@ describe('register: collection pane', () => {
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await clock.advance(4_250)
     await band.press({ key: 'throw' })
-    await clock.advance(2_000)
+    await clock.advance(CATCH_THROW_MS + 250)
     expect(await pane.find({ type: 'Text', text: 'Caught 1/1' })).toBeDefined()
     expect(await pane.find({ type: 'Text', text: 'Sproutling' })).toBeDefined()
     await band.unmount()

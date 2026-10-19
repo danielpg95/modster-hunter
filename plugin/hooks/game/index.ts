@@ -11,6 +11,7 @@ export {
   type EncounterState,
   type EncounterStep,
 } from './encounter-machine'
+export { catchBeatAt, throwingMs, type CatchBeatAt, type CatchOutcome } from './catch-timeline'
 export { formatOddsTable, oddsTable, type OddsRow } from './odds-table'
 export { pickBiome } from './pick-biome'
 export { encounterPool, pickEncounter, tierChances, type PoolMember } from './pick-encounter'

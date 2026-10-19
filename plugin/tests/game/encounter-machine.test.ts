@@ -64,7 +64,8 @@ function setup(...random: number[]) {
   }
 }
 
-// Random draws, in order: [first spawn delay], then per encounter [which Modster], [one per throw], [next spawn delay]
+// Random draws, in order: [first spawn delay], then per encounter [tier], [which Modster], per throw [lands?] and,
+// for a miss, [rocks: < 0.5 → 1, else 2] (decision 0035), then [next spawn delay]
 // Delay r → 10 + r × 20 s. Modster r < 0.75 → Sproutling.
 
 describe('encounter machine', () => {
@@ -116,52 +117,70 @@ describe('encounter machine', () => {
     expect(game.phase).toBe('waiting')
   })
 
-  test('a throw that lands: wobble for 1.5 s, then caught, then the card for 4 s', () => {
-    const game = setup(0, 0, 0.1, 0.49, 0) // 0.49 < 0.5 lands
+  test('a throw that lands rocks 3 times and clicks at 2.4 s, then the card shows for 4 s (decision 0035)', () => {
+    const game = setup(0, 0, 0.1, 0.49, 0) // 0.49 < 0.5 lands; a catch draws no rock count
     game.at(0).turnStart()
     game.at(10 * S).tick()
     game.at(11 * S).throw()
     expect(game.phase).toBe('throwing')
-    expect(game.state.encounter?.attemptsLeft).toBe(2)
-    game.at(12.5 * S - 1).tick()
+    expect([game.state.encounter?.attemptsLeft, game.state.encounter?.rocks, game.state.encounter?.throwAt]).toEqual([2, 3, 11 * S])
+    game.at(13.4 * S - 1).tick()
     expect(game.phase).toBe('throwing')
-    expect(game.at(12.5 * S).tick()).toEqual([{ type: 'caught', modsterId: 'sproutling', tier: 'common' }])
+    expect(game.at(13.4 * S).tick()).toEqual([{ type: 'caught', modsterId: 'sproutling', tier: 'common' }])
     expect([game.phase, game.state.encounter?.outcome]).toEqual(['result', 'caught'])
-    game.at(16.5 * S - 1).tick()
+    // The card keeps the throw, so its caught beat can play
+    expect([game.state.encounter?.rocks, game.state.encounter?.throwAt]).toEqual([3, 11 * S])
+    game.at(17.4 * S - 1).tick()
     expect(game.phase).toBe('result')
-    game.at(16.5 * S).tick()
+    game.at(17.4 * S).tick()
     expect(game.phase).toBe('idle')
   })
 
-  test('a throw that misses goes back to waiting with one attempt fewer', () => {
-    const game = setup(0, 0, 0.1, 0.5) // 0.5 is not < 0.5: miss
+  test('a throw that misses rocks once, breaks free at 1.85 s, and goes back to waiting with one attempt fewer', () => {
+    const game = setup(0, 0, 0.1, 0.5, 0.49) // 0.5 is not < 0.5: miss; 0.49 → 1 rock
     game.at(0).turnStart()
     game.at(10 * S).tick()
     game.at(11 * S).throw()
-    expect(game.at(12.5 * S).tick()).toEqual([{ type: 'missed', modsterId: 'sproutling', attemptsLeft: 2 }])
+    expect(game.state.encounter?.rocks).toBe(1)
+    game.at(12.85 * S - 1).tick()
+    expect(game.phase).toBe('throwing')
+    expect(game.at(12.85 * S).tick()).toEqual([{ type: 'missed', modsterId: 'sproutling', attemptsLeft: 2 }])
+    expect(game.phase).toBe('waiting')
+    expect([game.state.encounter?.rocks, game.state.encounter?.throwAt]).toEqual([undefined, undefined])
+  })
+
+  test('a miss may rock twice instead, breaking free at 2.35 s', () => {
+    const game = setup(0, 0, 0.1, 0.5, 0.5) // 0.5 → 2 rocks
+    game.at(0).turnStart()
+    game.at(10 * S).tick()
+    game.at(11 * S).throw()
+    expect(game.state.encounter?.rocks).toBe(2)
+    game.at(13.35 * S - 1).tick()
+    expect(game.phase).toBe('throwing')
+    game.at(13.35 * S).tick()
     expect(game.phase).toBe('waiting')
   })
 
   test('missing every attempt makes it flee', () => {
-    const game = setup(0, 0, 0.1, 0.9, 0.9, 0.9, 0)
+    const game = setup(0, 0, 0.1, 0.9, 0, 0.9, 0, 0.9, 0, 0)
     game.at(0).turnStart()
     game.at(10 * S).tick()
     for (const t of [11, 13, 15]) {
       game.at(t * S).throw()
-      game.at((t + 1.5) * S).tick()
+      game.at((t + 1.85) * S).tick()
     }
     expect(game.log).toEqual(['appeared sproutling', 'missed sproutling', 'missed sproutling', 'fled sproutling'])
     expect([game.phase, game.state.encounter?.outcome, game.state.encounter?.fledBecause]).toEqual(['result', 'fled', 'attempts'])
   })
 
-  test('throws during appearing or the wobble are ignored and cost nothing (0014)', () => {
-    const game = setup(0, 0, 0.1, 0.9)
+  test('throws during appearing or the catch animation are ignored and cost nothing (0014)', () => {
+    const game = setup(0, 0, 0.1, 0.9, 0)
     game.at(0).turnStart()
     game.at(10 * S).tick()
     game.at(10.5 * S).throw() // appearing
     expect([game.phase, game.state.encounter?.attemptsLeft]).toEqual(['appearing', 3])
     game.at(11 * S).throw()
-    game.at(11.5 * S).throw() // wobbling
+    game.at(11.5 * S).throw() // the catcher is rocking
     expect([game.phase, game.state.encounter?.attemptsLeft]).toEqual(['throwing', 2])
   })
 
@@ -176,14 +195,14 @@ describe('encounter machine', () => {
   })
 
   test('the idle timer restarts after each throw', () => {
-    const game = setup(0, 0, 0.1, 0.9)
+    const game = setup(0, 0, 0.1, 0.9, 0)
     game.at(0).turnStart()
     game.at(10 * S).tick()
     game.at(50 * S).throw()
-    game.at(51.5 * S).tick() // missed; idle window starts at 51.5 s
-    game.at(141.5 * S - 1).tick()
+    game.at(51.85 * S).tick() // missed after 1 rock; idle window starts at 51.85 s
+    game.at(141.85 * S - 1).tick()
     expect(game.phase).toBe('waiting')
-    game.at(141.5 * S).tick()
+    game.at(141.85 * S).tick()
     expect(game.state.encounter?.fledBecause).toBe('idle')
   })
 
@@ -205,7 +224,7 @@ describe('encounter machine', () => {
     game.at(10 * S).tick()
     game.at(10.5 * S).turnEnd()
     game.at(30 * S).throw()
-    expect(game.at(31.5 * S).tick()).toEqual([{ type: 'caught', modsterId: 'sproutling', tier: 'common' }])
+    expect(game.at(32.4 * S).tick()).toEqual([{ type: 'caught', modsterId: 'sproutling', tier: 'common' }])
   })
 
   test('only one encounter at a time, however long the turn runs', () => {
@@ -222,10 +241,10 @@ describe('encounter machine', () => {
     game.at(0).turnStart()
     game.at(10 * S).tick()
     game.at(11 * S).throw()
-    game.at(12.5 * S).tick() // caught; card until 16.5 s
-    game.at(26.5 * S - 1).tick()
+    game.at(13.4 * S).tick() // caught; card until 17.4 s
+    game.at(27.4 * S - 1).tick()
     expect(game.log).toEqual(['appeared sproutling', 'caught sproutling'])
-    game.at(26.5 * S).tick()
+    game.at(27.4 * S).tick()
     expect(game.log.at(-1)).toBe('appeared sproutling')
   })
 
@@ -234,7 +253,7 @@ describe('encounter machine', () => {
     game.at(0).turnStart()
     game.at(10 * S).tick()
     game.at(11 * S).throw()
-    // Wobble ended at 12.5 s, the card at 16.5 s, the next 10 s countdown at 26.5 s
+    // The catch clicked at 13.4 s, the card ended at 17.4 s, the next 10 s countdown at 27.4 s
     game.at(60 * S).tick()
     expect(game.log).toEqual(['appeared sproutling', 'caught sproutling', 'appeared mossbeast'])
     expect(game.phase).toBe('appearing')
@@ -253,7 +272,7 @@ describe('encounter machine', () => {
     game.at(10 * S).tick()
     expect([game.state.encounter?.maxAttempts, game.state.encounter?.catchRate]).toEqual([2, 0.9])
     game.at(11 * S).throw()
-    game.at(12.5 * S).tick()
+    game.at(13.4 * S).tick()
     expect(game.state.encounter?.outcome).toBe('caught')
   })
 
@@ -290,14 +309,14 @@ describe('encounter machine', () => {
     expect(game.log.at(-1)).toBe('appeared sproutling')
   })
 
-  test('runs during appearing or the wobble are ignored, so a rolled throw still resolves', () => {
+  test('runs during appearing or the catch animation are ignored, so a rolled throw still resolves', () => {
     const game = setup(0, 0, 0.1, 0.1)
     game.at(0).turnStart()
     game.at(10 * S).tick()
     expect(game.at(10.5 * S).run()).toEqual([]) // appearing
     game.at(11 * S).throw()
-    expect(game.at(11.5 * S).run()).toEqual([]) // wobbling
-    expect(game.at(12.5 * S).tick()).toEqual([{ type: 'caught', modsterId: 'sproutling', tier: 'common' }])
+    expect(game.at(11.5 * S).run()).toEqual([]) // the catcher is rocking
+    expect(game.at(13.4 * S).tick()).toEqual([{ type: 'caught', modsterId: 'sproutling', tier: 'common' }])
   })
 
   test('with no encounter, run does nothing', () => {

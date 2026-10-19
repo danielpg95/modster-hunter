@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { catchBeatAt, throwingMs } from '../../hooks/render'
+import { catchBeatAt, throwingMs } from '../../hooks/game'
 
 describe('catch timeline', () => {
   test('a catch clicks at 2.4 s; a miss ends after 1.85 s or 2.35 s (decision 0035 point 6)', () => {
