@@ -653,15 +653,15 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Loading and merging include catchers: a user catcher with a built-in's id replaces it (0007), and built-in catchers load even when `includeBuiltins` is off. Tests use the injected loader ports.
   - [x] The helper's `check` (0025) reports catcher issues.
 
-#### [ ] P5-28 — Catch animation frames
+#### [x] P5-28 — Catch animation frames
 - **Depends on:** P5-27
 - **Size:** M
 - **Goal:** a pure function draws any frame of a catcher's throw animation (decision 0035 points 3–6). Split from the first P5-28 with P5-32 and P5-33 (asked by @danielpg95, 2026-10-19).
 - **Done when:**
-  - [ ] A pure frame function under `plugin/hooks/render/` takes the catcher, the Modster's sprite, the outcome, the rock count and the time, and returns the frame's cells for the Modster's sprite area. It applies the `contain` and `cover` presets from CONTENT_FORMAT.md.
-  - [ ] It covers every beat, `place`, `modster` and `path` value, the frames made from frame 0 (tilted for `rock`, the `lidRows` lid lifting and flying off), `glowIndex` and `rimIndex`. Tests use the fake clock and check pixels at chosen times.
-  - [ ] It says whether the catcher fits the sprite area, so callers can fall back to the dot count (0035 point 8).
-  - [ ] The beat lengths of 0035 point 5 live in `constants.ts`.
+  - [x] A pure frame function under `plugin/hooks/render/` takes the catcher, the Modster's sprite, the outcome, the rock count and the time, and returns the frame's cells for the Modster's sprite area. It applies the `contain` and `cover` presets from CONTENT_FORMAT.md.
+  - [x] It covers every beat, `place`, `modster` and `path` value, the frames made from frame 0 (tilted for `rock`, the `lidRows` lid lifting and flying off), `glowIndex` and `rimIndex`. Tests use the fake clock and check pixels at chosen times.
+  - [x] It says whether the catcher fits the sprite area, so callers can fall back to the dot count (0035 point 8).
+  - [x] The beat lengths of 0035 point 5 live in `constants.ts`.
 
 #### [ ] P5-29 — Built-in catchers
 - **Depends on:** P5-28
