@@ -205,7 +205,7 @@ The pane can't delete files, so for a player's own item it says to ask you:
 2. Tell the player:
    - which files you wrote, and the odds of each changed biome;
    - `/modsters reload` loads their changes now (an encounter in progress
-     finishes first); the Settings tab (`/modsters`, then `4`) lists any
+     finishes first); the Settings tab (`/modsters`, then `5`) lists any
      problems;
    - each session picks one biome at random, so a new biome may take a few
      sessions to come up.

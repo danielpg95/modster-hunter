@@ -17,7 +17,6 @@ this file lists only tasks someone has claimed.
 | --- | --- | --- | --- | --- | --- | --- |
 | P5-19 | @danielpg95 | in-review | p5-19-forest-roster | 2026-10-14 | 2026-10-16 | Check the forest live with `/modsters hunt`, then merge PR #112 |
 | P5-21 | @victor-aguilars | in-progress | p5-21-saltbreeze-roster | 2026-10-14 | 2026-10-14 | Design the 5 Saltbreeze Modsters, starting with Lanternmaw |
-| P5-30 | @danielpg95 | in-progress | p5-30-catchers-tab | 2026-10-19 | 2026-10-19 | Add `5: Catchers` to `COLLECTION_TABS` and check the tab row fits the narrowest pane |
 
 ## Up next
 

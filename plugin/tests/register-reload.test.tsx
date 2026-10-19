@@ -117,7 +117,7 @@ describe('register: reload', () => {
     const files = oneModsterForest()
     await start($, on, files)
     files['modsters/broken/modster.json'] = '{ not json'
-    expect(await reload($)).toBe('Modster Hunter: reloaded · 1 biome, 1 Modster · 1 problem, see /modsters → 4: Settings')
+    expect(await reload($)).toBe('Modster Hunter: reloaded · 1 biome, 1 Modster · 1 problem, see /modsters → 5: Settings')
   })
 
   test('an encounter in progress keeps its Modster, sprite and odds; the next one plays the new content', async ($, on) => {

@@ -674,16 +674,16 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Checked by hand by @danielpg95 in a real terminal with the default jar, which they judged enough (2026-10-19). The other three were checked in the preview GIFs (moved from P5-32).
   - [x] A preview GIF of each catcher (a catch and both kinds of miss, dark and light) is in `docs/previews/catchers/`, and the PR description shows them.
 
-#### [ ] P5-30 — Catchers tab
+#### [x] P5-30 — Catchers tab
 - **Depends on:** P5-29, P3-01
 - **Size:** M
 - **Goal:** `/modsters` has a `5: Catchers` tab where the player picks the catcher in use (decision 0035 point 9).
 - **Done when:**
-  - [ ] The tab lists every catcher, marking the one in use `✓ in use` and the player's own `yours`. The selected one plays animated on a Modster the player has caught, or on a silhouette when they've caught none.
-  - [ ] `Enter` saves the selected catcher as `prefs:catcher` in `$.store`. The next throw uses it, and a throw in progress keeps its catcher. Register tests cover this.
-  - [ ] A player's own catcher shows the delete hint from 0032 point 7.
-  - [ ] The tab row with `5: Catchers` fits the narrowest pane, or wraps without breaking the tab hotkeys. A render test covers the narrowest width.
-  - [ ] `docs/ARCHITECTURE.md` lists `prefs:catcher` in its state table.
+  - [x] The tab lists every catcher, marking the one in use `✓ in use` and the player's own `yours`. The selected one plays animated on a Modster the player has caught, or on a silhouette when they've caught none.
+  - [x] `u` (in place of `Enter`, since a hotkey is one digit or letter; asked by @danielpg95) saves the selected catcher as `prefs:catcher` in `$.store`. The next throw uses it, and a throw in progress keeps its catcher. Register tests cover this.
+  - [x] A player's own catcher shows the delete hint from 0032 point 7.
+  - [x] The tab row with `4: Catchers` (Settings moves to `5`, asked by @danielpg95) fits the narrowest pane, or wraps without breaking the tab hotkeys. A render test covers the narrowest width.
+  - [x] `docs/ARCHITECTURE.md` lists `prefs:catcher` in its state table.
 
 #### [ ] P5-31 — Catchers in the content skill
 - **Depends on:** P5-28

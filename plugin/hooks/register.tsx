@@ -12,6 +12,7 @@ import {
   type LoadedBiome,
   type LoadedCatcher,
   type LoadedModster,
+  type Sprite,
   type MergedContent,
   type SheetFiles,
   type ToggleChange,
@@ -34,6 +35,9 @@ import {
   biomeRow,
   biomesBody,
   catchFrame,
+  catcherEntries,
+  catcherRow,
+  previewModsterId,
   pixelsToCells,
   prepareCatch,
   oddsRow,
@@ -64,6 +68,7 @@ import {
   type BandLine,
   type BiomeEntry,
   type CatchArt,
+  type CatcherEntry,
   type CollectionEntry,
   type CollectionTab,
   type DisplayPlan,
@@ -74,6 +79,7 @@ import {
   CATCHER_KEY,
   HUNT_PANE_KEY,
   catcherInUse,
+  catcherPref,
   caughtKey,
   compactStats,
   huntPanePref,
@@ -188,6 +194,13 @@ let biomesSelected: string | undefined
 let statsShown: { stats: SessionStats | undefined } | undefined
 // Its sprite animates on a loop of its own: the encounter's loop follows the encounter's Modster
 const COLLECTION_SPRITE_KEY = 'collection-sprite'
+// The Catchers tab (P5-30): its selection, none yet meaning the catcher in use, and
+// a preview that loops a catch on its own timer while the tab shows it
+let catchersSelected: string | undefined
+const CATCHER_PREVIEW_KEY = 'catcher-preview'
+let catcherPreview: { requestId: string; key: string; catcher: LoadedCatcher; sprite: Sprite; art: CatchArt; tick: number; cells: string } | undefined
+let catcherPreviewTimer: Timer | undefined
+let isBlittingPreview = false
 const silhouettes = new Map<string, string>()
 let collectionSite: string | undefined
 let collectionSpriteModster: LoadedModster | undefined
@@ -511,7 +524,7 @@ export const register: Register = (on, options) => {
     )
   })
 
-  // The collection pane (P3-01): tabs on hotkeys 1–4, which fire while the pane
+  // The collection pane (P3-01): tabs on hotkeys 1–5, which fire while the pane
   // holds the keys. Inline the tabs share the header row when they fit; docked
   // they get a row, or a row each when the dock is narrow
   on('ui.render', { component: 'Pane' }, ($, e, next) => {
@@ -582,6 +595,7 @@ export const register: Register = (on, options) => {
     const usedRows = 1 + tabRows + 1 + (biome ? 0 : 1)
     if (collectionTab !== 'collection') dropCollectionSite(e.requestId)
     if (collectionTab !== 'biomes') dropBiomesSceneSite(e.requestId)
+    if (collectionTab !== 'catchers') dropCatcherPreview(e.requestId)
     return (
       <Box flexDirection="column">
         {header}
@@ -598,9 +612,117 @@ export const register: Register = (on, options) => {
             ? biomesView(e.props.scroll.bodyRows - usedRows)
             : collectionTab === 'stats'
               ? statsView()
-              : settingsView()}
+              : collectionTab === 'catchers'
+                ? catchersView(e.props.scroll.bodyRows - usedRows)
+                : settingsView()}
       </Box>
     )
+
+    /** The Catchers tab: a summary line with k/j/u, the list, and the selected catcher's preview (decision 0035 point 9). */
+    function catchersView(rows: number) {
+      const inUse = content ? catcherInUse(content.catchers, pickedCatcherId, CATCH.defaultCatcher)?.catcher.id : undefined
+      const entries = content ? catcherEntries([...content.catchers.values()].map((loaded) => loaded.catcher), inUse, content.userIds.catchers) : []
+      // A selected catcher that no longer loads falls back to the one in use
+      const at = (id: string | undefined) => entries.findIndex((entry) => entry.id === id)
+      const index = Math.max(0, at(catchersSelected) >= 0 ? at(catchersSelected) : at(inUse))
+      const selected = entries[index]
+      const select = (entry: CatcherEntry | undefined) => {
+        if (!entry || entry.id === selected?.id) return
+        catchersSelected = entry.id
+        $.ui.invalidate('ui.render')
+      }
+      const summary = (
+        <Box key="summary" flexDirection="row" columnGap={COLLECTION.gapColumns}>
+          <Text bold>{`Catchers ${entries.length}`}</Text>
+          <Button key="catcher-up" label="Up" hotkey="k" plain dimColor onPress={() => select(entries[index - 1])} />
+          <Button key="catcher-down" label="Down" hotkey="j" plain dimColor onPress={() => select(entries[index + 1])} />
+          {selected && !selected.isInUse ? (
+            // `u`, not Enter: a hotkey is one digit or letter (asked by @danielpg95 in P5-30)
+            <Button key="catcher-use" label="Use" hotkey="u" plain dimColor onPress={() => useCatcher($, selected)} />
+          ) : null}
+        </Box>
+      )
+      const loadedCatcher = selected ? content?.catchers.get(selected.id) : undefined
+      if (!selected || !loadedCatcher) {
+        dropCatcherPreview(e.requestId)
+        return (
+          <Box key="catchers" flexDirection="column">
+            {summary}
+            <Text dimColor>No catchers loaded.</Text>
+          </Box>
+        )
+      }
+      // The preview plays on the Modster caught last, or a silhouette when none is caught yet
+      const all = content ? [...content.modsters.values(), ...content.off.modsters.values()] : []
+      const caughtId = previewModsterId(collectionRecords, new Set(all.map((loaded) => loaded.modster.id)))
+      const modster = all.find((loaded) => loaded.modster.id === caughtId) ?? all[0]
+      const lines: BandLine[] = [
+        [{ text: selected.name, bold: true }],
+        ...(selected.description ? [[{ text: selected.description, dim: true }] as BandLine] : []),
+        ...itemNotes('catcher', selected.id, selected),
+      ]
+      const plan = collectionBody({
+        columns: e.props.bodyColumns,
+        // Less the summary line
+        rows: Math.max(1, rows - 1),
+        spriteColumns: modster && e.surface === 'terminal' ? modster.sprite.width : Number.MAX_SAFE_INTEGER,
+        spriteRows: modster && e.surface === 'terminal' ? Math.ceil(modster.sprite.height / 2) : Number.MAX_SAFE_INTEGER,
+        detailRows: COLLECTION.catcherDetailRows,
+      })
+      const window = listWindow(entries.length, index, plan.listRows)
+      const more = moreText(window)
+      const list = (
+        <Box key="catcher-list" flexDirection="column" {...(plan.split === 'side' ? { width: COLLECTION.listColumns } : {})}>
+          {entries.slice(window.start, window.end).map((entry) => (
+            <Button key={entry.id} plain onPress={() => select(entry)}>
+              {texts(catcherRow(entry, entry.id === selected.id), 'truncate')}
+            </Button>
+          ))}
+          {more ? <Text dimColor>{more}</Text> : null}
+        </Box>
+      )
+      const text = (
+        <Box key="catcher-text" flexDirection="column" width={plan.textColumns}>
+          {lines.map((line, row) => (
+            <Box key={`catcher-line-${row}`} flexDirection="row">
+              {texts(line, 'wrap')}
+            </Box>
+          ))}
+        </Box>
+      )
+      let detail = text
+      if (plan.sprite !== 'none' && modster && e.surface === 'terminal') {
+        const { Raster } = $.ui.resolve(e)
+        const sprite = caughtId === undefined ? silhouetteSprite(modster.sprite) : modster.sprite
+        const cells = catcherPreviewCells($, e.requestId, loadedCatcher, modster, sprite)
+        const beside = plan.sprite === 'beside'
+        detail = (
+          <Box key="detail" flexDirection={beside ? 'row' : 'column'} {...(beside ? { columnGap: COLLECTION.gapColumns } : {})}>
+            <Raster key={CATCHER_PREVIEW_KEY} columns={sprite.width} rows={Math.ceil(sprite.height / 2)} cells={cells} />
+            {text}
+          </Box>
+        )
+      } else {
+        dropCatcherPreview(e.requestId)
+      }
+      return (
+        <Box key="catchers" flexDirection="column">
+          {summary}
+          {plan.split === 'side' ? (
+            <Box key="split" flexDirection="row" columnGap={COLLECTION.gapColumns}>
+              {list}
+              {detail}
+            </Box>
+          ) : (
+            <Box key="split" flexDirection="column">
+              {list}
+              <Text> </Text>
+              {detail}
+            </Box>
+          )}
+        </Box>
+      )
+    }
 
     /** The Settings tab: every content issue from the last load, and how to reload (P4-02). */
     function settingsView() {
@@ -879,6 +1001,7 @@ export const register: Register = (on, options) => {
     const result = await next(e)
     if (e.id === COLLECTION_PANE_ID) dropCollectionSite(COLLECTION_PANE_ID)
     if (e.id === COLLECTION_PANE_ID) dropBiomesSceneSite(COLLECTION_PANE_ID)
+    if (e.id === COLLECTION_PANE_ID) dropCatcherPreview(COLLECTION_PANE_ID)
     const pref = e.id === PANE_ID ? prefAfterClose(e.origin.kind) : undefined
     if (pref) queueWrite($, (store) => store.set(HUNT_PANE_KEY, pref))
     $.ui.invalidate('ui.render')
@@ -1230,6 +1353,7 @@ function stopTimers(): void {
   tickTimer?.cancel()
   tickTimer = undefined
   stopCatch()
+  stopCatcherPreview()
   stopFrames()
   stopScene()
   sceneSites.clear()
@@ -1381,6 +1505,59 @@ function stopCollectionFrames(): void {
   collectionTimer = undefined
 }
 
+/** Makes `entry` the catcher in use from the next throw, and saves it (0035 point 9); a throw in progress keeps its own. */
+function useCatcher($: EngineInterface, entry: CatcherEntry): void {
+  pickedCatcherId = entry.id
+  queueWrite($, (store) => store.set(CATCHER_KEY, catcherPref(entry.id)))
+  $.ui.toast(`Modster Hunter: catching with the ${entry.name} from the next throw`)
+  $.ui.invalidate('ui.render')
+}
+
+/** A sprite in the silhouette's one gray, for a preview before anything is caught. */
+function silhouetteSprite(sprite: Sprite): Sprite {
+  return { ...sprite, palette: silhouettePalette(sprite) }
+}
+
+/**
+ * The Catchers tab's preview cells now: a catch by `catcher` on `modster`, looped on a timer
+ * at CATCH.fps with a pause after each. Another catcher or Modster starts it over.
+ */
+function catcherPreviewCells($: EngineInterface, requestId: string, catcher: LoadedCatcher, modster: LoadedModster, sprite: Sprite): string {
+  const key = `${catcher.catcher.id}/${modster.modster.id}/${sprite === modster.sprite ? 'caught' : 'silhouette'}`
+  const shown = catcherPreview
+  if (shown && shown.requestId === requestId && shown.key === key && shown.catcher === catcher && shown.sprite.frames === sprite.frames) return shown.cells
+  stopCatcherPreview()
+  const art = prepareCatch(catcher.catcher, catcher.sprite, sprite, modster.modster.sprite.fps ?? CONTENT.modster.defaultFps)
+  const cells = pixelsToCells(catchFrame(art, 'caught', CATCH.rocksToCatch, 0))
+  catcherPreview = { requestId, key, catcher, sprite, art, tick: 0, cells }
+  const loopMs = throwingMs('caught', CATCH.rocksToCatch) + CATCH.beatMs.caught + CATCH.previewPauseMs
+  catcherPreviewTimer = $.clock.every(Math.round(1000 / CATCH.fps), () => {
+    const preview = catcherPreview
+    // Skip a tick while the last blit is in flight (P1-03)
+    if (!preview || isBlittingPreview) return
+    isBlittingPreview = true
+    preview.tick += 1
+    preview.cells = pixelsToCells(catchFrame(preview.art, 'caught', CATCH.rocksToCatch, ((preview.tick * 1000) / CATCH.fps) % loopMs))
+    void $.ui
+      .blit({ requestId: preview.requestId, key: CATCHER_PREVIEW_KEY, cells: preview.cells })
+      .catch(() => undefined)
+      .finally(() => {
+        isBlittingPreview = false
+      })
+  })
+  return cells
+}
+
+function dropCatcherPreview(requestId: string): void {
+  if (catcherPreview?.requestId === requestId) stopCatcherPreview()
+}
+
+function stopCatcherPreview(): void {
+  catcherPreviewTimer?.cancel()
+  catcherPreviewTimer = undefined
+  catcherPreview = undefined
+}
+
 /** A biome's idle scene, made once per content load (0028 point 1). */
 function biomeScene(loaded: LoadedBiome): IdleScene | undefined {
   if (!biomeScenes.has(loaded.biome.id)) biomeScenes.set(loaded.biome.id, idleScene(loaded.biome, loaded.background))
@@ -1434,6 +1611,7 @@ async function reloadContent($: EngineInterface, includeBuiltins: boolean, idleT
   // Sprites and backgrounds may have changed, and Modsters and catchers come or go
   cellsByModster.clear()
   catchArts.clear()
+  stopCatcherPreview()
   silhouettes.clear()
   biomeScenes.clear()
   dropCollectionSite(COLLECTION_PANE_ID)
@@ -1463,7 +1641,7 @@ async function reloadContent($: EngineInterface, includeBuiltins: boolean, idleT
 
   const issues = content.issues.length
   const loaded = `${content.biomes.size} biome${content.biomes.size === 1 ? '' : 's'}, ${content.modsters.size} Modster${content.modsters.size === 1 ? '' : 's'}`
-  const problems = issues === 0 ? 'no problems' : `${issues} problem${issues === 1 ? '' : 's'}, see /modsters → 4: Settings`
+  const problems = issues === 0 ? 'no problems' : `${issues} problem${issues === 1 ? '' : 's'}, see /modsters → 5: Settings`
   if (content.biomes.size === 0) {
     const none = noBiomesMessage(includeBuiltins, USER_FOLDER_LABEL)
     return { reply: `Modster Hunter: reloaded · ${none} · ${problems}`, note: ` · ${none}` }
