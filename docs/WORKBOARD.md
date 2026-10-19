@@ -31,4 +31,4 @@ list when you finish a task.
 - **P5-09** — Sprite miniatures (spike)
 - **P5-17** — Player-defined tiers (spike)
 - **P5-18** — Live Stats tab
-- **P5-28** — Catch animation engine
+- **P5-28** — Catch animation frames
