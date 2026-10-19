@@ -21,6 +21,35 @@ export const ENCOUNTER = {
   agentWorkMaxMs: 30 * 60 * 1000,
 } as const
 
+/**
+ * The catch animation, decision 0035 point 5: beat lengths are the same for
+ * every catcher. `caught` plays at the start of the result card. The rest
+ * tune how frames made from a catcher's frame 0 move (CONTENT_FORMAT "Styles").
+ */
+export const CATCH = {
+  fps: 12,
+  beatMs: { throw: 350, take: 400, settle: 150, rock: 500, caught: 700, broken: 450 },
+  /** A catch rocks this many times; a miss 1 to one fewer (0035 point 6) */
+  rocksToCatch: 3,
+  /** How far frame 0 tilts at the top of a rock */
+  tiltRadians: 0.26,
+  /** How far the lid rises while the Modster goes in */
+  lidLiftPx: 4,
+  /** A `shrink` (a cover catcher cinching) ends at this scale */
+  shrinkScale: 0.65,
+  /** How high a `hop-out` jumps */
+  hopPx: 3,
+  /** A `dim` Modster's colors are mixed this far toward black */
+  dimAmount: 0.5,
+  /** A `stretch` shape reaches this far past the Modster's outline */
+  stretchMarginPx: 2,
+  /** Past this share of a `stretch` shape's radius, `rimIndex` draws the edge */
+  rimFrom: 0.82,
+  sparkleColors: ['#ffffff', '#fff6b0'],
+  /** `glowIndex` takes the Modster's most common color with summed RGB over this (half of full brightness) */
+  glowMinBrightness: 384,
+} as const
+
 /** Band layout, decision 0012: the full layout needs sprite + gap + text block in the band's width. */
 export const BAND = {
   gapColumns: 2,

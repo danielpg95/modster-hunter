@@ -653,15 +653,15 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Loading and merging include catchers: a user catcher with a built-in's id replaces it (0007), and built-in catchers load even when `includeBuiltins` is off. Tests use the injected loader ports.
   - [x] The helper's `check` (0025) reports catcher issues.
 
-#### [ ] P5-28 — Catch animation frames
+#### [x] P5-28 — Catch animation frames
 - **Depends on:** P5-27
 - **Size:** M
 - **Goal:** a pure function draws any frame of a catcher's throw animation (decision 0035 points 3–6). Split from the first P5-28 with P5-32 and P5-33 (asked by @danielpg95, 2026-10-19).
 - **Done when:**
-  - [ ] A pure frame function under `plugin/hooks/render/` takes the catcher, the Modster's sprite, the outcome, the rock count and the time, and returns the frame's cells for the Modster's sprite area. It applies the `contain` and `cover` presets from CONTENT_FORMAT.md.
-  - [ ] It covers every beat, `place`, `modster` and `path` value, the frames made from frame 0 (tilted for `rock`, the `lidRows` lid lifting and flying off), `glowIndex` and `rimIndex`. Tests use the fake clock and check pixels at chosen times.
-  - [ ] It says whether the catcher fits the sprite area, so callers can fall back to the dot count (0035 point 8).
-  - [ ] The beat lengths of 0035 point 5 live in `constants.ts`.
+  - [x] A pure frame function under `plugin/hooks/render/` takes the catcher, the Modster's sprite, the outcome, the rock count and the time, and returns the frame's cells for the Modster's sprite area. It applies the `contain` and `cover` presets from CONTENT_FORMAT.md.
+  - [x] It covers every beat, `place`, `modster` and `path` value, the frames made from frame 0 (tilted for `rock`, the `lidRows` lid lifting and flying off), `glowIndex` and `rimIndex`. Tests use the fake clock and check pixels at chosen times.
+  - [x] It says whether the catcher fits the sprite area, so callers can fall back to the dot count (0035 point 8).
+  - [x] The beat lengths of 0035 point 5 live in `constants.ts`.
 
 #### [ ] P5-29 — Built-in catchers
 - **Depends on:** P5-28
@@ -691,6 +691,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Done when:**
   - [ ] SKILL.md has a "Make a catcher" section. It asks for the style (`contain`, `cover` or `custom`) and the beats one question at a time, draws the closed frame first, and adds other frames only when the player wants them.
   - [ ] The helper renders a catcher's animation on a sample Modster (a catch and both kinds of miss, dark and light) into a GIF or HTML page the player can open. It reuses P5-28's frame function, with a test.
+  - [ ] For a `custom` catcher, the skill steers the player to one of the two ways a catcher can hold a Modster: stretched over it (`place: stretch`, like the net) or with the Modster shrinking in (`shrink-in`, like the jar, or the seed pod, whose husk opens, takes the Modster completely inside and snaps shut). An anchored catcher that keeps a full-size Modster visible is smaller than the Modster, so it overflows (noted by @danielpg95, 2026-10-19, on a test bubble). Before saving, the skill shows the preview on a large Modster, such as Elderbark.
   - [ ] `reference/format.md` documents `catcher.json`, and "Delete your own" covers catchers.
   - [ ] Checked by hand: a new `custom` catcher made through the skill appears in the Catchers tab after `/modsters reload` and plays on a throw.
 
