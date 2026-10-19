@@ -48,8 +48,9 @@ export const CATCH = {
   stretchMarginPx: 2,
   /** Past this share of a `stretch` shape's radius, `rimIndex` draws the edge */
   rimFrom: 0.82,
-  // White for dark terminals, a deep gold that still shows on light ones
-  sparkleColors: ['#ffffff', '#e0a800'],
+  /** A catch's sparkles: a white center that glints on dark terminals, deep gold arms that show on light ones */
+  sparkleCore: '#ffffff',
+  sparkleArms: '#e0a800',
   /** Played when `prefs:catcher` is missing or names a catcher that didn't load (0035 point 10) */
   defaultCatcher: 'jar',
   /** `glowIndex` takes the Modster's most common color with summed RGB over this (half of full brightness) */

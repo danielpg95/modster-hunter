@@ -43,3 +43,4 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 
 The `.sprite.json` next to each sheet is generated from it with `npm run sprite`.
 | `catchers/jar/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Glass jar, the default catcher (decision 0035); P5-29 |
+| `catchers/pod/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Seed pod catcher (decision 0035); P5-29 |

@@ -362,13 +362,14 @@ function drawSparkles(canvas: Canvas, art: CatchArt, beat: ResolvedBeat, at: Cat
   const r = 3 + at.progress * 9
   const size = at.progress < 0.6 ? 2 : 1
   const points = [[-1, -1], [1, -1], [-1.4, 0.2], [1.4, 0.2], [0, -1.4]] as const
-  points.forEach(([ax, ay], n) => {
-    const color = rgbaOf(CATCH.sparkleColors[n % CATCH.sparkleColors.length] ?? '#ffffff').slice(0, 3)
+  const core = rgbaOf(CATCH.sparkleCore).slice(0, 3)
+  const arms = rgbaOf(CATCH.sparkleArms).slice(0, 3)
+  for (const [ax, ay] of points) {
     const x = Math.round(center[0] + ax * r)
     const y = Math.round(center[1] + ay * r)
-    canvas.put(x, y, color, 0)
-    for (let k = 1; k <= size; k++) for (const [dx, dy] of [[k, 0], [-k, 0], [0, k], [0, -k]] as const) canvas.put(x + dx, y + dy, color, 0)
-  })
+    canvas.put(x, y, core, 0)
+    for (let k = 1; k <= size; k++) for (const [dx, dy] of [[k, 0], [-k, 0], [0, k], [0, -k]] as const) canvas.put(x + dx, y + dy, arms, 0)
+  }
 }
 
 // ---------- helpers ----------
