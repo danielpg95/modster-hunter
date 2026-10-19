@@ -17,6 +17,7 @@ this file lists only tasks someone has claimed.
 | --- | --- | --- | --- | --- | --- | --- |
 | P5-19 | @danielpg95 | in-review | p5-19-forest-roster | 2026-10-14 | 2026-10-16 | Check the forest live with `/modsters hunt`, then merge PR #112 |
 | P5-21 | @victor-aguilars | in-progress | p5-21-saltbreeze-roster | 2026-10-14 | 2026-10-14 | Design the 5 Saltbreeze Modsters, starting with Lanternmaw |
+| P5-28 | @danielpg95 | in-progress | p5-28-catch-frames | 2026-10-19 | 2026-10-19 | Write `catchFrame` in `plugin/hooks/render/catch-frame.ts` with the beat timeline and the `contain` preset |
 
 ## Up next
 
@@ -31,4 +32,3 @@ list when you finish a task.
 - **P5-09** — Sprite miniatures (spike)
 - **P5-17** — Player-defined tiers (spike)
 - **P5-18** — Live Stats tab
-- **P5-28** — Catch animation frames
