@@ -49,6 +49,8 @@ export const CATCH = {
   /** Past this share of a `stretch` shape's radius, `rimIndex` draws the edge */
   rimFrom: 0.82,
   sparkleColors: ['#ffffff', '#fff6b0'],
+  /** Played when `prefs:catcher` is missing or names a catcher that didn't load (0035 point 10) */
+  defaultCatcher: 'jar',
   /** `glowIndex` takes the Modster's most common color with summed RGB over this (half of full brightness) */
   glowMinBrightness: 384,
 } as const
