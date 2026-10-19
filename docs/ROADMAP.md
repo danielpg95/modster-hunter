@@ -706,11 +706,11 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `prefs:catcher` in `$.store` picks the catcher; a missing or unknown id falls back to `jar` (0035 point 10).
   - [x] The hand check moved to P5-29, so it happens with the real catchers (agreed with @danielpg95, 2026-10-19).
 
-#### [ ] P5-33 — Catch dot count
+#### [x] P5-33 — Catch dot count
 - **Depends on:** P5-32
 - **Size:** S
 - **Goal:** text-only places show the dot count during a throw instead of `wobble…`, and so does the band where the catcher doesn't fit (decision 0035 points 7–8, split from P5-28).
 - **Done when:**
-  - [ ] The compact band, the one-row band and the status line show `● ○ ○`, `● ● ○`, `● ● ● click!` or `● ✕ ○ broke free!` as the throw goes. The spinner is unchanged. Render tests run at `maxRows` 1, 2 and 7.
-  - [ ] Where the catcher doesn't fit the sprite area, the sprite holds still and the text lines show the dot count. The band never takes more rows than it does today.
-  - [ ] No `wobble` text is left in `plugin/hooks/`.
+  - [x] The compact band, the one-row band and the status line show `● ○ ○`, `● ● ○`, `● ● ● click!` or `● ✕ ○ broke free!` as the throw goes. The spinner is unchanged. Render tests run at `maxRows` 1, 2 and 7.
+  - [x] Where the catcher doesn't fit the sprite area, the sprite holds still and the text lines show the dot count. The band never takes more rows than it does today.
+  - [x] No `wobble` text is left in `plugin/hooks/`.
