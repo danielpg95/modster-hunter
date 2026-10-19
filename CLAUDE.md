@@ -70,6 +70,7 @@ node tools/check-tracking.mjs --next    # tasks that can be claimed now
 claude --plugin-dir ./plugin            # run the mod from source (hot reload)
 claude plugin validate ./plugin --strict
 claude plugin test ./plugin
+node --test tools/*.test.mjs            # tools and content helper tests (CI runs them); Node 22.18+
 ```
 
 ## Git conventions
