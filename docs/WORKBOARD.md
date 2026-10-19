@@ -17,6 +17,7 @@ this file lists only tasks someone has claimed.
 | --- | --- | --- | --- | --- | --- | --- |
 | P5-19 | @danielpg95 | in-review | p5-19-forest-roster | 2026-10-14 | 2026-10-16 | Check the forest live with `/modsters hunt`, then merge PR #112 |
 | P5-21 | @victor-aguilars | in-progress | p5-21-saltbreeze-roster | 2026-10-14 | 2026-10-14 | Design the 5 Saltbreeze Modsters, starting with Lanternmaw |
+| P5-33 | @danielpg95 | in-progress | p5-33-catch-dot-count | 2026-10-19 | 2026-10-19 | Write the pure dot-count text from `catchBeatAt` and use it in `band-view.ts` and `display-plan.ts` |
 
 ## Up next
 
@@ -32,4 +33,3 @@ list when you finish a task.
 - **P5-17** — Player-defined tiers (spike)
 - **P5-18** — Live Stats tab
 - **P5-31** — Catchers in the content skill
-- **P5-33** — Catch dot count
