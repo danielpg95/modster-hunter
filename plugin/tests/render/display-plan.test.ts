@@ -36,7 +36,8 @@ describe('displayPlan', () => {
     const plan = (e: Partial<BandEncounter>) => displayPlan(settings(), { encounter: encounter(e), turnRunning: false }).status
     expect(plan({ phase: 'appearing' })).toBe('A wild Sproutling (common) appeared!')
     expect(plan({ phase: 'waiting', attemptsLeft: 2 })).toBe('Sproutling (common) · 2 left · 1: Throw in the band or pane')
-    expect(plan({ phase: 'throwing' })).toBe('Sproutling (common) · wobble…')
+    expect(plan({ phase: 'throwing' })).toBe('Sproutling (common) · ○ ○ ○')
+    expect(plan({ phase: 'throwing', dots: '● ○ ○' })).toBe('Sproutling (common) · ● ○ ○')
     expect(plan({ phase: 'result', outcome: 'fled', fledBecause: 'idle' })).toBe('Sproutling wandered off.')
   })
 

@@ -1,6 +1,7 @@
 export { BAND_BUTTONS, bandRows, bandView, lineWidth, resultText, type BandButton, type BandEncounter, type BandInput, type BandLine, type BandSegment, type BandView } from './band-view'
 export { displayPlan, type DisplayPlan, type DisplayState } from './display-plan'
 export { readDisplaySettings, type DisplaySettings, type EncounterPaneMode } from './display-settings'
+export { catchDots } from './catch-dots'
 export { resolveBeats, type ResolvedBeat, type ResolvedBeats } from './catch-beats'
 export { catchFrame, prepareCatch, type CatchArt } from './catch-frame'
 export { DEFAULT_COLOR, pixelsToCells, type Frame } from './pixels-to-cells'

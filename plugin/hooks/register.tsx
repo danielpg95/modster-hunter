@@ -34,6 +34,7 @@ import {
   biomeEntries,
   biomeRow,
   biomesBody,
+  catchDots,
   catchFrame,
   catcherEntries,
   catcherRow,
@@ -138,12 +139,14 @@ let isBlitting = false
 
 // The catch animation (decision 0035): while a throw plays, its frames are blitted to
 // the same sprite sites at CATCH.fps, and the Modster's idle loop waits. The throw
-// keeps the catcher it started with. With no catcher loaded the throw shows the
-// idle loop and `wobble…` as before (agreed for P5-32).
+// keeps the catcher it started with. With no catcher drawn (none loaded, or one too
+// big for the sprite area) the Modster holds still and the text tells the throw (0035 point 8).
 // The picked catcher's id from `prefs:catcher`, read at session start (point 9)
 let pickedCatcherId: string | undefined
 // Keyed by catcher and Modster id, checked against what they were made from: a reload may change either
 const catchArts = new Map<string, { catcher: LoadedCatcher; modster: LoadedModster; art: CatchArt }>()
+// The throw as a dot count for the text (point 7), kept current by the tick
+let shownDots: string | undefined
 let catchPlay: { art: CatchArt; outcome: CatchOutcome; rocks: number; throwAt: number; endsAt: number } | undefined
 let catchCells: string | undefined
 let catchTimer: Timer | undefined
@@ -1069,7 +1072,27 @@ function currentEncounter(): BandEncounter | undefined {
     spriteHeight: modster.sprite.height,
     ...(encounter.outcome ? { outcome: encounter.outcome } : {}),
     ...(encounter.fledBecause ? { fledBecause: encounter.fledBecause } : {}),
+    ...(shownDots ? { dots: shownDots } : {}),
   }
+}
+
+/**
+ * The dot count for the throw now (0035 point 7): while throwing, and for a catch
+ * while its caught beat opens the result card. Returns whether it changed.
+ */
+function updateDots(now: number): boolean {
+  const encounter = machine?.encounter
+  const throwAt = encounter?.throwAt
+  const rocks = encounter?.rocks
+  let dots: string | undefined
+  if (encounter && throwAt !== undefined && rocks !== undefined) {
+    const outcome: CatchOutcome = encounter.throwLands || encounter.outcome === 'caught' ? 'caught' : 'missed'
+    const end = throwAt + throwingMs(outcome, rocks) + (outcome === 'caught' ? CATCH.beatMs.caught : 0)
+    if (encounter.phase === 'throwing' || now < end) dots = catchDots(outcome, rocks, now - throwAt)
+  }
+  if (dots === shownDots) return false
+  shownDots = dots
+  return true
 }
 
 /** The encounter as the band and pane draw it: with the caught mark (P5-10, P5-11); the spinner and status line go without */
@@ -1090,6 +1113,7 @@ function currentPlan(): DisplayPlan {
 function startMachine($: EngineInterface, idleTimeoutSec: number): void {
   stopTimers()
   machine = undefined
+  shownDots = undefined
   machineContext = undefined
   alreadyCaught = false
   encounterModster = undefined
@@ -1141,8 +1165,16 @@ async function advanceMachine($: EngineInterface, action: MachineAction): Promis
   if (!machine || !machineContext) return
   const now = await $.clock.now()
   const step = stepEncounter(machine, { ...action, now } as EncounterInput, machineContext)
-  if (step.state === machine) return
+  if (step.state === machine) {
+    // The dots move on while the state holds still
+    if (updateDots(now)) {
+      $.ui.invalidate('ui.render')
+      updateStatus($)
+    }
+    return
+  }
   machine = step.state
+  updateDots(now)
   // Before the redraw, so a throw's first frame is what the band draws
   updateCatch($, now)
   // Before the redraw, so a scene that stops is drawn still
@@ -1206,8 +1238,9 @@ function addSite($: EngineInterface, requestId: string, loaded: LoadedModster): 
   if (frameTimer || loaded.sprite.frames.length < 2) return
   frameTimer = $.clock.every(Math.max(1, Math.round(1000 / (loaded.modster.sprite.fps ?? 6))), () => {
     const current = frameModster
-    // Skip a tick while the last blits are in flight (P1-03), or while a throw plays
-    if (!current || isBlitting || spriteSites.size === 0 || catchPlay) return
+    // Skip a tick while the last blits are in flight (P1-03), or during a throw: the
+    // catcher plays, or with none drawn the Modster holds still (0035 point 8)
+    if (!current || isBlitting || spriteSites.size === 0 || catchPlay || machine?.encounter?.phase === 'throwing') return
     isBlitting = true
     frameIndex = (frameIndex + 1) % current.sprite.frames.length
     const blits = [...spriteSites].map((site) =>
@@ -1721,6 +1754,7 @@ function moveToNewBiome($: EngineInterface, idleTimeoutSec: number): LoadedBiome
     tickTimer = undefined
     stopFrames()
     machine = undefined
+    shownDots = undefined
     machineContext = undefined
     encounterModster = undefined
     updateStatus($)

@@ -129,15 +129,31 @@ describe('register: catch animation', () => {
     await pane.unmount()
   })
 
-  test('with no catcher loaded, the throw keeps the idle loop and the wobble (agreed for P5-32)', async ($, on) => {
+  test('with no catcher drawn, the Modster holds still and the text tells the throw (0035 point 8)', async ($, on) => {
     const { clock, blits } = await start($, on, oneModsterForest())
     const band = await mountBand($)
     await untilWaiting($, clock)
     blits.length = 0
     await band.press({ key: 'throw' })
     await clock.advance(1_000)
-    expect(await band.find({ type: 'Text', text: 'wobble… wobble…' })).toBeDefined()
-    expect(blits.length > 0 && blits.every(([, cells]) => IDLE.has(cells))).toBe(true)
+    expect(await band.find({ type: 'Text', text: '● ○ ○' })).toBeDefined()
+    expect(blits).toHaveLength(0)
+    await band.unmount()
+  })
+
+  test('a catcher too big for the sprite area holds the Modster still too', async ($, on) => {
+    const content = files()
+    // Twice the 8×8 fixture Modster
+    const big = JSON.parse(content['catchers/jar/sprite.sprite.json'] ?? '{}')
+    content['catchers/jar/sprite.sprite.json'] = JSON.stringify({ ...big, width: 16, height: 16, frames: [btoa(String.fromCharCode(...new Array(256).fill(2)))] })
+    const { clock, blits } = await start($, on, content)
+    const band = await mountBand($)
+    await untilWaiting($, clock)
+    blits.length = 0
+    await band.press({ key: 'throw' })
+    await clock.advance(1_000)
+    expect(blits).toHaveLength(0)
+    expect(await band.find({ type: 'Text', text: '● ○ ○' })).toBeDefined()
     await band.unmount()
   })
 })

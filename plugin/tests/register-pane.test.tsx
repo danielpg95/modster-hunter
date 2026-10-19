@@ -105,7 +105,7 @@ describe('register: encounter pane', () => {
     await clock.advance(1_000)
     await pane.press({ key: 'throw' })
     await clock.advance(250)
-    expect(await pane.find({ type: 'Text', text: 'wobble… wobble…' })).toBeDefined()
+    expect(await pane.find({ type: 'Text', text: '○ ○ ○' })).toBeDefined()
     await clock.advance(CATCH_THROW_MS)
     expect(await pane.find({ type: 'Text', text: 'Caught Sproutling!' })).toBeDefined()
     await pane.unmount()
