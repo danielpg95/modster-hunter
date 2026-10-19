@@ -24,7 +24,10 @@ export interface CatchArt {
   height: number
   modster: Art
   modsterFps: number
+  /** As drawn; `glowIndex` keeps its own color */
   catcher: Art
+  /** With `glowIndex` in the Modster's color, shown while the Modster is inside (beats where it's `hidden`) */
+  lit: Art
   beats: ResolvedBeats
   lidRows: number
   rim?: number[]
@@ -34,12 +37,13 @@ export interface CatchArt {
   fits: boolean
 }
 
-/** Decodes the art; `glowIndex` takes the Modster's most common bright color. */
+/** Decodes the art, plus a lit copy where `glowIndex` takes the Modster's most common bright color. */
 export function prepareCatch(catcher: Catcher, catcherSprite: Sprite, modsterSprite: Sprite, modsterFps: number): CatchArt {
   const modster: Art = { width: modsterSprite.width, height: modsterSprite.height, frames: spriteRgba(modsterSprite) }
+  const art: Art = { width: catcherSprite.width, height: catcherSprite.height, frames: spriteRgba(catcherSprite) }
   const palette = [...catcherSprite.palette]
   if (catcher.glowIndex !== undefined) palette[catcher.glowIndex] = mainColor(modster)
-  const art: Art = { width: catcherSprite.width, height: catcherSprite.height, frames: spriteRgba(catcherSprite, palette) }
+  const lit: Art = catcher.glowIndex === undefined ? art : { ...art, frames: spriteRgba(catcherSprite, palette) }
   const beats = resolveBeats(catcher)
   const anchored = Object.values(beats).some((beat) => beat.place !== 'stretch')
   const rimColor = catcher.rimIndex === undefined ? undefined : catcherSprite.palette[catcher.rimIndex]
@@ -49,6 +53,7 @@ export function prepareCatch(catcher: Catcher, catcherSprite: Sprite, modsterSpr
     modster,
     modsterFps,
     catcher: art,
+    lit,
     beats,
     lidRows: catcher.lidRows ?? 0,
     ...(rimColor ? { rim: rgbaOf(rimColor).slice(0, 3) } : {}),
@@ -151,11 +156,15 @@ function drawCatcher(canvas: Canvas, art: CatchArt, beat: ResolvedBeat, at: Catc
   else drawAnchored(canvas, art, beat, at, frame)
 }
 
-/** The frame a beat shows now: its own frames spread over the beat, or frame 0 when the preset makes them. */
+/**
+ * The frame a beat shows now: its own frames spread over the beat, or frame 0
+ * when the preset makes them. It glows only while the Modster is inside it.
+ */
 function beatFrame(art: CatchArt, beat: ResolvedBeat, at: CatchBeatAt): Uint8Array {
   const list = beat.frames ?? [0]
   const index = list[Math.min(list.length - 1, Math.floor(at.progress * list.length))] ?? 0
-  return art.catcher.frames[index] ?? art.catcher.frames[0] ?? new Uint8Array()
+  const { frames } = beat.modster === 'hidden' ? art.lit : art.catcher
+  return frames[index] ?? frames[0] ?? new Uint8Array()
 }
 
 /** The catcher's resting place: bottom center of the area. */
@@ -258,10 +267,15 @@ interface Dome {
   ry: number
 }
 
+/** The Modster's outline plus a margin, kept inside the area so the whole rounded edge shows. */
 function dome(art: CatchArt): Dome {
   const { x0, y0, x1, y1 } = art.bounds
+  const margin = CATCH.stretchMarginPx
+  const left = Math.max(0, x0 - margin)
+  const right = Math.min(art.width - 1, x1 + margin)
+  const top = Math.max(0, y0 - margin)
   const by = Math.min(art.height - 1, y1 + 1)
-  return { cx: (x0 + x1 + 1) / 2, by, rx: (x1 - x0 + 1) / 2 + CATCH.stretchMarginPx, ry: by - y0 + CATCH.stretchMarginPx }
+  return { cx: (left + right + 1) / 2, by, rx: (right - left + 1) / 2, ry: Math.max(1, by - top) }
 }
 
 interface StretchMotion {
@@ -314,12 +328,16 @@ function stretchMotion(art: CatchArt, beat: ResolvedBeat, at: CatchBeatAt, pose:
   const u = at.progress
   switch (at.beat) {
     case 'throw': {
+      // It flies in folded flat and lands on top of the Modster, so `take` is its only fall
       const v = easeOut(u)
       const scale = 0.35 + 0.65 * v
+      const folded = Math.max(2, full.ry * 0.2)
+      const endBy = full.by - full.ry + folded
       const startX = beat.path === 'arc' ? -full.rx : full.cx
-      const startY = beat.path === 'none' ? full.by : full.by - full.ry * 1.1
-      const lift = beat.path === 'arc' ? full.ry * 0.4 * Math.sin(v * Math.PI) : 0
-      const shape = { cx: startX + (full.cx - startX) * v, by: startY + (full.by - startY) * v - lift, rx: full.rx * scale, ry: full.ry * scale * 0.6 }
+      // Its flight stays inside the area, where it can be seen: an arc slides in across the top
+      const startY = beat.path === 'drop' ? endBy - full.ry : endBy
+      const lift = beat.path === 'arc' ? Math.min(full.ry * 0.4, endBy - folded) * Math.sin(v * Math.PI) : 0
+      const shape = { cx: startX + (full.cx - startX) * v, by: startY + (endBy - startY) * v - lift, rx: full.rx * scale, ry: folded }
       return { ...base, shape }
     }
     case 'take':
@@ -353,13 +371,14 @@ function drawSparkles(canvas: Canvas, art: CatchArt, beat: ResolvedBeat, at: Cat
   const r = 3 + at.progress * 9
   const size = at.progress < 0.6 ? 2 : 1
   const points = [[-1, -1], [1, -1], [-1.4, 0.2], [1.4, 0.2], [0, -1.4]] as const
-  points.forEach(([ax, ay], n) => {
-    const color = rgbaOf(CATCH.sparkleColors[n % CATCH.sparkleColors.length] ?? '#ffffff').slice(0, 3)
+  const core = rgbaOf(CATCH.sparkleCore).slice(0, 3)
+  const arms = rgbaOf(CATCH.sparkleArms).slice(0, 3)
+  for (const [ax, ay] of points) {
     const x = Math.round(center[0] + ax * r)
     const y = Math.round(center[1] + ay * r)
-    canvas.put(x, y, color, 0)
-    for (let k = 1; k <= size; k++) for (const [dx, dy] of [[k, 0], [-k, 0], [0, k], [0, -k]] as const) canvas.put(x + dx, y + dy, color, 0)
-  })
+    canvas.put(x, y, core, 0)
+    for (let k = 1; k <= size; k++) for (const [dx, dy] of [[k, 0], [-k, 0], [0, k], [0, -k]] as const) canvas.put(x + dx, y + dy, arms, 0)
+  }
 }
 
 // ---------- helpers ----------

@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "jar",
+  "name": "Glass jar",
+  "description": "A firefly jar with a cork lid. It glows with whatever it holds.",
+  "style": "contain",
+  "sprite": { "file": "sprite.sprite.json" },
+  "glowIndex": 9,
+  "lidRows": 4
+}

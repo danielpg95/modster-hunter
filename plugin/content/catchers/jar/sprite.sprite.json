@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "width": 14,
+  "height": 18,
+  "palette": [
+    "#00000000",
+    "#1b1a24ff",
+    "#d9a066ff",
+    "#a8743fff",
+    "#7a5230ff",
+    "#5f7c88ff",
+    "#9fd3e3ff",
+    "#d8f3faff",
+    "#ffffffff",
+    "#b9e4f0ff",
+    "#fffbe8ff",
+    "#6fa9bdff"
+  ],
+  "frames": [
+    "AAAAAAEBAQEBAQAAAAAAAAABAgICAgICAQAAAAAAAAEDAwMDAwQBAAAAAAABAQUFBQUFBQEBAAAAAAABBgcGBgYGAQAAAAAAAQYHBgYGBgYGAQAAAAEGCAYGBgYGBgYGAQABBggGBgYJCQkJBgYGAQEGCAYGCQoKCQkJBgYBAQYIBgkKCgkJCQkGBgEBBggGCQkJCQkJCQYLAQEGBgYJCQkJCQkJBgsBAQYGBgYJCQkJCQYGCwEBBgYGBgYGBgYGBgsLAQEGBgYGBgYGBgYGCwsBAAEGBgYGBgYGBgsLAQAAAAEBBgYGBgYGAQEAAAAAAAABAQEBAQEAAAAA"
+  ]
+}

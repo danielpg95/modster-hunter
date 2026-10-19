@@ -219,7 +219,7 @@ picks one in `/modsters`; it only changes how a throw looks.
 | `sprite.file` | yes | A `.sprite.json` in this folder. User content may name a `.png` sheet instead, as for a Modster |
 | `sprite.frames` | with a `.png` | Integer 1–16, as for a Modster. Required with a `.png`, an error with a `.sprite.json` |
 | `beats` | with `custom` | An object with any of the six beats below. With `contain` or `cover`, only what differs from the preset |
-| `glowIndex` | no | Integer 1–63: a palette index painted in the Modster's most common bright color. Must be inside the sprite's palette |
+| `glowIndex` | no | Integer 1–63: a palette index painted in the Modster's most common bright color while the Modster is inside, in beats where its `modster` is `hidden`. Otherwise it shows its own color, so draw it as the empty catcher. Must be inside the sprite's palette |
 | `rimIndex` | no | Integer 1–63: a palette index for the edge of a `stretch` shape. Must be inside the sprite's palette. Without it, a `stretch` shape has no edge |
 | `lidRows` | no | Integer 1–31: the closed frame's top rows that lift to open and fly off on a break, when those beats have no frames of their own. Must be less than the sprite's height |
 

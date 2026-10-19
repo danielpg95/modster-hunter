@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "lantern",
+  "name": "Lantern",
+  "description": "A brass lantern with a cold wick. A Modster inside lights its flame in its own color.",
+  "style": "contain",
+  "sprite": { "file": "sprite.sprite.json" },
+  "glowIndex": 7,
+  "lidRows": 7
+}

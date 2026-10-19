@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "pod",
+  "name": "Seed pod",
+  "description": "A husk that opens, swallows a Modster whole and snaps shut. Its seam glows with what's inside.",
+  "style": "contain",
+  "sprite": { "file": "sprite.sprite.json" },
+  "glowIndex": 8,
+  "lidRows": 9
+}

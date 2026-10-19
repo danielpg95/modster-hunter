@@ -44,11 +44,13 @@ export const CATCH = {
   hopPx: 3,
   /** A `dim` Modster's colors are mixed this far toward black */
   dimAmount: 0.5,
-  /** A `stretch` shape reaches this far past the Modster's outline */
+  /** A `stretch` shape reaches this far past the Modster's outline, within its area */
   stretchMarginPx: 2,
   /** Past this share of a `stretch` shape's radius, `rimIndex` draws the edge */
   rimFrom: 0.82,
-  sparkleColors: ['#ffffff', '#fff6b0'],
+  /** A catch's sparkles: a white center that glints on dark terminals, deep gold arms that show on light ones */
+  sparkleCore: '#ffffff',
+  sparkleArms: '#e0a800',
   /** Played when `prefs:catcher` is missing or names a catcher that didn't load (0035 point 10) */
   defaultCatcher: 'jar',
   /** `glowIndex` takes the Modster's most common color with summed RGB over this (half of full brightness) */
