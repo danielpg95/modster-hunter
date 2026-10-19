@@ -6,7 +6,7 @@ import { validateSettings } from './validate-settings'
 export interface ContentFolders {
   reader: ContentReader
   builtInRoot: string
-  /** The `includeBuiltins` option (decision 0007 point 5) */
+  /** The `includeBuiltins` option (decision 0007 point 5); built-in catchers load either way (decision 0035 point 1) */
   includeBuiltins: boolean
   /** The user's content folder; absent when the home folder is unknown */
   user?: { root: string; label: string; sheets: SheetLoader }
@@ -19,7 +19,7 @@ export interface ContentFolders {
 export async function loadAllContent(folders: ContentFolders): Promise<MergedContent> {
   const { reader, builtInRoot, includeBuiltins, user } = folders
   const [builtIn, userContent] = await Promise.all([
-    includeBuiltins ? loadFolder(reader, builtInRoot) : undefined,
+    loadFolder(reader, builtInRoot, includeBuiltins ? {} : { catchersOnly: true }),
     user ? loadFolder(reader, user.root, { label: user.label, sheets: user.sheets }) : emptyRegistry(),
   ])
   const settingsFile = `${user?.label ?? ''}settings.json`
@@ -27,7 +27,7 @@ export async function loadAllContent(folders: ContentFolders): Promise<MergedCon
   const settings = user ? await readSettings(reader, `${user.root}/settings.json`, settingsFile, settingsIssues) : undefined
 
   return mergeContent({
-    ...(builtIn ? { builtIn } : {}),
+    builtIn,
     user: { ...userContent, issues: [...userContent.issues, ...settingsIssues] },
     ...(settings ? { settings } : {}),
     settingsFile,
@@ -60,5 +60,5 @@ async function readSettings(reader: ContentReader, path: string, file: string, i
 }
 
 function emptyRegistry(): ContentRegistry {
-  return { biomes: new Map(), modsters: new Map(), issues: [] }
+  return { biomes: new Map(), modsters: new Map(), catchers: new Map(), issues: [] }
 }

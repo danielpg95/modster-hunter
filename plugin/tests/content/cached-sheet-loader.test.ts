@@ -5,7 +5,7 @@ import { encodePng } from '../fixtures/encode-png'
 const PNG_PATH = '/home/u/content/modsters/blobby/sprite.png'
 const CACHE = '/home/u/cache/sprites'
 const CACHE_FILE = `${CACHE}/blobby.sprite.json`
-const sheet = { path: PNG_PATH, file: 'modsters/blobby/sprite.png', modsterId: 'blobby', frames: 2 }
+const sheet = { path: PNG_PATH, file: 'modsters/blobby/sprite.png', cacheKey: 'blobby', frames: 2 }
 
 const samples = Array.from({ length: 16 * 8 }, (_, i) => (i % 3 === 0 ? 1 : 0))
 const PNG = encodePng({ width: 16, height: 8, colorType: 3, bitDepth: 2, samples, palette: [0, 0, 0, 9, 9, 9], transparency: [0] })
@@ -85,5 +85,19 @@ describe('cachedSheetLoader', () => {
     const result = await cachedSheetLoader(files, CACHE)({ ...sheet, frames: 3 })
     expect(result?.ok).toBe(false)
     expect(texts[CACHE_FILE]).toBeUndefined()
+  })
+
+  test("a catcher's sheet is cached under its own key and may have 16 frames (decision 0035)", async () => {
+    const wide = encodePng({ width: 128, height: 8, colorType: 3, bitDepth: 2, samples: Array.from({ length: 128 * 8 }, (_, i) => (i % 3 === 0 ? 1 : 0)), palette: [0, 0, 0, 9, 9, 9], transparency: [0] })
+    const { files, texts } = memoryFiles()
+    files.readBytes = async () => wide
+    const path = '/home/u/content/catchers/jar/sprite.png'
+    files.stat = async () => ({ size: wide.length, mtimeMs: 1 })
+    const result = await cachedSheetLoader(files, CACHE)({ path, file: 'catchers/jar/sprite.png', cacheKey: 'jar.catcher', frames: 16, maxFrames: 16 })
+    expect(result?.ok && result.value.frames.length).toBe(16)
+    expect(Object.keys(texts)).toEqual([`${CACHE}/jar.catcher.sprite.json`])
+    // The cached copy is read back with the same limit
+    const again = await cachedSheetLoader(files, CACHE)({ path, file: 'catchers/jar/sprite.png', cacheKey: 'jar.catcher', frames: 16, maxFrames: 16 })
+    expect(again?.ok && again.value.frames.length).toBe(16)
   })
 })

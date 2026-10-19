@@ -1,8 +1,9 @@
 import { CONTENT } from '../constants'
 import { checkBiomeReferences } from './check-biome-references'
 import { checkTierBalance } from './check-tier-balance'
-import type { Biome, ContentIssue, Modster, Sprite, Validation } from './types'
+import type { Biome, Catcher, ContentIssue, Modster, Sprite, Validation } from './types'
 import { validateBiome } from './validate-biome'
+import { checkCatcherSprite, validateCatcher } from './validate-catcher'
 import { validateModster } from './validate-modster'
 import { validateSprite } from './validate-sprite'
 
@@ -15,16 +16,21 @@ export interface ContentReader {
 }
 
 /**
- * Turns a Modster's PNG sheet into a sprite (decision 0016): undefined when
- * the PNG doesn't exist. May reject when it can't be read.
+ * Turns a Modster's or a catcher's PNG sheet into a sprite (decision 0016):
+ * undefined when the PNG doesn't exist. May reject when it can't be read.
+ * `cacheKey` names it among cached sheets: the Modster's id, or
+ * `<id>.catcher` for a catcher (ids have no dots, so they never clash).
+ * `maxFrames` is set for a catcher, whose sheet may have more (decision 0035).
  */
-export type SheetLoader = (sheet: { path: string; file: string; modsterId: string; frames: number }) => Promise<Validation<Sprite> | undefined>
+export type SheetLoader = (sheet: { path: string; file: string; cacheKey: string; frames: number; maxFrames?: number }) => Promise<Validation<Sprite> | undefined>
 
 export interface LoadOptions {
   /** Put before every file name in issues, so they say which folder, e.g. `~/.claude/modster-hunter/content/` */
   label?: string
-  /** Given for user content only: its Modsters may then name a PNG sheet */
+  /** Given for user content only: its Modsters and catchers may then name a PNG sheet */
   sheets?: SheetLoader
+  /** Load only the catchers: built-in catchers load even with `includeBuiltins` off (decision 0035 point 1) */
+  catchersOnly?: true
 }
 
 export interface LoadedModster {
@@ -40,10 +46,16 @@ export interface LoadedBiome {
   file: string
 }
 
+export interface LoadedCatcher {
+  catcher: Catcher
+  sprite: Sprite
+}
+
 /** Everything that loaded, by id, and every problem found on the way. */
 export interface ContentRegistry {
   biomes: Map<string, LoadedBiome>
   modsters: Map<string, LoadedModster>
+  catchers: Map<string, LoadedCatcher>
   issues: ContentIssue[]
 }
 
@@ -54,13 +66,14 @@ export async function loadContent(reader: ContentReader, root: string, options: 
 
 /**
  * Loads a content folder (docs/CONTENT_FORMAT.md layout): Modsters with their
- * sprites first, then biomes. Biome entries aren't checked against the
+ * sprites first, then biomes, then catchers. Biome entries aren't checked against the
  * Modsters yet; that runs after merging, in `resolveReferences`. A bad file is
  * skipped with its issues listed; this never rejects (decision 0007).
  */
 export async function loadFolder(reader: ContentReader, root: string, options: LoadOptions = {}): Promise<ContentRegistry> {
   const issues: ContentIssue[] = []
   const at: Folder = { reader, root, label: options.label ?? '', issues, ...(options.sheets ? { sheets: options.sheets } : {}) }
+  if (options.catchersOnly) return { biomes: new Map(), modsters: new Map(), catchers: await loadCatchers(at), issues }
 
   const modsterFolders = await listFolders(at, 'modsters')
   const modsters = new Map<string, LoadedModster>()
@@ -74,7 +87,7 @@ export async function loadFolder(reader: ContentReader, root: string, options: L
     if (loaded) biomes.set(loaded.biome.id, loaded)
   }
 
-  return { biomes, modsters, issues }
+  return { biomes, modsters, catchers: await loadCatchers(at), issues }
 }
 
 /**
@@ -93,7 +106,7 @@ export function resolveReferences(registry: ContentRegistry): ContentRegistry {
     issues.push(...checkTierBalance(biome, modsters, loaded.file))
     biomes.set(id, { ...loaded, biome })
   }
-  return { biomes, modsters: registry.modsters, issues }
+  return { biomes, modsters: registry.modsters, catchers: registry.catchers, issues }
 }
 
 /** Where a load is reading from, and where its issues go. */
@@ -114,7 +127,7 @@ async function loadModster(at: Folder, folder: string): Promise<LoadedModster | 
   if (!modster) return undefined
 
   const spriteFile = `modsters/${folder}/${modster.sprite.file}`
-  const sprite = modster.sprite.frames === undefined ? await loadSpriteJson(at, spriteFile) : await loadSheet(at, spriteFile, modster)
+  const sprite = await loadSprite(at, spriteFile, modster.sprite.frames, { cacheKey: modster.id })
   if (!sprite) {
     // A Modster can't appear without its sprite, so it's skipped too
     at.issues.push(issueFor(at.label + file, 'sprite.file', `points to a sprite that didn't load: ${at.label + spriteFile}`))
@@ -123,17 +136,50 @@ async function loadModster(at: Folder, folder: string): Promise<LoadedModster | 
   return { modster, sprite }
 }
 
-async function loadSpriteJson(at: Folder, file: string): Promise<Sprite | undefined> {
-  const json = await readJson(at, file)
-  return json && keep(validateSprite(json.value, { file: at.label + file }), at.issues)
+async function loadCatchers(at: Folder): Promise<Map<string, LoadedCatcher>> {
+  const catchers = new Map<string, LoadedCatcher>()
+  for (const loaded of await Promise.all((await listFolders(at, 'catchers')).map((folder) => loadCatcher(at, folder)))) {
+    if (loaded) catchers.set(loaded.catcher.id, loaded)
+  }
+  return catchers
 }
 
-/** A PNG sheet, through the sheet loader; `frames` is only set when the validator allowed a PNG. */
-async function loadSheet(at: Folder, file: string, modster: Modster): Promise<Sprite | undefined> {
-  if (!at.sheets || modster.sprite.frames === undefined) return undefined
+async function loadCatcher(at: Folder, folder: string): Promise<LoadedCatcher | undefined> {
+  const file = `catchers/${folder}/catcher.json`
+  const shownFile = at.label + file
+  const json = await readJson(at, file)
+  const userContent = at.sheets !== undefined
+  const catcher = json && keep(validateCatcher(json.value, { file: shownFile, folder, userContent }), at.issues)
+  if (!catcher) return undefined
+
+  const spriteFile = `catchers/${folder}/${catcher.sprite.file}`
+  const maxFrames = CONTENT.catcher.framesMax
+  const sprite = await loadSprite(at, spriteFile, catcher.sprite.frames, { cacheKey: `${catcher.id}.catcher`, maxFrames })
+  if (!sprite) {
+    at.issues.push(issueFor(shownFile, 'sprite.file', `points to a sprite that didn't load: ${at.label + spriteFile}`))
+    return undefined
+  }
+  const spriteIssues = checkCatcherSprite(catcher, sprite, shownFile)
+  at.issues.push(...spriteIssues)
+  return spriteIssues.length === 0 ? { catcher, sprite } : undefined
+}
+
+/** A `.sprite.json`, or a PNG sheet when `frames` is set (only when the validator allowed a PNG). */
+async function loadSprite(at: Folder, file: string, frames: number | undefined, sheet: { cacheKey: string; maxFrames?: number }): Promise<Sprite | undefined> {
+  return frames === undefined ? loadSpriteJson(at, file, sheet.maxFrames) : loadSheet(at, file, frames, sheet)
+}
+
+async function loadSpriteJson(at: Folder, file: string, maxFrames?: number): Promise<Sprite | undefined> {
+  const json = await readJson(at, file)
+  return json && keep(validateSprite(json.value, { file: at.label + file, ...(maxFrames === undefined ? {} : { maxFrames }) }), at.issues)
+}
+
+/** A PNG sheet, through the sheet loader. */
+async function loadSheet(at: Folder, file: string, frames: number, sheet: { cacheKey: string; maxFrames?: number }): Promise<Sprite | undefined> {
+  if (!at.sheets) return undefined
   let result: Validation<Sprite> | undefined
   try {
-    result = await at.sheets({ path: `${at.root}/${file}`, file: at.label + file, modsterId: modster.id, frames: modster.sprite.frames })
+    result = await at.sheets({ path: `${at.root}/${file}`, file: at.label + file, frames, ...sheet })
   } catch (error) {
     at.issues.push(issueFor(at.label + file, '', `could not be read: ${errorMessage(error)}`))
     return undefined

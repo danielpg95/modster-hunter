@@ -10,7 +10,7 @@ export function checkReport(registry: ContentRegistry): { lines: string[]; error
   const warnings = registry.issues.length - errors
   const count = (n: number, one: string) => `${n} ${one}${n === 1 ? '' : 's'}`
   const summary = [
-    `${count(registry.biomes.size, 'biome')} and ${count(registry.modsters.size, 'Modster')} load`,
+    `${count(registry.biomes.size, 'biome')}, ${count(registry.modsters.size, 'Modster')} and ${count(registry.catchers.size, 'catcher')} load`,
     `${count(errors, 'error')}, ${count(warnings, 'warning')}`,
   ].join('; ')
   return { lines: [...registry.issues.map(formatIssue), summary], errors }

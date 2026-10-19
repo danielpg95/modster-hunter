@@ -1473,7 +1473,7 @@ async function loadGameContent($: EngineInterface, includeBuiltins: boolean): Pr
   })
   const ms = Math.round(performance.now() - started)
   for (const issue of registry.issues) $.ui.log(formatIssue(issue), { to: 'debug' })
-  const summary = `${registry.biomes.size} biomes, ${registry.modsters.size} Modsters, ${registry.issues.length} issues`
+  const summary = `${registry.biomes.size} biomes, ${registry.modsters.size} Modsters, ${registry.catchers.size} catchers, ${registry.issues.length} issues`
   $.ui.log(`content: ${summary} in ${ms} ms`, { to: 'debug' })
   return registry
 }

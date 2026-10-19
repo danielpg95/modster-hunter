@@ -22,34 +22,34 @@ interface Source {
 }
 
 /**
- * Loads PNG sheets through a cache in `cacheFolder`, one `<modster-id>.sprite.json`
+ * Loads PNG sheets through a cache in `cacheFolder`, one `<cacheKey>.sprite.json`
  * each (decision 0016 point 7). The cache is used only when the PNG's size,
  * mtime and frame count match and its sprite still validates. A cache that
  * can't be read or written is ignored: the PNG is decoded instead.
  */
 export function cachedSheetLoader(files: SheetFiles, cacheFolder: string): SheetLoader {
-  return async ({ path, file, modsterId, frames }) => {
+  return async ({ path, file, cacheKey, frames, maxFrames }) => {
     const stat = await files.stat(path)
     if (!stat) return undefined
     const source: Source = { size: stat.size, mtimeMs: stat.mtimeMs, frames }
-    const cachePath = `${cacheFolder}/${modsterId}.sprite.json`
+    const cachePath = `${cacheFolder}/${cacheKey}.sprite.json`
 
-    const cached = await readCache(files, cachePath, source, file)
+    const cached = await readCache(files, cachePath, source, file, maxFrames)
     if (cached) return { ok: true, value: cached, issues: [] }
 
-    const result = spriteFromPng(await files.readBytes(path), frames, file)
+    const result = spriteFromPng(await files.readBytes(path), frames, file, maxFrames)
     if (result.ok) await writeCache(files, cachePath, source, result.value)
     return result
   }
 }
 
-async function readCache(files: SheetFiles, cachePath: string, source: Source, file: string): Promise<Sprite | undefined> {
+async function readCache(files: SheetFiles, cachePath: string, source: Source, file: string, maxFrames: number | undefined): Promise<Sprite | undefined> {
   try {
     const text = await files.readText(cachePath)
     if (text === undefined) return undefined
     const entry: unknown = JSON.parse(text)
     if (!isObject(entry) || entry.v !== USER_CONTENT.spriteCacheVersion || !sameSource(entry.source, source)) return undefined
-    const sprite: Validation<Sprite> = validateSprite(entry.sprite, { file })
+    const sprite: Validation<Sprite> = validateSprite(entry.sprite, { file, ...(maxFrames === undefined ? {} : { maxFrames }) })
     return sprite.ok ? sprite.value : undefined
   } catch {
     return undefined

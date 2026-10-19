@@ -193,7 +193,7 @@ async function check(argv) {
       root,
       label,
       // No PNG cache: check writes nothing
-      sheets: async ({ path, file, frames }) => (existsSync(path) ? spriteFromPng(new Uint8Array(readFileSync(path)), frames, file) : undefined),
+      sheets: async ({ path, file, frames, maxFrames }) => (existsSync(path) ? spriteFromPng(new Uint8Array(readFileSync(path)), frames, file, maxFrames) : undefined),
     },
   })
   const { lines, errors } = checkReport(registry)

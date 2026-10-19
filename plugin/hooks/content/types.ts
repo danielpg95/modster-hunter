@@ -78,6 +78,37 @@ export interface Sprite {
   frames: string[]
 }
 
+export type CatcherStyle = (typeof CONTENT.catcher.styles)[number]
+export type CatcherBeatName = (typeof CONTENT.catcher.beats)[number]
+export type CatcherPlace = (typeof CONTENT.catcher.places)[number]
+export type CatcherModsterAction = (typeof CONTENT.catcher.modsterActions)[number]
+export type CatcherPath = (typeof CONTENT.catcher.paths)[number]
+
+/** One beat of a throw as the file gives it; missing fields come from the style's preset (decision 0035 point 4). */
+export interface CatcherBeat {
+  /** Sprite frame indexes, played evenly over the beat */
+  frames?: number[]
+  place?: CatcherPlace
+  modster?: CatcherModsterAction
+  /** `throw` only */
+  path?: CatcherPath
+}
+
+/** A throw animation (decision 0035). Frame 0 of its sprite is the closed catcher. */
+export interface Catcher {
+  schemaVersion: 1
+  id: string
+  name: string
+  description?: string
+  style: CatcherStyle
+  /** As a Modster's, without `fps`: beat lengths are fixed (0035 point 5) */
+  sprite: { file: string; frames?: number }
+  beats?: Partial<Record<CatcherBeatName, CatcherBeat>>
+  glowIndex?: number
+  rimIndex?: number
+  lidRows?: number
+}
+
 /** User `settings.json` (user folder only). */
 export interface UserSettings {
   schemaVersion: 1

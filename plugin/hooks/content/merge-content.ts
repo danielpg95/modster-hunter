@@ -1,5 +1,5 @@
 import { fieldPath } from './fields'
-import type { ContentRegistry, LoadedBiome, LoadedModster } from './load-content'
+import type { ContentRegistry, LoadedBiome, LoadedCatcher, LoadedModster } from './load-content'
 import { resolveReferences } from './load-content'
 import type { ContentIssue, UserSettings } from './types'
 
@@ -7,12 +7,12 @@ import type { ContentIssue, UserSettings } from './types'
 export interface MergedContent extends ContentRegistry {
   /** Loaded but turned off in `settings.json`: kept aside for the pane, never played (0032 point 5) */
   off: { biomes: Map<string, LoadedBiome>; modsters: Map<string, LoadedModster> }
-  /** Ids that loaded from the user folder, on or off; the pane offers delete only for these (0032 point 7) */
-  userIds: { biomes: Set<string>; modsters: Set<string> }
+  /** Ids that loaded from the user folder, on or off; the pane offers delete only for these (0032 point 7, 0035 point 9) */
+  userIds: { biomes: Set<string>; modsters: Set<string>; catchers: Set<string> }
 }
 
 export interface ContentSources {
-  /** Absent when `includeBuiltins` is off (decision 0007 point 5) */
+  /** With `includeBuiltins` off, only its catchers (decision 0035 point 1), or absent */
   builtIn?: ContentRegistry
   user: ContentRegistry
   settings?: UserSettings
@@ -26,7 +26,8 @@ export interface ContentSources {
  * built-in's dex number (decision 0017); ids in `disabledBiomes` and
  * `disabledModsters` are set aside in `off` (0032); then biome entries are
  * checked against the Modsters left. An entry naming a Modster that's off is
- * dropped quietly (0032 point 6). A user file that failed to load replaces nothing.
+ * dropped quietly (0032 point 6). Catchers merge by id too, and are never off
+ * (decision 0035 point 9). A user file that failed to load replaces nothing.
  */
 export function mergeContent(sources: ContentSources): MergedContent {
   const { builtIn, user, settings, settingsFile } = sources
@@ -35,6 +36,7 @@ export function mergeContent(sources: ContentSources): MergedContent {
   const modsters = new Map<string, LoadedModster>(builtIn?.modsters ?? [])
   for (const [id, loaded] of user.modsters) modsters.set(id, keepDexNumber(loaded, modsters.get(id)))
   const biomes = new Map<string, LoadedBiome>([...(builtIn?.biomes ?? []), ...user.biomes])
+  const catchers = new Map<string, LoadedCatcher>([...(builtIn?.catchers ?? []), ...user.catchers])
 
   const offModsters = disable(modsters, settings?.disabledModsters, 'disabledModsters', 'a Modster', settingsFile, issues)
   const offBiomes = disable(biomes, settings?.disabledBiomes, 'disabledBiomes', 'a biome', settingsFile, issues)
@@ -42,9 +44,9 @@ export function mergeContent(sources: ContentSources): MergedContent {
   for (const [id, loaded] of offBiomes) offBiomes.set(id, withoutModsters(loaded, offModsters))
 
   return {
-    ...resolveReferences({ biomes, modsters, issues }),
+    ...resolveReferences({ biomes, modsters, catchers, issues }),
     off: { biomes: offBiomes, modsters: offModsters },
-    userIds: { biomes: new Set(user.biomes.keys()), modsters: new Set(user.modsters.keys()) },
+    userIds: { biomes: new Set(user.biomes.keys()), modsters: new Set(user.modsters.keys()), catchers: new Set(user.catchers.keys()) },
   }
 }
 

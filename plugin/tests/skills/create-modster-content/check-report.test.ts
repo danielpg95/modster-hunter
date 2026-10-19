@@ -2,7 +2,7 @@ import { describe, expect, test } from 'claude-code/testing'
 import type { ContentRegistry } from '../../../hooks/content'
 import { checkReport } from '../../../skills/create-modster-content/scripts/lib'
 
-const empty: ContentRegistry = { biomes: new Map(), modsters: new Map(), issues: [] }
+const empty: ContentRegistry = { biomes: new Map(), modsters: new Map(), catchers: new Map(), issues: [] }
 
 describe('checkReport', () => {
   test('every issue, then a summary; errors counted for the exit code', () => {
@@ -17,13 +17,13 @@ describe('checkReport', () => {
       lines: [
         '~/c/modsters/a/modster.json: name is required',
         '~/c/modsters/a/sprite.sprite.json: palette[0] should be transparent (warning)',
-        '0 biomes and 0 Modsters load; 1 error, 1 warning',
+        '0 biomes, 0 Modsters and 0 catchers load; 1 error, 1 warning',
       ],
       errors: 1,
     })
   })
 
   test('a clean folder is one line and no errors', () => {
-    expect(checkReport(empty)).toEqual({ lines: ['0 biomes and 0 Modsters load; 0 errors, 0 warnings'], errors: 0 })
+    expect(checkReport(empty)).toEqual({ lines: ['0 biomes, 0 Modsters and 0 catchers load; 0 errors, 0 warnings'], errors: 0 })
   })
 })
