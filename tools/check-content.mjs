@@ -8,12 +8,16 @@
 // biome has a common, an uncommon and a rare Modster, at least one legendary
 // across all biomes, and every sprite has 2–4 frames. Every built-in Modster
 // also needs a complete dex with a unique number (decision 0017 point 4).
+// Every built-in catcher fits every built-in Modster's sprite area and has a
+// credits row, and the default catcher ships (decision 0035).
 import './ts-resolve.mjs'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 const { loadContent, formatIssue } = await import('../plugin/hooks/content/index.ts')
 const { oddsTable, formatOddsTable } = await import('../plugin/hooks/game/index.ts')
+const { prepareCatch } = await import('../plugin/hooks/render/index.ts')
+const { CATCH, CONTENT } = await import('../plugin/hooks/constants.ts')
 
 const root = fileURLToPath(new URL('../plugin/content', import.meta.url))
 const reader = {
@@ -59,7 +63,17 @@ for (const [id, { modster }] of content.modsters) {
   else numbers.set(number, id)
 }
 
-console.log(`\n${content.biomes.size} biomes, ${content.modsters.size} Modsters`)
+const credits = readFileSync(new URL('../plugin/content/CREDITS.md', import.meta.url), 'utf8')
+if (!content.catchers.has(CATCH.defaultCatcher)) problems.push(`catchers/${CATCH.defaultCatcher}: the default catcher must ship (0035 point 10)`)
+for (const [id, { catcher, sprite }] of content.catchers) {
+  const tooSmall = [...content.modsters.values()].filter(
+    (loaded) => !prepareCatch(catcher, sprite, loaded.sprite, loaded.modster.sprite.fps ?? CONTENT.modster.defaultFps).fits,
+  )
+  if (tooSmall.length > 0) problems.push(`catchers/${id}: doesn't fit ${tooSmall.map((loaded) => loaded.modster.id).join(', ')}; built-in catchers fit every built-in Modster (P5-29)`)
+  if (!credits.includes(`\`catchers/${id}/sprite.png\``)) problems.push(`catchers/${id}: no row in plugin/content/CREDITS.md`)
+}
+
+console.log(`\n${content.biomes.size} biomes, ${content.modsters.size} Modsters, ${content.catchers.size} catchers`)
 for (const line of warnings) console.log(`warning: ${line}`)
 for (const line of problems) console.error(`error: ${line}`)
 process.exit(problems.length > 0 ? 1 : 0)
