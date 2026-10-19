@@ -24,7 +24,10 @@ export interface CatchArt {
   height: number
   modster: Art
   modsterFps: number
+  /** As drawn; `glowIndex` keeps its own color */
   catcher: Art
+  /** With `glowIndex` in the Modster's color, shown while the Modster is inside (beats where it's `hidden`) */
+  lit: Art
   beats: ResolvedBeats
   lidRows: number
   rim?: number[]
@@ -34,12 +37,13 @@ export interface CatchArt {
   fits: boolean
 }
 
-/** Decodes the art; `glowIndex` takes the Modster's most common bright color. */
+/** Decodes the art, plus a lit copy where `glowIndex` takes the Modster's most common bright color. */
 export function prepareCatch(catcher: Catcher, catcherSprite: Sprite, modsterSprite: Sprite, modsterFps: number): CatchArt {
   const modster: Art = { width: modsterSprite.width, height: modsterSprite.height, frames: spriteRgba(modsterSprite) }
+  const art: Art = { width: catcherSprite.width, height: catcherSprite.height, frames: spriteRgba(catcherSprite) }
   const palette = [...catcherSprite.palette]
   if (catcher.glowIndex !== undefined) palette[catcher.glowIndex] = mainColor(modster)
-  const art: Art = { width: catcherSprite.width, height: catcherSprite.height, frames: spriteRgba(catcherSprite, palette) }
+  const lit: Art = catcher.glowIndex === undefined ? art : { ...art, frames: spriteRgba(catcherSprite, palette) }
   const beats = resolveBeats(catcher)
   const anchored = Object.values(beats).some((beat) => beat.place !== 'stretch')
   const rimColor = catcher.rimIndex === undefined ? undefined : catcherSprite.palette[catcher.rimIndex]
@@ -49,6 +53,7 @@ export function prepareCatch(catcher: Catcher, catcherSprite: Sprite, modsterSpr
     modster,
     modsterFps,
     catcher: art,
+    lit,
     beats,
     lidRows: catcher.lidRows ?? 0,
     ...(rimColor ? { rim: rgbaOf(rimColor).slice(0, 3) } : {}),
@@ -151,11 +156,15 @@ function drawCatcher(canvas: Canvas, art: CatchArt, beat: ResolvedBeat, at: Catc
   else drawAnchored(canvas, art, beat, at, frame)
 }
 
-/** The frame a beat shows now: its own frames spread over the beat, or frame 0 when the preset makes them. */
+/**
+ * The frame a beat shows now: its own frames spread over the beat, or frame 0
+ * when the preset makes them. It glows only while the Modster is inside it.
+ */
 function beatFrame(art: CatchArt, beat: ResolvedBeat, at: CatchBeatAt): Uint8Array {
   const list = beat.frames ?? [0]
   const index = list[Math.min(list.length - 1, Math.floor(at.progress * list.length))] ?? 0
-  return art.catcher.frames[index] ?? art.catcher.frames[0] ?? new Uint8Array()
+  const { frames } = beat.modster === 'hidden' ? art.lit : art.catcher
+  return frames[index] ?? frames[0] ?? new Uint8Array()
 }
 
 /** The catcher's resting place: bottom center of the area. */

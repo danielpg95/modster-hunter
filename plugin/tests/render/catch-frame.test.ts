@@ -162,12 +162,20 @@ describe('catchFrame', () => {
     ])
   })
 
+  test('glowIndex keeps its own color until the Modster is inside: empty on the throw and the take, lit once it hides', () => {
+    const art = prepare({ glowIndex: 3, beats: { throw: { path: 'none' } } })
+    // The glow spot sits at x 7–8, y 12–13 of the resting catcher
+    expect(pixel(catchFrame(art, 'caught', 3, 0), 7, 12)).toBe('#123456')
+    expect(pixel(catchFrame(art, 'caught', 3, SETTLE + 100), 7, 12)).toBe(YELLOW)
+    expect(pixel(catchFrame(art, 'missed', 1, BROKEN + 300), 7, 12)).not.toBe(YELLOW)
+  })
+
   test('caught: sparkles burst around the catcher, then stop; the catcher stays', () => {
     const art = prepare()
     const burst = catchFrame(art, 'caught', 3, CAUGHT + 200)
-    expect(where(burst, '#fff6b0').length > 0).toBe(true)
+    expect(where(burst, '#e0a800').length > 0).toBe(true)
     const after = catchFrame(art, 'caught', 3, CAUGHT + 5000)
-    expect(where(after, '#fff6b0').length).toBe(0)
+    expect(where(after, '#e0a800').length).toBe(0)
     expect(where(after, BLUE).length > 0).toBe(true)
     expect(where(after, GREEN).length).toBe(0)
   })

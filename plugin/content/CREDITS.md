@@ -42,3 +42,4 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `biomes/crystal-grotto/background.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Idle scene (decision 0026) |
 
 The `.sprite.json` next to each sheet is generated from it with `npm run sprite`.
+| `catchers/jar/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Glass jar, the default catcher (decision 0035); P5-29 |
