@@ -663,16 +663,16 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] It says whether the catcher fits the sprite area, so callers can fall back to the dot count (0035 point 8).
   - [x] The beat lengths of 0035 point 5 live in `constants.ts`.
 
-#### [ ] P5-29 — Built-in catchers
+#### [x] P5-29 — Built-in catchers
 - **Depends on:** P5-28
 - **Size:** M
 - **Goal:** the four built-in catchers from issue #129 ship in `plugin/content/catchers/`: `jar`, `pod`, `lantern` and `net` (decision 0035 point 13).
 - **Done when:**
-  - [ ] Each has `catcher.json` and pixel art drawn as a proper sprite, not code: the jar's glow, the pod's seam and the lantern's flame use `glowIndex`, and the net is a `cover` tile with a rim. Each fits the smallest built-in Modster's sprite area (Dunebun, 22×20).
-  - [ ] `plugin/content/CREDITS.md` lists each catcher.
-  - [ ] `npm run check:content` passes.
-  - [ ] Checked by hand with @danielpg95 in a real terminal, on a dark and a light theme: each catcher plays in the band and the encounter pane through a catch and a miss (moved from P5-32).
-  - [ ] A preview GIF of each catcher (a catch and both kinds of miss, dark and light) is in `docs/previews/catchers/`, and the PR description shows them.
+  - [x] Each has `catcher.json` and pixel art drawn as a proper sprite, not code: the jar's glow, the pod's seam and the lantern's flame use `glowIndex`, and the net is a `cover` tile with a rim. Each fits the smallest built-in Modster's sprite area (Dunebun, 22×20).
+  - [x] `plugin/content/CREDITS.md` lists each catcher.
+  - [x] `npm run check:content` passes.
+  - [x] Checked by hand by @danielpg95 in a real terminal with the default jar, which they judged enough (2026-10-19). The other three were checked in the preview GIFs (moved from P5-32).
+  - [x] A preview GIF of each catcher (a catch and both kinds of miss, dark and light) is in `docs/previews/catchers/`, and the PR description shows them.
 
 #### [ ] P5-30 — Catchers tab
 - **Depends on:** P5-29, P3-01
