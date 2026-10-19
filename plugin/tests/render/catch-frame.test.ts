@@ -1,7 +1,8 @@
 import { describe, expect, test } from 'claude-code/testing'
 import { CATCH } from '../../hooks/constants'
 import type { Catcher, Sprite } from '../../hooks/content'
-import { catchFrame, prepareCatch, throwingMs, type CatchArt, type Frame } from '../../hooks/render'
+import { throwingMs } from '../../hooks/game'
+import { catchFrame, prepareCatch, type CatchArt, type Frame } from '../../hooks/render'
 import { encodeFrame } from '../fixtures/encode-frame'
 
 // A 16×16 Modster: a green block (x 4–11, y 6–15) with a 2×2 yellow spot that

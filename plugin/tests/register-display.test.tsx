@@ -2,6 +2,11 @@ import { describe, expect, mock, test } from 'claude-code/testing'
 import type { On, UiPane } from 'claude-code'
 import { oneModsterForest } from './fixtures/one-modster-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
+import { CATCH } from '../hooks/constants'
+import { throwingMs } from '../hooks/game'
+
+// A throw that lands plays the whole catch animation (decision 0035); a miss is shorter
+const CATCH_THROW_MS = throwingMs('caught', CATCH.rocksToCatch)
 
 // Display settings (decision 0023): band, encounter pane, spinner and status line,
 // each on and off. The one-Modster forest spawns after 3 s of work and always
@@ -86,7 +91,7 @@ describe('register: display settings', () => {
 
     await clock.advance(1_000)
     await band.press({ key: 'throw' })
-    await clock.advance(1_500 + 250)
+    await clock.advance(CATCH_THROW_MS + 250)
     await spinner.redraw()
     expect(last(seen.spinner)).toBe('Caught Sproutling!')
     await spinner.unmount()
@@ -127,7 +132,7 @@ describe('register: display settings', () => {
     expect(last(seen.statuses)).toBe('Sproutling (common) · 3 left · 1: Throw in the band or pane')
 
     await band.press({ key: 'throw' })
-    await clock.advance(1_500 + 250)
+    await clock.advance(CATCH_THROW_MS + 250)
     expect(last(seen.statuses)).toBe('Caught Sproutling!')
     await clock.advance(4_000)
     expect(last(seen.statuses)).toBeUndefined()
@@ -167,7 +172,7 @@ describe('register: display settings', () => {
     expect(await band.find({ type: 'Button', key: 'throw' })).toBeDefined()
 
     await band.press({ key: 'throw' })
-    await clock.advance(1_500 + 250)
+    await clock.advance(CATCH_THROW_MS + 250)
     expect(await band.find({ type: 'Text', text: 'Caught Sproutling!' })).toBeDefined()
     expect(seen.store['caught:sproutling']).toMatchObject({ count: 1 })
     await band.unmount()

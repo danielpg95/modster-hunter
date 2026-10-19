@@ -1,7 +1,7 @@
 import { CATCH } from '../constants'
 import type { Catcher, Sprite } from '../content'
 import { resolveBeats, type ResolvedBeat, type ResolvedBeats } from './catch-beats'
-import { catchBeatAt, type CatchBeatAt, type CatchOutcome } from './catch-timeline'
+import { catchBeatAt, type CatchBeatAt, type CatchOutcome } from '../game'
 import type { Frame } from './pixels-to-cells'
 import { rgbaOf, spriteRgba } from './sprite-cells'
 

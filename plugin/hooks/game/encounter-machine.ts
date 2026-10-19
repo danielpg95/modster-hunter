@@ -1,5 +1,6 @@
-import { CONTENT, ENCOUNTER } from '../constants'
+import { CATCH, CONTENT, ENCOUNTER } from '../constants'
 import type { Biome, Modster, Rarity } from '../content'
+import { throwingMs } from './catch-timeline'
 import { encounterPool, pickEncounter } from './pick-encounter'
 import type { RandomSource } from './random-source'
 import { resolveCatchOdds } from './resolve-catch-odds'
@@ -9,8 +10,8 @@ import { resolveCatchOdds } from './resolve-catch-odds'
 // randomness comes from `ctx.random` (decision 0003).
 //
 //   idle ─(work time reaches the next spawn)→ appearing ─1 s→ waiting
-//   waiting ─throw→ throwing ─1.5 s→ caught → result
-//                                   └→ missed → waiting, or fled → result when no attempts are left
+//   waiting ─throw→ throwing ─catch animation→ caught → result
+//                                               └→ missed → waiting, or fled → result when no attempts are left
 //   waiting ─run→ ran → result (0020)
 //   appearing/waiting ─idle timeout→ fled → result ─4 s→ idle
 //
@@ -39,8 +40,12 @@ export interface Encounter {
   phaseEndsAt: number
   /** Start of the idle-timeout window: appearance, the last throw, or the last turn start */
   idleSince: number
-  /** Rolled when the throw is made; revealed when the wobble ends */
+  /** Rolled when the throw is made; revealed when the catch animation ends */
   throwLands?: boolean
+  /** How many times the catcher rocks: 3 for a catch, 1 or 2 for a miss (decision 0035 point 6) */
+  rocks?: number
+  /** When the throw was made, to time its animation; kept into a catch's result card, where the `caught` beat plays */
+  throwAt?: number
   outcome?: 'caught' | 'fled' | 'ran'
   fledBecause?: 'attempts' | 'idle'
 }
@@ -121,17 +126,22 @@ export function stepEncounter(state: EncounterState, input: EncounterInput, ctx:
       if (Object.values(next.agents).some((startedAt) => agentEnd(startedAt) <= input.now)) next = settle(next, input.now)
       break
     case 'throw':
-      // Only while waiting; presses during appearing or the wobble are ignored (0014)
+      // Only while waiting; presses during appearing or the catch animation are ignored (0014)
       if (next.encounter?.phase === 'waiting') {
         const encounter = next.encounter
+        const lands = ctx.random() < encounter.catchRate
+        // A miss breaks free after 1 or 2 rocks, so the rock count hints at the result (0035 point 6)
+        const rocks = lands ? CATCH.rocksToCatch : 1 + Math.floor(ctx.random() * (CATCH.rocksToCatch - 1))
         next = {
           ...next,
           encounter: {
             ...encounter,
             phase: 'throwing',
             attemptsLeft: encounter.attemptsLeft - 1,
-            phaseEndsAt: input.now + ENCOUNTER.throwingMs,
-            throwLands: ctx.random() < encounter.catchRate,
+            phaseEndsAt: input.now + throwingMs(lands ? 'caught' : 'missed', rocks),
+            throwLands: lands,
+            rocks,
+            throwAt: input.now,
           },
         }
       }
@@ -218,7 +228,7 @@ function resolveDuePhase(state: EncounterState, now: number, ctx: EncounterConte
         return toResult(state, encounter, 'fled', 'attempts', at)
       }
       events.push({ type: 'missed', modsterId: encounter.modsterId, attemptsLeft: encounter.attemptsLeft })
-      const { throwLands: _rolled, ...rest } = encounter
+      const { throwLands: _rolled, rocks: _rocks, throwAt: _at, ...rest } = encounter
       return { ...state, encounter: { ...rest, phase: 'waiting', idleSince: at } }
     }
     case 'result':
@@ -237,8 +247,10 @@ function toResult(
   because: 'attempts' | 'idle' | undefined,
   at: number,
 ): EncounterState {
-  const { throwLands: _rolled, ...rest } = encounter
+  const { throwLands: _rolled, rocks, throwAt, ...rest } = encounter
   const result: Encounter = { ...rest, phase: 'result', outcome, phaseEndsAt: at + ENCOUNTER.resultMs }
+  // A catch's card opens with the catcher's `caught` beat, timed from the throw (0035 point 6)
+  if (outcome === 'caught' && rocks !== undefined && throwAt !== undefined) Object.assign(result, { rocks, throwAt })
   if (because) result.fledBecause = because
   return { ...state, encounter: result }
 }

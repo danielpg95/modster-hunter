@@ -3,7 +3,6 @@ export { displayPlan, type DisplayPlan, type DisplayState } from './display-plan
 export { readDisplaySettings, type DisplaySettings, type EncounterPaneMode } from './display-settings'
 export { resolveBeats, type ResolvedBeat, type ResolvedBeats } from './catch-beats'
 export { catchFrame, prepareCatch, type CatchArt } from './catch-frame'
-export { catchBeatAt, throwingMs, type CatchBeatAt, type CatchOutcome } from './catch-timeline'
 export { DEFAULT_COLOR, pixelsToCells, type Frame } from './pixels-to-cells'
 export { paneHint, type PaneHintInput } from './pane-hint'
 export { rgbaOf, spriteCells, spriteRgba } from './sprite-cells'

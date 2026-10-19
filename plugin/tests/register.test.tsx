@@ -8,6 +8,11 @@ import { validBiome } from './fixtures/valid-biome'
 import { validModster } from './fixtures/valid-modster'
 import { validUserModster } from './fixtures/valid-user-modster'
 import { validSprite } from './fixtures/valid-sprite'
+import { CATCH } from '../hooks/constants'
+import { throwingMs } from '../hooks/game'
+
+// A throw that lands plays the whole catch animation (decision 0035); a miss is shorter
+const CATCH_THROW_MS = throwingMs('caught', CATCH.rocksToCatch)
 
 /** A user folder (paths under ~/.claude/modster-hunter/) with one biome whose Modster is a 2-frame PNG sheet. */
 function userPngMeadow(): Record<string, string> {
@@ -139,7 +144,7 @@ describe('register', () => {
     expect(await ui.find({ type: 'Text', text: 'wobble… wobble…' })).toBeDefined()
     expect(await ui.find({ type: 'Button', key: 'throw' })).toBeUndefined()
 
-    await clock.advance(1_500)
+    await clock.advance(CATCH_THROW_MS)
     expect(await ui.find({ type: 'Text', text: 'Caught Sproutling!' })).toBeDefined()
 
     await clock.advance(4_000)
@@ -247,7 +252,7 @@ describe('register', () => {
 
     await $.turn.complete({ reason: 'answer', answer: 'ok', durationMs: 1 } as any)
     await ui.press({ key: 'throw' })
-    await clock.advance(1_500 + 4_000 + BAND_TICK)
+    await clock.advance(CATCH_THROW_MS + 4_000 + BAND_TICK)
     expect(await ui.find({ type: 'Raster', key: 'scene' })).toBeDefined()
     await ui.unmount()
   })
@@ -281,7 +286,7 @@ describe('register', () => {
     await clock.advance(4_000 + BAND_TICK)
     await $.turn.complete({ reason: 'answer', answer: 'ok', durationMs: 1 } as any)
     await ui.press({ key: 'throw' })
-    await clock.advance(1_500 + BAND_TICK)
+    await clock.advance(CATCH_THROW_MS + BAND_TICK)
     expect(await ui.find({ type: 'Text', text: 'Caught Sproutling!' })).toBeDefined()
     await clock.advance(4_000)
     expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeDefined()
@@ -304,7 +309,7 @@ describe('register', () => {
     await clock.advance(4_000 + BAND_TICK)
     await $.turn.complete({ reason: 'answer', answer: 'ok', durationMs: 1 } as any)
     await ui.press({ key: 'throw' })
-    await clock.advance(1_500 + BAND_TICK)
+    await clock.advance(CATCH_THROW_MS + BAND_TICK)
     expect(await ui.find({ type: 'Text', text: 'wobble… wobble…' })).toBeUndefined()
     if (!(await ui.find({ type: 'Text', text: 'Caught Sproutling!' }))) {
       expect(await ui.find({ type: 'Text', text: '2 throws left' })).toBeDefined()
@@ -365,7 +370,7 @@ describe('register', () => {
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await clock.advance(4_000 + BAND_TICK)
     await ui.press({ key: 'throw' })
-    await clock.advance(1_500 + BAND_TICK)
+    await clock.advance(CATCH_THROW_MS + BAND_TICK)
 
     // What the mod wrote, read back through the same in-memory store
     expect(store['caught:sproutling']).toMatchObject({
@@ -409,7 +414,7 @@ describe('register', () => {
     await clock.advance(4_000 + BAND_TICK)
     expect(await ui.find({ type: 'Text', text: /●/ })).toBeUndefined()
     await ui.press({ key: 'throw' })
-    await clock.advance(1_500 + BAND_TICK)
+    await clock.advance(CATCH_THROW_MS + BAND_TICK)
     expect(store['caught:sproutling']).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /●/ })).toBeUndefined()
     await ui.unmount()
