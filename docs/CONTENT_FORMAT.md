@@ -4,8 +4,8 @@ How biomes, Modsters and sprites are described on disk. This is the contract
 between the game, the built-in content, user content, the editor and the
 content skills. Rules come from decisions [0004](decisions/0004-attempts-and-catch-rate.md),
 [0007](decisions/0007-content-model.md), [0016](decisions/0016-user-png-sprites.md),
-[0017](decisions/0017-modster-dex-fields.md), [0025](decisions/0025-user-content-helper.md) and
-[0030](decisions/0030-tier-first-encounters.md).
+[0017](decisions/0017-modster-dex-fields.md), [0025](decisions/0025-user-content-helper.md),
+[0030](decisions/0030-tier-first-encounters.md) and [0035](decisions/0035-catchers.md).
 
 > **Status:** schema version `1`, implemented by the validator in
 > `plugin/hooks/content/` (P2-01). Changing a field now needs a new decision
@@ -41,11 +41,16 @@ content/
 │   └── <biome-id>/
 │       ├── biome.json
 │       └── background.sprite.json # optional: the idle scene (decision 0026)
-└── modsters/
-    └── <modster-id>/
-        ├── modster.json
-        ├── sprite.png              # source sheet (built-in: required; user: optional)
-        └── sprite.sprite.json      # runtime sprite (user: optional when sprite.file is the PNG)
+├── modsters/
+│   └── <modster-id>/
+│       ├── modster.json
+│       ├── sprite.png              # source sheet (built-in: required; user: optional)
+│       └── sprite.sprite.json      # runtime sprite (user: optional when sprite.file is the PNG)
+└── catchers/                       # throw animations (decision 0035)
+    └── <catcher-id>/
+        ├── catcher.json
+        ├── sprite.png              # as for a Modster
+        └── sprite.sprite.json
 ```
 
 ## IDs
@@ -53,6 +58,8 @@ content/
 - Lowercase letters, digits and `-`, 2–32 characters, starting with a letter:
   `^[a-z][a-z0-9-]{1,31}$`.
 - The folder name must equal the `id` in the file.
+- Biomes, Modsters and catchers each have their own ids: a catcher may share
+  an id with a Modster.
 - IDs are permanent: the collection is stored by id. Renaming an id loses the
   collection entry, so change `name` instead.
 
@@ -179,6 +186,83 @@ them all (`npm run check:content` checks this, and that numbers are unique).
 
 Habitat isn't a field: it comes from the biomes that list the Modster.
 
+## `catcher.json`
+
+A catcher is what a throw plays: it flies in, takes the Modster, rocks, and
+clicks shut or breaks (decision [0035](decisions/0035-catchers.md)). The player
+picks one in `/modsters`; it only changes how a throw looks.
+
+```json
+{
+  "schemaVersion": 1,
+  "id": "firefly-jar",
+  "name": "Firefly Jar",
+  "description": "Glows with whatever it holds.",
+  "style": "contain",
+  "sprite": { "file": "sprite.sprite.json" },
+  "beats": {
+    "take": { "frames": [1] },
+    "rock": { "frames": [2, 0, 3, 0] }
+  },
+  "glowIndex": 5,
+  "lidRows": 4
+}
+```
+
+| Field | Required | Rules |
+| --- | --- | --- |
+| `schemaVersion` | yes | `1` |
+| `id` | yes | See IDs |
+| `name` | yes | 1–32 chars |
+| `description` | no | ≤ 120 chars; shown in the Catchers tab |
+| `style` | yes | `contain`, `cover` or `custom` (see [Styles](#styles)) |
+| `sprite.file` | yes | A `.sprite.json` in this folder. User content may name a `.png` sheet instead, as for a Modster |
+| `sprite.frames` | with a `.png` | Integer 1–16, as for a Modster. Required with a `.png`, an error with a `.sprite.json` |
+| `beats` | with `custom` | An object with any of the six beats below. With `contain` or `cover`, only what differs from the preset |
+| `glowIndex` | no | Integer 1–63: a palette index painted in the Modster's most common bright color. Must be inside the sprite's palette |
+| `rimIndex` | no | Integer 1–63: a palette index for the edge of a `stretch` shape. Must be inside the sprite's palette. Without it, a `stretch` shape has no edge |
+| `lidRows` | no | Integer 1–31: the closed frame's top rows that lift to open and fly off on a break, when those beats have no frames of their own. Must be less than the sprite's height |
+
+The sprite follows the [`.sprite.json`](#spritejson) rules, but a catcher's is
+at most 32×32 px and may have up to 16 frames. **Frame 0 is the closed
+catcher**; every other frame is used only where a beat names it. A catcher that
+doesn't fit a Modster's sprite area isn't drawn there: the dot count plays
+instead (0035 point 8).
+
+### Beats
+
+A throw plays `throw`, `take`, `settle`, `rock` once per rock, then `caught` or
+`broken`. Their lengths are fixed (0035 point 5); a catcher sets only what
+they show. Each beat is an object with these fields, all optional except
+`modster` in a `custom` catcher:
+
+| Field | Rules |
+| --- | --- |
+| `frames` | A list of 1–16 frame indexes, played evenly over the beat (each rock plays the whole list). Each must be a frame of the sprite |
+| `place` | `over`: anchored at the bottom center of the Modster's area, in front of it. `behind`: the same, behind it. `stretch`: frame tiled over the Modster's outline |
+| `modster` | What the Modster does: `visible`, `hidden`, `dim`, `shake`, `shrink-in` (shrinks into the catcher's opening, flashing white), `shrink`, `hop-out` or `pop-out` (grows back out of the opening) |
+| `path` | `throw` only: `arc`, `drop` (falls from the top) or `none` (appears in place). An error on any other beat |
+
+### Styles
+
+`contain` and `cover` are presets: a beat the file doesn't give, and any field
+a given beat leaves out, comes from the table. A `custom` catcher has no preset:
+every beat must be given with its `modster`; `frames` defaults to `[0]`,
+`place` to `over` and `path` to `arc`.
+
+| Beat | `contain` | `cover` |
+| --- | --- | --- |
+| `throw` | `over`, `visible`, `arc` | `stretch`, `visible`, `arc` |
+| `take` | `over`, `shrink-in`; the lid lifts | `stretch`, `visible`; drops over it |
+| `settle` | `over`, `hidden` | `stretch`, `visible` |
+| `rock` | `over`, `hidden`; frame 0 tilts left and right | `stretch`, `shake` |
+| `caught` | `over`, `hidden`; sparkles | `stretch`, `shrink`; sparkles |
+| `broken` | `over`, `pop-out`; the lid flies off | `stretch`, `hop-out`; tears open |
+
+Where a preset beat has no `frames`, they're made from frame 0 as the table
+says: tilted for `rock`, with the top `lidRows` rows lifted for `take` or
+flying off for `broken` (no lid moves without `lidRows`).
+
 ## `.sprite.json`
 
 ```json
@@ -235,7 +319,7 @@ biome entry naming a disabled Modster is dropped without an issue.
 
 | Key | Type | Default | What it does |
 | --- | --- | --- | --- |
-| `includeBuiltins` | boolean | `true` | Load the content that ships with the mod |
+| `includeBuiltins` | boolean | `true` | Load the biomes and Modsters that ship with the mod. Built-in catchers load either way (decision 0035) |
 | `encounterIdleTimeoutSec` | number | `90` | Seconds without a throw before an encounter's Modster wanders off |
 | `showIdleLine` | boolean | `true` | Show the current biome in the band between encounters |
 | `showIdleScene` | boolean | `true` | Draw the biome's scene between encounters when the biome has one and it fits: in the band above the idle line (decision 0026), or in the encounter pane above its idle text (0027). It moves only while Claude works |
