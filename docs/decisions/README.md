@@ -16,7 +16,7 @@ settled questions and avoid making assumptions about open ones.
 | --- | --- | --- |
 | [0001](0001-terminal-first-rendering.md) | Terminal first; sprites drawn as half-block `Raster` cells | Superseded by 0012 |
 | [0002](0002-where-the-game-is-drawn.md) | Encounters in the band above the prompt, collection in a pane | Accepted (amended by 0015, 0019, 0023) |
-| [0003](0003-catch-mechanic.md) | Pure-luck catching for v1; light skill element as a later experiment | Accepted |
+| [0003](0003-catch-mechanic.md) | Pure-luck catching for v1; light skill element as a later experiment | Accepted (amended by 0035) |
 | [0004](0004-attempts-and-catch-rate.md) | Attempts and catch rate per Modster, derived from rarity unless overridden | Accepted (point 1 superseded by 0030) |
 | [0005](0005-encounter-lifetime.md) | An encounter lingers after the turn ends, until resolved or idle timeout | Accepted (amended by 0018, 0020, 0031) |
 | [0006](0006-biome-selection.md) | One random biome per session | Accepted (amended by 0031) |
@@ -27,7 +27,7 @@ settled questions and avoid making assumptions about open ones.
 | [0011](0011-license.md) | MIT for code, CC BY 4.0 for art | Accepted |
 | [0012](0012-sprite-size-and-band-layout.md) | Half-block `Raster` sprites up to 24×12; text-only band when they don't fit | Accepted (amended by 0020, 0021) |
 | [0013](0013-host-calls-in-register.md) | All `$` calls live in `register.ts`; pure modules reach the host through plain ports | Accepted |
-| [0014](0014-encounter-timings.md) | Encounter timings, a work-time spawn countdown, and no throws outside "waiting" | Accepted (amended by 0018, 0020) |
+| [0014](0014-encounter-timings.md) | Encounter timings, a work-time spawn countdown, and no throws outside "waiting" | Accepted (amended by 0018, 0020, 0035) |
 | [0015](0015-encounter-pane.md) | An opt-in encounter pane, with the band stepping aside while it shows | Accepted (point 4 settled by 0019; amended by 0023, 0024) |
 | [0016](0016-user-png-sprites.md) | User Modsters may use a PNG sheet directly; the mod decodes and caches it | Accepted (amended by 0025) |
 | [0017](0017-modster-dex-fields.md) | Modsters carry a dex entry: number, type, category, height, weight and entry text | Accepted (amended by 0022) |
@@ -48,3 +48,4 @@ settled questions and avoid making assumptions about open ones.
 | [0032](0032-in-pane-enable-disable.md) | The pane turns content on and off; deleting is the content skill's job | Accepted |
 | [0033](0033-standard-sprite-size.md) | Every Modster's sprite is at most 32 px tall and 48 px wide | Accepted |
 | [0034](0034-color-limit.md) | A Modster's sprite uses at most 24 colors | Accepted |
+| [0035](0035-catchers.md) | Throws play a catcher animation, and players can make their own catchers | Accepted |
