@@ -115,7 +115,7 @@ describe('register: toggle', () => {
     const pane = await paneOn($, 'collection')
     await pane.press({ key: 'down' })
     expect(await pressForToast(pane, 'toggle', toasts)).toBe(
-      'Modster Hunter: fix ~/.claude/modster-hunter/content/settings.json first (see /modsters → 4: Settings)',
+      'Modster Hunter: fix ~/.claude/modster-hunter/content/settings.json first (see /modsters → 5: Settings)',
     )
     expect(user[SETTINGS]).toBe('{ not json')
     await pane.unmount()

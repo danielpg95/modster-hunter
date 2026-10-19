@@ -1,6 +1,6 @@
 # 0035 — Throws play a catcher animation, and players can make their own catchers
 
-- **Status:** Accepted (amends 0003 and 0014; point 2 extended by P5-27 with `rimIndex`)
+- **Status:** Accepted (amends 0003 and 0014; point 2 extended by P5-27 with `rimIndex`; in point 9, P5-30 uses `u` instead of `Enter`, since a hotkey is one digit or letter, and puts the tab on `4`, with Settings moving to `5`, asked by @danielpg95)
 - **Date:** 2026-10-19
 - **Decided by:** @danielpg95 (outside issue #129; details chosen in the 2026-10-19 session and drafted by Claude)
 

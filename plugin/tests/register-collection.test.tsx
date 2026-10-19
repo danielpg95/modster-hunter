@@ -12,7 +12,7 @@ import { throwingMs } from '../hooks/game'
 const CATCH_THROW_MS = throwingMs('caught', CATCH.rocksToCatch)
 
 // The collection pane (decision 0002, P3-01): `/modsters` opens it focused, Esc
-// closes it, tabs switch on 1–4. The one-Modster forest is "Whispering Forest".
+// closes it, tabs switch on 1–5. The one-Modster forest is "Whispering Forest".
 
 const PANE_PROPS = { title: 'Modster collection', isFocused: true, bodyColumns: 120, placement: 'inline', scroll: { offset: 0, bodyRows: 8 }, view: {} }
 const BAND_PROPS = { hasSurvey: false, isWorking: true, maxRows: 7, bodyColumns: 120 }
@@ -60,7 +60,7 @@ const mountPane = ($: any, props: Partial<typeof PANE_PROPS> = {}) =>
   $.ui.mount({ plugin: 'modster-hunter', surface: 'terminal', component: 'Pane', requestId: 'modster-collection', props: { ...PANE_PROPS, ...props } })
 const mountBand = ($: any) => $.ui.mount({ plugin: 'modster-hunter', surface: 'terminal', component: 'AbovePrompt', props: BAND_PROPS })
 
-const TAB_KEYS = ['collection', 'biomes', 'stats', 'settings']
+const TAB_KEYS = ['collection', 'biomes', 'stats', 'catchers', 'settings']
 
 /** The four tab Buttons, in order; the pane has others (k, j, the list's rows). */
 async function tabButtons(pane: any): Promise<any[]> {
@@ -152,7 +152,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('the tabs read 1: Collection to 4: Settings, the shown one not dim', async ($, on) => {
+  test('the tabs read 1: Collection to 5: Settings, the shown one not dim', async ($, on) => {
     await start($, on)
     const pane = await mountPane($)
     const buttons = await tabButtons(pane)
@@ -160,9 +160,10 @@ describe('register: collection pane', () => {
       ['collection', 'Collection', '1', true],
       ['biomes', 'Biomes', '2', true],
       ['stats', 'Stats', '3', true],
-      ['settings', 'Settings', '4', true],
+      ['catchers', 'Catchers', '4', true],
+      ['settings', 'Settings', '5', true],
     ])
-    expect(buttons.map((button: any) => button.props.dimColor === true)).toEqual([false, true, true, true])
+    expect(buttons.map((button: any) => button.props.dimColor === true)).toEqual([false, true, true, true, true])
     await pane.unmount()
   })
 
@@ -201,11 +202,12 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('a narrow dock puts one tab per row', async ($, on) => {
+  test('a narrow dock puts one tab per row, keeping every hotkey (P5-30)', async ($, on) => {
     await start($, on)
-    const pane = await mountPane($, { placement: 'dock', bodyColumns: 30, scroll: { offset: 0, bodyRows: 30 } })
+    // As narrow as a dock gets: the longest tab, `4: Catchers`, still fits
+    const pane = await mountPane($, { placement: 'dock', bodyColumns: 20, scroll: { offset: 0, bodyRows: 30 } })
     expect((await pane.find({ type: 'Box', key: 'tabs' }))?.props.flexDirection).toBe('column')
-    expect(await tabButtons(pane)).toHaveLength(4)
+    expect((await tabButtons(pane)).map((button: any) => button.props.hotkey)).toEqual(['1', '2', '3', '4', '5'])
     await pane.unmount()
   })
 

@@ -27,7 +27,7 @@ export function offRow(row: BandLine, marks: ItemMarks): BandLine {
 }
 
 /** `Turned off` and the delete hint, each when it applies. */
-export function itemNotes(kind: 'biome' | 'Modster', id: string, marks: ItemMarks): BandLine[] {
+export function itemNotes(kind: 'biome' | 'Modster' | 'catcher', id: string, marks: ItemMarks): BandLine[] {
   const lines: BandLine[] = []
   if (marks.isOff) lines.push([{ text: 'Turned off', bold: true }])
   if (marks.isYours) lines.push([{ text: `Yours · to delete it, ask Claude: "delete my ${kind} ${id}"`, dim: true }])

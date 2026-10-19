@@ -13,7 +13,7 @@ them in the same PR.
                                      band view ◄── state ────┘   │ tick (clock)
                                      ($.ui.blit frames)          │
                                                              caught? ──► collection store ($.store)
- /modsters ──► pane (Collection · Biomes · Stats · Settings) ◄── reads store + content registry
+ /modsters ──► pane (Collection · Biomes · Stats · Catchers · Settings) ◄── reads store + content registry
  session.start ──► content loader (built-in + user, validated, merged) ──► registry ──► biome pick
 ```
 
@@ -75,6 +75,8 @@ plugin/
 | The Biomes tab's selected biome | A module variable in `register.tsx` | Starts on the session's biome; kept across tabs and reopening (P3-03). Its odds and caught counts come from the same records as the Collection tab. Its scene runs on its own timer while the tab draws it (0028) |
 | The Stats tab's summed stats | A module variable in `register.tsx` | Read, after folding idle session keys (0029), when the tab is pressed or `/modsters` opens on it (P3-04) |
 | Whether the encounter pane reopens (`prefs:huntPane`) | `$.store` | Set by `/modsters hunt`, cleared by a close by hand (decision 0019) |
+| The catcher in use (`prefs:catcher`, `{ v: 1, id }`) | `$.store` | Set by `u` in the Catchers tab, read at session start; missing or unknown means `jar` (decision 0035 points 9–10). A throw keeps the catcher it started with |
+| The Catchers tab's selection and preview | Module variables in `register.tsx` | Starts on the catcher in use (P5-30). The preview loops a catch on the Modster caught last, or a silhouette, on its own timer while the tab shows it |
 | User content | Files in `~/.claude/modster-hunter/content/` | Editable by hand, by the editor and by Claude |
 | Decoded user PNG sprites | Files in `~/.claude/modster-hunter/cache/sprites/` | Keyed by the PNG's size, mtime and frame count; safe to delete (decision 0016) |
 

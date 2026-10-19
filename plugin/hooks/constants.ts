@@ -51,6 +51,8 @@ export const CATCH = {
   /** A catch's sparkles: a white center that glints on dark terminals, deep gold arms that show on light ones */
   sparkleCore: '#ffffff',
   sparkleArms: '#e0a800',
+  /** The Catchers tab's preview loops a catch, then holds still this long before the next */
+  previewPauseMs: 800,
   /** Played when `prefs:catcher` is missing or names a catcher that didn't load (0035 point 10) */
   defaultCatcher: 'jar',
   /** `glowIndex` takes the Modster's most common color with summed RGB over this (half of full brightness) */
@@ -119,6 +121,10 @@ export const COLLECTION = {
   /** P3-03's biome list: `▸ Whispering Forest 2/5 here`; names past `biomeNameColumns` are cut */
   biomeListColumns: 30,
   biomeNameColumns: 17,
+  /** P5-30's catcher list, as wide as the Collection tab's: `▸ Glass jar          ✓ in use`; names past this are cut */
+  catcherNameColumns: 18,
+  /** Rows the Catchers tab's text under or beside the preview takes: the description and the delete hint */
+  catcherDetailRows: 4,
   /** P3-03's odds rows: `#001 Sproutling     40.0%  legendary ×3` */
   oddsColumns: 44,
   /** A biome list under nothing but the odds (a narrow dock) shows at most this many rows */

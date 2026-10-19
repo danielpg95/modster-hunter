@@ -49,7 +49,7 @@ describe('toggleDisabled', () => {
 
   test('a settings file that is not valid JSON is never overwritten', () => {
     const plan = toggleDisabled('{ not json', { kind: 'modster', id: 'mossbeast', off: true }, FILE)
-    expect(plan).toEqual({ ok: false, problem: `fix ${FILE} first (see /modsters → 4: Settings)` })
+    expect(plan).toEqual({ ok: false, problem: `fix ${FILE} first (see /modsters → 5: Settings)` })
   })
 
   test('a settings file that fails validation is never overwritten', () => {

@@ -2,7 +2,7 @@ import { describe, expect, test } from 'claude-code/testing'
 import { collectionLayout } from '../../hooks/render'
 
 // P3-01: where the tabs go by placement and width, and which hint fits.
-// The tab row is 47 columns; "Whispering Forest" is 17.
+// The tab row is 60 columns; "Whispering Forest" is 17.
 
 const TITLE = 17
 
@@ -20,8 +20,8 @@ describe('collectionLayout', () => {
   })
 
   test('a dock narrower than the row puts one tab per row', () => {
-    expect(collectionLayout({ placement: 'dock', isFocused: true, columns: 46, titleColumns: TITLE }).tabs).toBe('column')
-    expect(collectionLayout({ placement: 'dock', isFocused: true, columns: 47, titleColumns: TITLE }).tabs).toBe('row')
+    expect(collectionLayout({ placement: 'dock', isFocused: true, columns: 59, titleColumns: TITLE }).tabs).toBe('column')
+    expect(collectionLayout({ placement: 'dock', isFocused: true, columns: 60, titleColumns: TITLE }).tabs).toBe('row')
   })
 
   test('not focused, the hint says how to give the pane the keys', () => {
@@ -31,9 +31,9 @@ describe('collectionLayout', () => {
   })
 
   test('the hint is left out when it doesn\'t fit after the title and the tabs beside it', () => {
-    // 17 + 2 + 47 = 66 beside; " · Esc: close" is 13
-    expect(collectionLayout({ placement: 'inline', isFocused: true, columns: 79, titleColumns: TITLE })).toEqual({ tabs: 'beside', hint: ' · Esc: close' })
-    expect(collectionLayout({ placement: 'inline', isFocused: true, columns: 78, titleColumns: TITLE })).toEqual({ tabs: 'beside' })
+    // 17 + 2 + 60 = 79 beside; " · Esc: close" is 13
+    expect(collectionLayout({ placement: 'inline', isFocused: true, columns: 92, titleColumns: TITLE })).toEqual({ tabs: 'beside', hint: ' · Esc: close' })
+    expect(collectionLayout({ placement: 'inline', isFocused: true, columns: 91, titleColumns: TITLE })).toEqual({ tabs: 'beside' })
     expect(collectionLayout({ placement: 'dock', isFocused: true, columns: 29, titleColumns: TITLE })).toEqual({ tabs: 'column' })
   })
 })

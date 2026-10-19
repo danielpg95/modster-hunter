@@ -10,6 +10,7 @@ export { artFrame, idleScene, isAnimated, makeParticles, particlePixel, sceneCel
 export { COLLECTION_TABS, tabRowWidth, tabWidth, type CollectionTab, type CollectionTabInfo } from './collection-tabs'
 export { collectionLayout, type CollectionLayout, type CollectionLayoutInput } from './collection-layout'
 export { collectionEntries, dexNumber, entryMarks, type CollectionEntry, type EntryMarks } from './collection-entries'
+export { catcherEntries, catcherRow, previewModsterId, type CatcherEntry } from './catcher-entries'
 export { TOGGLE_HOTKEY, itemNotes, offRow, toggleLabel, type ItemMarks } from './item-notes'
 export { listRow, listWindow, moreText, type ListWindow } from './collection-list'
 export { detailLines, type DetailInput } from './collection-detail'

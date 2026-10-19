@@ -19,7 +19,7 @@ export type TogglePlan = { ok: true; text: string } | { ok: false; problem: stri
  * `validateSettings` before it's returned.
  */
 export function toggleDisabled(current: string | undefined, change: ToggleChange, file: string): TogglePlan {
-  const fixFirst = { ok: false, problem: `fix ${file} first (see /modsters → 4: Settings)` } as const
+  const fixFirst = { ok: false, problem: `fix ${file} first (see /modsters → 5: Settings)` } as const
   let settings: UserSettings = { schemaVersion: CONTENT.schemaVersion }
   if (current !== undefined) {
     let value: unknown
