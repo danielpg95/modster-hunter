@@ -44,7 +44,7 @@ export const CATCH = {
   hopPx: 3,
   /** A `dim` Modster's colors are mixed this far toward black */
   dimAmount: 0.5,
-  /** A `stretch` shape reaches this far past the Modster's outline */
+  /** A `stretch` shape reaches this far past the Modster's outline, within its area */
   stretchMarginPx: 2,
   /** Past this share of a `stretch` shape's radius, `rimIndex` draws the edge */
   rimFrom: 0.82,

@@ -267,10 +267,15 @@ interface Dome {
   ry: number
 }
 
+/** The Modster's outline plus a margin, kept inside the area so the whole rounded edge shows. */
 function dome(art: CatchArt): Dome {
   const { x0, y0, x1, y1 } = art.bounds
+  const margin = CATCH.stretchMarginPx
+  const left = Math.max(0, x0 - margin)
+  const right = Math.min(art.width - 1, x1 + margin)
+  const top = Math.max(0, y0 - margin)
   const by = Math.min(art.height - 1, y1 + 1)
-  return { cx: (x0 + x1 + 1) / 2, by, rx: (x1 - x0 + 1) / 2 + CATCH.stretchMarginPx, ry: by - y0 + CATCH.stretchMarginPx }
+  return { cx: (left + right + 1) / 2, by, rx: (right - left + 1) / 2, ry: Math.max(1, by - top) }
 }
 
 interface StretchMotion {
@@ -323,12 +328,16 @@ function stretchMotion(art: CatchArt, beat: ResolvedBeat, at: CatchBeatAt, pose:
   const u = at.progress
   switch (at.beat) {
     case 'throw': {
+      // It flies in folded flat and lands on top of the Modster, so `take` is its only fall
       const v = easeOut(u)
       const scale = 0.35 + 0.65 * v
+      const folded = Math.max(2, full.ry * 0.2)
+      const endBy = full.by - full.ry + folded
       const startX = beat.path === 'arc' ? -full.rx : full.cx
-      const startY = beat.path === 'none' ? full.by : full.by - full.ry * 1.1
-      const lift = beat.path === 'arc' ? full.ry * 0.4 * Math.sin(v * Math.PI) : 0
-      const shape = { cx: startX + (full.cx - startX) * v, by: startY + (full.by - startY) * v - lift, rx: full.rx * scale, ry: full.ry * scale * 0.6 }
+      // Its flight stays inside the area, where it can be seen: an arc slides in across the top
+      const startY = beat.path === 'drop' ? endBy - full.ry : endBy
+      const lift = beat.path === 'arc' ? Math.min(full.ry * 0.4, endBy - folded) * Math.sin(v * Math.PI) : 0
+      const shape = { cx: startX + (full.cx - startX) * v, by: startY + (endBy - startY) * v - lift, rx: full.rx * scale, ry: folded }
       return { ...base, shape }
     }
     case 'take':
