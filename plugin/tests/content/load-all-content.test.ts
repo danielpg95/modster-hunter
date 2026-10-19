@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'claude-code/testing'
 import { formatIssue, loadAllContent, type SheetLoader } from '../../hooks/content'
 import { memoryReader } from '../fixtures/memory-reader'
+import { validCatcher } from '../fixtures/valid-catcher'
 import { validUserModster } from '../fixtures/valid-user-modster'
 import { validSprite } from '../fixtures/valid-sprite'
 
@@ -14,6 +15,14 @@ function biomeWith(root: string, biomeId: string, modsterId: string, name = mods
     [`${root}/biomes/${biomeId}/biome.json`]: JSON.stringify({ schemaVersion: 1, id: biomeId, name: biomeId, modsters: [{ id: modsterId }] }),
     [`${root}/modsters/${modsterId}/modster.json`]: JSON.stringify({ ...validUserModster(), id: modsterId, name }),
     [`${root}/modsters/${modsterId}/sprite.sprite.json`]: JSON.stringify(validSprite()),
+  }
+}
+
+/** A catcher named `name`, written under `root`. */
+function catcherIn(root: string, id: string, name: string): Record<string, string> {
+  return {
+    [`${root}/catchers/${id}/catcher.json`]: JSON.stringify({ ...validCatcher(), id, name }),
+    [`${root}/catchers/${id}/sprite.sprite.json`]: JSON.stringify(validSprite()),
   }
 }
 
@@ -77,5 +86,20 @@ describe('loadAllContent', () => {
     const files = biomeWith(BUILT_IN, 'forest', 'sproutling')
     const content = await loadAllContent({ reader: memoryReader(files), builtInRoot: BUILT_IN, includeBuiltins: true })
     expect([...content.biomes.keys()]).toEqual(['forest'])
+  })
+
+  test('built-in catchers load even with includeBuiltins off (decision 0035 point 1)', async () => {
+    const files = { ...biomeWith(BUILT_IN, 'forest', 'sproutling'), ...catcherIn(BUILT_IN, 'jar', 'Glass jar'), ...biomeWith(USER, 'meadow', 'blobby') }
+    const content = await loadAllContent({ reader: memoryReader(files), builtInRoot: BUILT_IN, includeBuiltins: false, user })
+    expect([...content.biomes.keys()]).toEqual(['meadow'])
+    expect([...content.catchers.keys()]).toEqual(['jar'])
+    expect(content.issues).toEqual([])
+  })
+
+  test('a user catcher replaces the built-in one with its id, and is named in userIds', async () => {
+    const files = { ...catcherIn(BUILT_IN, 'jar', 'Glass jar'), ...catcherIn(BUILT_IN, 'net', 'Net'), ...catcherIn(USER, 'jar', 'My jar') }
+    const content = await loadAllContent({ reader: memoryReader(files), builtInRoot: BUILT_IN, includeBuiltins: true, user })
+    expect([...content.catchers.values()].map((loaded) => loaded.catcher.name)).toEqual(['My jar', 'Net'])
+    expect([...content.userIds.catchers]).toEqual(['jar'])
   })
 })

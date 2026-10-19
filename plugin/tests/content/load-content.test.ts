@@ -1,7 +1,9 @@
 import { describe, expect, test } from 'claude-code/testing'
 import { formatIssue, loadContent, type SheetLoader, type Sprite } from '../../hooks/content'
 import { memoryReader } from '../fixtures/memory-reader'
+import { encodeFrame } from '../fixtures/encode-frame'
 import { validBiome } from '../fixtures/valid-biome'
+import { validCatcher } from '../fixtures/valid-catcher'
 import { validUserModster } from '../fixtures/valid-user-modster'
 import { validSprite } from '../fixtures/valid-sprite'
 
@@ -186,7 +188,7 @@ describe('loadContent', () => {
     }
     const content = await loadContent(memoryReader(pngForest()), ROOT, { label: '~/c/', sheets })
     expect(content.modsters.get('sproutling')?.sprite).toEqual(sprite)
-    expect(asked).toEqual([{ path: `${ROOT}/modsters/sproutling/sprite.png`, file: '~/c/modsters/sproutling/sprite.png', modsterId: 'sproutling', frames: 2 }])
+    expect(asked).toEqual([{ path: `${ROOT}/modsters/sproutling/sprite.png`, file: '~/c/modsters/sproutling/sprite.png', cacheKey: 'sproutling', frames: 2 }])
   })
 
   test('without a sheet loader (built-in content), a PNG sprite is an error', async () => {
@@ -210,5 +212,81 @@ describe('loadContent', () => {
         'modsters/sproutling/modster.json: sprite.file points to a sprite that didn\'t load: modsters/sproutling/sprite.png',
       ])
     }
+  })
+
+  /** The forest plus one catcher, `firefly-jar`, with `validSprite` as its art. */
+  function withCatcher(change: (catcher: Record<string, unknown>) => void = () => {}): Record<string, string | Error> {
+    const catcher = validCatcher()
+    change(catcher)
+    return {
+      ...forest(),
+      [`${ROOT}/catchers/firefly-jar/catcher.json`]: JSON.stringify(catcher),
+      [`${ROOT}/catchers/firefly-jar/sprite.sprite.json`]: JSON.stringify(validSprite()),
+    }
+  }
+
+  test('a valid catcher loads with its sprite, next to the biomes and Modsters (decision 0035)', async () => {
+    const content = await loadContent(memoryReader(withCatcher()), ROOT)
+    expect([...content.catchers.keys()]).toEqual(['firefly-jar'])
+    expect(content.catchers.get('firefly-jar')?.sprite.frames.length).toBe(2)
+    expect(content.modsters.size).toBe(3)
+    expect(content.issues).toEqual([])
+  })
+
+  test('an invalid catcher is skipped and listed; the rest load', async () => {
+    const content = await loadContent(memoryReader(withCatcher((catcher) => (catcher.style = 'bubble'))), ROOT)
+    expect(content.catchers.size).toBe(0)
+    expect(content.biomes.size).toBe(1)
+    expect(lines(content.issues)).toEqual([
+      'catchers/firefly-jar/catcher.json: style must be one of contain, cover, custom (it is "bubble")',
+    ])
+  })
+
+  test('a catcher whose beats name a frame its sprite lacks is skipped with the reason', async () => {
+    const content = await loadContent(memoryReader(withCatcher((catcher) => (catcher.beats = { rock: { frames: [0, 5] } }))), ROOT)
+    expect(content.catchers.size).toBe(0)
+    expect(lines(content.issues)).toEqual(['catchers/firefly-jar/catcher.json: beats.rock.frames[1] is frame 5, but the sprite has 2 (0–1)'])
+  })
+
+  test('a catcher whose sprite is missing is skipped too', async () => {
+    const files = withCatcher()
+    delete files[`${ROOT}/catchers/firefly-jar/sprite.sprite.json`]
+    const content = await loadContent(memoryReader(files), ROOT)
+    expect(content.catchers.size).toBe(0)
+    expect(lines(content.issues)).toEqual([
+      'catchers/firefly-jar/sprite.sprite.json is missing',
+      "catchers/firefly-jar/catcher.json: sprite.file points to a sprite that didn't load: catchers/firefly-jar/sprite.sprite.json",
+    ])
+  })
+
+  test("a catcher's sprite may have up to 16 frames, more than a Modster's 8", async () => {
+    const pixels = new Array(64).fill(1)
+    const art = (count: number) => JSON.stringify({ ...validSprite(), shinyPalette: undefined, frames: Array.from({ length: count }, () => encodeFrame(pixels)) })
+    const files = withCatcher()
+    files[`${ROOT}/catchers/firefly-jar/sprite.sprite.json`] = art(16)
+    expect((await loadContent(memoryReader(files), ROOT)).catchers.size).toBe(1)
+    files[`${ROOT}/catchers/firefly-jar/sprite.sprite.json`] = art(17)
+    const content = await loadContent(memoryReader(files), ROOT)
+    expect(content.catchers.size).toBe(0)
+    expect(lines(content.issues)[0]).toBe('catchers/firefly-jar/sprite.sprite.json: frames must have 1–16 frames (it has 17)')
+  })
+
+  test('a user catcher naming a PNG asks the sheet loader with its own cache key and 16 frames', async () => {
+    const asked: unknown[] = []
+    const sheets: SheetLoader = async (sheet) => {
+      asked.push(sheet)
+      return { ok: true, value: sprite, issues: [] }
+    }
+    const files = withCatcher((catcher) => (catcher.sprite = { file: 'sprite.png', frames: 2 }))
+    const content = await loadContent(memoryReader(files), ROOT, { label: '~/c/', sheets })
+    expect(content.catchers.has('firefly-jar')).toBe(true)
+    expect(asked).toEqual([
+      { path: `${ROOT}/catchers/firefly-jar/sprite.png`, file: '~/c/catchers/firefly-jar/sprite.png', cacheKey: 'firefly-jar.catcher', frames: 2, maxFrames: 16 },
+    ])
+  })
+
+  test('catchersOnly loads the catchers and nothing else', async () => {
+    const content = await loadContent(memoryReader(withCatcher()), ROOT, { catchersOnly: true })
+    expect([content.biomes.size, content.modsters.size, content.catchers.size, content.issues.length]).toEqual([0, 0, 1, 0])
   })
 })

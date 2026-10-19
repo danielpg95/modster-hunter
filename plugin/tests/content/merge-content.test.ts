@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { formatIssue, mergeContent, type ContentRegistry, type Modster, type Sprite } from '../../hooks/content'
+import { formatIssue, mergeContent, type ContentRegistry, type LoadedCatcher, type Modster, type Sprite } from '../../hooks/content'
 import { validSprite } from '../fixtures/valid-sprite'
 
 const SETTINGS = '~/.claude/modster-hunter/content/settings.json'
@@ -22,6 +22,7 @@ function registry(biomes: Record<string, string[]>, modsters: Record<string, str
         return [id, { modster, sprite: validSprite() as unknown as Sprite }]
       }),
     ),
+    catchers: new Map(),
     issues: [],
   }
 }
@@ -129,5 +130,21 @@ describe('mergeContent', () => {
       settingsFile: SETTINGS,
     })
     expect(content.issues.map((found) => found.file)).toEqual(['a.json', 'b.json'])
+  })
+
+  test('catchers merge by id, the user one winning, and are never turned off (decision 0035)', () => {
+    const catcher = (id: string, name: string): [string, LoadedCatcher] => [
+      id,
+      { catcher: { schemaVersion: 1, id, name, style: 'contain', sprite: { file: 'sprite.sprite.json' } }, sprite: validSprite() as unknown as Sprite },
+    ]
+    const settings = { schemaVersion: 1 as const, disabledModsters: ['jar'] }
+    const content = mergeContent({
+      builtIn: { ...builtIn(), catchers: new Map([catcher('jar', 'Glass jar'), catcher('net', 'Net')]) },
+      user: { ...registry({}, {}), catchers: new Map([catcher('jar', 'My jar'), catcher('bubble', 'Bubble')]) },
+      settings,
+      settingsFile: SETTINGS,
+    })
+    expect([...content.catchers.values()].map((loaded) => loaded.catcher.name)).toEqual(['My jar', 'Net', 'Bubble'])
+    expect([...content.userIds.catchers]).toEqual(['jar', 'bubble'])
   })
 })

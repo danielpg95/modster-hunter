@@ -162,6 +162,23 @@ export const CONTENT = {
     framesMin: 1,
     framesMax: 8,
   },
+  // Decision 0035 points 2–4: a catcher's file and its beats
+  catcher: {
+    nameMaxChars: 32,
+    styles: ['contain', 'cover', 'custom'],
+    beats: ['throw', 'take', 'settle', 'rock', 'caught', 'broken'],
+    places: ['over', 'behind', 'stretch'],
+    modsterActions: ['visible', 'hidden', 'dim', 'shake', 'shrink-in', 'shrink', 'hop-out', 'pop-out'],
+    paths: ['arc', 'drop', 'none'],
+    widthMax: 32,
+    heightMax: 32,
+    framesMax: 16,
+    beatFramesMax: 16,
+    paletteIndexMin: 1,
+    paletteIndexMax: 63,
+    lidRowsMin: 1,
+    lidRowsMax: 31,
+  },
 } as const
 
 /** Modster types and their badge colors, decision 0017 point 2. Flavor only: no effect on odds. */

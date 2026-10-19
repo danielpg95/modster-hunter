@@ -1,4 +1,5 @@
 import { CONTENT, MODSTER_TYPES } from '../constants'
+import { checkSpriteRef } from './check-sprite-ref'
 import { checkKeys, checkNumber, checkPattern, checkRarity, checkSchemaVersion, checkString, describe, fieldPath, isObject, type JsonObject } from './fields'
 import { IssueList } from './issue-list'
 import type { Modster, Validation } from './types'
@@ -6,7 +7,6 @@ import type { Modster, Validation } from './types'
 const KEYS = ['schemaVersion', 'id', 'name', 'description', 'rarity', 'maxAttempts', 'catchRate', 'shinyChance', 'dex', 'sprite']
 const REQUIRED = ['schemaVersion', 'id', 'name', 'rarity', 'sprite']
 const SPRITE_KEYS = ['file', 'frames', 'fps']
-const SPRITE_REQUIRED = ['file']
 // `type` is listed only so its rename error isn't doubled by "not a known field" (decision 0022)
 const DEX_KEYS = ['number', 'types', 'type', 'category', 'heightM', 'weightKg', 'entry']
 const TYPES = Object.keys(MODSTER_TYPES)
@@ -80,26 +80,6 @@ function checkTypes(dex: JsonObject, issues: IssueList): void {
 }
 
 function checkSprite(value: unknown, allowPng: boolean, issues: IssueList): void {
-  if (value === undefined) return
-  if (!isObject(value)) {
-    issues.error('sprite', 'must be an object like { "file": "sprite.sprite.json" }')
-    return
-  }
-  checkKeys(value, SPRITE_KEYS, SPRITE_REQUIRED, issues, 'sprite')
-  checkNumber(value, 'fps', { min: CONTENT.modster.fpsMin, max: CONTENT.modster.fpsMax }, issues, 'sprite')
-
-  const isPng = allowPng && typeof value.file === 'string' && CONTENT.pngFilePattern.test(value.file)
-  if (!isPng) {
-    const expected = allowPng ? 'a .sprite.json or .png file in this folder' : 'a .sprite.json file in this folder'
-    const file = checkPattern(value, 'file', CONTENT.spriteFilePattern, expected, issues, 'sprite')
-    // The .sprite.json holds its own frames
-    if (file !== undefined && Object.hasOwn(value, 'frames')) issues.error('sprite.frames', 'is only for a .png sheet')
-    return
-  }
-  // A sheet's frames sit side by side; only the file names how many (decision 0016)
-  if (!Object.hasOwn(value, 'frames')) {
-    issues.error('sprite.frames', 'is required with a .png sheet: how many frames sit side by side')
-    return
-  }
-  checkNumber(value, 'frames', { min: CONTENT.sprite.framesMin, max: CONTENT.sprite.framesMax, integer: true }, issues, 'sprite')
+  const sprite = checkSpriteRef(value, { allowPng, keys: SPRITE_KEYS, maxFrames: CONTENT.sprite.framesMax }, issues)
+  if (sprite) checkNumber(sprite, 'fps', { min: CONTENT.modster.fpsMin, max: CONTENT.modster.fpsMax }, issues, 'sprite')
 }

@@ -123,10 +123,11 @@ describe('validateSprite', () => {
     expect(issuesAt(validateSprite(withFrames(5), background), 'frames')[0]?.problem).toBe('must have 1–4 frames (it has 5)')
   })
 
-  test('maxFrames never raises the sprite limit of 8', () => {
-    const sprite = { ...validSprite(), frames: Array.from({ length: 9 }, () => blank(8, 8)) }
-    const where9 = { file: 'x.sprite.json', maxFrames: 20 }
-    expect(issuesAt(validateSprite(sprite, where9), 'frames')[0]?.problem).toBe('must have 1–8 frames (it has 9)')
+  test('without maxFrames the limit is 8; a catcher raises it to 16 (decision 0035)', () => {
+    const sprite = (count: number) => ({ ...validSprite(), frames: Array.from({ length: count }, () => blank(8, 8)) })
+    expect(issuesAt(validateSprite(sprite(9), { file: 'x.sprite.json' }), 'frames')[0]?.problem).toBe('must have 1–8 frames (it has 9)')
+    expect(validateSprite(sprite(16), { file: 'x.sprite.json', maxFrames: 16 }).ok).toBe(true)
+    expect(issuesAt(validateSprite(sprite(17), { file: 'x.sprite.json', maxFrames: 16 }), 'frames')[0]?.problem).toBe('must have 1–16 frames (it has 17)')
   })
 
   test('frames are not decoded when the size is already wrong, so errors are not repeated', () => {

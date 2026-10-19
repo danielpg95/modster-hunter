@@ -1,6 +1,6 @@
 # 0035 — Throws play a catcher animation, and players can make their own catchers
 
-- **Status:** Accepted (amends 0003 and 0014)
+- **Status:** Accepted (amends 0003 and 0014; point 2 extended by P5-27 with `rimIndex`)
 - **Date:** 2026-10-19
 - **Decided by:** @danielpg95 (outside issue #129; details chosen in the 2026-10-19 session and drafted by Claude)
 

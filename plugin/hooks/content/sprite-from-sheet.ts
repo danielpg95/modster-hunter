@@ -19,13 +19,14 @@ const TRANSPARENT = '#00000000'
  * value (decision 0008). Index 0 is transparent; opaque colors follow in the
  * order they first appear. The result is checked with `validateSprite`, so an
  * `ok` result is always a valid file. Problems come back as issues with a hint.
+ * `maxFrames` is higher for a catcher's sheet (decision 0035).
  */
-export function spriteFromSheet(sheet: RgbaImage, frameCount: number, file: string): Validation<Sprite> {
+export function spriteFromSheet(sheet: RgbaImage, frameCount: number, file: string, maxFrames: number = CONTENT.sprite.framesMax): Validation<Sprite> {
   const issues = new IssueList(file)
   const { sprite: bounds } = CONTENT
 
-  if (!Number.isInteger(frameCount) || frameCount < bounds.framesMin || frameCount > bounds.framesMax) {
-    return issues.fail('frames', `must be ${bounds.framesMin}–${bounds.framesMax} frames (asked for ${frameCount})`)
+  if (!Number.isInteger(frameCount) || frameCount < bounds.framesMin || frameCount > maxFrames) {
+    return issues.fail('frames', `must be ${bounds.framesMin}–${maxFrames} frames (asked for ${frameCount})`)
   }
   if (sheet.width % frameCount !== 0) {
     return issues.fail(
@@ -72,7 +73,7 @@ export function spriteFromSheet(sheet: RgbaImage, frameCount: number, file: stri
   }
 
   const sprite: Sprite = { schemaVersion: 1, width, height, palette, frames }
-  return validateSprite(sprite, { file })
+  return validateSprite(sprite, { file, maxFrames })
 }
 
 /** `#rrggbbaa` of the pixel at byte offset `at`, with alpha snapped to 00 or ff. */

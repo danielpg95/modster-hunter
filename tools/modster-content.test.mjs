@@ -18,7 +18,8 @@ const HELPER = new URL('../plugin/skills/create-modster-content/scripts/modster-
 const dir = mkdtempSync(join(tmpdir(), 'modster-content-test-'))
 // Counted from the built-in content, so adding a biome or a Modster doesn't break the tests
 const BUILT_IN = new URL('../plugin/content/', import.meta.url).pathname
-const builtInCount = (kind) => readdirSync(join(BUILT_IN, kind), { withFileTypes: true }).filter((entry) => entry.isDirectory()).length
+const builtInCount = (kind) =>
+  existsSync(join(BUILT_IN, kind)) ? readdirSync(join(BUILT_IN, kind), { withFileTypes: true }).filter((entry) => entry.isDirectory()).length : 0
 
 function run(...args) {
   const result = spawnSync(process.execPath, [HELPER, ...args], { encoding: 'utf8' })
@@ -188,17 +189,31 @@ test('check: a user folder loads like the mod loads it, with every issue', () =>
   writeJson('content/biomes/test-meadow/biome.json', {
     schemaVersion: 1, id: 'test-meadow', name: 'Test Meadow', modsters: [{ id: 'blobby' }, { id: 'sproutling' }],
   })
+  // A catcher with a PNG sheet (decision 0035)
+  const catcherSheet = join(root, 'catchers', 'blob-jar', 'sprite.png')
+  mkdirSync(join(catcherSheet, '..'), { recursive: true })
+  run('draw', writeJson('blob-jar.json', GRID), '--out', catcherSheet)
+  const catcher = { schemaVersion: 1, id: 'blob-jar', name: 'Blob Jar', style: 'contain', sprite: { file: 'sprite.png', frames: 2 }, beats: { rock: { frames: [1, 0] } } }
+  writeJson('content/catchers/blob-jar/catcher.json', catcher)
   const clean = run('check', root)
   assert.equal(clean.code, 0, clean.stdout)
   const biomes = builtInCount('biomes') + 1
   const modsters = builtInCount('modsters') + 1
-  assert.match(clean.stdout, new RegExp(`^${biomes} biomes and ${modsters} Modsters load; 0 errors, 0 warnings$`, 'm'))
+  const catchers = builtInCount('catchers') + 1
+  assert.match(clean.stdout, new RegExp(`^${biomes} biomes, ${modsters} Modsters and ${catchers} catchers? load; 0 errors, 0 warnings$`, 'm'))
+
+  // A catcher naming a frame its sheet lacks is listed and skipped
+  writeJson('content/catchers/blob-jar/catcher.json', { ...catcher, beats: { rock: { frames: [1, 2] } } })
+  const badCatcher = run('check', root)
+  assert.equal(badCatcher.code, 1)
+  assert.match(badCatcher.stdout, /content\/catchers\/blob-jar\/catcher\.json: beats\.rock\.frames\[1\] is frame 2, but the sprite has 2 \(0–1\)/)
+  writeJson('content/catchers/blob-jar/catcher.json', catcher)
 
   // Without the built-ins, sproutling is missing
   const alone = run('check', root, '--without-builtins')
   assert.equal(alone.code, 1)
   assert.match(alone.stdout, /content\/biomes\/test-meadow\/biome\.json: modsters\[1\]\.id names a Modster that doesn't exist: "sproutling"/)
-  assert.match(alone.stdout, /1 biome and 1 Modster load; 1 error, 0 warnings/)
+  assert.match(alone.stdout, /1 biome, 1 Modster and \d+ catchers? load; 1 error, 0 warnings/)
 
   assert.match(run('check', join(dir, 'nowhere')).stderr, /no content folder here yet/)
 

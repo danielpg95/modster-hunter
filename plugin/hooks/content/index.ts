@@ -11,6 +11,7 @@ export {
   type ContentReader,
   type ContentRegistry,
   type LoadedBiome,
+  type LoadedCatcher,
   type LoadedModster,
   type LoadOptions,
   type SheetLoader,
@@ -21,8 +22,9 @@ export { spriteFromGif } from './sprite-from-gif'
 export { spriteFromPng } from './sprite-from-png'
 export { spriteFromSheet, type RgbaImage } from './sprite-from-sheet'
 export { toggleDisabled, type ToggleChange, type TogglePlan } from './toggle-disabled'
-export type { Biome, BiomeModsterEntry, BiomeParticles, ContentIssue, Modster, ModsterDex, ModsterType, ParticleStyle, Rarity, Sprite, UserSettings, Validation } from './types'
+export type { Biome, BiomeModsterEntry, BiomeParticles, Catcher, CatcherBeat, CatcherBeatName, CatcherModsterAction, CatcherPath, CatcherPlace, CatcherStyle, ContentIssue, Modster, ModsterDex, ModsterType, ParticleStyle, Rarity, Sprite, UserSettings, Validation } from './types'
 export { validateBiome } from './validate-biome'
+export { checkCatcherSprite, validateCatcher } from './validate-catcher'
 export { validateModster } from './validate-modster'
 export { validateSettings } from './validate-settings'
 export { validateSprite } from './validate-sprite'

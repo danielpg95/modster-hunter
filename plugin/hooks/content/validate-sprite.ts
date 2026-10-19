@@ -10,7 +10,8 @@ const BASE64 = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$
 
 /**
  * Checks a parsed `.sprite.json` against CONTENT_FORMAT.md and decision 0012.
- * `maxFrames` lowers the frame limit, for a biome background (decision 0026 point 1).
+ * `maxFrames` sets another frame limit: lower for a biome background (decision
+ * 0026 point 1), higher for a catcher (decision 0035).
  */
 export function validateSprite(input: unknown, where: { file: string; maxFrames?: number }): Validation<Sprite> {
   const issues = new IssueList(where.file)
@@ -73,7 +74,7 @@ function checkPalette(value: unknown, field: string, issues: IssueList): string[
 function checkFrameList(value: unknown, maxFrames: number | undefined, issues: IssueList): string[] | undefined {
   if (value === undefined) return undefined
   const { framesMin } = CONTENT.sprite
-  const framesMax = Math.min(maxFrames ?? CONTENT.sprite.framesMax, CONTENT.sprite.framesMax)
+  const framesMax = maxFrames ?? CONTENT.sprite.framesMax
   if (!Array.isArray(value)) {
     issues.error('frames', `must be a list of ${framesMin}–${framesMax} base64 strings`)
     return undefined
