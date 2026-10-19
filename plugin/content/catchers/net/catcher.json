@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "id": "net",
+  "name": "Net",
+  "description": "A rope net thrown over the Modster. It stays in view, struggles, and gets bundled up.",
+  "style": "cover",
+  "sprite": { "file": "sprite.sprite.json" },
+  "rimIndex": 1
+}
