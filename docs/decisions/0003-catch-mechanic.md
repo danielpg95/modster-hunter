@@ -1,6 +1,6 @@
 # 0003 — Pure-luck catching for v1; light skill element as a later experiment
 
-- **Status:** Accepted
+- **Status:** Accepted (amended by 0035)
 - **Date:** 2026-10-07
 - **Decided by:** @danielpg95
 

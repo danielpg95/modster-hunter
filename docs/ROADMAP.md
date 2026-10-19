@@ -642,3 +642,57 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `npm run check:content` passes.
   - [x] `docs/previews/` is regenerated for the ten, and the PR description shows each one (enlarged, every frame, dark and light).
   - [x] The `add-modster` skill's reference prompt ends with the spec lines that made references convert cleanly: chunky blocks with minimum sizes in blocks, ≤ 24 colours, a flat background (asked by @danielpg95, 2026-10-18).
+
+#### [ ] P5-27 — Catcher format and loader
+- **Depends on:** P2-01, P4-03
+- **Size:** M
+- **Goal:** catchers load as content from `content/catchers/<id>/` in the built-in and the user folder (decision 0035 points 1–4).
+- **Done when:**
+  - [ ] `CONTENT_FORMAT.md` has a `catcher.json` section: every field from 0035 point 2 with exact bounds (sprite size, frame indexes, `lidRows`, `glowIndex`), the beat fields of point 3 and the presets of point 4. The folder layout shows `catchers/`.
+  - [ ] The validator checks `catcher.json` and its sprite, never throws, and reports issues like other content (file, field, problem). Unknown fields are errors. Tests cover each rule.
+  - [ ] Loading and merging include catchers: a user catcher with a built-in's id replaces it (0007), and built-in catchers load even when `includeBuiltins` is off. Tests use the injected loader ports.
+  - [ ] The helper's `check` (0025) reports catcher issues.
+
+#### [ ] P5-28 — Catch animation engine
+- **Depends on:** P5-27
+- **Size:** L
+- **Goal:** a throw plays the catcher in use in the band and the encounter pane, with the dot count in text-only places, replacing `wobble…` (decision 0035 points 3–8, 10 and 12).
+- **Done when:**
+  - [ ] A pure frame function under `plugin/hooks/render/` takes the catcher, the Modster's sprite, the outcome, the rock count and the time, and returns the frame's cells. It covers every beat, `place`, `modster` and `path` value, the frames made from the closed frame, and `glowIndex`. Tests use the fake clock.
+  - [ ] The encounter machine rolls the rock count with the throw (3 for a catch; 1 or 2 for a miss, from the injected random source) and times the throwing phase by 0035 points 5–6. The timeline replaces `ENCOUNTER.throwingMs` in `constants.ts`. The existing throw, run and `/clear` tests are updated, and new ones cover the timings.
+  - [ ] `register.tsx` blits the catcher's frames during the throw to every sprite site (band and pane), skipping a tick while blits are in flight, and goes back to the idle loop afterwards. The `caught` beat plays at the start of the result card.
+  - [ ] The compact band, the one-row band and the status line show the dot count (0035 point 7). Render tests run at `maxRows` 1, 2 and 7.
+  - [ ] Where the catcher doesn't fit the sprite area, the sprite holds still and the text shows the dot count. The band never takes more rows than it does today.
+  - [ ] `prefs:catcher` picks the catcher; a missing or unknown id falls back to `jar`.
+  - [ ] Checked by hand in a real terminal on a dark and a light theme, noted in the handoff.
+
+#### [ ] P5-29 — Built-in catchers
+- **Depends on:** P5-28
+- **Size:** M
+- **Goal:** the four built-in catchers from issue #129 ship in `plugin/content/catchers/`: `jar`, `pod`, `lantern` and `net` (decision 0035 point 13).
+- **Done when:**
+  - [ ] Each has `catcher.json` and pixel art drawn as a proper sprite, not code: the jar's glow, the pod's seam and the lantern's flame use `glowIndex`, and the net is a `cover` tile with a rim. Each fits the smallest built-in Modster's sprite area (Dunebun, 22×20).
+  - [ ] `plugin/content/CREDITS.md` lists each catcher.
+  - [ ] `npm run check:content` passes.
+  - [ ] A preview GIF of each catcher (a catch and both kinds of miss, dark and light) is in `docs/previews/catchers/`, and the PR description shows them.
+
+#### [ ] P5-30 — Catchers tab
+- **Depends on:** P5-29, P3-01
+- **Size:** M
+- **Goal:** `/modsters` has a `5: Catchers` tab where the player picks the catcher in use (decision 0035 point 9).
+- **Done when:**
+  - [ ] The tab lists every catcher, marking the one in use `✓ in use` and the player's own `yours`. The selected one plays animated on a Modster the player has caught, or on a silhouette when they've caught none.
+  - [ ] `Enter` saves the selected catcher as `prefs:catcher` in `$.store`. The next throw uses it, and a throw in progress keeps its catcher. Register tests cover this.
+  - [ ] A player's own catcher shows the delete hint from 0032 point 7.
+  - [ ] The tab row with `5: Catchers` fits the narrowest pane, or wraps without breaking the tab hotkeys. A render test covers the narrowest width.
+  - [ ] `docs/ARCHITECTURE.md` lists `prefs:catcher` in its state table.
+
+#### [ ] P5-31 — Catchers in the content skill
+- **Depends on:** P5-28
+- **Size:** M
+- **Goal:** players make, preview and delete their own catchers through `create-modster-content` (decision 0035 point 14).
+- **Done when:**
+  - [ ] SKILL.md has a "Make a catcher" section. It asks for the style (`contain`, `cover` or `custom`) and the beats one question at a time, draws the closed frame first, and adds other frames only when the player wants them.
+  - [ ] The helper renders a catcher's animation on a sample Modster (a catch and both kinds of miss, dark and light) into a GIF or HTML page the player can open. It reuses P5-28's frame function, with a test.
+  - [ ] `reference/format.md` documents `catcher.json`, and "Delete your own" covers catchers.
+  - [ ] Checked by hand: a new `custom` catcher made through the skill appears in the Catchers tab after `/modsters reload` and plays on a throw.
