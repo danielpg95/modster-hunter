@@ -653,18 +653,15 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Loading and merging include catchers: a user catcher with a built-in's id replaces it (0007), and built-in catchers load even when `includeBuiltins` is off. Tests use the injected loader ports.
   - [x] The helper's `check` (0025) reports catcher issues.
 
-#### [ ] P5-28 — Catch animation engine
+#### [ ] P5-28 — Catch animation frames
 - **Depends on:** P5-27
-- **Size:** L
-- **Goal:** a throw plays the catcher in use in the band and the encounter pane, with the dot count in text-only places, replacing `wobble…` (decision 0035 points 3–8, 10 and 12).
+- **Size:** M
+- **Goal:** a pure function draws any frame of a catcher's throw animation (decision 0035 points 3–6). Split from the first P5-28 with P5-32 and P5-33 (asked by @danielpg95, 2026-10-19).
 - **Done when:**
-  - [ ] A pure frame function under `plugin/hooks/render/` takes the catcher, the Modster's sprite, the outcome, the rock count and the time, and returns the frame's cells. It covers every beat, `place`, `modster` and `path` value, the frames made from the closed frame, and `glowIndex`. Tests use the fake clock.
-  - [ ] The encounter machine rolls the rock count with the throw (3 for a catch; 1 or 2 for a miss, from the injected random source) and times the throwing phase by 0035 points 5–6. The timeline replaces `ENCOUNTER.throwingMs` in `constants.ts`. The existing throw, run and `/clear` tests are updated, and new ones cover the timings.
-  - [ ] `register.tsx` blits the catcher's frames during the throw to every sprite site (band and pane), skipping a tick while blits are in flight, and goes back to the idle loop afterwards. The `caught` beat plays at the start of the result card.
-  - [ ] The compact band, the one-row band and the status line show the dot count (0035 point 7). Render tests run at `maxRows` 1, 2 and 7.
-  - [ ] Where the catcher doesn't fit the sprite area, the sprite holds still and the text shows the dot count. The band never takes more rows than it does today.
-  - [ ] `prefs:catcher` picks the catcher; a missing or unknown id falls back to `jar`.
-  - [ ] Checked by hand in a real terminal on a dark and a light theme, noted in the handoff.
+  - [ ] A pure frame function under `plugin/hooks/render/` takes the catcher, the Modster's sprite, the outcome, the rock count and the time, and returns the frame's cells for the Modster's sprite area. It applies the `contain` and `cover` presets from CONTENT_FORMAT.md.
+  - [ ] It covers every beat, `place`, `modster` and `path` value, the frames made from frame 0 (tilted for `rock`, the `lidRows` lid lifting and flying off), `glowIndex` and `rimIndex`. Tests use the fake clock and check pixels at chosen times.
+  - [ ] It says whether the catcher fits the sprite area, so callers can fall back to the dot count (0035 point 8).
+  - [ ] The beat lengths of 0035 point 5 live in `constants.ts`.
 
 #### [ ] P5-29 — Built-in catchers
 - **Depends on:** P5-28
@@ -696,3 +693,22 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] The helper renders a catcher's animation on a sample Modster (a catch and both kinds of miss, dark and light) into a GIF or HTML page the player can open. It reuses P5-28's frame function, with a test.
   - [ ] `reference/format.md` documents `catcher.json`, and "Delete your own" covers catchers.
   - [ ] Checked by hand: a new `custom` catcher made through the skill appears in the Catchers tab after `/modsters reload` and plays on a throw.
+
+#### [ ] P5-32 — Catch timeline and blits
+- **Depends on:** P5-28
+- **Size:** M
+- **Goal:** a throw plays the catcher in use in the band and the encounter pane, timed by decision 0035 points 5–6 (split from P5-28).
+- **Done when:**
+  - [ ] The encounter machine rolls the rock count with the throw (3 for a catch; 1 or 2 for a miss, from the injected random source) and times the throwing phase by 0035 points 5–6, replacing `ENCOUNTER.throwingMs`. The existing throw, run and `/clear` tests are updated, and new ones cover the timings.
+  - [ ] `register.tsx` blits P5-28's frames during the throw to every sprite site (band and pane), skipping a tick while blits are in flight, then goes back to the idle loop. The `caught` beat plays at the start of the result card. A register test drives it with the fake clock.
+  - [ ] `prefs:catcher` in `$.store` picks the catcher; a missing or unknown id falls back to `jar` (0035 point 10).
+  - [ ] Checked by hand in a real terminal on a dark and a light theme, noted in the handoff.
+
+#### [ ] P5-33 — Catch dot count
+- **Depends on:** P5-32
+- **Size:** S
+- **Goal:** text-only places show the dot count during a throw instead of `wobble…`, and so does the band where the catcher doesn't fit (decision 0035 points 7–8, split from P5-28).
+- **Done when:**
+  - [ ] The compact band, the one-row band and the status line show `● ○ ○`, `● ● ○`, `● ● ● click!` or `● ✕ ○ broke free!` as the throw goes. The spinner is unchanged. Render tests run at `maxRows` 1, 2 and 7.
+  - [ ] Where the catcher doesn't fit the sprite area, the sprite holds still and the text lines show the dot count. The band never takes more rows than it does today.
+  - [ ] No `wobble` text is left in `plugin/hooks/`.
