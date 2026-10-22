@@ -690,12 +690,12 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Size:** M
 - **Goal:** players make, preview and delete their own catchers through `create-modster-content` (decision 0035 point 14).
 - **Done when:**
-  - [ ] SKILL.md has a "Make a catcher" section. It asks for the style (`contain`, `cover` or `custom`) and the beats one question at a time, draws the closed frame first, and adds other frames only when the player wants them.
-  - [ ] The helper renders a catcher's animation on a sample Modster (a catch and both kinds of miss, dark and light) into a GIF or HTML page the player can open. It reuses P5-28's frame function, with a test.
-  - [ ] For a `custom` catcher, the skill steers the player to one of the two ways a catcher can hold a Modster: stretched over it (`place: stretch`, like the net) or with the Modster shrinking in (`shrink-in`, like the jar, or the seed pod, whose husk opens, takes the Modster completely inside and snaps shut). An anchored catcher that keeps a full-size Modster visible is smaller than the Modster, so it overflows (noted by @danielpg95, 2026-10-19, on a test bubble). Before saving, the skill shows the preview on a large Modster, such as Elderbark.
-  - [ ] `reference/format.md` documents `catcher.json`, and "Delete your own" covers catchers.
+  - [x] SKILL.md has a "Make a catcher" section. It asks for the style (`contain`, `cover` or `custom`) and the beats one question at a time, draws the closed frame first, and adds other frames only when the player wants them.
+  - [x] The helper renders a catcher's animation on a sample Modster (a catch and both kinds of miss, dark and light) into a GIF or HTML page the player can open. It reuses P5-28's frame function, with a test.
+  - [x] For a `custom` catcher, the skill steers the player to one of the two ways a catcher can hold a Modster: stretched over it (`place: stretch`, like the net) or with the Modster shrinking in (`shrink-in`, like the jar, or the seed pod, whose husk opens, takes the Modster completely inside and snaps shut). An anchored catcher that keeps a full-size Modster visible is smaller than the Modster, so it overflows (noted by @danielpg95, 2026-10-19, on a test bubble). Before saving, the skill shows the preview on a large Modster, such as Elderbark.
+  - [x] `reference/format.md` documents `catcher.json`, and "Delete your own" covers catchers.
   - [ ] Checked by hand: a new `custom` catcher made through the skill appears in the Catchers tab after `/modsters reload` and plays on a throw.
-  - [ ] The Puzzle Cube, made through the skill, ships as a fifth built-in catcher (decision 0036, asked by @danielpg95, 2026-10-22): `plugin/content/catchers/puzzle-cube/`, a `CREDITS.md` row and `docs/previews/catchers/puzzle-cube.gif`.
+  - [x] The Puzzle Cube, made through the skill, ships as a fifth built-in catcher (decision 0036, asked by @danielpg95, 2026-10-22): `plugin/content/catchers/puzzle-cube/`, a `CREDITS.md` row and `docs/previews/catchers/puzzle-cube.gif`.
 
 #### [x] P5-32 — Catch timeline and blits
 - **Depends on:** P5-28
