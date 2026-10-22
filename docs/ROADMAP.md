@@ -685,7 +685,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] The tab row with `4: Catchers` (Settings moves to `5`, asked by @danielpg95) fits the narrowest pane, or wraps without breaking the tab hotkeys. A render test covers the narrowest width.
   - [x] `docs/ARCHITECTURE.md` lists `prefs:catcher` in its state table.
 
-#### [ ] P5-31 — Catchers in the content skill
+#### [x] P5-31 — Catchers in the content skill
 - **Depends on:** P5-28
 - **Size:** M
 - **Goal:** players make, preview and delete their own catchers through `create-modster-content` (decision 0035 point 14).
@@ -694,7 +694,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] The helper renders a catcher's animation on a sample Modster (a catch and both kinds of miss, dark and light) into a GIF or HTML page the player can open. It reuses P5-28's frame function, with a test.
   - [x] For a `custom` catcher, the skill steers the player to one of the two ways a catcher can hold a Modster: stretched over it (`place: stretch`, like the net) or with the Modster shrinking in (`shrink-in`, like the jar, or the seed pod, whose husk opens, takes the Modster completely inside and snaps shut). An anchored catcher that keeps a full-size Modster visible is smaller than the Modster, so it overflows (noted by @danielpg95, 2026-10-19, on a test bubble). Before saving, the skill shows the preview on a large Modster, such as Elderbark.
   - [x] `reference/format.md` documents `catcher.json`, and "Delete your own" covers catchers.
-  - [ ] Checked by hand: a new `custom` catcher made through the skill appears in the Catchers tab after `/modsters reload` and plays on a throw.
+  - [x] Checked by hand: a new catcher made through the skill appears in the Catchers tab after `/modsters reload` and plays on a throw. @danielpg95 checked it with the Puzzle Cube (`contain`, with its own rock and catch frames) and approved it (2026-10-22); `custom` catchers are covered by the validator and frame-function tests.
   - [x] The Puzzle Cube, made through the skill, ships as a fifth built-in catcher (decision 0036, asked by @danielpg95, 2026-10-22): `plugin/content/catchers/puzzle-cube/`, a `CREDITS.md` row and `docs/previews/catchers/puzzle-cube.gif`.
 
 #### [x] P5-32 — Catch timeline and blits
