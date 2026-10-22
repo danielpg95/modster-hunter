@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "puzzle-cube",
+  "name": "Puzzle Cube",
+  "description": "Traps a Modster and shuffles until every side clicks into place.",
+  "style": "contain",
+  "sprite": { "file": "sprite.sprite.json" },
+  "beats": {
+    "rock": { "frames": [1, 2, 3] },
+    "caught": { "frames": [4] }
+  },
+  "lidRows": 9
+}
