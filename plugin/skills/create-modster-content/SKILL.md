@@ -1,11 +1,12 @@
 ---
 name: create-modster-content
-description: Create your own Modsters and biomes for the Modster Hunter mod, pixel art included, written to ~/.claude/modster-hunter/content/. Use when someone playing Modster Hunter wants to make, draw, import (PNG or GIF) or change their own Modster or biome, add a Modster to a biome, delete one of their own, or hide built-in ones. Not for contributing built-in content to the Modster Hunter repo.
+description: Create your own Modsters, biomes and catchers for the Modster Hunter mod, pixel art included, written to ~/.claude/modster-hunter/content/. Use when someone playing Modster Hunter wants to make, draw, import (PNG or GIF) or change their own Modster, biome or catcher (the throw animation that catches a Modster), add a Modster to a biome, delete one of their own, or hide built-in ones. Not for contributing built-in content to the Modster Hunter repo.
 ---
 
 # Create Modster Hunter content
 
-You help the player make their own Modsters (creatures) and biomes (areas).
+You help the player make their own Modsters (creatures), biomes (areas) and
+catchers (the animation a throw plays).
 Everything goes in their content folder, `~/.claude/modster-hunter/content/`,
 which the mod loads at the start of every session next to the built-in content.
 
@@ -19,7 +20,8 @@ which the mod loads at the start of every session next to the built-in content.
   follow [Without Node](#without-node) and tell the player once what that
   limits.
 - **Look first.** List `~/.claude/modster-hunter/content/` and the built-in
-  `modsters/` and `biomes/`, so new ids are new and you know what exists.
+  `modsters/`, `biomes/` and `catchers/`, so new ids are new and you know what
+  exists.
 - **Scratch files** (grids, previews, drawing scripts) go in a temporary
   folder, never in the content folder.
 - **Access.** The content folder is outside the player's project, so the first
@@ -31,8 +33,9 @@ which the mod loads at the start of every session next to the built-in content.
 - **The player decides; you suggest.** Ask one field at a time, with 2–3
   suggestions and room for their own idea. Never present a finished design for
   a yes/no.
-- **Never overwrite without asking.** If `modsters/<id>/` or `biomes/<id>/`
-  already exists in the content folder, show what's there and ask.
+- **Never overwrite without asking.** If `modsters/<id>/`, `biomes/<id>/` or
+  `catchers/<id>/` already exists in the content folder, show what's there and
+  ask.
 - **Reusing a built-in id replaces that built-in entirely** (no field merge).
   Say so before doing it, and that the copy won't get later updates to the
   built-in. To hide a built-in instead, use `settings.json` (below).
@@ -97,6 +100,63 @@ which the mod loads at the start of every session next to the built-in content.
    --out biomes/<id>/background.sprite.json`, kept subtle so Modsters stay
    readable, and `"background": "background.sprite.json"`.
 4. Check and finish.
+
+## Make a catcher
+
+A catcher is the animation a throw plays: it flies in, takes the Modster,
+rocks, then clicks shut or breaks. The rocks hint at the result (3 means a
+catch). The player picks the one in use in `/modsters`, tab `4: Catchers`. It
+only changes looks, never the odds. Format: [reference/format.md](reference/format.md).
+
+1. **Design**, one question at a time:
+   - The idea, `name` (≤ 32) and a one-line `description` (≤ 120).
+   - `style`. Explain the three, and suggest one from the idea:
+     - `contain`: the Modster shrinks in and the catcher closes, like the
+       built-in glass jar, seed pod and lantern.
+     - `cover`: a pattern stretched over the Modster, which stays in view and
+       struggles, like the net.
+     - `custom`: the player sets every beat.
+2. **For `custom`, settle how it holds the Modster first.** Only two ways
+   work. A Modster is almost always bigger than its catcher, so an anchored
+   catcher that keeps it at full size overflows. Suggest one of these:
+   - **Stretched over it:** `"place": "stretch"`, like the net, which is
+     bigger than the Modster.
+   - **Caught completely inside:** `"modster": "shrink-in"` on `take`, then
+     `hidden`, like the jar, or the seed pod, whose husk opens, takes the whole
+     Modster in and snaps shut.
+
+   Then ask about each beat in turn: `throw` (`path`), `take`, `settle`,
+   `rock`, `caught` and `broken`. For each, ask what the Modster does and where
+   the catcher sits. Explain each choice in a few words.
+3. **Size and colors.** For `contain` and `custom`, keep the catcher at most
+   20 px tall and 22 wide, the size of the smallest built-in Modster (Dunebun),
+   so it shows on every Modster. A bigger one still works, but on smaller
+   Modsters the throw shows as a dot count instead. For `cover`, the art is a
+   tile about 8×8 that repeats over the Modster. Leave gaps so the Modster
+   shows through, and use a dark color for knots or edges: `rimIndex` points
+   at it. Use ≤ 24 colors.
+4. **Draw the closed frame first** (frame 0). Write a grid as in
+   [Drawing](#drawing), then
+   `draw <tmp>/grid.json --out ~/.claude/modster-hunter/content/catchers/<id>/sprite.png --catcher`.
+   - `lidRows`: for a lid that lifts and flies off, the top rows of frame 0
+     that are the lid.
+   - `glowIndex`: for a part that lights up with the Modster's color once it's
+     inside (the jar's contents, the pod's seam, the lantern's flame). Draw it
+     in its empty color. A small white shine drawn beside it keeps it bright.
+   - Add more frames (up to 16) only when the player wants them, for example an
+     open lid or a drawn tilt. Name them in that beat's `frames`. Without them,
+     the preset makes the motion from frame 0.
+5. **Write `catcher.json`**, then preview it:
+   `preview-catcher ~/.claude/modster-hunter/content/catchers/<id> --out <tmp>/catcher.html`.
+   It plays a catch and both kinds of miss on Elderbark (large) and Dunebun
+   (small), on dark and light, and says where the catcher is too big. Open the
+   page, post its full path in chat on its own line, and wait for the
+   player's reply. Fix colors that vanish on either background. For a
+   `custom` catcher, always look at it on a large Modster before finishing,
+   and if the Modster pokes out of the catcher, go back to step 2.
+6. **Check** and finish (see [Check and finish](#check-and-finish)). Tell the
+   player to run `/modsters reload`, open `/modsters`, press `4`, select it with
+   `j`/`k` and press `u`. The next throw plays it.
 
 ## Odds
 
@@ -182,12 +242,15 @@ off in `/config` for Modster Hunter. Then run `check` with `--without-builtins`.
 ## Delete your own
 
 The pane can't delete files, so for a player's own item it says to ask you:
-"delete my Modster <id>" or "delete my biome <id>" (decision 0032).
+"delete my Modster <id>", "delete my biome <id>" or "delete my catcher <id>"
+(decision 0032).
 
-1. Check `modsters/<id>/` or `biomes/<id>/` exists in the content folder. If the
-   id is only built in, say it can't be deleted, only turned off (`o` in
-   `/modsters`). If the player's item replaces a built-in, say the built-in
-   comes back after the delete.
+1. Check `modsters/<id>/`, `biomes/<id>/` or `catchers/<id>/` exists in the
+   content folder. If the id is only built in, say it can't be deleted: a
+   Modster or biome can be turned off (`o` in `/modsters`), and a catcher just
+   not picked. If the player's item replaces a built-in, say the built-in comes
+   back after the delete. If the catcher is the one in use, throws go back to
+   the glass jar.
 2. List the files you'll remove, and for a Modster any of the player's biomes
    that list it (those entries will be dropped, and a biome left with none
    won't load). Ask the player to confirm. Do nothing without a yes.
@@ -204,6 +267,7 @@ The pane can't delete files, so for a player's own item it says to ask you:
    `0 errors`. Warnings are fine, but mention them.
 2. Tell the player:
    - which files you wrote, and the odds of each changed biome;
+   - for a catcher: pick it in `/modsters` → `4: Catchers` with `u`;
    - `/modsters reload` loads their changes now (an encounter in progress
      finishes first); the Settings tab (`/modsters`, then `5`) lists any
      problems;
@@ -218,6 +282,8 @@ The pane can't delete files, so for a player's own item it says to ask you:
   export one).
 - Drawing needs the helper. Offer a PNG from a pixel editor, or installing
   Node 22.18+.
+- A catcher works the same way: a PNG sheet with `"frames": N`. Its preview
+  needs the helper, so check it in a throw after `/modsters reload`.
 - Check by hand against [reference/format.md](reference/format.md), field by
   field. A file with an error is skipped without a message in the game, so be
   careful.

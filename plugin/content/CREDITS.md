@@ -48,3 +48,4 @@ The `.sprite.json` next to each sheet is generated from it with `npm run sprite`
 | `catchers/pod/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Seed pod catcher (decision 0035); P5-29 |
 | `catchers/lantern/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Lantern catcher (decision 0035); P5-29 |
 | `catchers/net/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Net catcher, a rope tile with a rim (decision 0035); P5-29 |
+| `catchers/puzzle-cube/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Puzzle Cube catcher, scrambled until a catch solves it (decision 0036); P5-31 |

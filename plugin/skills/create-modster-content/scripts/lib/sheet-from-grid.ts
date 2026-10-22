@@ -16,9 +16,10 @@ const COLOR_PATTERN = /^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/
  * Turns the helper's text grid into a sheet (decision 0025): a `palette` of
  * one-character keys (`"transparent"`, `#rrggbb` or `#rrggbbaa`) and `frames`,
  * each a list of equal rows, one character per pixel. Sprite bounds are left
- * to `spriteFromSheet`. Never throws.
+ * to `spriteFromSheet`. `maxFrames` is higher for a catcher (decision 0035).
+ * Never throws.
  */
-export function sheetFromGrid(value: unknown, file: string): Validation<GridSheet> {
+export function sheetFromGrid(value: unknown, file: string, maxFrames: number = CONTENT.sprite.framesMax): Validation<GridSheet> {
   const issues = new IssueList(file)
   if (!isObject(value)) return issues.fail('', `must be an object with "palette" and "frames", not ${describe(value)}`)
   for (const key of Object.keys(value)) if (key !== 'palette' && key !== 'frames') issues.error(key, 'is not a known field')
@@ -37,7 +38,8 @@ export function sheetFromGrid(value: unknown, file: string): Validation<GridShee
   }
 
   const frames = value['frames']
-  const { framesMin, framesMax } = CONTENT.sprite
+  const { framesMin } = CONTENT.sprite
+  const framesMax = maxFrames
   if (!Array.isArray(frames) || frames.length < framesMin || frames.length > framesMax) {
     issues.error('frames', `must be a list of ${framesMin}–${framesMax} frames, each a list of rows`)
     return issues.result({ image: { width: 0, height: 0, data: [] }, frames: 0 })

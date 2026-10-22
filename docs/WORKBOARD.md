@@ -17,7 +17,6 @@ this file lists only tasks someone has claimed.
 | --- | --- | --- | --- | --- | --- | --- |
 | P5-19 | @danielpg95 | in-review | p5-19-forest-roster | 2026-10-14 | 2026-10-16 | Check the forest live with `/modsters hunt`, then merge PR #112 |
 | P5-21 | @victor-aguilars | in-progress | p5-21-saltbreeze-roster | 2026-10-14 | 2026-10-16 | Pick a concept for the second common (#033); Peekashell and Sir Kelpsie are in the partial PR |
-| P5-31 | @danielpg95 | in-progress | p5-31-catchers-skill | 2026-10-22 | 2026-10-22 | Add a `preview-catcher` command to the content helper that writes an HTML page of the animation, reusing `catchFrame` |
 
 ## Up next
 

@@ -14,11 +14,16 @@ errors, and a file with an error is skipped.
 │   └── <biome-id>/
 │       ├── biome.json
 │       └── background.sprite.json   # optional
-└── modsters/
-    └── <modster-id>/
-        ├── modster.json
-        ├── sprite.png            # a PNG sheet, or…
-        └── sprite.sprite.json    # …a converted sprite
+├── modsters/
+│   └── <modster-id>/
+│       ├── modster.json
+│       ├── sprite.png            # a PNG sheet, or…
+│       └── sprite.sprite.json    # …a converted sprite
+└── catchers/
+    └── <catcher-id>/
+        ├── catcher.json
+        ├── sprite.png            # as for a Modster
+        └── sprite.sprite.json
 ```
 
 ## Ids
@@ -27,6 +32,8 @@ errors, and a file with an error is skipped.
   `^[a-z][a-z0-9-]{1,31}$`.
 - The folder name must equal the `id` in the file.
 - A user id equal to a built-in id replaces the built-in entirely.
+- Biomes, Modsters and catchers have their own ids: a catcher may share an id
+  with a Modster.
 - Ids are permanent; change `name` instead.
 
 ## `biome.json`
@@ -124,6 +131,78 @@ errors, and a file with an error is skipped.
 - **Transparency:** alpha below 128 is transparent, 128 and up is opaque.
 - **GIFs** aren't read by the mod: convert them to a `.sprite.json` with the
   helper, or export a PNG sheet.
+
+## `catcher.json`
+
+A catcher is what a throw plays: it flies in, takes the Modster, rocks, and
+clicks shut or breaks. The player picks one in `/modsters`, tab `4: Catchers`.
+It only changes how a throw looks, never the odds.
+
+```json
+{
+  "schemaVersion": 1,
+  "id": "firefly-jar",
+  "name": "Firefly Jar",
+  "description": "Glows with whatever it holds.",
+  "style": "contain",
+  "sprite": { "file": "sprite.png", "frames": 2 },
+  "beats": { "take": { "frames": [1] } },
+  "glowIndex": 5,
+  "lidRows": 4
+}
+```
+
+| Field | Required | Rules |
+| --- | --- | --- |
+| `schemaVersion` | yes | `1` |
+| `id` | yes | See Ids |
+| `name` | yes | 1–32 chars |
+| `description` | no | ≤ 120 chars; shown in the Catchers tab |
+| `style` | yes | `contain`, `cover` or `custom` (below) |
+| `sprite.file` | yes | `sprite.png` (a PNG sheet) or a `.sprite.json`, in the catcher's folder |
+| `sprite.frames` | with a `.png` | Integer 1–16. An error with a `.sprite.json` |
+| `beats` | with `custom` | Any of the six beats below; with `contain` or `cover`, only what differs |
+| `glowIndex` | no | Integer 1–63, a palette index inside the sprite's palette. It shows its own color while the catcher is empty, and the Modster's most common bright color while the Modster is inside (beats where `modster` is `hidden`) |
+| `rimIndex` | no | Integer 1–63, inside the palette: the edge of a `stretch` shape. The color must appear in the art, or it's left out of the palette |
+| `lidRows` | no | Integer 1–31, less than the sprite's height: the top rows of frame 0 that lift to open and fly off on a break |
+
+**The sprite:** at most 32×32 px, with up to 16 frames, and the usual sprite
+rules. **Frame 0 is the closed catcher**; other frames are used only where a
+beat names them. A catcher bigger than a Modster's sprite area isn't drawn on
+that Modster: the text shows the throw as a dot count instead.
+
+### Beats
+
+A throw plays `throw`, `take`, `settle`, `rock` once per rock (3 for a catch,
+1–2 for a miss), then `caught` or `broken`. Their lengths are fixed. Each beat
+is an object with these fields:
+
+| Field | Rules |
+| --- | --- |
+| `frames` | 1–16 frame indexes inside the sprite, played evenly over the beat (each rock plays the whole list) |
+| `place` | `over`: at the bottom center of the Modster's area, in front of it. `behind`: the same, behind it. `stretch`: the frame tiled over the Modster's outline |
+| `modster` | `visible`, `hidden`, `dim`, `shake`, `shrink-in` (shrinks into the opening, flashing white), `shrink`, `hop-out` or `pop-out` (grows back out of the opening) |
+| `path` | `throw` only: `arc`, `drop` (falls from the top) or `none` |
+
+### Styles
+
+`contain` and `cover` are presets: a beat the file leaves out, and any field a
+given beat leaves out, comes from the table. In a `custom` catcher every beat
+must be given with its `modster`; `frames` defaults to `[0]`, `place` to
+`over` and `path` to `arc`.
+
+| Beat | `contain` (jar, seed pod, lantern) | `cover` (net) |
+| --- | --- | --- |
+| `throw` | `over`, `visible`, `arc` | `stretch`, `visible`, `arc` |
+| `take` | `over`, `shrink-in`; the lid lifts | `stretch`, `visible`; drops over it |
+| `settle` | `over`, `hidden` | `stretch`, `visible` |
+| `rock` | `over`, `hidden`; frame 0 tilts | `stretch`, `shake` |
+| `caught` | `over`, `hidden`; sparkles | `stretch`, `shrink`; sparkles |
+| `broken` | `over`, `pop-out`; the lid flies off | `stretch`, `hop-out`; tears open |
+
+Where a preset beat has no `frames`, they're made from frame 0: tilted for
+`rock`, with the top `lidRows` rows lifting for `take` and flying off for
+`broken`.
 
 ## Rarity tiers
 

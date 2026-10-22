@@ -160,6 +160,39 @@ test('draw: a grid with problems, or too small for a sprite, prints them and wri
   assert.match(run('draw', writeJson('g3.json', GRID), '--out', join(dir, 'x.gif')).stderr, /--out must name a \.png file/)
 })
 
+test('draw and convert allow 16 frames with --catcher, and 8 without (decision 0035)', () => {
+  const frames = (count) => Array.from({ length: count }, () => GRID.frames[0])
+  const out = join(dir, 'catcher-sheet.png')
+  const many = run('draw', writeJson('many.json', { ...GRID, frames: frames(16) }), '--out', out, '--catcher')
+  assert.equal(many.code, 0, many.stderr)
+  assert.match(many.stdout, /16 frames.*in catcher\.json: "sprite": \{ "file": "catcher-sheet\.png", "frames": 16 \}/)
+  assert.equal(run('draw', writeJson('nine.json', { ...GRID, frames: frames(9) }), '--out', join(dir, 'nine.png')).code, 1)
+  const converted = run('convert', out, '--frames', '16', '--out', join(dir, 'catcher.sprite.json'), '--catcher')
+  assert.equal(converted.code, 0, converted.stderr)
+  assert.match(run('convert', out, '--frames', '16', '--out', join(dir, 'x.sprite.json')).stderr, /--frames must be a whole number 1–8/)
+})
+
+test('preview-catcher: a catcher folder becomes an HTML page of its throw on built-in Modsters', () => {
+  const folder = join(dir, 'catchers', 'blob-jar')
+  mkdirSync(folder, { recursive: true })
+  run('draw', writeJson('blob-jar-grid.json', GRID), '--out', join(folder, 'sprite.png'), '--catcher')
+  writeFileSync(join(folder, 'catcher.json'), JSON.stringify({ schemaVersion: 1, id: 'blob-jar', name: 'Blob Jar', style: 'contain', sprite: { file: 'sprite.png', frames: 2 }, lidRows: 2 }))
+  const out = join(dir, 'blob-jar.html')
+  const made = run('preview-catcher', folder, '--out', out, '--scale', '1')
+  assert.equal(made.code, 0, made.stderr)
+  assert.match(made.stdout, /Blob Jar on Elderbark, Dunebun, \d+ frames at 1×/)
+  const page = readFileSync(out, 'utf8')
+  assert.ok((page.match(/<img /g) ?? []).length > 10)
+  assert.ok(!/https?:\/\//.test(page))
+
+  assert.match(run('preview-catcher', folder, '--out', out, '--on', 'nobody').stderr, /--on: "nobody" isn't a built-in Modster/)
+  assert.match(run('preview-catcher', folder, '--out', join(dir, 'x.png')).stderr, /--out must name a \.html file/)
+  writeFileSync(join(folder, 'catcher.json'), JSON.stringify({ schemaVersion: 1, id: 'blob-jar', name: 'Blob Jar', style: 'contain', sprite: { file: 'sprite.png', frames: 2 }, beats: { rock: { frames: [5] } } }))
+  const bad = run('preview-catcher', folder, '--out', out)
+  assert.equal(bad.code, 1)
+  assert.match(bad.stderr, /beats\.rock\.frames\[0\] is frame 5, but the sprite has 2/)
+})
+
 test('preview: a sheet, a GIF or a .sprite.json becomes an enlarged PNG', () => {
   const sheet = join(dir, 'for-preview.png')
   run('draw', writeJson('pv.json', GRID), '--out', sheet)
