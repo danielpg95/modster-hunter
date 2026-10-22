@@ -48,4 +48,5 @@ settled questions and avoid making assumptions about open ones.
 | [0032](0032-in-pane-enable-disable.md) | The pane turns content on and off; deleting is the content skill's job | Accepted |
 | [0033](0033-standard-sprite-size.md) | Every Modster's sprite is at most 32 px tall and 48 px wide | Accepted |
 | [0034](0034-color-limit.md) | A Modster's sprite uses at most 24 colors | Accepted |
-| [0035](0035-catchers.md) | Throws play a catcher animation, and players can make their own catchers | Accepted (P5-27 added `rimIndex`; P5-30: `u: Use`, tab `4: Catchers`) |
+| [0035](0035-catchers.md) | Throws play a catcher animation, and players can make their own catchers | Accepted (P5-27 added `rimIndex`; P5-30: `u: Use`, tab `4: Catchers`; amended by 0036) |
+| [0036](0036-puzzle-cube-catcher.md) | A fifth built-in catcher, the Puzzle Cube | Accepted |
