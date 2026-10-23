@@ -1,7 +1,7 @@
 // The Settings tab's lines (P4-02): every content issue from the last load,
 // each as `formatIssue` writes it (decision 0025, so the content helper's
 // `check` and this tab agree), then how to turn content off (decision 0032),
-// how to reload, and where the settings live.
+// and how to reload. The options themselves are rows above these (decision 0040).
 // Like the Stats tab, the rows aren't windowed; past the pane's rows the engine
 // scrolls its body.
 
@@ -13,8 +13,6 @@ export const NO_ISSUES_TEXT = 'All content loaded, no problems.'
 // The `o` key is otherwise only a dim button on the Collection and Biomes summary rows
 export const TOGGLE_TEXT = `Press ${TOGGLE_HOTKEY} in Collection or Biomes to turn one off or on.`
 export const RELOAD_TEXT = 'Changed a file? Run /modsters reload.'
-// 0023 point 7, as amended by P3-01
-export const CONFIG_TEXT = 'Change where the game shows in /config.'
 
 export function settingsLines(issues: readonly ContentIssue[]): BandLine[] {
   const lines: BandLine[] = []
@@ -29,7 +27,6 @@ export function settingsLines(issues: readonly ContentIssue[]): BandLine[] {
   lines.push([{ text: '' }])
   lines.push([{ text: TOGGLE_TEXT, dim: true }])
   lines.push([{ text: RELOAD_TEXT, dim: true }])
-  lines.push([{ text: CONFIG_TEXT, dim: true }])
   return lines
 }
 

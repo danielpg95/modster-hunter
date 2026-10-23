@@ -58,7 +58,7 @@ plugin/
 | `ui.render` `{ component: 'Pane' }` (our id) | Draw the collection pane (P3), or the encounter pane `modster-hunt` (0015), with the biome's scene between encounters (0027) |
 | `ui.render` `{ component: 'Spinner' }` | Name the Modster in the main turn's spinner while an encounter is up (`showInSpinner`, 0023) |
 | `ui.close` | The encounter pane closed: redraw so the band takes the encounter back (0015); a close by hand stores `prefs:huntPane` `open: false` (0019) |
-| `command.run` `{ command: 'modsters' }` | Registered `immediate`, so it runs during a turn too, and never reads the turn (0039). Open the collection pane; `hunt` and `stop` turn the game on and off through `$.config.set` on `autoStart` (0038); `pane` opens the encounter pane (0015), starting the game if it's off, and stores `prefs:huntPane` `open: true` (0019), or answers that it's off with `encounterPane: off` (0023); `reload` reloads content; `help` and an unknown word reply with the commands (0038) |
+| `command.run` `{ command: 'modsters' }` | Registered `immediate`, so it runs during a turn too, and never reads the turn (0039). Open the collection pane; `hunt` and `stop` turn the game on and off through `$.config.set` on `autoStart` (0038); `pane` opens the encounter pane (0015), starting the game if it's off, and stores `prefs:huntPane` `open: true` (0019), or answers that it's off with `encounterPane: off` (0023); `settings` opens the collection pane on its Settings tab (0040); `reload` reloads content; `help` and an unknown word reply with the commands (0038) |
 | `session.end` | Clear running turn and subagents, stop timers, clear the status line, flush stats (≤ 1.5 s total budget) |
 
 ## Where state lives
@@ -78,6 +78,7 @@ plugin/
 | Whether the encounter pane reopens (`prefs:huntPane`) | `$.store` | Set by `/modsters pane`, cleared by a close by hand (decision 0019); used only while `autoStart` is on (0038) |
 | Whether the welcome toast was shown (`prefs:welcomed`, `{ v: 1 }`) | `$.store` | Written once, at the first session start, before `autoStart` changes (decision 0038) |
 | The catcher in use (`prefs:catcher`, `{ v: 1, id }`) | `$.store` | Set by `u` in the Catchers tab, read at session start; missing or unknown means `jar` (decision 0035 points 9–10). A throw keeps the catcher it started with |
+| The options as the Settings tab shows them, and its selected row | Module variables in `register.tsx` (`settingValues`, `settingsSelected`) | Read from the load's options; the tab's `o`, `/modsters hunt` and `stop` update them after `$.config.set` succeeds. A changed idle timeout waits in `pendingIdleTimeoutMs` until no encounter is up (decision 0040) |
 | The Catchers tab's selection and preview | Module variables in `register.tsx` | Starts on the catcher in use (P5-30). The preview loops a catch on the Modster caught last, or a silhouette, on its own timer while the tab shows it |
 | User content | Files in `~/.claude/modster-hunter/content/` | Editable by hand, by the editor and by Claude |
 | Decoded user PNG sprites | Files in `~/.claude/modster-hunter/cache/sprites/` | Keyed by the PNG's size, mtime and frame count; safe to delete (decision 0016) |

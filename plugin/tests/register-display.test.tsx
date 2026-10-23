@@ -206,7 +206,7 @@ describe('register: display settings', () => {
   test('encounterPane off: /modsters pane says so and opens nothing', { options: { autoStart: true, encounterPane: 'off' } }, async ($, on) => {
     const { seen } = await start($, on, { store: { 'prefs:huntPane': { v: 1, open: true } } })
     const reply = await $.command.run({ command: 'modsters', args: 'pane' } as any)
-    expect(reply).toEqual({ text: 'The encounter pane is off · turn it on in /config' })
+    expect(reply).toEqual({ text: 'The encounter pane is off · turn it on in /modsters settings' })
     expect(seen.opens).toEqual([])
     expect(seen.store['prefs:huntPane']).toEqual({ v: 1, open: true })
   })

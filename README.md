@@ -71,9 +71,9 @@ Claude for anything. `/modsters stop` turns the game off.
 | `1` / `2` | Throw / run while a Modster is up |
 | `/modsters` | Your collection, the biomes, stats, catchers and settings |
 | `/modsters pane` | A bigger encounter pane, for a better view |
+| `/modsters settings` | Every option: Auto start, where the game shows, and more |
 | `/modsters reload` | Load your own Modsters after you add or change them |
 | `/modsters help` | Every command |
-| `/config` | Auto start, and where the game shows: band, pane, spinner, status line |
 
 ## Contributing
 

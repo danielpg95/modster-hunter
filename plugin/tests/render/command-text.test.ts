@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { MODSTERS_ARGUMENT_HINT, STOP_REPLY, autoStartDeniedReply, helpText, huntReply, unknownSubcommandText, welcomeText } from '../../hooks/render'
+import { MODSTERS_ARGUMENT_HINT, PANE_OFF_REPLY, STOP_REPLY, settingDeniedText, autoStartDeniedReply, helpText, huntReply, unknownSubcommandText, welcomeText } from '../../hooks/render'
 
 describe('command text (0038)', () => {
   test('the typeahead hint lists every subcommand (point 8)', () => {
-    expect(MODSTERS_ARGUMENT_HINT).toBe('[hunt | stop | pane | reload | help]')
+    expect(MODSTERS_ARGUMENT_HINT).toBe('[hunt | stop | pane | settings | reload | help]')
   })
 
   test('hunt names the biome, and says how to stop (point 3)', () => {
@@ -22,11 +22,11 @@ describe('command text (0038)', () => {
 
   test('help lists every subcommand, the keys, and Auto start (point 6)', () => {
     const text = helpText(false)
-    for (const part of ['/modsters hunt', '/modsters stop', '/modsters  ', '/modsters pane', '/modsters reload', '1: Throw · 2: Run, from an empty prompt']) {
+    for (const part of ['/modsters hunt', '/modsters stop', '/modsters  ', '/modsters pane', '/modsters settings', '/modsters reload', '1: Throw · 2: Run, from an empty prompt']) {
       expect(text).toContain(part)
     }
-    expect(text.split('\n').at(-1)).toBe('Auto start is off (/config)')
-    expect(helpText(true).split('\n').at(-1)).toBe('Auto start is on (/config)')
+    expect(text.split('\n').at(-1)).toBe('Auto start is off · /modsters settings')
+    expect(helpText(true).split('\n').at(-1)).toBe('Auto start is on · /modsters settings')
   })
 
   test('an unknown word is named, then the help follows (point 7)', () => {
@@ -35,5 +35,10 @@ describe('command text (0038)', () => {
 
   test('the welcome says the game is on and how to stop it (0041)', () => {
     expect(welcomeText()).toBe('Modster Hunter is on · Modsters show up while Claude works · /modsters stop to turn it off · /modsters help for more')
+  })
+
+  test('the pane-off reply and refused settings point to /modsters settings (0040)', () => {
+    expect(PANE_OFF_REPLY).toBe('The encounter pane is off · turn it on in /modsters settings')
+    expect(settingDeniedText('Idle scene', 'locked')).toBe("Modster Hunter: couldn't change Idle scene · locked")
   })
 })

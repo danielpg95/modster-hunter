@@ -76,7 +76,16 @@ import {
   type IdleScene,
   type Particle,
   MODSTERS_ARGUMENT_HINT,
+  PANE_OFF_REPLY,
+  SETTING_SPECS,
   STOP_REPLY,
+  nextSettingValue,
+  readSettingValues,
+  settingDeniedText,
+  settingRow,
+  type SettingField,
+  type SettingValue,
+  type SettingValues,
   autoStartDeniedReply,
   helpText,
   huntReply,
@@ -184,8 +193,18 @@ let display = readDisplaySettings({})
 // Whether the game runs (decision 0038): the `autoStart` option at load, then what
 // /modsters hunt and stop wrote. While false, nothing draws outside /modsters
 let hunting = false
-// The `/config` row /modsters hunt and stop write (0038 points 3–4): `<plugin>.<field>`
-const AUTO_START_KEY = 'modster-hunter.autoStart'
+// The options as the Settings tab shows them (decision 0040): read at load, then
+// what the tab, /modsters hunt and stop wrote
+let settingValues: SettingValues = readSettingValues({})
+// The Settings tab's selected row
+let settingsSelected: SettingField = 'autoStart'
+// An idle timeout changed during an encounter waits for the next one (0040 point 5)
+let pendingIdleTimeoutMs: number | undefined
+// Options the Settings tab changes in place (0040 point 5); read from the load's options in register
+let idleTimeoutSec = 90
+let showIdleLine = true
+let showIdleScene = true
+let includeBuiltins = true
 // The `includeBuiltins` option, for messages outside register's closure
 let builtinsIncluded = true
 // What the status line shows now, so a tick that changes nothing doesn't re-pin it
@@ -235,10 +254,11 @@ let biomesSceneTick = 0
 let isBlittingBiomesScene = false
 
 export const register: Register = (on, options) => {
-  const idleTimeoutSec = typeof options.encounterIdleTimeoutSec === 'number' ? options.encounterIdleTimeoutSec : 90
-  const showIdleLine = options.showIdleLine !== false
-  const showIdleScene = options.showIdleScene !== false
-  const includeBuiltins = options.includeBuiltins !== false
+  idleTimeoutSec = typeof options.encounterIdleTimeoutSec === 'number' ? options.encounterIdleTimeoutSec : 90
+  showIdleLine = options.showIdleLine !== false
+  showIdleScene = options.showIdleScene !== false
+  includeBuiltins = options.includeBuiltins !== false
+  settingValues = readSettingValues(options)
   builtinsIncluded = includeBuiltins
   display = readDisplaySettings(options)
   // On unless the player turned it off (decision 0041)
@@ -756,10 +776,29 @@ export const register: Register = (on, options) => {
       )
     }
 
-    /** The Settings tab: every content issue from the last load, and how to reload (P4-02). */
+    /** The Settings tab: every option with k/j/o (decision 0040), then the content issues and how to reload (P4-02). */
     function settingsView() {
+      const fields = SETTING_SPECS.map((spec) => spec.field)
+      const index = Math.max(0, fields.indexOf(settingsSelected))
+      const select = (field: SettingField | undefined) => {
+        if (!field || field === settingsSelected) return
+        settingsSelected = field
+        $.ui.invalidate('ui.render')
+      }
       return (
         <Box key="settings" flexDirection="column">
+          <Box key="settings-summary" flexDirection="row" columnGap={COLLECTION.gapColumns}>
+            <Text bold>Settings</Text>
+            <Button key="setting-up" label="Up" hotkey="k" plain dimColor onPress={() => select(fields[index - 1])} />
+            <Button key="setting-down" label="Down" hotkey="j" plain dimColor onPress={() => select(fields[index + 1])} />
+            <Button key="setting-change" label="Change" hotkey={TOGGLE_HOTKEY} plain dimColor onPress={() => void changeSetting($, fields[index] ?? 'autoStart')} />
+          </Box>
+          {fields.map((field) => (
+            <Button key={`setting-${field}`} plain onPress={() => select(field)}>
+              {texts(settingRow(field, settingValues, field === fields[index]), 'truncate')}
+            </Button>
+          ))}
+          <Text key="settings-gap"> </Text>
           {settingsLines(content?.issues ?? []).map((line, at) => (
             <Box key={`settings-${at}`} flexDirection="row">
               {texts(line, 'wrap')}
@@ -1053,7 +1092,7 @@ export const register: Register = (on, options) => {
     }
     // `/modsters pane` opens the encounter pane, starting the game when it's off (0015, 0019, 0024; 0038 point 5)
     if (verb === 'pane') {
-      if (display.encounterPane === 'off') return { text: 'The encounter pane is off · turn it on in /config' }
+      if (display.encounterPane === 'off') return { text: PANE_OFF_REPLY }
       const denied = await startHunting($, idleTimeoutSec, { reopenPane: false })
       if (denied !== undefined) return { text: autoStartDeniedReply(true, denied) }
       queueWrite($, (store) => store.set(HUNT_PANE_KEY, huntPanePref(true)))
@@ -1064,6 +1103,8 @@ export const register: Register = (on, options) => {
       return opened.isPlaced ? {} : { text: 'Modster Hunter: the pane is waiting for more room (widen the terminal)' }
     }
     if (verb === 'help') return { text: helpText(hunting) }
+    // `/modsters settings` opens the collection on its Settings tab (0040 point 1)
+    if (verb === 'settings') collectionTab = 'settings'
     if (verb === 'reload') {
       reloading ??= reloadContent($, includeBuiltins, idleTimeoutSec).finally(() => {
         reloading = undefined
@@ -1071,7 +1112,7 @@ export const register: Register = (on, options) => {
       return { text: (await reloading).reply }
     }
     // A word it doesn't know gets the help, not the collection (0038 point 7)
-    if (verb !== '') return { text: unknownSubcommandText(verb, hunting) }
+    if (verb !== '' && verb !== 'settings') return { text: unknownSubcommandText(verb, hunting) }
     // Catches from other sessions show up when the pane opens
     loadCollectionRecords($)
     if (collectionTab === 'stats') loadStats($)
@@ -1080,6 +1121,64 @@ export const register: Register = (on, options) => {
     const opened = await $.ui.open({ id: COLLECTION_PANE_ID, title: 'Modster collection', focus: true, closeOnEscape: true })
     return opened.isPlaced ? {} : { text: 'Modster Hunter: the collection is waiting for more room (widen the terminal)' }
   })
+
+}
+
+/**
+ * The Settings tab's `o` (decision 0040 points 3–5): writes the next value through
+ * /config and applies it at once. A refused write keeps the value and says why.
+ */
+async function changeSetting($: EngineInterface, field: SettingField): Promise<void> {
+  const next = nextSettingValue(field, settingValues[field])
+  const label = SETTING_SPECS.find((spec) => spec.field === field)?.label ?? field
+  if (field === 'autoStart') {
+    // Exactly what /modsters hunt and stop do (0038 points 3–4)
+    const denied = next === true ? await startHunting($, idleTimeoutSec, { reopenPane: true }) : await stopHunting($)
+    if (denied !== undefined) $.ui.toast(settingDeniedText(label, denied))
+    $.ui.invalidate('ui.render')
+    return
+  }
+  const denied = await setOption($, field, next)
+  if (denied !== undefined) {
+    $.ui.toast(settingDeniedText(label, denied))
+    return
+  }
+  settingValues = { ...settingValues, [field]: next }
+  switch (field) {
+    case 'showInBand':
+    case 'encounterPane':
+    case 'showInSpinner':
+    case 'showInStatusLine':
+      // Where the game shows, by 0023's rules
+      display = readDisplaySettings(settingValues)
+      if (field === 'encounterPane' && next === 'off') await closeHuntPane($)
+      if (field === 'encounterPane' && next === 'always' && hunting) await openHuntPaneAtStart($)
+      updateStatus($)
+      break
+    case 'showIdleLine':
+      showIdleLine = next === true
+      break
+    case 'showIdleScene':
+      showIdleScene = next === true
+      updateSceneTimer($)
+      break
+    case 'includeBuiltins': {
+      includeBuiltins = next === true
+      builtinsIncluded = includeBuiltins
+      // As /modsters reload does (0031)
+      await reloading?.catch(() => undefined)
+      reloading = reloadContent($, includeBuiltins, idleTimeoutSec).finally(() => {
+        reloading = undefined
+      })
+      $.ui.toast((await reloading).reply)
+      break
+    }
+    case 'encounterIdleTimeoutSec':
+      idleTimeoutSec = Number(next)
+      setIdleTimeout(idleTimeoutSec * 1000)
+      break
+  }
+  $.ui.invalidate('ui.render')
 }
 
 function cellsFor(loaded: LoadedModster): string[] {
@@ -1166,6 +1265,7 @@ function startMachine($: EngineInterface, idleTimeoutSec: number): void {
   setScene($, loaded)
   if (!content || !loaded) return
   machineContext = playContext(content, loaded, idleTimeoutSec)
+  pendingIdleTimeoutMs = undefined
   machine = startEncounters(machineContext)
   // Timers start in session.start, never at module top level (mod-code rule)
   tickTimer = $.clock.every(BAND.tickMs, () => {
@@ -1217,6 +1317,10 @@ async function advanceMachine($: EngineInterface, action: MachineAction): Promis
     return
   }
   machine = step.state
+  if (pendingIdleTimeoutMs !== undefined && !machine.encounter) {
+    machineContext = { ...machineContext, idleTimeoutMs: pendingIdleTimeoutMs }
+    pendingIdleTimeoutMs = undefined
+  }
   updateDots(now)
   // Before the redraw, so a throw's first frame is what the band draws
   updateCatch($, now)
@@ -1424,13 +1528,23 @@ async function welcome($: EngineInterface): Promise<void> {
   }
 }
 
-/** Writes the `autoStart` row through /config (0038); returns why it was refused, or undefined once written. */
-async function setAutoStart($: EngineInterface, on: boolean): Promise<string | undefined> {
+/** Writes one of our `/config` rows, `modster-hunter.<field>` (0038, 0040); returns why it was refused, or undefined once written. */
+async function setOption($: EngineInterface, field: SettingField, value: SettingValue): Promise<string | undefined> {
   try {
-    const result = await $.config.set({ key: AUTO_START_KEY, value: on })
+    const result = await $.config.set({ key: `modster-hunter.${field}`, value })
     return result.deny
   } catch (error) {
     return error instanceof Error ? error.message : String(error)
+  }
+}
+
+/** The idle timeout from the next encounter on (0040 point 5): now when none is up, else once it ends. */
+function setIdleTimeout(ms: number): void {
+  if (machineContext && !machine?.encounter) {
+    machineContext = { ...machineContext, idleTimeoutMs: ms }
+    pendingIdleTimeoutMs = undefined
+  } else {
+    pendingIdleTimeoutMs = ms
   }
 }
 
@@ -1440,9 +1554,10 @@ async function setAutoStart($: EngineInterface, on: boolean): Promise<string | u
  */
 async function startHunting($: EngineInterface, idleTimeoutSec: number, how: { reopenPane: boolean }): Promise<string | undefined> {
   if (hunting) return undefined
-  const denied = await setAutoStart($, true)
+  const denied = await setOption($, 'autoStart', true)
   if (denied !== undefined) return denied
   hunting = true
+  settingValues = { ...settingValues, autoStart: true }
   startMachine($, idleTimeoutSec)
   if (how.reopenPane) await openHuntPaneAtStart($)
   $.ui.invalidate('ui.render')
@@ -1454,9 +1569,10 @@ async function startHunting($: EngineInterface, idleTimeoutSec: number, how: { r
  * result, and the band, status line, spinner and encounter pane cleared. Returns why /config refused, if it did.
  */
 async function stopHunting($: EngineInterface): Promise<string | undefined> {
-  const denied = await setAutoStart($, false)
+  const denied = await setOption($, 'autoStart', false)
   if (denied !== undefined) return denied
   hunting = false
+  settingValues = { ...settingValues, autoStart: false }
   stopGame()
   updateStatus($)
   await closeHuntPane($)

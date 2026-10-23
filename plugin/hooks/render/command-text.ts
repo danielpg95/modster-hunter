@@ -2,11 +2,19 @@
 // command's reply and a toast are drawn by the engine, not as a tree.
 
 /** Dim after `/modsters` in the typeahead (point 8). */
-export const MODSTERS_ARGUMENT_HINT = '[hunt | stop | pane | reload | help]'
+export const MODSTERS_ARGUMENT_HINT = '[hunt | stop | pane | settings | reload | help]'
 
 /** `/modsters hunt`'s reply, also when hunting was already on (point 3). */
 export function huntReply(biomeName: string | undefined): string {
   return `${biomeName ? `Hunting in ${biomeName}` : 'Hunting'} · Modsters show up while Claude works · /modsters stop to stop`
+}
+
+/** The reply to `/modsters pane` while `encounterPane` is `off` (0023 point 4, text by 0040 point 6). */
+export const PANE_OFF_REPLY = 'The encounter pane is off · turn it on in /modsters settings'
+
+/** A Settings tab change that /config refused (0040 point 4). */
+export function settingDeniedText(label: string, reason: string): string {
+  return `Modster Hunter: couldn't change ${label} · ${reason}`
 }
 
 /** `/modsters stop`'s reply (point 4). */
@@ -21,13 +29,14 @@ export function autoStartDeniedReply(on: boolean, reason: string): string {
 export function helpText(autoStart: boolean): string {
   return [
     'Modster Hunter',
-    '/modsters hunt    start hunting',
-    '/modsters stop    stop hunting',
-    '/modsters         your collection',
-    '/modsters pane    a bigger encounter view',
-    '/modsters reload  load your own Modsters after changes',
+    '/modsters hunt      start hunting',
+    '/modsters stop      stop hunting',
+    '/modsters           your collection',
+    '/modsters pane      a bigger encounter view',
+    '/modsters settings  change every option',
+    '/modsters reload    load your own Modsters after changes',
     '1: Throw · 2: Run, from an empty prompt',
-    `Auto start is ${autoStart ? 'on' : 'off'} (/config)`,
+    `Auto start is ${autoStart ? 'on' : 'off'} · /modsters settings`,
   ].join('\n')
 }
 

@@ -266,7 +266,7 @@ describe('register: opt-in hunting', () => {
 
   test('/modsters is registered with the subcommands as its typeahead hint', async ($, on) => {
     const { seen } = await start($, on, { store: WELCOMED })
-    expect(seen.argumentHints).toEqual(['[hunt | stop | pane | reload | help]'])
+    expect(seen.argumentHints).toEqual(['[hunt | stop | pane | settings | reload | help]'])
   })
 
   test('/modsters is registered as immediate, so it runs while Claude works (0039)', async ($, on) => {
