@@ -46,7 +46,7 @@ Every throw plays a catcher. Pick yours in `/modsters`, on the Catchers tab:
   <tr>
     <td align="center"><img src="docs/previews/readme-catch-pod.gif" alt="Musketail shrinks into a seed pod, which rocks three times and sparkles" height="128"><br><b>Seed pod</b></td>
     <td align="center"><img src="docs/previews/readme-catch-lantern.gif" alt="Lamparito is drawn into a brass lantern, which rocks three times and sparkles" height="128"><br><b>Lantern</b></td>
-    <td align="center"><img src="docs/previews/readme-catch-puzzle-cube.gif" alt="Musketail goes into a scrambled puzzle cube, which comes out solved" height="128"><br><b>Puzzle Cube</b></td>
+    <td align="center"><img src="docs/previews/readme-catch-puzzle-cube.gif" alt="Glowcap, a blue mushroom, goes into a scrambled puzzle cube, which comes out solved" height="128"><br><b>Puzzle Cube</b></td>
   </tr>
 </table>
 
