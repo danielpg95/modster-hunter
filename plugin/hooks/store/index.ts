@@ -1,6 +1,6 @@
 export { addCatch, caughtKey, isCaught, readCaughtRecord, type Catch, type CaughtRecord } from './caught-record'
 export { CATCHER_KEY, catcherInUse, catcherPref, readCatcherId, type CatcherPref } from './catcher-pref'
-export { WELCOMED_KEY, hasPlayed, readWelcomed, welcomedPref, type WelcomedPref } from './welcome-pref'
+export { WELCOMED_KEY, readWelcomed, welcomedPref, type WelcomedPref } from './welcome-pref'
 export { HUNT_PANE_KEY, huntPanePref, prefAfterClose, readHuntPaneOpen, type HuntPanePref } from './hunt-pane-pref'
 export { recordEncounterEvents, recordStat } from './record-encounter-events'
 export { addToStats, readSessionStats, statsKey, type BiomeStats, type SessionStats, type StatsEvent } from './session-stats'

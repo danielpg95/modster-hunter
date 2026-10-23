@@ -53,3 +53,4 @@ settled questions and avoid making assumptions about open ones.
 | [0037](0037-portable-core-and-hosts.md) | Claude Code users first, then a portable core shared by other hosts | Proposed |
 | [0038](0038-opt-in-hunting.md) | The game runs only while `autoStart` is on; `/modsters hunt` and `stop` flip it | Accepted |
 | [0039](0039-modsters-runs-immediately.md) | `/modsters` runs at once, even while Claude works | Proposed |
+| [0041](0041-auto-start-on-by-default.md) | Auto start is on by default; one welcome toast says how to stop | Proposed |

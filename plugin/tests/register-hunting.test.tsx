@@ -5,14 +5,16 @@ import { stubContentFs } from './fixtures/stub-content-fs'
 import { helpText } from '../hooks/render'
 import { WELCOME_TOAST_MS } from '../hooks/constants'
 
-// Opt-in hunting (decision 0038): the game runs only while `autoStart` is on, and
-// /modsters hunt, stop and pane flip it through /config. The one-Modster forest
+// Hunting (decisions 0038, 0041): the game runs only while `autoStart` is on (the
+// default), and /modsters hunt, stop and pane flip it through /config. The one-Modster forest
 // spawns after 3 s of work; the appearing phase lasts 1 s.
 
 const BAND_PROPS = { hasSurvey: false, isWorking: true, maxRows: 7, bodyColumns: 120 }
 const SPINNER_PROPS = { word: 'Sauteing', message: null, suffix: '…', mode: 'thinking' }
 const WAITING = 4_250
 const HUNTING = { options: { autoStart: true } }
+// Turned off by the player (0041 makes on the default)
+const OFF = { options: { autoStart: false } }
 const WELCOMED = { 'prefs:welcomed': { v: 1 } }
 const HUNT_PANE: UiPane = { id: 'modster-hunt', title: 'Modster Hunter', isShown: true, isFocused: false, isPlaced: true }
 
@@ -91,7 +93,7 @@ const last = <T,>(list: T[]): T | undefined => list[list.length - 1]
 
 describe('register: opt-in hunting', () => {
   // Off (point 1)
-  test('off by default: the band draws nothing, even while Claude works', async ($, on) => {
+  test('turned off: the band draws nothing, even while Claude works', OFF, async ($, on) => {
     const { clock } = await start($, on, { store: WELCOMED })
     const band = await mountBand($)
     expect(await band.find({ type: 'Text', text: /Whispering Forest/ })).toBeUndefined()
@@ -103,7 +105,7 @@ describe('register: opt-in hunting', () => {
     await band.unmount()
   })
 
-  test('off: no spinner text, no status line, no turn stats', async ($, on) => {
+  test('off: no spinner text, no status line, no turn stats', OFF, async ($, on) => {
     const { clock, seen } = await start($, on, { store: WELCOMED })
     const spinner = await mountSpinner($)
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
@@ -115,7 +117,7 @@ describe('register: opt-in hunting', () => {
     await spinner.unmount()
   })
 
-  test('off: the encounter pane never reopens, and one left open is closed by the mod', async ($, on) => {
+  test('off: the encounter pane never reopens, and one left open is closed by the mod', OFF, async ($, on) => {
     const { seen } = await start($, on, { store: { ...WELCOMED, 'prefs:huntPane': { v: 1, open: true } }, panes: () => [HUNT_PANE] })
     await $.classic.SessionStart({ source: 'clear' })
     expect(seen.opens).toEqual([])
@@ -124,13 +126,13 @@ describe('register: opt-in hunting', () => {
     expect(seen.store['prefs:huntPane']).toEqual({ v: 1, open: true })
   })
 
-  test('off: /modsters still opens the collection', async ($, on) => {
+  test('off: /modsters still opens the collection', OFF, async ($, on) => {
     const { seen } = await start($, on, { store: WELCOMED })
     await run($, '')
     expect(seen.opens).toEqual(['modster-collection:focus'])
   })
 
-  test('with autoStart on, the game plays from the start', HUNTING, async ($, on) => {
+  test('by default the game plays from the start', async ($, on) => {
     const { clock } = await start($, on, { store: WELCOMED })
     const band = await mountBand($)
     expect(await band.find({ type: 'Text', text: /Whispering Forest/ })).toBeDefined()
@@ -141,39 +143,38 @@ describe('register: opt-in hunting', () => {
     await band.unmount()
   })
 
-  // Welcome (points 2 and 9)
-  test('a new player gets the welcome toast once, and stays off', async ($, on) => {
+  // Welcome (0038 point 9, 0041)
+  test('every player gets the welcome toast once, for 15 s, and the game is on', async ($, on) => {
     const { seen } = await start($, on)
-    expect(seen.toasts).toEqual(['Modster Hunter is installed · /modsters hunt to play · /modsters help for the commands'])
+    expect(seen.toasts).toEqual(['Modster Hunter is on · Modsters show up while Claude works · /modsters stop to turn it off · /modsters help for more'])
     expect(seen.store['prefs:welcomed']).toEqual({ v: 1 })
     // Long enough to read at session start; the 4 s default went by unread
     expect(seen.toastTimeouts).toEqual([WELCOME_TOAST_MS])
     expect(WELCOME_TOAST_MS).toBeGreaterThanOrEqual(10_000)
-    expect(seen.configSets).toEqual([])
+    const band = await mountBand($)
+    expect(await band.find({ type: 'Text', text: /Whispering Forest/ })).toBeDefined()
+    await band.unmount()
     await $.session.end({ reason: 'exit' } as any)
     await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' })
     expect(seen.toasts).toHaveLength(1)
   })
 
-  test('a returning player gets autoStart turned on once, the game plays, and the toast says how to stop', async ($, on) => {
+  test('a player who already played gets the same welcome, and nothing writes /config', async ($, on) => {
     const { seen } = await start($, on, { store: { 'caught:sproutling': { v: 1, count: 1 } } })
-    expect(seen.configSets).toEqual(['modster-hunter.autoStart=true'])
-    expect(seen.toasts).toEqual(['Modster Hunter · new: /modsters stop turns the game off · /modsters help for the commands'])
-    const band = await mountBand($)
-    expect(await band.find({ type: 'Text', text: /Whispering Forest/ })).toBeDefined()
-    await band.unmount()
+    expect(seen.toasts).toEqual(['Modster Hunter is on · Modsters show up while Claude works · /modsters stop to turn it off · /modsters help for more'])
+    expect(seen.configSets).toEqual([])
   })
 
-  test('a returning player whose autoStart change is refused stays off', async ($, on) => {
-    const { seen } = await start($, on, { store: { 'stats:total': {} }, denyConfig: 'set by your organization' })
-    expect(seen.configSets).toEqual(['modster-hunter.autoStart=true'])
+  test('a player who turned the game off still gets the welcome once, and it stays off', OFF, async ($, on) => {
+    const { seen } = await start($, on)
+    expect(seen.toasts).toHaveLength(1)
     const band = await mountBand($)
     expect(await band.find({ type: 'Text', text: /Whispering Forest/ })).toBeUndefined()
     await band.unmount()
   })
 
   // /modsters hunt (point 3)
-  test('/modsters hunt turns autoStart on, replies with the biome, and Modsters appear', async ($, on) => {
+  test('/modsters hunt turns autoStart on, replies with the biome, and Modsters appear', OFF, async ($, on) => {
     const { clock, seen } = await start($, on, { store: WELCOMED })
     expect(await run($, 'hunt')).toEqual({ text: 'Hunting in Whispering Forest · Modsters show up while Claude works · /modsters stop to stop' })
     expect(seen.configSets).toEqual(['modster-hunter.autoStart=true'])
@@ -192,13 +193,13 @@ describe('register: opt-in hunting', () => {
     expect(seen.configSets).toEqual([])
   })
 
-  test('/modsters hunt reopens the encounter pane for someone who left it open (0019)', async ($, on) => {
+  test('/modsters hunt reopens the encounter pane for someone who left it open (0019)', OFF, async ($, on) => {
     const { seen } = await start($, on, { store: { ...WELCOMED, 'prefs:huntPane': { v: 1, open: true } } })
     await run($, 'hunt')
     expect(seen.opens).toEqual(['modster-hunt'])
   })
 
-  test('a refused /modsters hunt says why and the game stays off', async ($, on) => {
+  test('a refused /modsters hunt says why and the game stays off', OFF, async ($, on) => {
     const { seen } = await start($, on, { store: WELCOMED, denyConfig: 'set by your organization' })
     expect(await run($, 'hunt')).toEqual({ text: "Modster Hunter: couldn't turn Auto start on · set by your organization" })
     const band = await mountBand($)
@@ -241,7 +242,7 @@ describe('register: opt-in hunting', () => {
   })
 
   // /modsters pane (point 5)
-  test('/modsters pane while off turns the game on and opens the pane with focus', async ($, on) => {
+  test('/modsters pane while off turns the game on and opens the pane with focus', OFF, async ($, on) => {
     const { seen } = await start($, on, { store: WELCOMED })
     expect(await run($, 'pane')).toEqual({})
     expect(seen.configSets).toEqual(['modster-hunter.autoStart=true'])
@@ -250,14 +251,14 @@ describe('register: opt-in hunting', () => {
   })
 
   // Help, unknown words and the typeahead (points 6–8)
-  test('/modsters help shows the quickstart with Auto start off or on', async ($, on) => {
+  test('/modsters help shows the quickstart with Auto start off or on', OFF, async ($, on) => {
     await start($, on, { store: WELCOMED })
     expect(await run($, 'help')).toEqual({ text: helpText(false) })
     await run($, 'hunt')
     expect(await run($, 'help')).toEqual({ text: helpText(true) })
   })
 
-  test('an unknown word gets the help instead of the collection', async ($, on) => {
+  test('an unknown word gets the help instead of the collection', OFF, async ($, on) => {
     const { seen } = await start($, on, { store: WELCOMED })
     expect(await run($, 'hutn')).toEqual({ text: `Modster Hunter doesn't know "hutn"\n${helpText(false)}` })
     expect(seen.opens).toEqual([])
@@ -273,7 +274,7 @@ describe('register: opt-in hunting', () => {
     expect(seen.immediate).toEqual([true])
   })
 
-  test('/modsters reload while off loads content but doesn\'t start the game', async ($, on) => {
+  test('/modsters reload while off loads content but doesn\'t start the game', OFF, async ($, on) => {
     const { clock } = await start($, on, { store: WELCOMED })
     const reply = await run($, 'reload')
     expect(reply.text).toContain('reloaded')

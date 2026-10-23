@@ -59,8 +59,8 @@ claude plugin install modster-hunter --marketplace danielpg95/modster-hunter
 ```
 
 Or, inside a session: `/plugin marketplace add danielpg95/modster-hunter`, then
-`/plugin install modster-hunter@modster-hunter`. Start a new session and type
-`/modsters hunt` to play.
+`/plugin install modster-hunter@modster-hunter`. Start a new session and ask
+Claude for anything. `/modsters stop` turns the game off.
 
 ## How to play
 

@@ -50,6 +50,11 @@ Build decision 0038: every "done when" item, up to the hand check.
 
 ## Decisions made
 
+- @victor-aguilars: Auto start on by default. Decision 0041 (Proposed, for
+  @danielpg95 in this PR) supersedes 0038's default, point 2 and the welcome
+  texts. The returning-player branch and `hasPlayed` are gone, and there's one
+  welcome text for everyone. The off state is tested with `autoStart: false`.
+
 - @victor-aguilars: make `/modsters` immediate now. Decision 0039 (Proposed, for
   @danielpg95 in this PR) is added, and P5-35 relies on it: `immediate: true`
   in `$.command.register`, with a register test.
@@ -74,9 +79,9 @@ Build decision 0038: every "done when" item, up to the hand check.
 ## Next steps
 
 1. Hand check with `claude --plugin-dir ./plugin` and a fresh `$.store` (or a
-   second computer). Check that the welcome toast shows, nothing draws until
-   `/modsters hunt`, `/config` shows Auto start on, `/modsters stop` clears
-   everything and shows it off, and `/modsters help` and the typeahead hint
+   second computer). Check that the welcome toast shows and the game plays,
+   `/modsters stop` clears everything and `/config` shows Auto start off,
+   `/modsters hunt` brings it back, and `/modsters help` and the typeahead hint
    look right. Type `/modsters pane` and `/modsters stop` while Claude works:
    they should act at once without disturbing the turn (0039). Then tick the last P5-35 item and mark the PR ready.
 2. Merge claim PR #152 first, then the P5-35 PR.

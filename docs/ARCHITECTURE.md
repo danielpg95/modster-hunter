@@ -50,7 +50,7 @@ plugin/
 
 | Event | Purpose |
 | --- | --- |
-| `session.start` | Register `/modsters` (with its subcommands as the typeahead hint), load content, pick the biome, restore `$.state`, show the welcome toast once (`prefs:welcomed`, turning `autoStart` on for a returning player, 0038), clear the status line, and, only while `autoStart` is on, start the game and open the encounter pane as `encounterPane` says: if `prefs:huntPane` says so (0019), every session, or never (0023). While off, close an encounter pane left open |
+| `session.start` | Register `/modsters` (with its subcommands as the typeahead hint), load content, pick the biome, restore `$.state`, show the welcome toast once (`prefs:welcomed`, 0038, 0041), clear the status line, and, only while `autoStart` is on, start the game and open the encounter pane as `encounterPane` says: if `prefs:huntPane` says so (0019), every session, or never (0023). While off, close an encounter pane left open |
 | `classic.SessionStart` (`clear`, `resume`, `fork`) | Re-copy stored values into `$.state` (reset by those commands); while `autoStart` is on, open the encounter pane as at `session.start` (0019, 0023) and, after a `session.end` (which they fire), restart the game on the same biome under the new session id (P5-15) |
 | `turn.start` / `turn.complete` | Tell the scheduler a turn is running / ended |
 | `classic.SubagentStart` / `classic.SubagentStop` | Tell the scheduler a subagent is running / stopped, by `agent_id`; work time includes it (0018) |

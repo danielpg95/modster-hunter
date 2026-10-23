@@ -36,9 +36,7 @@ export function unknownSubcommandText(word: string, autoStart: boolean): string 
   return `Modster Hunter doesn't know "${word}"\n${helpText(autoStart)}`
 }
 
-/** The welcome toast, once per player (point 9); `returning` for players who already played (point 2). */
-export function welcomeText(returning: boolean): string {
-  return returning
-    ? 'Modster Hunter · new: /modsters stop turns the game off · /modsters help for the commands'
-    : 'Modster Hunter is installed · /modsters hunt to play · /modsters help for the commands'
+/** The welcome toast, once per player (0038 point 9, texts by 0041). */
+export function welcomeText(): string {
+  return 'Modster Hunter is on · Modsters show up while Claude works · /modsters stop to turn it off · /modsters help for more'
 }

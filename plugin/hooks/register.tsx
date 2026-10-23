@@ -87,7 +87,6 @@ import {
   CATCHER_KEY,
   HUNT_PANE_KEY,
   WELCOMED_KEY,
-  hasPlayed,
   readWelcomed,
   welcomedPref,
   catcherInUse,
@@ -242,7 +241,8 @@ export const register: Register = (on, options) => {
   const includeBuiltins = options.includeBuiltins !== false
   builtinsIncluded = includeBuiltins
   display = readDisplaySettings(options)
-  hunting = options.autoStart === true
+  // On unless the player turned it off (decision 0041)
+  hunting = options.autoStart !== false
 
   on('session.start', async ($, e, next) => {
     content = await loadGameContent($, includeBuiltins)
@@ -252,7 +252,6 @@ export const register: Register = (on, options) => {
     // Keep the biome if session.start ever repeats in this process; pick only when there's none yet
     if (biomeId === undefined || !content.biomes.has(biomeId)) biomeId = pickBiome(content.biomes.keys(), Math.random)
     pickedCatcherId = readCatcherId(await $.store.get(CATCHER_KEY).catch(() => undefined))
-    // Before the game starts: a returning player's first session turns autoStart on (0038 point 2)
     await welcome($)
     if (hunting) startMachine($, idleTimeoutSec)
     loadCollectionRecords($)
@@ -1413,23 +1412,13 @@ async function closeHuntPane($: EngineInterface): Promise<void> {
   }
 }
 
-/**
- * The welcome toast, once per player (decision 0038 point 9). A player who already
- * played gets autoStart turned on first, so an update never switches their game off (point 2).
- */
+/** The welcome toast, once per player: the game is on, and how to stop it (decisions 0038 point 9, 0041). */
 async function welcome($: EngineInterface): Promise<void> {
   try {
     await pendingWrites
     if (readWelcomed(await $.store.get(WELCOMED_KEY))) return
-    const returning = hasPlayed(await $.store.keys())
-    // Stored before autoStart changes, so a reload that change may cause never welcomes twice
     await $.store.set(WELCOMED_KEY, welcomedPref())
-    if (returning && !hunting) {
-      const denied = await setAutoStart($, true)
-      if (denied === undefined) hunting = true
-      else $.ui.log(`welcome: autoStart stays off: ${denied}`, { to: 'debug' })
-    }
-    $.ui.toast(welcomeText(returning), { timeoutMs: WELCOME_TOAST_MS })
+    $.ui.toast(welcomeText(), { timeoutMs: WELCOME_TOAST_MS })
   } catch (error) {
     $.ui.log(`welcome: skipped: ${error instanceof Error ? error.message : String(error)}`, { to: 'debug' })
   }

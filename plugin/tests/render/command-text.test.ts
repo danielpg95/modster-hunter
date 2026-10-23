@@ -33,8 +33,7 @@ describe('command text (0038)', () => {
     expect(unknownSubcommandText('hutn', true)).toBe(`Modster Hunter doesn't know "hutn"\n${helpText(true)}`)
   })
 
-  test('the welcome differs for new and returning players (point 9)', () => {
-    expect(welcomeText(false)).toBe('Modster Hunter is installed · /modsters hunt to play · /modsters help for the commands')
-    expect(welcomeText(true)).toBe('Modster Hunter · new: /modsters stop turns the game off · /modsters help for the commands')
+  test('the welcome says the game is on and how to stop it (0041)', () => {
+    expect(welcomeText()).toBe('Modster Hunter is on · Modsters show up while Claude works · /modsters stop to turn it off · /modsters help for more')
   })
 })

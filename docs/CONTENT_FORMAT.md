@@ -319,7 +319,7 @@ biome entry naming a disabled Modster is dropped without an issue.
 
 | Key | Type | Default | What it does |
 | --- | --- | --- | --- |
-| `autoStart` | boolean | `false` | Run the game. Off: nothing draws outside `/modsters`. `/modsters hunt` turns it on, `/modsters stop` turns it off, and a returning player's first session after the update turns it on once (decision 0038) |
+| `autoStart` | boolean | `true` | Run the game. Off: nothing draws outside `/modsters`. `/modsters hunt` turns it on, `/modsters stop` turns it off (decisions 0038, 0041) |
 | `includeBuiltins` | boolean | `true` | Load the biomes and Modsters that ship with the mod. Built-in catchers load either way (decision 0035) |
 | `encounterIdleTimeoutSec` | number | `90` | Seconds without a throw before an encounter's Modster wanders off |
 | `showIdleLine` | boolean | `true` | Show the current biome in the band between encounters |

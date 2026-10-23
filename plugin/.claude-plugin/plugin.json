@@ -14,7 +14,7 @@
       "type": "boolean",
       "title": "Auto start",
       "description": "Start hunting every session. /modsters hunt turns it on, /modsters stop turns it off",
-      "default": false
+      "default": true
     },
     "includeBuiltins": {
       "type": "boolean",
