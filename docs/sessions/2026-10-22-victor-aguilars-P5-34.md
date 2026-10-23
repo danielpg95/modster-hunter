@@ -24,6 +24,13 @@ and keep it updated.
   compact Install with updates, a How to play table (`1`/`2`, `/modsters`,
   `hunt`, `reload`, `/config`), a shorter Contributing section with
   run-from-source, and License. "What you get" folded into the pitch and the table.
+- Trimmed further (asked by @victor-aguilars): removed the "no grinding / fully
+  offline" line, the "Get updates" paragraph and the "Make your own" line.
+- Added `docs/previews/readme-whispering-forest.gif` and
+  `readme-crystal-grotto.gif`: each biome's idle scene at 100 columns, 6×,
+  48 ticks at 8 fps, particles included. They come from the mod's own
+  `idleScene`, `artFrame` and `particlePixel` through a one-off script (not
+  in the repo), like `idle-scenes.gif` in P5-14.
 - Verified: `claude plugin validate ./plugin --strict` passes, and so does
   `node tools/check-tracking.mjs`.
 
@@ -31,7 +38,9 @@ and keep it updated.
 
 - @victor-aguilars: the marketplace install goes in the README now, ahead of P5-07.
 - @victor-aguilars: lead with the Modster pair. Show some biomes (two, by name), not all of them.
-- @victor-aguilars: keep the README lean, with the main commands in it.
+- @victor-aguilars: keep the README lean, with the main commands in it. No update
+  steps and no "make your own" line in the README. Auto-update stays a player's
+  own choice in `/plugin`.
 - @victor-aguilars: keep `version` in plugin.json and raise it whenever players
   should get changes. Dropping it would make every merge ship, but CI's
   `validate --strict` rejects a missing version. P5-07 writes down the rule.
