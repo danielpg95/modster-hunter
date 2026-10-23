@@ -52,3 +52,4 @@ settled questions and avoid making assumptions about open ones.
 | [0036](0036-puzzle-cube-catcher.md) | A fifth built-in catcher, the Puzzle Cube | Accepted |
 | [0037](0037-portable-core-and-hosts.md) | Claude Code users first, then a portable core shared by other hosts | Proposed |
 | [0038](0038-opt-in-hunting.md) | The game runs only while `autoStart` is on; `/modsters hunt` and `stop` flip it | Accepted |
+| [0040](0040-in-game-settings.md) | `/modsters settings` opens a Settings tab where players change every option | Proposed |
