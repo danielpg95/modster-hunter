@@ -1,5 +1,5 @@
 import type { EngineInterface, Register, Timer } from 'claude-code'
-import { BAND, CATCH, COLLECTION, CONTENT, USER_CONTENT } from './constants'
+import { BAND, CATCH, COLLECTION, CONTENT, USER_CONTENT, WELCOME_TOAST_MS } from './constants'
 import {
   cachedSheetLoader,
   formatIssue,
@@ -75,10 +75,20 @@ import {
   type DisplayPlan,
   type IdleScene,
   type Particle,
+  MODSTERS_ARGUMENT_HINT,
+  STOP_REPLY,
+  autoStartDeniedReply,
+  helpText,
+  huntReply,
+  unknownSubcommandText,
+  welcomeText,
 } from './render'
 import {
   CATCHER_KEY,
   HUNT_PANE_KEY,
+  WELCOMED_KEY,
+  readWelcomed,
+  welcomedPref,
   catcherInUse,
   catcherPref,
   caughtKey,
@@ -164,13 +174,18 @@ let isBlittingScene = false
 // Why the band last skipped the scene, so the debug log notes each change once
 let loggedSceneSkip: string | undefined
 
-// The opt-in encounter pane (decision 0015), opened with `/modsters hunt`; it
+// The opt-in encounter pane (decision 0015), opened with `/modsters pane` (0038); it
 // reopens at session start for people who opened it (0019), or every session (0023)
 const PANE_ID = 'modster-hunt'
 
 // Where the game shows (0023). A change in /config reloads the module, so this is
 // read once per load
 let display = readDisplaySettings({})
+// Whether the game runs (decision 0038): the `autoStart` option at load, then what
+// /modsters hunt and stop wrote. While false, nothing draws outside /modsters
+let hunting = false
+// The `/config` row /modsters hunt and stop write (0038 points 3–4): `<plugin>.<field>`
+const AUTO_START_KEY = 'modster-hunter.autoStart'
 // The `includeBuiltins` option, for messages outside register's closure
 let builtinsIncluded = true
 // What the status line shows now, so a tick that changes nothing doesn't re-pin it
@@ -226,6 +241,8 @@ export const register: Register = (on, options) => {
   const includeBuiltins = options.includeBuiltins !== false
   builtinsIncluded = includeBuiltins
   display = readDisplaySettings(options)
+  // On unless the player turned it off (decision 0041)
+  hunting = options.autoStart !== false
 
   on('session.start', async ($, e, next) => {
     content = await loadGameContent($, includeBuiltins)
@@ -235,20 +252,24 @@ export const register: Register = (on, options) => {
     // Keep the biome if session.start ever repeats in this process; pick only when there's none yet
     if (biomeId === undefined || !content.biomes.has(biomeId)) biomeId = pickBiome(content.biomes.keys(), Math.random)
     pickedCatcherId = readCatcherId(await $.store.get(CATCHER_KEY).catch(() => undefined))
-    startMachine($, idleTimeoutSec)
+    await welcome($)
+    if (hunting) startMachine($, idleTimeoutSec)
     loadCollectionRecords($)
     // Clears a line left by a load that had the status line on (0023 point 6)
     shownStatus = undefined
     $.ui.status(undefined)
-    await openHuntPaneAtStart($)
-    // Register last: a taken name throws and would skip the rest of this hook
-    await $.command.register({ name: 'modsters', description: 'Open your Modster collection' })
+    // The encounter pane waits for hunting too; one left open is closed (0038 point 1)
+    if (hunting) await openHuntPaneAtStart($)
+    else await closeHuntPane($)
+    // Register last: a taken name throws and would skip the rest of this hook. Immediate, so it
+    // runs while Claude works, when people play; the command.run hook never reads the turn (0039)
+    await $.command.register({ name: 'modsters', description: 'Open your Modster collection', argumentHint: MODSTERS_ARGUMENT_HINT, immediate: true })
     return next(e)
   })
 
   // /clear, /resume and /branch don't fire session.start; keep the pane for them too (0019)
   on('classic.SessionStart', async ($, e, next) => {
-    if (e.source !== 'startup') {
+    if (e.source !== 'startup' && hunting) {
       // They do fire session.end, which stopped the timers: start the game again
       // on the same biome, under the new session id (P5-15)
       if (!tickTimer && content) {
@@ -264,6 +285,8 @@ export const register: Register = (on, options) => {
   })
 
   on('turn.start', async ($, e, next) => {
+    // No turn stats while the game is off (0038 point 1)
+    if (!hunting) return next(e)
     await advanceMachine($, { type: 'turnStart' })
     const at = await $.clock.now()
     queueWrite($, (store) => recordStat(store, sessionId, { kind: 'turn', at }))
@@ -299,6 +322,12 @@ export const register: Register = (on, options) => {
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     // A survey owns the band while it's up
     if (e.props.hasSurvey) return next(e)
+    // The game is off: the band is the prompt's alone (0038 point 1)
+    if (!hunting) {
+      removeSite(e.requestId)
+      removeSceneSite(e.requestId)
+      return next(e)
+    }
     // While the encounter pane is on screen the band steps aside, so the same
     // encounter isn't drawn twice (0015)
     if (await isPaneShown($)) {
@@ -1012,10 +1041,21 @@ export const register: Register = (on, options) => {
   })
 
   on('command.run', { command: 'modsters' }, async ($, e) => {
-    // `/modsters hunt` opens the encounter pane; the mod opens it by itself only to reopen it (0015, 0019)
     const verb = typeof e.args === 'string' ? e.args.trim() : ''
+    // `/modsters hunt` and `stop` turn the game on and off through autoStart (0038 points 3–4)
     if (verb === 'hunt') {
+      const denied = await startHunting($, idleTimeoutSec, { reopenPane: true })
+      return { text: denied === undefined ? huntReply(sessionBiome()?.biome.name) : autoStartDeniedReply(true, denied) }
+    }
+    if (verb === 'stop') {
+      const denied = await stopHunting($)
+      return { text: denied === undefined ? STOP_REPLY : autoStartDeniedReply(false, denied) }
+    }
+    // `/modsters pane` opens the encounter pane, starting the game when it's off (0015, 0019, 0024; 0038 point 5)
+    if (verb === 'pane') {
       if (display.encounterPane === 'off') return { text: 'The encounter pane is off · turn it on in /config' }
+      const denied = await startHunting($, idleTimeoutSec, { reopenPane: false })
+      if (denied !== undefined) return { text: autoStartDeniedReply(true, denied) }
       queueWrite($, (store) => store.set(HUNT_PANE_KEY, huntPanePref(true)))
       // The person asked for it, so the pane takes the keys; granted only over an empty composer (0024)
       const opened = await $.ui.open({ id: PANE_ID, title: 'Modster Hunter', focus: true })
@@ -1023,12 +1063,15 @@ export const register: Register = (on, options) => {
       $.ui.invalidate('ui.render')
       return opened.isPlaced ? {} : { text: 'Modster Hunter: the pane is waiting for more room (widen the terminal)' }
     }
+    if (verb === 'help') return { text: helpText(hunting) }
     if (verb === 'reload') {
       reloading ??= reloadContent($, includeBuiltins, idleTimeoutSec).finally(() => {
         reloading = undefined
       })
       return { text: (await reloading).reply }
     }
+    // A word it doesn't know gets the help, not the collection (0038 point 7)
+    if (verb !== '') return { text: unknownSubcommandText(verb, hunting) }
     // Catches from other sessions show up when the pane opens
     loadCollectionRecords($)
     if (collectionTab === 'stats') loadStats($)
@@ -1345,8 +1388,7 @@ function updateStatus($: EngineInterface): void {
 async function openHuntPaneAtStart($: EngineInterface): Promise<void> {
   try {
     if (display.encounterPane === 'off') {
-      // Our close, so prefs:huntPane is kept for when the setting comes back (0019 point 2)
-      if ((await $.ui.panes()).some((pane) => pane.id === PANE_ID)) await $.ui.close({ id: PANE_ID })
+      await closeHuntPane($)
       return
     }
     if (display.encounterPane === 'when-opened') {
@@ -1359,6 +1401,83 @@ async function openHuntPaneAtStart($: EngineInterface): Promise<void> {
   } catch (error) {
     $.ui.log(`hunt pane: not opened at start: ${error instanceof Error ? error.message : String(error)}`, { to: 'debug' })
   }
+}
+
+/** Closes the encounter pane when it's open. Our close, so prefs:huntPane is kept for when it comes back (0019 point 2). */
+async function closeHuntPane($: EngineInterface): Promise<void> {
+  try {
+    if ((await $.ui.panes()).some((pane) => pane.id === PANE_ID)) await $.ui.close({ id: PANE_ID })
+  } catch (error) {
+    $.ui.log(`hunt pane: not closed: ${error instanceof Error ? error.message : String(error)}`, { to: 'debug' })
+  }
+}
+
+/** The welcome toast, once per player: the game is on, and how to stop it (decisions 0038 point 9, 0041). */
+async function welcome($: EngineInterface): Promise<void> {
+  try {
+    await pendingWrites
+    if (readWelcomed(await $.store.get(WELCOMED_KEY))) return
+    await $.store.set(WELCOMED_KEY, welcomedPref())
+    $.ui.toast(welcomeText(), { timeoutMs: WELCOME_TOAST_MS })
+  } catch (error) {
+    $.ui.log(`welcome: skipped: ${error instanceof Error ? error.message : String(error)}`, { to: 'debug' })
+  }
+}
+
+/** Writes the `autoStart` row through /config (0038); returns why it was refused, or undefined once written. */
+async function setAutoStart($: EngineInterface, on: boolean): Promise<string | undefined> {
+  try {
+    const result = await $.config.set({ key: AUTO_START_KEY, value: on })
+    return result.deny
+  } catch (error) {
+    return error instanceof Error ? error.message : String(error)
+  }
+}
+
+/**
+ * Turns the game on (0038 points 3 and 5): autoStart on, then the band and the
+ * spawn countdown. Already on changes nothing. Returns why /config refused, if it did.
+ */
+async function startHunting($: EngineInterface, idleTimeoutSec: number, how: { reopenPane: boolean }): Promise<string | undefined> {
+  if (hunting) return undefined
+  const denied = await setAutoStart($, true)
+  if (denied !== undefined) return denied
+  hunting = true
+  startMachine($, idleTimeoutSec)
+  if (how.reopenPane) await openHuntPaneAtStart($)
+  $.ui.invalidate('ui.render')
+  return undefined
+}
+
+/**
+ * Turns the game off (0038 point 4): autoStart off, an encounter dropped without a
+ * result, and the band, status line, spinner and encounter pane cleared. Returns why /config refused, if it did.
+ */
+async function stopHunting($: EngineInterface): Promise<string | undefined> {
+  const denied = await setAutoStart($, false)
+  if (denied !== undefined) return denied
+  hunting = false
+  stopGame()
+  updateStatus($)
+  await closeHuntPane($)
+  $.ui.invalidate('ui.render')
+  return undefined
+}
+
+/** Stops the encounter loop and its animations; the collection pane's own timers keep going. */
+function stopGame(): void {
+  tickTimer?.cancel()
+  tickTimer = undefined
+  stopCatch()
+  stopFrames()
+  stopScene()
+  sceneSites.clear()
+  machine = undefined
+  machineContext = undefined
+  shownDots = undefined
+  encounterModster = undefined
+  retiredBiome = undefined
+  alreadyCaught = false
 }
 
 /** Whether our encounter pane is open, placed and the shown tab. Unknown counts as no. */
@@ -1653,7 +1772,10 @@ async function reloadContent($: EngineInterface, includeBuiltins: boolean, idleT
 
   const kept = biomeId === undefined ? undefined : content.biomes.get(biomeId)
   let note = ''
-  if (kept && machine) {
+  if (!hunting) {
+    // The game is off (0038 point 1): only keep a biome for when it starts
+    if (!kept) biomeId = pickBiome(content.biomes.keys(), Math.random)
+  } else if (kept && machine) {
     retiredBiome = undefined
     machineContext = playContext(content, kept, idleTimeoutSec)
     setScene($, kept)

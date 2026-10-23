@@ -9,6 +9,9 @@ import { oneModsterForest } from './fixtures/one-modster-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
 import { validSprite } from './fixtures/valid-sprite'
 
+// The game runs only while autoStart is on (decision 0038); these tests play it
+const HUNTING = { options: { autoStart: true } }
+
 // The catch animation in the band and the encounter pane (decision 0035, P5-32).
 // The one-Modster forest spawns after 3 s of work and always catches (catchRate 1),
 // so every throw here is a 3-rock catch: 2.4 s, then its caught beat in the result card.
@@ -71,7 +74,7 @@ async function untilWaiting($: any, clock: { advance: (ms: number) => Promise<vo
 }
 
 describe('register: catch animation', () => {
-  test('a throw draws the catcher in use from its first frame, the jar by default (0035 point 10)', async ($, on) => {
+  test('a throw draws the catcher in use from its first frame, the jar by default (0035 point 10)', HUNTING, async ($, on) => {
     const { clock } = await start($, on)
     const band = await mountBand($)
     await untilWaiting($, clock)
@@ -80,7 +83,7 @@ describe('register: catch animation', () => {
     await band.unmount()
   })
 
-  test('the catcher picked in prefs:catcher plays instead', async ($, on) => {
+  test('the catcher picked in prefs:catcher plays instead', HUNTING, async ($, on) => {
     const { clock } = await start($, on, files(), { 'prefs:catcher': { v: 1, id: 'net' } })
     const band = await mountBand($)
     await untilWaiting($, clock)
@@ -89,7 +92,7 @@ describe('register: catch animation', () => {
     await band.unmount()
   })
 
-  test('a picked catcher that did not load falls back to the jar', async ($, on) => {
+  test('a picked catcher that did not load falls back to the jar', HUNTING, async ($, on) => {
     const { clock } = await start($, on, files(), { 'prefs:catcher': { v: 1, id: 'bubble' } })
     const band = await mountBand($)
     await untilWaiting($, clock)
@@ -98,7 +101,7 @@ describe('register: catch animation', () => {
     await band.unmount()
   })
 
-  test('frames are blitted at 12 fps while the idle loop waits, through the caught beat, then the idle loop comes back', async ($, on) => {
+  test('frames are blitted at 12 fps while the idle loop waits, through the caught beat, then the idle loop comes back', HUNTING, async ($, on) => {
     const { clock, blits } = await start($, on)
     const band = await mountBand($)
     await untilWaiting($, clock)
@@ -118,9 +121,9 @@ describe('register: catch animation', () => {
     await band.unmount()
   })
 
-  test('the band and the encounter pane both get the frames', async ($, on) => {
+  test('the band and the encounter pane both get the frames', HUNTING, async ($, on) => {
     const { clock, blits } = await start($, on, files(), {}, () => SHOWN)
-    await $.command.run({ command: 'modsters', args: 'hunt' } as any)
+    await $.command.run({ command: 'modsters', args: 'pane' } as any)
     const pane = await mountPane($)
     await untilWaiting($, clock)
     await pane.press({ key: 'throw' })
@@ -129,7 +132,7 @@ describe('register: catch animation', () => {
     await pane.unmount()
   })
 
-  test('with no catcher drawn, the Modster holds still and the text tells the throw (0035 point 8)', async ($, on) => {
+  test('with no catcher drawn, the Modster holds still and the text tells the throw (0035 point 8)', HUNTING, async ($, on) => {
     const { clock, blits } = await start($, on, oneModsterForest())
     const band = await mountBand($)
     await untilWaiting($, clock)
@@ -141,7 +144,7 @@ describe('register: catch animation', () => {
     await band.unmount()
   })
 
-  test('a catcher too big for the sprite area holds the Modster still too', async ($, on) => {
+  test('a catcher too big for the sprite area holds the Modster still too', HUNTING, async ($, on) => {
     const content = files()
     // Twice the 8×8 fixture Modster
     const big = JSON.parse(content['catchers/jar/sprite.sprite.json'] ?? '{}')

@@ -731,14 +731,15 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 #### [ ] P5-35 — Opt-in hunting, commands and a welcome toast
 - **Depends on:** —
 - **Size:** M
-- **Goal:** the game runs only while the `autoStart` setting is on. `/modsters hunt` and `/modsters stop` flip it, the encounter pane moves to `/modsters pane`, `/modsters help` and the typeahead list the commands, and a one-time welcome toast explains it (decision 0038, asked by @victor-aguilars, 2026-10-22).
+- **Goal:** the game runs only while the `autoStart` setting is on (the default, decision 0041). `/modsters hunt` and `/modsters stop` flip it, the encounter pane moves to `/modsters pane`, `/modsters help` and the typeahead list the commands, and a one-time welcome toast explains it (decision 0038, asked by @victor-aguilars, 2026-10-22).
 - **Done when:**
-  - [ ] `plugin.json` has `autoStart` (boolean, default `false`) and CONTENT_FORMAT.md documents it. `prefs:welcomed` is a pure store helper under `plugin/hooks/store/` with tests.
-  - [ ] While `autoStart` is off: no band, spinner text, status line, encounter, spawn countdown, encounter pane or `turn` stat. Register tests cover each.
-  - [ ] `/modsters hunt`, `stop` and `pane` set `autoStart` through `$.config.set` and reply as 0038 points 3–5 say, including when it's refused. `/modsters help` and an unknown word reply as points 6–7 say. `/modsters` registers with the `argumentHint` from point 8. Register tests cover each.
-  - [ ] The welcome toast shows once per player, with the new-player or returning-player text. A returning player gets `autoStart` set to `true` once (0038 points 2 and 9). Register tests cover both and a second session.
-  - [ ] Docs follow 0038's consequences: decision status lines and index rows, CLAUDE.md rule 6, CONTENT_FORMAT.md, ARCHITECTURE.md, and the README's How to play table.
-  - [ ] `claude plugin test ./plugin` and `claude plugin validate ./plugin --strict` pass. Checked by hand on a fresh install: the toast shows, nothing draws until `/modsters hunt`, `/config` shows Auto start on, and `/modsters stop` clears everything and shows it off.
+  - [x] `plugin.json` has `autoStart` (boolean, default `true` by decision 0041, Proposed: this task relies on it) and CONTENT_FORMAT.md documents it. `prefs:welcomed` is a pure store helper under `plugin/hooks/store/` with tests.
+  - [x] While `autoStart` is off: no band, spinner text, status line, encounter, spawn countdown, encounter pane or `turn` stat. Register tests cover each.
+  - [x] `/modsters hunt`, `stop` and `pane` set `autoStart` through `$.config.set` and reply as 0038 points 3–5 say, including when it's refused. `/modsters help` and an unknown word reply as points 6–7 say. `/modsters` registers with the `argumentHint` from point 8. Register tests cover each.
+  - [x] The welcome toast shows once per player, for 15 s, with 0041's text (0038 point 2 is dropped by 0041). Register tests cover a first and a second session, a player who already played, and a player who turned it off.
+  - [x] Docs follow 0038's consequences: decision status lines and index rows, CLAUDE.md rule 6, CONTENT_FORMAT.md, ARCHITECTURE.md, and the README's How to play table.
+  - [x] `/modsters` registers as `immediate`, so it runs during a turn (decision 0039, Proposed: this task relies on it, asked by @victor-aguilars, 2026-10-22). A register test checks the flag.
+  - [ ] `claude plugin test ./plugin` and `claude plugin validate ./plugin --strict` pass. Checked by hand on a fresh install: the toast shows and the game plays, `/modsters stop` clears everything and `/config` shows Auto start off, and `/modsters hunt` brings it back. `/modsters pane` and `/modsters stop` typed while Claude works act at once without disturbing the turn (0039).
 
 #### [ ] P5-36 — In-game settings
 - **Depends on:** P5-35

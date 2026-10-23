@@ -5,6 +5,9 @@ import { stubContentFs } from './fixtures/stub-content-fs'
 import { CATCH } from '../hooks/constants'
 import { throwingMs } from '../hooks/game'
 
+// The game runs only while autoStart is on (decision 0038); these tests play it
+const HUNTING = { options: { autoStart: true } }
+
 // A throw that lands plays the whole catch animation (decision 0035); a miss is shorter
 const CATCH_THROW_MS = throwingMs('caught', CATCH.rocksToCatch)
 
@@ -78,7 +81,7 @@ const last = <T,>(list: T[]): T | undefined => list[list.length - 1]
 
 describe('register: display settings', () => {
   // Spinner (0023 point 5)
-  test('by default the spinner names the Modster while Claude works, then shows the result', async ($, on) => {
+  test('by default the spinner names the Modster while Claude works, then shows the result', HUNTING, async ($, on) => {
     const { clock, seen } = await start($, on)
     const band = await mountBand($)
     const spinner = await mountSpinner($)
@@ -98,7 +101,7 @@ describe('register: display settings', () => {
     await band.unmount()
   })
 
-  test('the spinner is left alone with showInSpinner off', { options: { showInSpinner: false } }, async ($, on) => {
+  test('the spinner is left alone with showInSpinner off', { options: { autoStart: true, showInSpinner: false } }, async ($, on) => {
     const { clock, seen } = await start($, on)
     const spinner = await mountSpinner($)
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
@@ -108,7 +111,7 @@ describe('register: display settings', () => {
     await spinner.unmount()
   })
 
-  test('a subagent\'s spinner row keeps its own words', async ($, on) => {
+  test('a subagent\'s spinner row keeps its own words', HUNTING, async ($, on) => {
     const { clock, seen } = await start($, on)
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await $.classic.SubagentStart({ agent_id: 'a1', agent_type: 'general-purpose' } as any)
@@ -119,7 +122,7 @@ describe('register: display settings', () => {
   })
 
   // Status line (0023 point 6)
-  test('by default the status line shows only while an encounter is up', async ($, on) => {
+  test('by default the status line shows only while an encounter is up', HUNTING, async ($, on) => {
     const { clock, seen } = await start($, on)
     const band = await mountBand($)
     // Cleared at load, nothing pinned between encounters
@@ -139,14 +142,14 @@ describe('register: display settings', () => {
     await band.unmount()
   })
 
-  test('the status line stays empty with showInStatusLine off', { options: { showInStatusLine: false } }, async ($, on) => {
+  test('the status line stays empty with showInStatusLine off', { options: { autoStart: true, showInStatusLine: false } }, async ($, on) => {
     const { clock, seen } = await start($, on)
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await clock.advance(WAITING)
     expect(seen.statuses.every((text) => text === undefined)).toBe(true)
   })
 
-  test('the status line is cleared when the session ends mid-encounter', async ($, on) => {
+  test('the status line is cleared when the session ends mid-encounter', HUNTING, async ($, on) => {
     const { clock, seen } = await start($, on)
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await clock.advance(WAITING)
@@ -156,14 +159,14 @@ describe('register: display settings', () => {
   })
 
   // Band (0023 point 3)
-  test('with the band off, nothing shows between encounters', { options: { showInBand: false } }, async ($, on) => {
+  test('with the band off, nothing shows between encounters', { options: { autoStart: true, showInBand: false } }, async ($, on) => {
     await start($, on)
     const band = await mountBand($)
     expect(await band.find({ type: 'Text', text: /Whispering Forest/ })).toBeUndefined()
     await band.unmount()
   })
 
-  test('with the band off, an encounter takes one row and Throw still catches, once', { options: { showInBand: false } }, async ($, on) => {
+  test('with the band off, an encounter takes one row and Throw still catches, once', { options: { autoStart: true, showInBand: false } }, async ($, on) => {
     const { clock, seen } = await start($, on)
     const band = await mountBand($)
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
@@ -178,7 +181,7 @@ describe('register: display settings', () => {
     await band.unmount()
   })
 
-  test('with the band off, the shown pane still takes the encounter', { options: { showInBand: false } }, async ($, on) => {
+  test('with the band off, the shown pane still takes the encounter', { options: { autoStart: true, showInBand: false } }, async ($, on) => {
     const pane: UiPane = { id: 'modster-hunt', title: 'Modster Hunter', isShown: true, isFocused: false, isPlaced: true }
     const { clock } = await start($, on, { panes: () => [pane] })
     const band = await mountBand($)
@@ -189,26 +192,26 @@ describe('register: display settings', () => {
   })
 
   // Encounter pane (0023 point 4)
-  test('encounterPane always opens the pane every session, even for someone who never opened it', { options: { encounterPane: 'always' } }, async ($, on) => {
+  test('encounterPane always opens the pane every session, even for someone who never opened it', { options: { autoStart: true, encounterPane: 'always' } }, async ($, on) => {
     const { seen } = await start($, on)
     for (const source of ['clear', 'resume', 'fork'] as const) await $.classic.SessionStart({ source })
     expect(seen.opens).toEqual(Array.from({ length: 4 }, () => 'modster-hunt'))
   })
 
-  test('encounterPane always opens it after a close by hand too', { options: { encounterPane: 'always' } }, async ($, on) => {
+  test('encounterPane always opens it after a close by hand too', { options: { autoStart: true, encounterPane: 'always' } }, async ($, on) => {
     const { seen } = await start($, on, { store: { 'prefs:huntPane': { v: 1, open: false } } })
     expect(seen.opens).toEqual(['modster-hunt'])
   })
 
-  test('encounterPane off: /modsters hunt says so and opens nothing', { options: { encounterPane: 'off' } }, async ($, on) => {
+  test('encounterPane off: /modsters pane says so and opens nothing', { options: { autoStart: true, encounterPane: 'off' } }, async ($, on) => {
     const { seen } = await start($, on, { store: { 'prefs:huntPane': { v: 1, open: true } } })
-    const reply = await $.command.run({ command: 'modsters', args: 'hunt' } as any)
+    const reply = await $.command.run({ command: 'modsters', args: 'pane' } as any)
     expect(reply).toEqual({ text: 'The encounter pane is off · turn it on in /config' })
     expect(seen.opens).toEqual([])
     expect(seen.store['prefs:huntPane']).toEqual({ v: 1, open: true })
   })
 
-  test('encounterPane off closes a pane left open, keeping the reopen pref', { options: { encounterPane: 'off' } }, async ($, on) => {
+  test('encounterPane off closes a pane left open, keeping the reopen pref', { options: { autoStart: true, encounterPane: 'off' } }, async ($, on) => {
     const pane: UiPane = { id: 'modster-hunt', title: 'Modster Hunter', isShown: true, isFocused: false, isPlaced: true }
     const { seen } = await start($, on, { panes: () => [pane], store: { 'prefs:huntPane': { v: 1, open: true } } })
     expect(seen.closes).toEqual(['modster-hunt:plugin'])

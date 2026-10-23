@@ -56,7 +56,8 @@ Two kinds of skills exist; don't mix them up:
 6. **Never break input.** The game never steals keystrokes, never auto-opens a
    pane (one exception: the encounter pane reopens for people who opened it,
    decision 0019, or every session with `encounterPane: always`, decision
-   0023), and never exceeds the band's `maxRows`.
+   0023, and only while `autoStart` is on, decision 0038), and never exceeds
+   the band's `maxRows`.
 7. **The mod stays offline and quiet.** No network calls, no model calls, no
    telemetry, no processes, unless a decision says otherwise.
 8. **Keep tracking honest.** Update the workboard and roadmap in the same PR as

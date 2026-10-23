@@ -8,6 +8,9 @@ import { twoBiomes } from './fixtures/two-biomes'
 import { CATCH } from '../hooks/constants'
 import { throwingMs } from '../hooks/game'
 
+// The game runs only while autoStart is on (decision 0038); these tests play it
+const HUNTING = { options: { autoStart: true } }
+
 // A throw that lands plays the whole catch animation (decision 0035); a miss is shorter
 const CATCH_THROW_MS = throwingMs('caught', CATCH.rocksToCatch)
 
@@ -132,19 +135,19 @@ async function tabsInHeader(pane: any): Promise<boolean> {
 }
 
 describe('register: collection pane', () => {
-  test('/modsters opens the collection pane with focus, and Esc closes it', async ($, on) => {
+  test('/modsters opens the collection pane with focus, and Esc closes it', HUNTING, async ($, on) => {
     const { opens } = await start($, on)
     expect(await $.command.run({ command: 'modsters' } as any)).toEqual({})
     expect(opens).toEqual([{ id: 'modster-collection', title: 'Modster collection', focus: true, closeOnEscape: true }])
   })
 
-  test('/modsters hunt still opens the encounter pane, not the collection', async ($, on) => {
+  test('/modsters pane still opens the encounter pane, not the collection', HUNTING, async ($, on) => {
     const { opens } = await start($, on)
-    await $.command.run({ command: 'modsters', args: 'hunt' } as any)
+    await $.command.run({ command: 'modsters', args: 'pane' } as any)
     expect(opens.map((open) => open.id)).toEqual(['modster-hunt'])
   })
 
-  test('the pane names the biome and opens on the Collection tab', async ($, on) => {
+  test('the pane names the biome and opens on the Collection tab', HUNTING, async ($, on) => {
     await start($, on)
     const pane = await mountPane($)
     expect(await pane.find({ type: 'Text', text: 'Whispering Forest' })).toBeDefined()
@@ -152,7 +155,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('the tabs read 1: Collection to 5: Settings, the shown one not dim', async ($, on) => {
+  test('the tabs read 1: Collection to 5: Settings, the shown one not dim', HUNTING, async ($, on) => {
     await start($, on)
     const pane = await mountPane($)
     const buttons = await tabButtons(pane)
@@ -167,7 +170,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('pressing a tab shows it, and the pane keeps it when reopened', async ($, on) => {
+  test('pressing a tab shows it, and the pane keeps it when reopened', HUNTING, async ($, on) => {
     await start($, on)
     const pane = await mountPane($)
     await pane.press({ key: 'stats' })
@@ -186,7 +189,7 @@ describe('register: collection pane', () => {
     await again.unmount()
   })
 
-  test('inline and wide, the tabs share the header row', async ($, on) => {
+  test('inline and wide, the tabs share the header row', HUNTING, async ($, on) => {
     await start($, on)
     const pane = await mountPane($, { placement: 'inline', bodyColumns: 120 })
     expect(await tabsInHeader(pane)).toBe(true)
@@ -194,7 +197,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('docked, the tabs sit on their own row under the header', async ($, on) => {
+  test('docked, the tabs sit on their own row under the header', HUNTING, async ($, on) => {
     await start($, on)
     const pane = await mountPane($, { placement: 'dock', bodyColumns: 60, scroll: { offset: 0, bodyRows: 30 } })
     expect(await tabsInHeader(pane)).toBe(false)
@@ -202,7 +205,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('a narrow dock puts one tab per row, keeping every hotkey (P5-30)', async ($, on) => {
+  test('a narrow dock puts one tab per row, keeping every hotkey (P5-30)', HUNTING, async ($, on) => {
     await start($, on)
     // As narrow as a dock gets: the longest tab, `4: Catchers`, still fits
     const pane = await mountPane($, { placement: 'dock', bodyColumns: 20, scroll: { offset: 0, bodyRows: 30 } })
@@ -211,14 +214,14 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('not focused, the header says ctrl+x tab', async ($, on) => {
+  test('not focused, the header says ctrl+x tab', HUNTING, async ($, on) => {
     await start($, on)
     const pane = await mountPane($, { isFocused: false })
     expect(await pane.find({ type: 'Text', text: ' · ctrl+x tab to use' })).toBeDefined()
     await pane.unmount()
   })
 
-  test('the collection pane being shown doesn\'t hide the encounter in the band', async ($, on) => {
+  test('the collection pane being shown doesn\'t hide the encounter in the band', HUNTING, async ($, on) => {
     const shown: UiPane[] = [{ id: 'modster-collection', title: 'Modster collection', isShown: true, isFocused: true, isPlaced: true }]
     const { clock } = await start($, on, () => shown)
     const band = await mountBand($)
@@ -230,7 +233,7 @@ describe('register: collection pane', () => {
 
   // P3-02: the Collection tab, a list beside the selected Modster
 
-  test('the list is in dex order, unnumbered Modsters last, ??? until caught', async ($, on) => {
+  test('the list is in dex order, unnumbered Modsters last, ??? until caught', HUNTING, async ($, on) => {
     await start($, on, () => [], collectionForest(3), { 'caught:mon-02': record(4) })
     const pane = await mountPane($, DOCK)
     expect(await pane.find({ type: 'Text', text: 'Caught 1/4' })).toBeDefined()
@@ -241,7 +244,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('j and k move the selection, and the detail follows', async ($, on) => {
+  test('j and k move the selection, and the detail follows', HUNTING, async ($, on) => {
     await start($, on, () => [], collectionForest(3), { 'caught:mon-02': record(4) })
     const pane = await mountPane($, DOCK)
     expect(await pane.find({ type: 'Text', text: 'Not caught yet' })).toBeDefined()
@@ -254,7 +257,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('pressing a row selects it', async ($, on) => {
+  test('pressing a row selects it', HUNTING, async ($, on) => {
     await start($, on, () => [], collectionForest(3), { 'caught:mon-01': record() })
     const pane = await mountPane($, DOCK)
     await pane.press({ key: 'mon-01' })
@@ -263,7 +266,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('the J and K buttons read k: Up and j: Down', async ($, on) => {
+  test('the J and K buttons read k: Up and j: Down', HUNTING, async ($, on) => {
     await start($, on, () => [], collectionForest(3))
     const pane = await mountPane($, DOCK)
     const up = await pane.find({ type: 'Button', key: 'up' })
@@ -272,7 +275,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('an uncaught Modster shows a still silhouette; a caught one animates', async ($, on) => {
+  test('an uncaught Modster shows a still silhouette; a caught one animates', HUNTING, async ($, on) => {
     const blits = collectionBlits(on)
     const { clock } = await start($, on, () => [], collectionForest(3), { 'caught:mon-02': record() })
     const pane = await mountPane($, DOCK)
@@ -292,7 +295,7 @@ describe('register: collection pane', () => {
   })
 
   // The test engine can't raise ui.close, so the close path is checked by hand
-  test('another tab stops the animation', async ($, on) => {
+  test('another tab stops the animation', HUNTING, async ($, on) => {
     const blits = collectionBlits(on)
     const { clock } = await start($, on, () => [], collectionForest(3), { 'caught:mon-03': record() })
     const pane = await mountPane($, DOCK)
@@ -306,7 +309,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('the layout holds still while scrolling past sprites of other sizes, caught or not', async ($, on) => {
+  test('the layout holds still while scrolling past sprites of other sizes, caught or not', HUNTING, async ($, on) => {
     await start($, on, () => [], collectionForest(3, true), { 'caught:mon-03': record() })
     const pane = await mountPane($, DOCK)
     // The box is the largest sprite's, 16 columns by 8 rows, whichever Modster is selected
@@ -326,7 +329,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('a short inline pane shows the list and the text, without the sprite', async ($, on) => {
+  test('a short inline pane shows the list and the text, without the sprite', HUNTING, async ($, on) => {
     await start($, on, () => [], collectionForest(3), { 'caught:mon-03': record() })
     // 6 rows: header, gap and summary leave 3, less than the sprite's 4
     const pane = await mountPane($, { placement: 'inline', bodyColumns: 120, scroll: { offset: 0, bodyRows: 6 } })
@@ -335,7 +338,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('with many Modsters the list scrolls to keep the selection in view', async ($, on) => {
+  test('with many Modsters the list scrolls to keep the selection in view', HUNTING, async ($, on) => {
     await start($, on, () => [], collectionForest(30))
     // Inline at 8 rows: header, gap and summary leave 5 for the list, 4 entries and the count row
     const pane = await mountPane($, { placement: 'inline', bodyColumns: 120, scroll: { offset: 0, bodyRows: 8 } })
@@ -353,7 +356,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('a catch this session shows in the open pane', async ($, on) => {
+  test('a catch this session shows in the open pane', HUNTING, async ($, on) => {
     const { clock } = await start($, on)
     const pane = await mountPane($, DOCK)
     expect(await pane.find({ type: 'Text', text: 'Caught 0/1' })).toBeDefined()
@@ -368,7 +371,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('/modsters reads catches made in other sessions', async ($, on) => {
+  test('/modsters reads catches made in other sessions', HUNTING, async ($, on) => {
     const stored: Record<string, unknown> = {}
     await start($, on, () => [], oneModsterForest(), stored)
     stored['caught:sproutling'] = record(2)
@@ -378,7 +381,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('the Biomes tab opens on the session biome, marked here, with each Modster\'s encounter % under its tier', async ($, on) => {
+  test('the Biomes tab opens on the session biome, marked here, with each Modster\'s encounter % under its tier', HUNTING, async ($, on) => {
     await start($, on, () => [], twoBiomes())
     const pane = await mountPane($)
     await pane.press({ key: 'biomes' })
@@ -395,7 +398,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('j and k move between biomes, and the odds follow', async ($, on) => {
+  test('j and k move between biomes, and the odds follow', HUNTING, async ($, on) => {
     await start($, on, () => [], twoBiomes())
     const pane = await mountPane($)
     await pane.press({ key: 'biomes' })
@@ -411,7 +414,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('uncaught Modsters read ??? in the Biomes tab; caught ones show their name and catches there', async ($, on) => {
+  test('uncaught Modsters read ??? in the Biomes tab; caught ones show their name and catches there', HUNTING, async ($, on) => {
     await start($, on, () => [], twoBiomes(), { 'caught:sproutling': { ...record(3), biomes: { 'ash-dunes': 3 } } })
     const pane = await mountPane($)
     await pane.press({ key: 'biomes' })
@@ -427,7 +430,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('a narrow dock puts the biome list above the odds', async ($, on) => {
+  test('a narrow dock puts the biome list above the odds', HUNTING, async ($, on) => {
     await start($, on, () => [], twoBiomes())
     const pane = await mountPane($, { placement: 'dock', bodyColumns: 50, scroll: { offset: 0, bodyRows: 20 } })
     await pane.press({ key: 'biomes' })
@@ -437,7 +440,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('a docked Biomes tab shows the selected biome\'s scene on top, animated between turns', async ($, on) => {
+  test('a docked Biomes tab shows the selected biome\'s scene on top, animated between turns', HUNTING, async ($, on) => {
     const blits = biomesSceneBlits(on)
     const { clock } = await start($, on, () => [], sceneForest())
     const pane = await mountPane($, DOCK)
@@ -453,7 +456,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('another tab stops the Biomes tab\'s scene', async ($, on) => {
+  test('another tab stops the Biomes tab\'s scene', HUNTING, async ($, on) => {
     const blits = biomesSceneBlits(on)
     const { clock } = await start($, on, () => [], sceneForest())
     const pane = await mountPane($, DOCK)
@@ -467,7 +470,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('the scene follows the selected biome, and a biome without one shows none', async ($, on) => {
+  test('the scene follows the selected biome, and a biome without one shows none', HUNTING, async ($, on) => {
     await start($, on, () => [], sceneAndDunes())
     const pane = await mountPane($, DOCK)
     await pane.press({ key: 'biomes' })
@@ -480,7 +483,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('a short inline pane leaves the scene out', async ($, on) => {
+  test('a short inline pane leaves the scene out', HUNTING, async ($, on) => {
     await start($, on, () => [], sceneForest())
     const pane = await mountPane($)
     await pane.press({ key: 'biomes' })
@@ -490,7 +493,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('showIdleScene off leaves the Biomes tab without a scene', { options: { showIdleScene: false } }, async ($, on) => {
+  test('showIdleScene off leaves the Biomes tab without a scene', { options: { autoStart: true, showIdleScene: false } }, async ($, on) => {
     await start($, on, () => [], sceneForest())
     const pane = await mountPane($, DOCK)
     await pane.press({ key: 'biomes' })
@@ -499,7 +502,7 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('the Stats tab sums every session and folds ones idle 24 hours into stats:total (0029)', async ($, on) => {
+  test('the Stats tab sums every session and folds ones idle 24 hours into stats:total (0029)', HUNTING, async ($, on) => {
     const stored: Record<string, unknown> = { 'stats:old': sessionStats(0), 'stats:recent': sessionStats(3 * DAY - 1000) }
     await start($, on, () => [], oneModsterForest(), stored, 3 * DAY)
     const pane = await mountPane($, DOCK)
@@ -507,11 +510,11 @@ describe('register: collection pane', () => {
     const rows = await statsRows(pane)
     expect(rows.slice(0, 2)).toEqual(['Encounters 2  Caught 2  Fled 0  Ran 0', 'Catch ratio 100%  Turns 2'])
     expect(rows.at(-1)).toBe('Whispering Forest      2      2      0      0   100%')
-    expect(Object.keys(stored).sort()).toEqual(['stats:recent', 'stats:total'])
+    expect(Object.keys(stored).filter((key) => key.startsWith('stats:')).sort()).toEqual(['stats:recent', 'stats:total'])
     await pane.unmount()
   })
 
-  test('this session\'s turns show when the Stats tab opens again', async ($, on) => {
+  test('this session\'s turns show when the Stats tab opens again', HUNTING, async ($, on) => {
     await start($, on)
     const pane = await mountPane($)
     await $.turn.start({ text: 'go', turnId: 't1' } as any)

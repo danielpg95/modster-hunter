@@ -176,8 +176,8 @@ workflow in the same PR.
   (decision 0023).
 - **Pane hotkeys need the pane to hold the keys.** A bare digit typed in an
   empty prompt only presses band Buttons, never a pane's. The person moves the
-  keys with `ctrl+x tab` (into the pane) and `Esc` (back); `/modsters hunt`
-  opens the encounter pane with focus (decision 0024).
+  keys with `ctrl+x tab` (into the pane) and `Esc` (back); `/modsters pane`
+  opens the encounter pane with focus (decisions 0024, 0038).
 - **Clicks only work in the fullscreen layout** (`/tui fullscreen`). Inline,
   even the engine's close mark (×) can't be clicked; `ctrl+x x` closes a pane.
 - **In tests, a drawn `Text` keeps no `key`.** `find({ type: 'Text', key })`

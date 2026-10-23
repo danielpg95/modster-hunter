@@ -6,10 +6,13 @@ import { stubContentFs } from './fixtures/stub-content-fs'
 import { CATCH } from '../hooks/constants'
 import { throwingMs } from '../hooks/game'
 
+// The game runs only while autoStart is on (decision 0038); these tests play it
+const HUNTING = { options: { autoStart: true } }
+
 // A throw that lands plays the whole catch animation (decision 0035); a miss is shorter
 const CATCH_THROW_MS = throwingMs('caught', CATCH.rocksToCatch)
 
-// The encounter pane (decision 0015): `/modsters hunt`, drawn on the terminal surface.
+// The encounter pane (decision 0015): `/modsters pane`, drawn on the terminal surface.
 // The one-Modster forest spawns after 3 s of work and always catches (catchRate 1).
 
 const PANE_PROPS = { title: 'Modster Hunter', isFocused: true, bodyColumns: 60, placement: 'dock', scroll: { offset: 0, bodyRows: 30 }, view: {} }
@@ -83,16 +86,16 @@ const OPEN = { v: 1, open: true }
 const CLOSED = { v: 1, open: false }
 
 describe('register: encounter pane', () => {
-  test('/modsters hunt opens the pane; it shows the biome while no Modster is here', async ($, on) => {
+  test('/modsters pane opens the pane; it shows the biome while no Modster is here', HUNTING, async ($, on) => {
     await start($, on)
-    expect(await $.command.run({ command: 'modsters', args: 'hunt' } as any)).toEqual({})
+    expect(await $.command.run({ command: 'modsters', args: 'pane' } as any)).toEqual({})
     const pane = await mountPane($)
     expect(await pane.find({ type: 'Text', text: 'Whispering Forest' })).toBeDefined()
     expect(await pane.find({ type: 'Text', text: /Listening for Modsters/ })).toBeDefined()
     await pane.unmount()
   })
 
-  test('the pane shows the encounter at the sprite\'s normal size, and Throw works from it', async ($, on) => {
+  test('the pane shows the encounter at the sprite\'s normal size, and Throw works from it', HUNTING, async ($, on) => {
     const clock = await start($, on)
     const pane = await mountPane($)
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
@@ -111,7 +114,7 @@ describe('register: encounter pane', () => {
     await pane.unmount()
   })
 
-  test('the band steps aside while the pane is shown, and takes the encounter back when it isn\'t', async ($, on) => {
+  test('the band steps aside while the pane is shown, and takes the encounter back when it isn\'t', HUNTING, async ($, on) => {
     let paneShown = true
     const clock = await start($, on, () =>
       paneShown ? [{ id: 'modster-hunt', title: 'Modster Hunter', isShown: true, isFocused: false, isPlaced: true }] : [],
@@ -129,7 +132,7 @@ describe('register: encounter pane', () => {
     await band.unmount()
   })
 
-  test('a pane in another tab, or not placed yet, doesn\'t hide the band', async ($, on) => {
+  test('a pane in another tab, or not placed yet, doesn\'t hide the band', HUNTING, async ($, on) => {
     let pane: UiPane = { id: 'modster-hunt', title: 'Modster Hunter', isShown: false, isFocused: false, isPlaced: true }
     const clock = await start($, on, () => [pane])
     const band = await mountBand($)
@@ -142,7 +145,7 @@ describe('register: encounter pane', () => {
     await band.unmount()
   })
 
-  test('the mod never opens the pane by itself for someone who never opened it', async ($, on) => {
+  test('the mod never opens the pane by itself for someone who never opened it', HUNTING, async ($, on) => {
     const opened: string[] = []
     on('ui.open', ($, e) => {
       opened.push(e.id)
@@ -157,11 +160,11 @@ describe('register: encounter pane', () => {
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await clock.advance(60_000)
     expect(opened).toEqual([])
-    await $.command.run({ command: 'modsters', args: 'hunt' } as any)
+    await $.command.run({ command: 'modsters', args: 'pane' } as any)
     expect(opened).toEqual(['modster-hunt'])
   })
 
-  test('the pane shows the caught mark for a Modster already in the collection (P5-11)', async ($, on) => {
+  test('the pane shows the caught mark for a Modster already in the collection (P5-11)', HUNTING, async ($, on) => {
     stubStore(on, {
       'caught:sproutling': { v: 1, count: 1, shinyCount: 0, firstCaughtAt: 1, lastCaughtAt: 1, bestTier: 'common', biomes: { 'whispering-forest': 1 } },
     })
@@ -173,7 +176,7 @@ describe('register: encounter pane', () => {
     await pane.unmount()
   })
 
-  test('a first encounter in the pane has no caught mark (P5-11)', async ($, on) => {
+  test('a first encounter in the pane has no caught mark (P5-11)', HUNTING, async ($, on) => {
     stubStore(on)
     const clock = await start($, on)
     const pane = await mountPane($)
@@ -185,14 +188,14 @@ describe('register: encounter pane', () => {
   })
 
   // Focus and hints (0024)
-  test('/modsters hunt opens the pane with focus', async ($, on) => {
+  test('/modsters pane opens the pane with focus', HUNTING, async ($, on) => {
     const opens = recordOpens(on)
     await startSession($, on)
-    await $.command.run({ command: 'modsters', args: 'hunt' } as any)
+    await $.command.run({ command: 'modsters', args: 'pane' } as any)
     expect(opens).toEqual([{ id: 'modster-hunt', focus: true }])
   })
 
-  test('the pane\'s Throw and Run read 1: Throw and 2: Run', async ($, on) => {
+  test('the pane\'s Throw and Run read 1: Throw and 2: Run', HUNTING, async ($, on) => {
     const clock = await start($, on)
     const pane = await mountPane($)
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
@@ -204,7 +207,7 @@ describe('register: encounter pane', () => {
     await pane.unmount()
   })
 
-  test('the header says how to move the keys, by focus and placement', async ($, on) => {
+  test('the header says how to move the keys, by focus and placement', HUNTING, async ($, on) => {
     await start($, on)
     const cases = [
       [{ isFocused: true, placement: 'dock', bodyColumns: 100 }, ' · Esc: back to prompt'],
@@ -221,7 +224,7 @@ describe('register: encounter pane', () => {
     }
   })
 
-  test('a narrow pane leaves the hint out before the biome name', async ($, on) => {
+  test('a narrow pane leaves the hint out before the biome name', HUNTING, async ($, on) => {
     await start($, on)
     const pane = await mountPane($, { isFocused: false, bodyColumns: 40 })
     expect(await pane.find({ type: 'Text', text: /ctrl\+x|Esc/ })).toBeUndefined()
@@ -230,23 +233,23 @@ describe('register: encounter pane', () => {
   })
 
   // Reopening for people who opened it (0019)
-  test('/modsters hunt remembers the pane is open', async ($, on) => {
+  test('/modsters pane remembers the pane is open', HUNTING, async ($, on) => {
     const store = stubStore(on)
     recordOpens(on)
     const clock = await startSession($, on)
-    await $.command.run({ command: 'modsters', args: 'hunt' } as any)
+    await $.command.run({ command: 'modsters', args: 'pane' } as any)
     await clock.advance(0)
     expect(store['prefs:huntPane']).toEqual(OPEN)
   })
 
-  test('the pane reopens at session start, without focus, for someone who left it open', async ($, on) => {
+  test('the pane reopens at session start, without focus, for someone who left it open', HUNTING, async ($, on) => {
     stubStore(on, { 'prefs:huntPane': OPEN })
     const opens = recordOpens(on)
     await startSession($, on)
     expect(opens).toEqual([{ id: 'modster-hunt' }])
   })
 
-  test('/clear, /resume and /branch reopen it too', async ($, on) => {
+  test('/clear, /resume and /branch reopen it too', HUNTING, async ($, on) => {
     stubStore(on, { 'prefs:huntPane': OPEN })
     const opens = recordOpens(on)
     await startSession($, on)
@@ -254,7 +257,7 @@ describe('register: encounter pane', () => {
     expect(opens).toEqual(Array.from({ length: 4 }, () => ({ id: 'modster-hunt' })))
   })
 
-  test('a pane closed by hand doesn\'t reopen', async ($, on) => {
+  test('a pane closed by hand doesn\'t reopen', HUNTING, async ($, on) => {
     const store = stubStore(on, { 'prefs:huntPane': CLOSED })
     const opens = recordOpens(on)
     await startSession($, on)
@@ -263,14 +266,14 @@ describe('register: encounter pane', () => {
     expect(store['prefs:huntPane']).toEqual(CLOSED)
   })
 
-  test('a pref it can\'t read doesn\'t reopen the pane', async ($, on) => {
+  test('a pref it can\'t read doesn\'t reopen the pane', HUNTING, async ($, on) => {
     stubStore(on, { 'prefs:huntPane': { v: 2, open: true } })
     const opens = recordOpens(on)
     await startSession($, on)
     expect(opens).toEqual([])
   })
 
-  test('a reopened pane that isn\'t placed leaves the encounter in the band', async ($, on) => {
+  test('a reopened pane that isn\'t placed leaves the encounter in the band', HUNTING, async ($, on) => {
     stubStore(on, { 'prefs:huntPane': OPEN })
     const opens = recordOpens(on, () => false)
     on('ui.panes', () => ({ value: [{ id: 'modster-hunt', title: 'Modster Hunter', isShown: true, isFocused: false, isPlaced: false }] }))
@@ -289,7 +292,7 @@ describe('register: encounter pane', () => {
   })
 
   // The idle scene in the pane (decision 0027)
-  test('between encounters the pane shows the biome scene above its idle text', async ($, on) => {
+  test('between encounters the pane shows the biome scene above its idle text', HUNTING, async ($, on) => {
     await start($, on, () => SHOWN, sceneForest())
     const pane = await mountPane($)
     expect(await pane.find({ type: 'Raster', key: 'scene' })).toBeDefined()
@@ -297,7 +300,7 @@ describe('register: encounter pane', () => {
     await pane.unmount()
   })
 
-  test('the pane scene moves only while Claude works, and the band that stepped aside gets no blits', async ($, on) => {
+  test('the pane scene moves only while Claude works, and the band that stepped aside gets no blits', HUNTING, async ($, on) => {
     on('turn.complete', () => ({ text: '' }))
     const blits = sceneBlits(on)
     const clock = await start($, on, () => SHOWN, sceneForest())
@@ -320,7 +323,7 @@ describe('register: encounter pane', () => {
     await pane.unmount()
   })
 
-  test('an encounter replaces the pane scene', async ($, on) => {
+  test('an encounter replaces the pane scene', HUNTING, async ($, on) => {
     const clock = await start($, on, () => SHOWN, sceneForest())
     const pane = await mountPane($)
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
@@ -330,7 +333,7 @@ describe('register: encounter pane', () => {
     await pane.unmount()
   })
 
-  test('a pane too short for the scene keeps its idle text', async ($, on) => {
+  test('a pane too short for the scene keeps its idle text', HUNTING, async ($, on) => {
     await start($, on, () => SHOWN, sceneForest())
     // 6 body rows leave 4 after the header and blank row; the 4-row scene and its text need 5
     const short = await mountPane($, { scroll: { offset: 0, bodyRows: 6 } })
@@ -341,7 +344,7 @@ describe('register: encounter pane', () => {
     await short.unmount()
   })
 
-  test('showIdleScene off keeps the pane text-only', { options: { showIdleScene: false } }, async ($, on) => {
+  test('showIdleScene off keeps the pane text-only', { options: { autoStart: true, showIdleScene: false } }, async ($, on) => {
     await start($, on, () => SHOWN, sceneForest())
     const pane = await mountPane($)
     expect(await pane.find({ type: 'Raster' })).toBeUndefined()
