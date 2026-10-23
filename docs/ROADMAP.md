@@ -726,3 +726,47 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] `plugin/.claude-plugin/plugin.json` has no `version`, so Claude Code versions the mod by git commit and players with auto-update get each merge (asked by @victor-aguilars, 2026-10-22, until P5-07 picks a versioning scheme). `claude plugin validate ./plugin --strict` passes.
   - [ ] Checked by hand: the README's install commands work on a second computer, and an update reaches it.
   - [ ] `node tools/check-tracking.mjs` passes.
+
+---
+
+## Phase 6 — Beyond the terminal
+
+Decision 0037 (Proposed): the mod ships first, then the game core moves out so other hosts can use it. Start these only once 0037 is accepted.
+
+#### [ ] P6-01 — Extract the host-neutral core
+- **Depends on:** P5-07
+- **Size:** L
+- **Goal:** the pure game, content, store and frame-level render modules live in a core package that has no `$`, DOM or Node APIs, and the mod imports it (decision 0037 point 2).
+- **Done when:**
+  - [ ] No file in the core package mentions `$`, `document`, `window` or a `node:` import. A check in `tools/` enforces it and runs in CI.
+  - [ ] `claude plugin test ./plugin` and `node --test tools/*.test.mjs` pass with no test expectations changed.
+  - [ ] `claude plugin validate ./plugin --strict` passes, and the mod installed from the marketplace plays an encounter as before.
+  - [ ] `docs/ARCHITECTURE.md` shows the new layout.
+
+#### [ ] P6-02 — Collection export format
+- **Depends on:** P6-01
+- **Size:** M
+- **Goal:** the player can export their collection and stats as a versioned JSON file that other hosts read (decision 0037 point 3).
+- **Done when:**
+  - [ ] A decision or a `docs/CONTENT_FORMAT.md` section defines the format (`v: 1`), with no paths, session ids or user content files in it.
+  - [ ] A pure function in the core builds the export from store records, and a parser reads it back, rejecting bad input. Both have tests.
+  - [ ] `/modsters export` writes the file and says where. A register test covers it.
+
+#### [ ] P6-03 — Web Modster-dex
+- **Depends on:** P6-01, P6-02
+- **Size:** L
+- **Goal:** a static web page anyone can open from a link shows the built-in biomes and Modsters with animated sprites, and an imported collection (decision 0037 point 4).
+- **Done when:**
+  - [ ] The page uses the core package and `plugin/content/` as is. Sprites draw on a canvas from the same RGBA frames as the terminal.
+  - [ ] It makes no network calls past loading its own files, and works offline once loaded.
+  - [ ] Importing a P6-02 export marks caught Modsters. A bad file shows an error and changes nothing.
+  - [ ] It builds with one documented command and is published (GitHub Pages or a Claude artifact), with the link in the README.
+
+#### [ ] P6-04 — MCP App feasibility (spike)
+- **Depends on:** P6-01
+- **Size:** M
+- **Goal:** find out whether an MCP App (an MCP server with a `ui://` view) can show Modster Hunter in Claude chat, so a decision can accept or reject it (decision 0037 point 5).
+- **Done when:**
+  - [ ] A throwaway prototype shows one encounter from the core in Claude Desktop chat. Screenshots and findings are in the session log.
+  - [ ] Findings cover packaging (connector or `.mcpb`), what triggers an encounter without turn events, where the collection is stored, and what rule 7 would need to allow.
+  - [ ] A decision accepts or rejects an MCP App host.
