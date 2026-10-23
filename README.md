@@ -2,9 +2,20 @@
 
 **Catch Modsters while you wait for Claude.**
 
-<p align="center">
-  <img src="docs/previews/idle-scenes.gif" alt="The four biomes: a pine forest, a sunny bay, a windy desert and a crystal cave" width="600">
-</p>
+<table align="center">
+  <tr>
+    <td align="center" width="50%">
+      <img src="docs/previews/readme-musketail.gif" alt="Musketail, a mouse in a feathered hat and leaf cloak, raising a pine-needle sword" height="160"><br>
+      <b>Musketail</b><br>
+      <sub>It picks a fresh leaf cloak each season. Autumn ones are its favorite, because red looks heroic.</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="docs/previews/readme-lamparito.gif" alt="Lamparito, a grinning purple smoke spirit rising from a brass lamp" height="160"><br>
+      <b>Lamparito</b><br>
+      <sub>A spirit of hot smoke that sleeps in a brass lamp half-buried in the sand. It offers every traveler three wishes and twists every one of them. Its grin is the only part of it that is never smoke.</sub>
+    </td>
+  </tr>
+</table>
 
 Modster Hunter is a [Claude Code mod](https://code.claude.com/docs/en/plugins/mods):
 a tiny collecting game that lives in your terminal, right above the prompt.
@@ -13,97 +24,68 @@ You ask Claude for something. While it works, a wild Modster wanders into view.
 Press `1` to throw. You get a few tries before it gets bored and leaves. When
 Claude is done, the game steps aside and you get back to work.
 
-That's it. No grinding, no timers to babysit, nothing that steals your
-keystrokes. Just something to catch while you wait for the tests to run.
+## Biomes
 
-## Meet some Modsters
+Each session drops you into one biome at random, each with its own Modsters:
 
-Dozens of Modsters hide across four biomes, from common critters to
-legendaries you'll be lucky to see once. Every one is hand-drawn pixel art with
-its own idle animation and dex entry. Here are two to get you started:
+🌲 **Whispering Forest**: tall pines, soft moss, something rustling.
+
+<img src="docs/previews/readme-whispering-forest.gif" alt="The Whispering Forest: dusk pines with leaves drifting by" width="600">
+
+💎 **Crystal Grotto**: whisper here and the crystals whisper back, a little out of tune.
+
+<img src="docs/previews/readme-crystal-grotto.gif" alt="The Crystal Grotto: pink and cyan crystals glinting in a dark cave" width="600">
+
+Two more are out there for you to find.
+
+## Catchers
+
+Every throw plays a catcher. Pick yours in `/modsters`, on the Catchers tab:
 
 <table align="center">
   <tr>
-    <td align="center" width="50%">
-      <img src="docs/previews/readme-musketail.gif" alt="Musketail, a mouse in a feathered hat and leaf cloak, raising a pine-needle sword" height="160"><br>
-      <b>Musketail</b> · rare · Whispering Forest<br>
-      <sub>A brave mouse with a leaf cloak, a feathered hat and a pine-needle sword. All for one acorn.</sub>
-    </td>
-    <td align="center" width="50%">
-      <img src="docs/previews/readme-lamparito.gif" alt="Lamparito, a grinning purple smoke spirit rising from a brass lamp" height="160"><br>
-      <b>Lamparito</b> · rare · Dustwind Expanse<br>
-      <sub>Rub the lamp and it grants one wish: to be left alone.</sub>
-    </td>
+    <td align="center"><img src="docs/previews/readme-catch-hootlet.gif" alt="Hootlet, a mossy owl, shrinks into a seed pod, which rocks three times and sparkles" height="128"><br><b>Seed pod</b></td>
+    <td align="center"><img src="docs/previews/readme-catch-echobat.gif" alt="Echobat, a purple bat with crystal ears, is drawn into a brass lantern, which rocks three times and sparkles" height="128"><br><b>Lantern</b></td>
+    <td align="center"><img src="docs/previews/readme-catch-glowcap.gif" alt="Glowcap, a blue mushroom, goes into a scrambled puzzle cube, which comes out solved" height="128"><br><b>Puzzle Cube</b></td>
   </tr>
 </table>
 
-The rest are out there for you to find.
+## Install
 
-| Biome | What you'll find |
+You need Claude Code **v2.1.292 or later** (`claude --version`), in a terminal.
+
+```bash
+claude plugin install modster-hunter --marketplace danielpg95/modster-hunter
+```
+
+Or, inside a session: `/plugin marketplace add danielpg95/modster-hunter`, then
+`/plugin install modster-hunter@modster-hunter`. Start a new session to play.
+
+## How to play
+
+| Key or command | What it does |
 | --- | --- |
-| 🌲 **Whispering Forest** | Tall pines, soft moss, something rustling. |
-| 🌊 **Saltbreeze Bay** | The tide comes in, the tide goes out, and something always stays behind. |
-| 🏜️ **Dustwind Expanse** | Endless sand where the wind never stops talking. |
-| 💎 **Crystal Grotto** | Whisper here and the crystals whisper back, a little out of tune. |
+| `1` / `2` | Throw / run while a Modster is up |
+| `/modsters` | Your collection, the biomes, stats, catchers and settings |
+| `/modsters hunt` | A bigger encounter pane, for a better view |
+| `/modsters reload` | Load your own Modsters after you add or change them |
+| `/config` | Where the game shows: band, pane, spinner, status line |
 
-Each session drops you into one biome at random, so you never know who's out
-there today.
+## Contributing
 
-## What you get
+New hands are welcome, **especially pixel artists**. Pitch a Modster or biome in
+an issue, playtest, report bugs, or pick up a task from the
+[roadmap](docs/ROADMAP.md). [CONTRIBUTING.md](CONTRIBUTING.md) explains the
+routine. If you use Claude Code, open the repo and start with the
+`start-session` skill.
 
-- **A band above the prompt** where Modsters show up while Claude works.
-- **`/modsters`** opens your collection: every Modster you've caught, the biomes,
-  your stats and settings.
-- **`/modsters hunt`** opens a bigger encounter pane, if you'd like a better view.
-- **Your own Modsters.** Ask Claude to "make me a Modster" and the mod's
-  `create-modster-content` skill designs one with you, sprite included. You can
-  also switch off the built-in biomes and play only with yours.
-- **Quiet by design.** Fully offline: no network, no model calls, no telemetry.
-  It never opens a pane on its own and never takes your keystrokes.
-
-## Try it
-
-Modster Hunter isn't on the plugin marketplace yet (that comes with v1.0). Until
-then, run it from source:
+To run from source:
 
 ```bash
 git clone https://github.com/danielpg95/modster-hunter.git
 cd modster-hunter
 claude --plugin-dir ./plugin
 ```
-
-Then ask Claude for anything and watch the band above the prompt. Type
-`/modsters` to see what you've caught.
-
-**You need** Claude Code **v2.1.287 or later** (`claude --version`), running in
-a terminal. Desktop app support is planned.
-
-## Contributing
-
-Modster Hunter is built by a small group of people, mostly pairing with
-Claude Code. New hands are very welcome, **especially pixel artists**.
-
-Ways to help:
-
-- **Draw or pitch a Modster or biome.** Open a "New Modster or biome idea"
-  issue, or add one yourself with the `add-modster` and `add-biome` skills.
-- **Playtest** and tell us what felt good or annoying in an issue.
-- **Report a bug** with the bug template.
-- **Pick up a task** from the [roadmap](docs/ROADMAP.md).
-  `node tools/check-tracking.mjs --next` lists the ones you can claim right now.
-
-We keep a simple routine so everyone stays on the same track: claim a task on
-the [workboard](docs/WORKBOARD.md), work on a branch, leave a handoff note, open
-a PR. [CONTRIBUTING.md](CONTRIBUTING.md) walks through it.
-
-If you use Claude Code, just open the repo. It reads [CLAUDE.md](CLAUDE.md),
-and the contributor skills in `.claude/skills/` guide you through each step.
-Start with `start-session`. No Claude Code? The skills are plain Markdown and
-work as step-by-step guides.
-
-Useful docs: [architecture](docs/ARCHITECTURE.md),
-[development](docs/DEVELOPMENT.md), [content format](docs/CONTENT_FORMAT.md)
-and the [decisions](docs/decisions/) behind how the game works.
 
 ## License
 
