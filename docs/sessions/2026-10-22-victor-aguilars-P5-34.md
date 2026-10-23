@@ -31,6 +31,9 @@ and keep it updated.
   48 ticks at 8 fps, particles included. They come from the mod's own
   `idleScene`, `artFrame` and `particlePixel` through a one-off script (not
   in the repo), like `idle-scenes.gif` in P5-14.
+- The two README Modsters show only their name and their real dex `entry` from
+  `modster.json` (asked by @victor-aguilars). The rarity, the biome and the old
+  made-up blurbs are gone.
 - Verified: `claude plugin validate ./plugin --strict` passes, and so does
   `node tools/check-tracking.mjs`.
 

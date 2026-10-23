@@ -6,13 +6,13 @@
   <tr>
     <td align="center" width="50%">
       <img src="docs/previews/readme-musketail.gif" alt="Musketail, a mouse in a feathered hat and leaf cloak, raising a pine-needle sword" height="160"><br>
-      <b>Musketail</b> · rare · Whispering Forest<br>
-      <sub>A brave mouse with a leaf cloak, a feathered hat and a pine-needle sword. All for one acorn.</sub>
+      <b>Musketail</b><br>
+      <sub>It picks a fresh leaf cloak each season. Autumn ones are its favorite, because red looks heroic.</sub>
     </td>
     <td align="center" width="50%">
       <img src="docs/previews/readme-lamparito.gif" alt="Lamparito, a grinning purple smoke spirit rising from a brass lamp" height="160"><br>
-      <b>Lamparito</b> · rare · Dustwind Expanse<br>
-      <sub>Rub the lamp and it grants one wish: to be left alone.</sub>
+      <b>Lamparito</b><br>
+      <sub>A spirit of hot smoke that sleeps in a brass lamp half-buried in the sand. It offers every traveler three wishes and twists every one of them. Its grin is the only part of it that is never smoke.</sub>
     </td>
   </tr>
 </table>
