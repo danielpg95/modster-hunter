@@ -1,6 +1,6 @@
 # 0024 — `/modsters hunt` gives the encounter pane the keys, and the pane says how to switch
 
-- **Status:** Accepted (amends 0015 point 1)
+- **Status:** Accepted (amends 0015 point 1; point 1 amended by 0038: it applies to `/modsters pane`)
 - **Date:** 2026-10-10
 - **Decided by:** @danielpg95 (proposed by @victor-aguilars after playing the pane on the local experiment branch; details drafted by Claude)
 

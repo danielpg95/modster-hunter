@@ -1,6 +1,6 @@
 # 0019 — The encounter pane reopens for people who opened it, until they close it by hand
 
-- **Status:** Accepted, amended by 0023 (`encounterPane`: `off`, `when-opened`, `always`)
+- **Status:** Accepted, amended by 0023 (`encounterPane`: `off`, `when-opened`, `always`); points 1 and 3 amended by 0038 (`/modsters pane` stores the pref; the reopen waits for `autoStart`)
 - **Date:** 2026-10-09
 - **Decided by:** @danielpg95 (issue #35; details drafted by Claude)
 
