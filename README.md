@@ -44,9 +44,9 @@ Every throw plays a catcher. Pick yours in `/modsters`, on the Catchers tab:
 
 <table align="center">
   <tr>
-    <td align="center"><img src="docs/previews/readme-catch-pod.gif" alt="Hootlet, a mossy owl, shrinks into a seed pod, which rocks three times and sparkles" height="128"><br><b>Hootlet</b> · Seed pod</td>
-    <td align="center"><img src="docs/previews/readme-catch-lantern.gif" alt="Echobat, a purple bat with crystal ears, is drawn into a brass lantern, which rocks three times and sparkles" height="128"><br><b>Echobat</b> · Lantern</td>
-    <td align="center"><img src="docs/previews/readme-catch-puzzle-cube.gif" alt="Glowcap, a blue mushroom, goes into a scrambled puzzle cube, which comes out solved" height="128"><br><b>Glowcap</b> · Puzzle Cube</td>
+    <td align="center"><img src="docs/previews/readme-catch-hootlet.gif" alt="Hootlet, a mossy owl, shrinks into a seed pod, which rocks three times and sparkles" height="128"><br><b>Hootlet</b> · Seed pod</td>
+    <td align="center"><img src="docs/previews/readme-catch-echobat.gif" alt="Echobat, a purple bat with crystal ears, is drawn into a brass lantern, which rocks three times and sparkles" height="128"><br><b>Echobat</b> · Lantern</td>
+    <td align="center"><img src="docs/previews/readme-catch-glowcap.gif" alt="Glowcap, a blue mushroom, goes into a scrambled puzzle cube, which comes out solved" height="128"><br><b>Glowcap</b> · Puzzle Cube</td>
   </tr>
 </table>
 

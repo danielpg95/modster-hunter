@@ -35,7 +35,7 @@ and keep it updated.
   `modster.json` (asked by @victor-aguilars). The rarity, the biome and the old
   made-up blurbs are gone.
 - Added a Catchers section (asked by @victor-aguilars, "showcase some Modster
-  pods"): `docs/previews/readme-catch-{pod,lantern,puzzle-cube}.gif`, one catch
+  pods"): `docs/previews/readme-catch-{hootlet,echobat,glowcap}.gif` (named after the Modster, so a swap never shows a cached old GIF), one catch
   each (a short idle, then throw, three rocks and the click with sparkles) at 4×
   and 12 fps on a dark background. They're drawn by the mod's own `prepareCatch`,
   `catchFrame` and `throwingMs` through a one-off script, on Musketail and
