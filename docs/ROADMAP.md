@@ -753,6 +753,16 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Docs follow 0040's consequences: decision status lines and index rows, CONTENT_FORMAT.md, ARCHITECTURE.md, and the README.
   - [x] `claude plugin test ./plugin` and `claude plugin validate ./plugin --strict` pass. Checked by hand: changing each kind of row in the tab updates `/config`, and the pane stays on the Settings tab after a change (passed after the `$.state` fix, @victor-aguilars, 2026-10-22).
 
+#### [ ] P5-37 — English names for the Dustwind roster
+- **Depends on:** —
+- **Size:** S
+- **Goal:** the built-in Modsters have English-like names while the language is English; Spanish names can come later with localization (asked by @victor-aguilars, 2026-10-22).
+- **Done when:**
+  - [ ] Ranactus is Cactoad, Torbellín is Twirlwind, Fuescorpion is Scorchion and Reyrayo is Kingbolt. Lamparito keeps its name. Ids stay the same, so players' catches are kept.
+  - [ ] No old name is left in the Modsters' text or in player-facing docs (session logs stay as written).
+  - [ ] `plugin.json`'s version goes up so players get the new names. `claude plugin test ./plugin` and `claude plugin validate ./plugin --strict` pass.
+  - [ ] `node tools/check-tracking.mjs` passes.
+
 ---
 
 ## Phase 6 — Beyond the terminal
