@@ -50,6 +50,10 @@ Build decision 0038: every "done when" item, up to the hand check.
 
 ## Decisions made
 
+- @victor-aguilars: make `/modsters` immediate now. Decision 0039 (Proposed, for
+  @danielpg95 in this PR) is added, and P5-35 relies on it: `immediate: true`
+  in `$.command.register`, with a register test.
+
 - Followed 0038 as accepted. The decision didn't specify two replies, so I chose:
   - `/modsters stop` while already off gives the same stop reply, mirroring
     `hunt` while on.
@@ -69,7 +73,8 @@ Build decision 0038: every "done when" item, up to the hand check.
    second computer). Check that the welcome toast shows, nothing draws until
    `/modsters hunt`, `/config` shows Auto start on, `/modsters stop` clears
    everything and shows it off, and `/modsters help` and the typeahead hint
-   look right. Then tick the last P5-35 item and mark the PR ready.
+   look right. Type `/modsters pane` and `/modsters stop` while Claude works:
+   they should act at once without disturbing the turn (0039). Then tick the last P5-35 item and mark the PR ready.
 2. Merge claim PR #152 first, then the P5-35 PR.
 
 ## Open questions
@@ -82,4 +87,3 @@ Build decision 0038: every "done when" item, up to the hand check.
 
 - The multi-line `/modsters help` reply depends on how the engine prints a
   command's `text`. Check it in the hand check.
-- `/modsters` isn't registered as `immediate` (noted in the 0038 session).

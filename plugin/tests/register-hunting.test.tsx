@@ -22,16 +22,18 @@ interface Seen {
   closes: string[]
   configSets: string[]
   argumentHints: (string | undefined)[]
+  immediate: (boolean | undefined)[]
   toasts: string[]
   store: Record<string, unknown>
 }
 
 /** Starts a session on the one-Modster forest with a fake clock, recording what the mod shows and writes. */
 async function start($: any, on: On, init: { store?: Record<string, unknown>; panes?: () => UiPane[]; denyConfig?: string } = {}) {
-  const seen: Seen = { statuses: [], spinner: [], opens: [], closes: [], configSets: [], argumentHints: [], toasts: [], store: structuredClone(init.store ?? {}) }
+  const seen: Seen = { statuses: [], spinner: [], opens: [], closes: [], configSets: [], argumentHints: [], immediate: [], toasts: [], store: structuredClone(init.store ?? {}) }
   on('session.start', ($, e) => ({ cwd: e.cwd }))
   on('command.register', ($, e) => {
     seen.argumentHints.push(e.argumentHint)
+    seen.immediate.push(e.immediate)
     return { value: { command: e.name } }
   })
   on('turn.start', ($, e) => ({ turnId: e.turnId }))
@@ -258,6 +260,11 @@ describe('register: opt-in hunting', () => {
   test('/modsters is registered with the subcommands as its typeahead hint', async ($, on) => {
     const { seen } = await start($, on, { store: WELCOMED })
     expect(seen.argumentHints).toEqual(['[hunt | stop | pane | reload | help]'])
+  })
+
+  test('/modsters is registered as immediate, so it runs while Claude works (0039)', async ($, on) => {
+    const { seen } = await start($, on, { store: WELCOMED })
+    expect(seen.immediate).toEqual([true])
   })
 
   test('/modsters reload while off loads content but doesn\'t start the game', async ($, on) => {

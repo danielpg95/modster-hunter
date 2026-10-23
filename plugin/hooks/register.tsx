@@ -262,8 +262,9 @@ export const register: Register = (on, options) => {
     // The encounter pane waits for hunting too; one left open is closed (0038 point 1)
     if (hunting) await openHuntPaneAtStart($)
     else await closeHuntPane($)
-    // Register last: a taken name throws and would skip the rest of this hook
-    await $.command.register({ name: 'modsters', description: 'Open your Modster collection', argumentHint: MODSTERS_ARGUMENT_HINT })
+    // Register last: a taken name throws and would skip the rest of this hook. Immediate, so it
+    // runs while Claude works, when people play; the command.run hook never reads the turn (0039)
+    await $.command.register({ name: 'modsters', description: 'Open your Modster collection', argumentHint: MODSTERS_ARGUMENT_HINT, immediate: true })
     return next(e)
   })
 

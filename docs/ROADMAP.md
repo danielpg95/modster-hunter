@@ -738,7 +738,8 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `/modsters hunt`, `stop` and `pane` set `autoStart` through `$.config.set` and reply as 0038 points 3–5 say, including when it's refused. `/modsters help` and an unknown word reply as points 6–7 say. `/modsters` registers with the `argumentHint` from point 8. Register tests cover each.
   - [x] The welcome toast shows once per player, with the new-player or returning-player text. A returning player gets `autoStart` set to `true` once (0038 points 2 and 9). Register tests cover both and a second session.
   - [x] Docs follow 0038's consequences: decision status lines and index rows, CLAUDE.md rule 6, CONTENT_FORMAT.md, ARCHITECTURE.md, and the README's How to play table.
-  - [ ] `claude plugin test ./plugin` and `claude plugin validate ./plugin --strict` pass. Checked by hand on a fresh install: the toast shows, nothing draws until `/modsters hunt`, `/config` shows Auto start on, and `/modsters stop` clears everything and shows it off.
+  - [x] `/modsters` registers as `immediate`, so it runs during a turn (decision 0039, Proposed: this task relies on it, asked by @victor-aguilars, 2026-10-22). A register test checks the flag.
+  - [ ] `claude plugin test ./plugin` and `claude plugin validate ./plugin --strict` pass. Checked by hand on a fresh install: the toast shows, nothing draws until `/modsters hunt`, `/config` shows Auto start on, and `/modsters stop` clears everything and shows it off. `/modsters pane` and `/modsters stop` typed while Claude works act at once without disturbing the turn (0039).
 
 ---
 

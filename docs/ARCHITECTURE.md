@@ -58,7 +58,7 @@ plugin/
 | `ui.render` `{ component: 'Pane' }` (our id) | Draw the collection pane (P3), or the encounter pane `modster-hunt` (0015), with the biome's scene between encounters (0027) |
 | `ui.render` `{ component: 'Spinner' }` | Name the Modster in the main turn's spinner while an encounter is up (`showInSpinner`, 0023) |
 | `ui.close` | The encounter pane closed: redraw so the band takes the encounter back (0015); a close by hand stores `prefs:huntPane` `open: false` (0019) |
-| `command.run` `{ command: 'modsters' }` | Open the collection pane; `hunt` and `stop` turn the game on and off through `$.config.set` on `autoStart` (0038); `pane` opens the encounter pane (0015), starting the game if it's off, and stores `prefs:huntPane` `open: true` (0019), or answers that it's off with `encounterPane: off` (0023); `reload` reloads content; `help` and an unknown word reply with the commands (0038) |
+| `command.run` `{ command: 'modsters' }` | Registered `immediate`, so it runs during a turn too, and never reads the turn (0039). Open the collection pane; `hunt` and `stop` turn the game on and off through `$.config.set` on `autoStart` (0038); `pane` opens the encounter pane (0015), starting the game if it's off, and stores `prefs:huntPane` `open: true` (0019), or answers that it's off with `encounterPane: off` (0023); `reload` reloads content; `help` and an unknown word reply with the commands (0038) |
 | `session.end` | Clear running turn and subagents, stop timers, clear the status line, flush stats (≤ 1.5 s total budget) |
 
 ## Where state lives
