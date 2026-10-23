@@ -17,6 +17,7 @@ this file lists only tasks someone has claimed.
 | --- | --- | --- | --- | --- | --- | --- |
 | P5-19 | @danielpg95 | in-review | p5-19-forest-roster | 2026-10-14 | 2026-10-16 | Check the forest live with `/modsters hunt`, then merge PR #112 |
 | P5-21 | @victor-aguilars | in-progress | p5-21-saltbreeze-roster | 2026-10-14 | 2026-10-16 | Pick a concept for the second common (#033); Peekashell and Sir Kelpsie are in the partial PR |
+| P5-34 | @victor-aguilars | in-progress | p5-34-readme-install | 2026-10-22 | 2026-10-22 | Rewrite the README top and Install section; drop `version` from plugin.json |
 
 ## Up next
 

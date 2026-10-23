@@ -716,6 +716,19 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Where the catcher doesn't fit the sprite area, the sprite holds still and the text lines show the dot count. The band never takes more rows than it does today.
   - [x] No `wobble` text is left in `plugin/hooks/`.
 
+#### [ ] P5-34 — README: marketplace install and Modsters first
+- **Depends on:** —
+- **Size:** S
+- **Goal:** the README leads with Modsters and says plainly how to install from the marketplace and keep the mod updated (asked by @victor-aguilars, 2026-10-22). This moves the marketplace install ahead of P5-07. The recording, CHANGELOG and version tag stay in P5-07.
+- **Done when:**
+  - [ ] The Musketail and Lamparito previews sit right under the title, and the four-biome scene GIF and biome table are gone. Biomes get one short line.
+  - [ ] An Install section gives the marketplace commands (shell and in-session), the Claude Code version they need, how to turn on auto-update, how to update by hand, and the from-source path for contributors.
+  - [ ] `plugin/.claude-plugin/plugin.json` has no `version`, so Claude Code versions the mod by git commit and players with auto-update get each merge (asked by @victor-aguilars, 2026-10-22, until P5-07 picks a versioning scheme). `claude plugin validate ./plugin --strict` passes.
+  - [ ] Checked by hand: the README's install commands work on a second computer, and an update reaches it.
+  - [ ] `node tools/check-tracking.mjs` passes.
+
+---
+
 ## Phase 6 — Beyond the terminal
 
 Decision 0037 (Proposed): the mod ships first, then the game core moves out so other hosts can use it. Start these only once 0037 is accepted.
