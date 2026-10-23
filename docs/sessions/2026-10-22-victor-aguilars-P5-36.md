@@ -52,9 +52,18 @@ Build decision 0040: every "done when" item, up to the hand check.
 
 ## Problems and findings
 
-- The pane doesn't save its tab beyond the module. If a `$.config.set` reload
-  happens in a real session, the pane may come back on the Collection tab.
-  0040 says to record that and revisit it. The hand check shows which.
+- Hand check (@victor-aguilars): each `o` sent the pane back to the Collection
+  tab. A `$.config.set` on our own row **reloads the mod**, which drops module
+  variables. It also re-rolled the biome on every change, and on `/modsters
+  hunt` and `stop`.
+- Fix: a `$.state` contract in `plugin/types/index.d.ts` (`"types"` in
+  plugin.json) with `paneTab`, `settingsSelected` and `biomeId`, since
+  `$.state` survives a hot reload.
+  - `keepState` writes them: tab presses, `/modsters settings`,
+    `changeSetting` (before the `/config` write), and the biome pick.
+  - `restoreSessionState` reads them back at `session.start`.
+  - Tests watch the writes through a `state.set` hook (the test `$` has no
+    `$.state`). A real reload can only be checked by hand.
 
 ## Next steps
 
@@ -69,8 +78,7 @@ Build decision 0040: every "done when" item, up to the hand check.
 
 ## Open questions
 
-- If a change does reload the mod and the pane jumps back to Collection, should
-  the tab be kept in `$.state` (it survives hot reloads)? — @victor-aguilars, after the hand check.
+None
 
 ## Found along the way
 

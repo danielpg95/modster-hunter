@@ -269,8 +269,11 @@ export const register: Register = (on, options) => {
     biomeScenes.clear()
     if (content.biomes.size === 0) $.ui.toast(`Modster Hunter: ${noBiomesMessage(includeBuiltins, USER_FOLDER_LABEL)}`)
     sessionId = await $.session.id().catch(() => 'unknown')
+    // A reload (a /config change, 0040) drops module variables; $.state keeps the session's view
+    await restoreSessionState($)
     // Keep the biome if session.start ever repeats in this process; pick only when there's none yet
     if (biomeId === undefined || !content.biomes.has(biomeId)) biomeId = pickBiome(content.biomes.keys(), Math.random)
+    if (biomeId !== undefined) await keepState($, 'biomeId', biomeId)
     pickedCatcherId = readCatcherId(await $.store.get(CATCHER_KEY).catch(() => undefined))
     await welcome($)
     if (hunting) startMachine($, idleTimeoutSec)
@@ -600,6 +603,7 @@ export const register: Register = (on, options) => {
         onPress={() => {
           if (tab.id === 'stats' && collectionTab !== 'stats') loadStats($)
           collectionTab = tab.id
+          void keepState($, 'paneTab', tab.id)
           $.ui.invalidate('ui.render')
         }}
       />
@@ -783,6 +787,7 @@ export const register: Register = (on, options) => {
       const select = (field: SettingField | undefined) => {
         if (!field || field === settingsSelected) return
         settingsSelected = field
+        void keepState($, 'settingsSelected', field)
         $.ui.invalidate('ui.render')
       }
       return (
@@ -1104,7 +1109,10 @@ export const register: Register = (on, options) => {
     }
     if (verb === 'help') return { text: helpText(hunting) }
     // `/modsters settings` opens the collection on its Settings tab (0040 point 1)
-    if (verb === 'settings') collectionTab = 'settings'
+    if (verb === 'settings') {
+      collectionTab = 'settings'
+      await keepState($, 'paneTab', 'settings')
+    }
     if (verb === 'reload') {
       reloading ??= reloadContent($, includeBuiltins, idleTimeoutSec).finally(() => {
         reloading = undefined
@@ -1130,6 +1138,9 @@ export const register: Register = (on, options) => {
  */
 async function changeSetting($: EngineInterface, field: SettingField): Promise<void> {
   const next = nextSettingValue(field, settingValues[field])
+  // The write below reloads the mod (0023): the pane must come back here, on this row (0040 point 5)
+  await keepState($, 'paneTab', 'settings')
+  await keepState($, 'settingsSelected', field)
   const label = SETTING_SPECS.find((spec) => spec.field === field)?.label ?? field
   if (field === 'autoStart') {
     // Exactly what /modsters hunt and stop do (0038 points 3–4)
@@ -1504,6 +1515,31 @@ async function openHuntPaneAtStart($: EngineInterface): Promise<void> {
     if (opened.isPlaced) $.ui.invalidate('ui.render')
   } catch (error) {
     $.ui.log(`hunt pane: not opened at start: ${error instanceof Error ? error.message : String(error)}`, { to: 'debug' })
+  }
+}
+
+/** Writes a session value that must survive a reload (`types/index.d.ts`); a failure is logged, never thrown. */
+async function keepState($: EngineInterface, key: 'paneTab' | 'settingsSelected' | 'biomeId', value: string): Promise<void> {
+  try {
+    if (key === 'paneTab') await $.state.set({ plugin: 'modster-hunter', key: 'paneTab' }, value as CollectionTab)
+    else if (key === 'settingsSelected') await $.state.set({ plugin: 'modster-hunter', key: 'settingsSelected' }, value)
+    else await $.state.set({ plugin: 'modster-hunter', key: 'biomeId' }, value)
+  } catch (error) {
+    $.ui.log(`state: ${key} not kept: ${error instanceof Error ? error.message : String(error)}`, { to: 'debug' })
+  }
+}
+
+/** Reads back what keepState wrote, after a reload dropped the module variables. Unknown values are ignored. */
+async function restoreSessionState($: EngineInterface): Promise<void> {
+  try {
+    const tab = (await $.state.get({ plugin: 'modster-hunter', key: 'paneTab' })).value
+    if (tab && COLLECTION_TABS.some((info) => info.id === tab)) collectionTab = tab
+    const selected = (await $.state.get({ plugin: 'modster-hunter', key: 'settingsSelected' })).value
+    if (selected && SETTING_SPECS.some((spec) => spec.field === selected)) settingsSelected = selected as SettingField
+    const biome = (await $.state.get({ plugin: 'modster-hunter', key: 'biomeId' })).value
+    if (biomeId === undefined && biome && content?.biomes.has(biome)) biomeId = biome
+  } catch (error) {
+    $.ui.log(`state: not restored: ${error instanceof Error ? error.message : String(error)}`, { to: 'debug' })
   }
 }
 
@@ -1981,6 +2017,7 @@ async function toggleContent($: EngineInterface, change: ToggleChange, name: str
 function moveToNewBiome($: EngineInterface, idleTimeoutSec: number): LoadedBiome | undefined {
   retiredBiome = undefined
   biomeId = content ? pickBiome(content.biomes.keys(), Math.random) : undefined
+  if (biomeId !== undefined) void keepState($, 'biomeId', biomeId)
   const loaded = biomeId === undefined ? undefined : content?.biomes.get(biomeId)
   if (!machine) {
     startMachine($, idleTimeoutSec)

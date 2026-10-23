@@ -17,11 +17,13 @@ interface Seen {
   configSets: string[]
   toasts: string[]
   store: Record<string, unknown>
+  /** The mod's $.state writes, last value per key */
+  state: Record<string, unknown>
 }
 
 /** Starts a session on the one-Modster forest with a fake clock; `config.set` answers as /config would, or refuses. */
 async function start($: any, on: On, init: { denyConfig?: string; panes?: () => UiPane[] } = {}) {
-  const seen: Seen = { opens: [], configSets: [], toasts: [], store: structuredClone(WELCOMED) }
+  const seen: Seen = { opens: [], configSets: [], toasts: [], store: structuredClone(WELCOMED), state: {} }
   on('session.start', ($, e) => ({ cwd: e.cwd }))
   on('command.register', ($, e) => ({ value: { command: e.name } }))
   on('turn.start', ($, e) => ({ turnId: e.turnId }))
@@ -44,6 +46,11 @@ async function start($: any, on: On, init: { denyConfig?: string; panes?: () => 
     return { value: undefined }
   })
   on('store.keys', () => ({ value: Object.keys(seen.store) }))
+  // Watch the mod's $.state writes; the kit beneath keeps the values
+  on('state.set', ($, e: any, next: any) => {
+    seen.state[e.key] = e.value
+    return next(e)
+  })
   on('ui.render', ($, e) => {
     const { Box } = $.ui.resolve(e)
     return <Box />
@@ -208,5 +215,28 @@ describe('register: Settings tab', () => {
     await pane.redraw()
     expect(await row(pane, 'autoStart')).toMatch(/on$/)
     await pane.unmount()
+  })
+
+  // A /config change reloads the mod (seen in the P5-36 hand check): $.state keeps the view
+  test('a change keeps the Settings tab and its row in $.state before writing, so a reload comes back to them', async ($, on) => {
+    const { seen } = await start($, on)
+    const pane = await settingsPane($)
+    await change(pane, 'showIdleScene')
+    expect(seen.state.paneTab).toBe('settings')
+    expect(seen.state.settingsSelected).toBe('showIdleScene')
+    await pane.unmount()
+  })
+
+  test('a tab press keeps the tab in $.state', async ($, on) => {
+    const { seen } = await start($, on)
+    const pane = await mountPane($)
+    await pane.press({ key: 'biomes' })
+    expect(seen.state.paneTab).toBe('biomes')
+    await pane.unmount()
+  })
+
+  test('the session biome is kept in $.state, so a reload plays on in it', async ($, on) => {
+    const { seen } = await start($, on)
+    expect(seen.state.biomeId).toBe('whispering-forest')
   })
 })
