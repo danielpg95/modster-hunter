@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "flexton",
+  "name": "Flexton",
+  "description": "Too small to see, too proud to hide. Flexes at anything that moves.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 33,
+    "types": ["water", "fighting"],
+    "category": "Flex Modster",
+    "heightM": 0.01,
+    "weightKg": 0.01,
+    "entry": "A plankton that decided to stop drifting and start lifting. It trains on tide-pool pebbles all day and has never once trained its legs."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 2
+  }
+}

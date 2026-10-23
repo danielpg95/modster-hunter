@@ -38,6 +38,7 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/musketail/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | P5-19 |
 | `modsters/sir-kelpsie/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Sir Kelpsie, a waist-up close-up from @victor-aguilars' reference (redrawn 2026-10-22); pupil, shield ridges and rim, and plume sway are hand-drawn |
 | `modsters/peekashell/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Peekashell, from @victor-aguilars' reference; the pupil, barnacles and shell swing are hand-drawn |
+| `modsters/flexton/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Flexton, from @victor-aguilars' reference; the eye, grin and arm flex are hand-drawn |
 | `biomes/whispering-forest/background.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Idle scene (decision 0026) |
 | `biomes/saltbreeze-bay/background.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Idle scene (decision 0026) |
 | `biomes/dustwind-expanse/background.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Idle scene (decision 0026) |
