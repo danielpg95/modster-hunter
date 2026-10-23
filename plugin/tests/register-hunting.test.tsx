@@ -3,6 +3,7 @@ import type { On, UiPane } from 'claude-code'
 import { oneModsterForest } from './fixtures/one-modster-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
 import { helpText } from '../hooks/render'
+import { WELCOME_TOAST_MS } from '../hooks/constants'
 
 // Opt-in hunting (decision 0038): the game runs only while `autoStart` is on, and
 // /modsters hunt, stop and pane flip it through /config. The one-Modster forest
@@ -24,12 +25,13 @@ interface Seen {
   argumentHints: (string | undefined)[]
   immediate: (boolean | undefined)[]
   toasts: string[]
+  toastTimeouts: (number | undefined)[]
   store: Record<string, unknown>
 }
 
 /** Starts a session on the one-Modster forest with a fake clock, recording what the mod shows and writes. */
 async function start($: any, on: On, init: { store?: Record<string, unknown>; panes?: () => UiPane[]; denyConfig?: string } = {}) {
-  const seen: Seen = { statuses: [], spinner: [], opens: [], closes: [], configSets: [], argumentHints: [], immediate: [], toasts: [], store: structuredClone(init.store ?? {}) }
+  const seen: Seen = { statuses: [], spinner: [], opens: [], closes: [], configSets: [], argumentHints: [], immediate: [], toasts: [], toastTimeouts: [], store: structuredClone(init.store ?? {}) }
   on('session.start', ($, e) => ({ cwd: e.cwd }))
   on('command.register', ($, e) => {
     seen.argumentHints.push(e.argumentHint)
@@ -74,8 +76,9 @@ async function start($: any, on: On, init: { store?: Record<string, unknown>; pa
     const { Box } = $.ui.resolve(e)
     return <Box />
   })
-  const { toasts } = stubContentFs(on, oneModsterForest())
+  const { toasts, toastTimeouts } = stubContentFs(on, oneModsterForest())
   seen.toasts = toasts
+  seen.toastTimeouts = toastTimeouts
   const clock = mock.clock(on)
   await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' })
   return { clock, seen }
@@ -143,6 +146,9 @@ describe('register: opt-in hunting', () => {
     const { seen } = await start($, on)
     expect(seen.toasts).toEqual(['Modster Hunter is installed · /modsters hunt to play · /modsters help for the commands'])
     expect(seen.store['prefs:welcomed']).toEqual({ v: 1 })
+    // Long enough to read at session start; the 4 s default went by unread
+    expect(seen.toastTimeouts).toEqual([WELCOME_TOAST_MS])
+    expect(WELCOME_TOAST_MS).toBeGreaterThanOrEqual(10_000)
     expect(seen.configSets).toEqual([])
     await $.session.end({ reason: 'exit' } as any)
     await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' })

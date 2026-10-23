@@ -1,5 +1,5 @@
 import type { EngineInterface, Register, Timer } from 'claude-code'
-import { BAND, CATCH, COLLECTION, CONTENT, USER_CONTENT } from './constants'
+import { BAND, CATCH, COLLECTION, CONTENT, USER_CONTENT, WELCOME_TOAST_MS } from './constants'
 import {
   cachedSheetLoader,
   formatIssue,
@@ -1429,7 +1429,7 @@ async function welcome($: EngineInterface): Promise<void> {
       if (denied === undefined) hunting = true
       else $.ui.log(`welcome: autoStart stays off: ${denied}`, { to: 'debug' })
     }
-    $.ui.toast(welcomeText(returning))
+    $.ui.toast(welcomeText(returning), { timeoutMs: WELCOME_TOAST_MS })
   } catch (error) {
     $.ui.log(`welcome: skipped: ${error instanceof Error ? error.message : String(error)}`, { to: 'debug' })
   }

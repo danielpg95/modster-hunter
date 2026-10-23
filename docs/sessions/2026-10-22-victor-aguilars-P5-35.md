@@ -61,6 +61,10 @@ Build decision 0038: every "done when" item, up to the hand check.
 
 ## Problems and findings
 
+- Hand check (@victor-aguilars): the welcome toast went away too fast at the
+  4 s default. It now stays `WELCOME_TOAST_MS` = 15 s (`constants.ts`, tested).
+  The pointer over it holds it, and a click takes it off.
+
 - Tests get `plugin.json`'s defaults, so `autoStart: false` turned the game off
   in every existing register test. Hence the `HUNTING` option on each one.
 - `$.config.set` may reload the module in a real session (0023 says a `/config`

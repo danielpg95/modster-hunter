@@ -59,6 +59,13 @@ export const CATCH = {
   glowMinBrightness: 384,
 } as const
 
+/**
+ * The welcome toast (decision 0038 point 9) stays this long: it shows at session
+ * start, when the person may be looking elsewhere, and the 4 s default went by
+ * unread in the hand check. The pointer over it holds it; a click takes it off.
+ */
+export const WELCOME_TOAST_MS = 15_000
+
 /** Band layout, decision 0012: the full layout needs sprite + gap + text block in the band's width. */
 export const BAND = {
   gapColumns: 2,

@@ -12,7 +12,7 @@ const USER_ROOT = `${STUB_HOME}/.claude/modster-hunter/`
  * `~/.claude/modster-hunter/` (its `content/` and `cache/`); writes land
  * there too. Also sets HOME, swallows `$.ui.log`, and collects toasts.
  */
-export function stubContentFs(on: On, files: Readonly<Record<string, string>>, user: Record<string, string> = {}): { toasts: string[] } {
+export function stubContentFs(on: On, files: Readonly<Record<string, string>>, user: Record<string, string> = {}): { toasts: string[]; toastTimeouts: (number | undefined)[] } {
   // The loader writes a summary to the debug log; nothing to check there
   on('ui.log', () => ({ value: undefined }))
   mock.env(on, { HOME: STUB_HOME })
@@ -66,9 +66,11 @@ export function stubContentFs(on: On, files: Readonly<Record<string, string>>, u
     return { value: undefined }
   })
   const toasts: string[] = []
+  const toastTimeouts: (number | undefined)[] = []
   on('ui.toast', ($, e) => {
     toasts.push(e.text)
+    toastTimeouts.push(e.timeoutMs)
     return { value: undefined }
   })
-  return { toasts }
+  return { toasts, toastTimeouts }
 }
