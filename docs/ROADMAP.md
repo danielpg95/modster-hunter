@@ -728,7 +728,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] The README stays lean: a short pitch, Biomes, Catchers, Install, a How to play table of the keys and main commands (`1`/`2`, `/modsters`, `hunt`, `reload`, `/config`), Contributing with run-from-source, and License (asked by @victor-aguilars, 2026-10-22).
   - [ ] `node tools/check-tracking.mjs` passes.
 
-#### [ ] P5-35 — Opt-in hunting, commands and a welcome toast
+#### [x] P5-35 — Opt-in hunting, commands and a welcome toast
 - **Depends on:** —
 - **Size:** M
 - **Goal:** the game runs only while the `autoStart` setting is on (the default, decision 0041). `/modsters hunt` and `/modsters stop` flip it, the encounter pane moves to `/modsters pane`, `/modsters help` and the typeahead list the commands, and a one-time welcome toast explains it (decision 0038, asked by @victor-aguilars, 2026-10-22).
@@ -738,13 +738,13 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `/modsters hunt`, `stop` and `pane` set `autoStart` through `$.config.set` and reply as 0038 points 3–5 say, including when it's refused. `/modsters help` and an unknown word reply as points 6–7 say. `/modsters` registers with the `argumentHint` from point 8. Register tests cover each.
   - [x] The welcome toast shows once per player, for 15 s, with 0041's text (0038 point 2 is dropped by 0041). Register tests cover a first and a second session, a player who already played, and a player who turned it off.
   - [x] Docs follow 0038's consequences: decision status lines and index rows, CLAUDE.md rule 6, CONTENT_FORMAT.md, ARCHITECTURE.md, and the README's How to play table.
-  - [x] `/modsters` registers as `immediate`, so it runs during a turn (decision 0039, Proposed: this task relies on it, asked by @victor-aguilars, 2026-10-22). A register test checks the flag.
-  - [ ] `claude plugin test ./plugin` and `claude plugin validate ./plugin --strict` pass. Checked by hand on a fresh install: the toast shows and the game plays, `/modsters stop` clears everything and `/config` shows Auto start off, and `/modsters hunt` brings it back. `/modsters pane` and `/modsters stop` typed while Claude works act at once without disturbing the turn (0039).
+  - [x] `/modsters` registers as `immediate`, so it runs during a turn (decision 0039, asked by @victor-aguilars, 2026-10-22). A register test checks the flag.
+  - [x] `claude plugin test ./plugin` and `claude plugin validate ./plugin --strict` pass. Checked by hand on a fresh install (passed, @victor-aguilars, 2026-10-22): the toast shows and the game plays, `/modsters stop` clears everything and `/config` shows Auto start off, and `/modsters hunt` brings it back. `/modsters pane` and `/modsters stop` typed while Claude works act at once without disturbing the turn (0039).
 
 #### [ ] P5-36 — In-game settings
 - **Depends on:** P5-35
 - **Size:** M
-- **Goal:** `/modsters settings` opens the collection pane's Settings tab, where players see and change every option with `k`, `j` and `o`, written through `$.config.set` (decision 0040, asked by @victor-aguilars, 2026-10-22). Start once 0040 is accepted.
+- **Goal:** `/modsters settings` opens the collection pane's Settings tab, where players see and change every option with `k`, `j` and `o`, written through `$.config.set` (decision 0040, asked by @victor-aguilars, 2026-10-22).
 - **Done when:**
   - [ ] A pure module under `plugin/hooks/render/` lists the setting rows in 0040's order, with labels, values and the next value for `o` (wrapping, and the idle timeout's next listed value). It has tests.
   - [ ] The Settings tab shows the rows above the content problems. `k`, `j` and `o` select and change them. A refused write shows a toast and keeps the value. Register tests cover a flip, a cycle and a refusal, with a stubbed `config.set`.

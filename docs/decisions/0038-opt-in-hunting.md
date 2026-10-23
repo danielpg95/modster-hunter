@@ -1,6 +1,6 @@
 # 0038 — The game runs only while `autoStart` is on; `/modsters hunt` and `stop` flip it
 
-- **Status:** Accepted (amends 0002, 0015 point 1, 0019 points 1 and 3, 0023 point 4, 0024 point 1)
+- **Status:** Accepted (amends 0002, 0015 point 1, 0019 points 1 and 3, 0023 point 4, 0024 point 1); points 1 (the default), 2 and 9 (the texts) superseded by 0041; points 6 and 7 amended by 0040
 - **Date:** 2026-10-22
 - **Decided by:** @danielpg95 (accepted by merging PR #150; proposed by @victor-aguilars, drafted by Claude)
 

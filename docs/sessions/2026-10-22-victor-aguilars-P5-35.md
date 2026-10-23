@@ -2,7 +2,7 @@
 
 - **Task:** P5-35 — Opt-in hunting, commands and a welcome toast
 - **Branch:** `p5-35-opt-in-hunting`
-- **Status at end:** in-review (waiting on the hand check)
+- **Status at end:** done
 - **Last commit:** see the P5-35 PR
 
 ## Goal for this session
@@ -65,6 +65,12 @@ Build decision 0038: every "done when" item, up to the hand check.
   - `/modsters hunt` with no biome loaded replies `Hunting · …`, without a biome name.
 
 ## Problems and findings
+
+- Hand check passed (@victor-aguilars): the welcome toast shows for 15 s and the
+  game plays, `/modsters stop` clears everything and `/config` shows Auto start
+  off, `/modsters hunt` brings it back, `/modsters pane` and `stop` act at once
+  while Claude works, and `/modsters help` prints cleanly. @danielpg95 accepted
+  0039, 0040 and 0041.
 
 - Hand check (@victor-aguilars): the welcome toast went away too fast at the
   4 s default. It now stays `WELCOME_TOAST_MS` = 15 s (`constants.ts`, tested).

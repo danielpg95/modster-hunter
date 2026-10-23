@@ -1,9 +1,9 @@
 # 0041 — Auto start is on by default; one welcome toast says how to stop
 
-- **Status:** Proposed — settled by @danielpg95 in the P5-35 PR review
+- **Status:** Accepted
 - **Date:** 2026-10-22
-- **Proposed by:** @victor-aguilars (drafted by Claude)
-- **Supersedes:** 0038 point 2 and the welcome texts of point 9; changes the default in point 1 (on acceptance)
+- **Decided by:** @danielpg95 (accepted with PR #153; proposed by @victor-aguilars, drafted by Claude)
+- **Supersedes:** 0038 point 2 and the welcome texts of point 9; changes the default in point 1
 
 ## Context
 
@@ -37,7 +37,7 @@ Option 1 (@victor-aguilars, 2026-10-22):
 
 ## Consequences
 
-- When accepted: 0038's status line and index row say "points 1 (default),
+- 0038's status line and index row say "points 1 (default),
   2 and 9 (texts) superseded by 0041".
 - P5-35 builds it in the same PR: the `plugin.json` default, `welcome()` without
   the returning-player branch, one welcome text, and no `hasPlayed` helper.
