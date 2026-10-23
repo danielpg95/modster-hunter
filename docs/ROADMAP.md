@@ -741,6 +741,18 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `/modsters` registers as `immediate`, so it runs during a turn (decision 0039, Proposed: this task relies on it, asked by @victor-aguilars, 2026-10-22). A register test checks the flag.
   - [ ] `claude plugin test ./plugin` and `claude plugin validate ./plugin --strict` pass. Checked by hand on a fresh install: the toast shows and the game plays, `/modsters stop` clears everything and `/config` shows Auto start off, and `/modsters hunt` brings it back. `/modsters pane` and `/modsters stop` typed while Claude works act at once without disturbing the turn (0039).
 
+#### [ ] P5-36 — In-game settings
+- **Depends on:** P5-35
+- **Size:** M
+- **Goal:** `/modsters settings` opens the collection pane's Settings tab, where players see and change every option with `k`, `j` and `o`, written through `$.config.set` (decision 0040, asked by @victor-aguilars, 2026-10-22). Start once 0040 is accepted.
+- **Done when:**
+  - [ ] A pure module under `plugin/hooks/render/` lists the setting rows in 0040's order, with labels, values and the next value for `o` (wrapping, and the idle timeout's next listed value). It has tests.
+  - [ ] The Settings tab shows the rows above the content problems. `k`, `j` and `o` select and change them. A refused write shows a toast and keeps the value. Register tests cover a flip, a cycle and a refusal, with a stubbed `config.set`.
+  - [ ] Each change takes effect at once, as 0040 point 5 says (Auto start like hunt and stop, display rows redraw, built-in content reloads, idle timeout from the next encounter). Register tests cover each kind.
+  - [ ] `/modsters settings` opens the pane on the Settings tab with focus. The typeahead hint and `/modsters help` list it, and the help and the pane-off reply point to `/modsters settings` (0040 points 1 and 6).
+  - [ ] Docs follow 0040's consequences: decision status lines and index rows, CONTENT_FORMAT.md, ARCHITECTURE.md, and the README.
+  - [ ] `claude plugin test ./plugin` and `claude plugin validate ./plugin --strict` pass. Checked by hand: changing each kind of row in the tab updates `/config`, and the pane stays on the Settings tab after a change.
+
 ---
 
 ## Phase 6 — Beyond the terminal
