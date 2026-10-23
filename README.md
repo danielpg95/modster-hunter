@@ -2,26 +2,6 @@
 
 **Catch Modsters while you wait for Claude.**
 
-<p align="center">
-  <img src="docs/previews/idle-scenes.gif" alt="The four biomes: a pine forest, a sunny bay, a windy desert and a crystal cave" width="600">
-</p>
-
-Modster Hunter is a [Claude Code mod](https://code.claude.com/docs/en/plugins/mods):
-a tiny collecting game that lives in your terminal, right above the prompt.
-
-You ask Claude for something. While it works, a wild Modster wanders into view.
-Press `1` to throw. You get a few tries before it gets bored and leaves. When
-Claude is done, the game steps aside and you get back to work.
-
-That's it. No grinding, no timers to babysit, nothing that steals your
-keystrokes. Just something to catch while you wait for the tests to run.
-
-## Meet some Modsters
-
-Dozens of Modsters hide across four biomes, from common critters to
-legendaries you'll be lucky to see once. Every one is hand-drawn pixel art with
-its own idle animation and dex entry. Here are two to get you started:
-
 <table align="center">
   <tr>
     <td align="center" width="50%">
@@ -37,17 +17,67 @@ its own idle animation and dex entry. Here are two to get you started:
   </tr>
 </table>
 
-The rest are out there for you to find.
+Modster Hunter is a [Claude Code mod](https://code.claude.com/docs/en/plugins/mods):
+a tiny collecting game that lives in your terminal, right above the prompt.
 
-| Biome | What you'll find |
-| --- | --- |
-| 🌲 **Whispering Forest** | Tall pines, soft moss, something rustling. |
-| 🌊 **Saltbreeze Bay** | The tide comes in, the tide goes out, and something always stays behind. |
-| 🏜️ **Dustwind Expanse** | Endless sand where the wind never stops talking. |
-| 💎 **Crystal Grotto** | Whisper here and the crystals whisper back, a little out of tune. |
+You ask Claude for something. While it works, a wild Modster wanders into view.
+Press `1` to throw. You get a few tries before it gets bored and leaves. When
+Claude is done, the game steps aside and you get back to work.
 
-Each session drops you into one biome at random, so you never know who's out
-there today.
+That's it. No grinding, no timers to babysit, nothing that steals your
+keystrokes. Just something to catch while you wait for the tests to run.
+
+Dozens of hand-drawn Modsters hide across four biomes, from a pine forest to a
+crystal grotto. Each session drops you into one at random. The rest are out
+there for you to find.
+
+## Install
+
+**You need** Claude Code **v2.1.292 or later** (`claude --version`), running in
+a terminal. Desktop app support is planned.
+
+In your shell:
+
+```bash
+claude plugin install modster-hunter --marketplace danielpg95/modster-hunter
+```
+
+Or inside a Claude Code session:
+
+```text
+/plugin marketplace add danielpg95/modster-hunter
+/plugin install modster-hunter@modster-hunter
+```
+
+Start a new session, ask Claude for anything and watch the band above the
+prompt. Type `/modsters` to see what you've caught.
+
+### Stay up to date
+
+We publish new versions with new Modsters and fixes. Claude Code doesn't update
+mods from other marketplaces on its own, so turn it on once:
+
+1. In a session, run `/plugin` and open the **Marketplaces** tab.
+2. Pick **modster-hunter** and choose **Enable auto-update**.
+
+Updates then download in the background, and the next session plays the new
+version. To update by hand instead:
+
+```bash
+claude plugin update modster-hunter@modster-hunter
+```
+
+Your collection and your own Modsters stay put across updates.
+
+### Run from source
+
+For contributors, or to try unreleased changes:
+
+```bash
+git clone https://github.com/danielpg95/modster-hunter.git
+cd modster-hunter
+claude --plugin-dir ./plugin
+```
 
 ## What you get
 
@@ -60,23 +90,6 @@ there today.
   also switch off the built-in biomes and play only with yours.
 - **Quiet by design.** Fully offline: no network, no model calls, no telemetry.
   It never opens a pane on its own and never takes your keystrokes.
-
-## Try it
-
-Modster Hunter isn't on the plugin marketplace yet (that comes with v1.0). Until
-then, run it from source:
-
-```bash
-git clone https://github.com/danielpg95/modster-hunter.git
-cd modster-hunter
-claude --plugin-dir ./plugin
-```
-
-Then ask Claude for anything and watch the band above the prompt. Type
-`/modsters` to see what you've caught.
-
-**You need** Claude Code **v2.1.287 or later** (`claude --version`), running in
-a terminal. Desktop app support is planned.
 
 ## Contributing
 

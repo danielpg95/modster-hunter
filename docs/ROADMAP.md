@@ -723,6 +723,6 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Done when:**
   - [ ] The Musketail and Lamparito previews sit right under the title, and the four-biome scene GIF and biome table are gone. Biomes get one short line.
   - [ ] An Install section gives the marketplace commands (shell and in-session), the Claude Code version they need, how to turn on auto-update, how to update by hand, and the from-source path for contributors.
-  - [ ] `plugin/.claude-plugin/plugin.json` has no `version`, so Claude Code versions the mod by git commit and players with auto-update get each merge (asked by @victor-aguilars, 2026-10-22, until P5-07 picks a versioning scheme). `claude plugin validate ./plugin --strict` passes.
+  - [ ] `plugin/.claude-plugin/plugin.json` says `"version": "0.1.0"`, so players who installed `0.0.1` get this update. From now on the version goes up whenever players should get changes (asked by @victor-aguilars, 2026-10-22; P5-07 writes down the rule). `claude plugin validate ./plugin --strict` passes.
   - [ ] Checked by hand: the README's install commands work on a second computer, and an update reaches it.
   - [ ] `node tools/check-tracking.mjs` passes.
