@@ -108,7 +108,7 @@ describe('register: reload', () => {
     const rows = await settingsRows(pane)
     expect(rows[0]).toBe('Content problems 1 error')
     expect(rows[1]).toMatch(/^modsters\/broken\/modster\.json/)
-    expect(rows.slice(-2)).toEqual(['Changed a file? Run /modsters reload.', 'Change where the game shows in /config.'])
+    expect(rows.slice(-2)).toEqual(['Press o in Collection or Biomes to turn one off or on.', 'Changed a file? Run /modsters reload.'])
 
     delete files['modsters/broken/modster.json']
     expect(await reload($)).toMatch(/· no problems$/)

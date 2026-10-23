@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'claude-code/testing'
 import type { ContentIssue } from '../../hooks/content'
-import { CONFIG_TEXT, NO_ISSUES_TEXT, RELOAD_TEXT, TOGGLE_TEXT, settingsLines } from '../../hooks/render'
+import { NO_ISSUES_TEXT, RELOAD_TEXT, TOGGLE_TEXT, settingsLines } from '../../hooks/render'
 
 // P4-02: every content issue, formatted as formatIssue writes it (0025), then how to
 // turn content off (P4-03, 0032) and how to reload.
@@ -11,8 +11,8 @@ const error = (file: string, field: string, problem: string): ContentIssue => ({
 const warning = (file: string, field: string, problem: string): ContentIssue => ({ severity: 'warning', file, field, problem })
 
 describe('settingsLines', () => {
-  test('with no issues it says so, then how to turn content off, how to reload and where the settings are', () => {
-    expect(settingsLines([]).map(text)).toEqual([NO_ISSUES_TEXT, '', TOGGLE_TEXT, RELOAD_TEXT, CONFIG_TEXT])
+  test('with no issues it says so, then how to turn content off and how to reload; the options are rows above (0040)', () => {
+    expect(settingsLines([]).map(text)).toEqual([NO_ISSUES_TEXT, '', TOGGLE_TEXT, RELOAD_TEXT])
   })
 
   test('the toggle hint names the key the tabs use', () => {
@@ -33,7 +33,6 @@ describe('settingsLines', () => {
       '',
       TOGGLE_TEXT,
       RELOAD_TEXT,
-      CONFIG_TEXT,
     ])
   })
 

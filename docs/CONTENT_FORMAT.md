@@ -330,4 +330,4 @@ biome entry naming a disabled Modster is dropped without an issue.
 | `showInStatusLine` | boolean | `true` | Show the encounter in the status line while one is up; cleared between encounters (0023) |
 | `sounds` | boolean | `false` | Play sounds (P5-02) |
 
-Changing any option in `/config` reloads the mod, which ends an encounter in progress (decision 0005).
+Players change these in the game with `/modsters settings` (every option but `sounds`, decision 0040), or in `/config`. A change from `/config` reloads the mod, which ends an encounter in progress (decision 0005); a change in the Settings tab applies at once.

@@ -66,6 +66,14 @@ export const CATCH = {
  */
 export const WELCOME_TOAST_MS = 15_000
 
+/** The Settings tab's option rows (decision 0040). */
+export const SETTINGS = {
+  /** What `o` steps the idle timeout through, wrapping (0040 point 2) */
+  idleTimeoutChoicesSec: [30, 60, 90, 180, 300],
+  /** Columns a row's label is padded to, so the values line up */
+  labelColumns: 24,
+} as const
+
 /** Band layout, decision 0012: the full layout needs sprite + gap + text block in the band's width. */
 export const BAND = {
   gapColumns: 2,
