@@ -24,99 +24,62 @@ You ask Claude for something. While it works, a wild Modster wanders into view.
 Press `1` to throw. You get a few tries before it gets bored and leaves. When
 Claude is done, the game steps aside and you get back to work.
 
-That's it. No grinding, no timers to babysit, nothing that steals your
-keystrokes. Just something to catch while you wait for the tests to run.
+No grinding, nothing that steals your keystrokes. Fully offline: no network, no
+model calls, no telemetry.
 
-Dozens of hand-drawn Modsters hide across four biomes, from a pine forest to a
-crystal grotto. Each session drops you into one at random. The rest are out
-there for you to find.
+## Biomes
+
+Each session drops you into one biome at random, each with its own Modsters:
+
+- 🌲 **Whispering Forest**: tall pines, soft moss, something rustling.
+- 💎 **Crystal Grotto**: whisper here and the crystals whisper back, a little out of tune.
+
+Two more are out there for you to find.
 
 ## Install
 
-**You need** Claude Code **v2.1.292 or later** (`claude --version`), running in
-a terminal. Desktop app support is planned.
-
-In your shell:
+You need Claude Code **v2.1.292 or later** (`claude --version`), in a terminal.
 
 ```bash
 claude plugin install modster-hunter --marketplace danielpg95/modster-hunter
 ```
 
-Or inside a Claude Code session:
+Or, inside a session: `/plugin marketplace add danielpg95/modster-hunter`, then
+`/plugin install modster-hunter@modster-hunter`. Start a new session to play.
 
-```text
-/plugin marketplace add danielpg95/modster-hunter
-/plugin install modster-hunter@modster-hunter
-```
+**Get updates.** Claude Code doesn't update mods from other marketplaces on its
+own. Turn it on once: `/plugin` → **Marketplaces** → **modster-hunter** →
+**Enable auto-update**. Or update by hand with
+`claude plugin update modster-hunter@modster-hunter`. Your collection stays put.
 
-Start a new session, ask Claude for anything and watch the band above the
-prompt. Type `/modsters` to see what you've caught.
+## How to play
 
-### Stay up to date
+| Key or command | What it does |
+| --- | --- |
+| `1` / `2` | Throw / run while a Modster is up |
+| `/modsters` | Your collection, the biomes, stats, catchers and settings |
+| `/modsters hunt` | A bigger encounter pane, for a better view |
+| `/modsters reload` | Load your own Modsters after you add or change them |
+| `/config` | Where the game shows: band, pane, spinner, status line |
 
-We publish new versions with new Modsters and fixes. Claude Code doesn't update
-mods from other marketplaces on its own, so turn it on once:
+**Make your own.** Ask Claude to "make me a Modster", a biome or a catcher, and
+the mod's `create-modster-content` skill designs it with you, sprite included.
 
-1. In a session, run `/plugin` and open the **Marketplaces** tab.
-2. Pick **modster-hunter** and choose **Enable auto-update**.
+## Contributing
 
-Updates then download in the background, and the next session plays the new
-version. To update by hand instead:
+New hands are welcome, **especially pixel artists**. Pitch a Modster or biome in
+an issue, playtest, report bugs, or pick up a task from the
+[roadmap](docs/ROADMAP.md). [CONTRIBUTING.md](CONTRIBUTING.md) explains the
+routine. If you use Claude Code, open the repo and start with the
+`start-session` skill.
 
-```bash
-claude plugin update modster-hunter@modster-hunter
-```
-
-Your collection and your own Modsters stay put across updates.
-
-### Run from source
-
-For contributors, or to try unreleased changes:
+To run from source:
 
 ```bash
 git clone https://github.com/danielpg95/modster-hunter.git
 cd modster-hunter
 claude --plugin-dir ./plugin
 ```
-
-## What you get
-
-- **A band above the prompt** where Modsters show up while Claude works.
-- **`/modsters`** opens your collection: every Modster you've caught, the biomes,
-  your stats and settings.
-- **`/modsters hunt`** opens a bigger encounter pane, if you'd like a better view.
-- **Your own Modsters.** Ask Claude to "make me a Modster" and the mod's
-  `create-modster-content` skill designs one with you, sprite included. You can
-  also switch off the built-in biomes and play only with yours.
-- **Quiet by design.** Fully offline: no network, no model calls, no telemetry.
-  It never opens a pane on its own and never takes your keystrokes.
-
-## Contributing
-
-Modster Hunter is built by a small group of people, mostly pairing with
-Claude Code. New hands are very welcome, **especially pixel artists**.
-
-Ways to help:
-
-- **Draw or pitch a Modster or biome.** Open a "New Modster or biome idea"
-  issue, or add one yourself with the `add-modster` and `add-biome` skills.
-- **Playtest** and tell us what felt good or annoying in an issue.
-- **Report a bug** with the bug template.
-- **Pick up a task** from the [roadmap](docs/ROADMAP.md).
-  `node tools/check-tracking.mjs --next` lists the ones you can claim right now.
-
-We keep a simple routine so everyone stays on the same track: claim a task on
-the [workboard](docs/WORKBOARD.md), work on a branch, leave a handoff note, open
-a PR. [CONTRIBUTING.md](CONTRIBUTING.md) walks through it.
-
-If you use Claude Code, just open the repo. It reads [CLAUDE.md](CLAUDE.md),
-and the contributor skills in `.claude/skills/` guide you through each step.
-Start with `start-session`. No Claude Code? The skills are plain Markdown and
-work as step-by-step guides.
-
-Useful docs: [architecture](docs/ARCHITECTURE.md),
-[development](docs/DEVELOPMENT.md), [content format](docs/CONTENT_FORMAT.md)
-and the [decisions](docs/decisions/) behind how the game works.
 
 ## License
 

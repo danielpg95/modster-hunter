@@ -721,8 +721,9 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Size:** S
 - **Goal:** the README leads with Modsters and says plainly how to install from the marketplace and keep the mod updated (asked by @victor-aguilars, 2026-10-22). This moves the marketplace install ahead of P5-07. The recording, CHANGELOG and version tag stay in P5-07.
 - **Done when:**
-  - [ ] The Musketail and Lamparito previews sit right under the title, and the four-biome scene GIF and biome table are gone. Biomes get one short line.
+  - [ ] The Musketail and Lamparito previews sit right under the title, and the four-biome scene GIF and biome table are gone. A short Biomes list names two biomes and leaves the rest to find.
   - [ ] An Install section gives the marketplace commands (shell and in-session), the Claude Code version they need, how to turn on auto-update, how to update by hand, and the from-source path for contributors.
   - [ ] `plugin/.claude-plugin/plugin.json` says `"version": "0.1.0"`, so players who installed `0.0.1` get this update. From now on the version goes up whenever players should get changes (asked by @victor-aguilars, 2026-10-22; P5-07 writes down the rule). `claude plugin validate ./plugin --strict` passes.
   - [ ] Checked by hand: the README's install commands work on a second computer, and an update reaches it.
+  - [ ] The README stays lean: a short pitch, Biomes, Install with updates, a How to play table of the keys and main commands (`1`/`2`, `/modsters`, `hunt`, `reload`, `/config`), Contributing with run-from-source, and License (asked by @victor-aguilars, 2026-10-22).
   - [ ] `node tools/check-tracking.mjs` passes.

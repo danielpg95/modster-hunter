@@ -19,13 +19,19 @@ and keep it updated.
   version needed (v2.1.292+ for the shell one-liner), "Stay up to date" (turn on
   auto-update, or `claude plugin update`), and "Run from source" for contributors.
 - `plugin/.claude-plugin/plugin.json`: `version` goes from `0.0.1` to `0.1.0`.
+- Made the README lean (asked by @victor-aguilars): a short pitch, a Biomes list
+  naming Whispering Forest and Crystal Grotto ("two more are out there"), a
+  compact Install with updates, a How to play table (`1`/`2`, `/modsters`,
+  `hunt`, `reload`, `/config`), a shorter Contributing section with
+  run-from-source, and License. "What you get" folded into the pitch and the table.
 - Verified: `claude plugin validate ./plugin --strict` passes, and so does
   `node tools/check-tracking.mjs`.
 
 ## Decisions made
 
 - @victor-aguilars: the marketplace install goes in the README now, ahead of P5-07.
-- @victor-aguilars: lead with the Modster pair, and don't show every biome.
+- @victor-aguilars: lead with the Modster pair. Show some biomes (two, by name), not all of them.
+- @victor-aguilars: keep the README lean, with the main commands in it.
 - @victor-aguilars: keep `version` in plugin.json and raise it whenever players
   should get changes. Dropping it would make every merge ship, but CI's
   `validate --strict` rejects a missing version. P5-07 writes down the rule.
