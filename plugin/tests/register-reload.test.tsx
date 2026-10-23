@@ -9,6 +9,9 @@ import { stubContentFs } from './fixtures/stub-content-fs'
 import { twoBiomes } from './fixtures/two-biomes'
 import { validModster } from './fixtures/valid-modster'
 
+// The game runs only while autoStart is on (decision 0038); these tests play it
+const HUNTING = { options: { autoStart: true } }
+
 // A throw that lands plays the whole catch animation (decision 0035); a miss is shorter
 const CATCH_THROW_MS = throwingMs('caught', CATCH.rocksToCatch)
 
@@ -20,7 +23,7 @@ const BAND_PROPS = { hasSurvey: false, isWorking: true, maxRows: 7, bodyColumns:
 const BAND_TICK = 250
 
 /** Starts a session on `files` with a fake clock and an in-memory store; edit `files` and reload to change the content. */
-async function start($: any, on: On, files: Record<string, string>, stored: Record<string, unknown> = {}) {
+async function start($: any, on: On, files: Record<string, string>, stored: Record<string, unknown> = { 'prefs:welcomed': { v: 1 } }) {
   on('session.start', ($, e) => ({ cwd: e.cwd }))
   on('command.register', ($, e) => ({ value: { command: e.name } }))
   on('turn.start', ($, e) => ({ turnId: e.turnId }))
@@ -84,7 +87,7 @@ async function settingsRows(pane: any): Promise<string[]> {
 }
 
 describe('register: reload', () => {
-  test('/modsters reload picks up a new Modster and says what loaded', async ($, on) => {
+  test('/modsters reload picks up a new Modster and says what loaded', HUNTING, async ($, on) => {
     const files = oneModsterForest()
     await start($, on, files)
     const biome = JSON.parse(files['biomes/whispering-forest/biome.json']!)
@@ -98,7 +101,7 @@ describe('register: reload', () => {
     await pane.unmount()
   })
 
-  test('the Settings tab lists every content problem, and a fixed file clears it after a reload', async ($, on) => {
+  test('the Settings tab lists every content problem, and a fixed file clears it after a reload', HUNTING, async ($, on) => {
     const files: Record<string, string> = { ...oneModsterForest(), 'modsters/broken/modster.json': '{ not json' }
     await start($, on, files)
     const pane = await paneOn($, 'settings')
@@ -113,14 +116,14 @@ describe('register: reload', () => {
     await pane.unmount()
   })
 
-  test('a reload with problems points to the Settings tab', async ($, on) => {
+  test('a reload with problems points to the Settings tab', HUNTING, async ($, on) => {
     const files = oneModsterForest()
     await start($, on, files)
     files['modsters/broken/modster.json'] = '{ not json'
     expect(await reload($)).toBe('Modster Hunter: reloaded · 1 biome, 1 Modster · 1 problem, see /modsters → 5: Settings')
   })
 
-  test('an encounter in progress keeps its Modster, sprite and odds; the next one plays the new content', async ($, on) => {
+  test('an encounter in progress keeps its Modster, sprite and odds; the next one plays the new content', HUNTING, async ($, on) => {
     const files = oneModsterForest()
     const { clock } = await start($, on, files)
     const band = await mountBand($)
@@ -146,7 +149,7 @@ describe('register: reload', () => {
     await band.unmount()
   })
 
-  test('when the biome is gone, its encounter plays out, then a new biome is picked', async ($, on) => {
+  test('when the biome is gone, its encounter plays out, then a new biome is picked', HUNTING, async ($, on) => {
     const files = oneModsterForest()
     const { clock, toasts } = await start($, on, files)
     const band = await mountBand($)
@@ -169,7 +172,7 @@ describe('register: reload', () => {
     await band.unmount()
   })
 
-  test('between encounters, a gone biome is swapped right away', async ($, on) => {
+  test('between encounters, a gone biome is swapped right away', HUNTING, async ($, on) => {
     const files = oneModsterForest()
     const { clock } = await start($, on, files)
     const band = await mountBand($)
@@ -182,7 +185,7 @@ describe('register: reload', () => {
     await band.unmount()
   })
 
-  test('a reload that leaves no biome says so, and one that brings a biome back starts the game', async ($, on) => {
+  test('a reload that leaves no biome says so, and one that brings a biome back starts the game', HUNTING, async ($, on) => {
     const files = oneModsterForest()
     const { clock } = await start($, on, files)
     const forest = files['biomes/whispering-forest/biome.json']!
@@ -200,7 +203,7 @@ describe('register: reload', () => {
 
   // From the phase 3 review: the pane's records and caches follow the reload
 
-  test('after a reload the Collection tab re-reads caught records', async ($, on) => {
+  test('after a reload the Collection tab re-reads caught records', HUNTING, async ($, on) => {
     const files = oneModsterForest()
     const stored: Record<string, unknown> = {}
     await start($, on, files, stored)
@@ -214,7 +217,7 @@ describe('register: reload', () => {
     await pane.unmount()
   })
 
-  test('after a reload the Collection tab draws the new sprite, caught or as a silhouette', async ($, on) => {
+  test('after a reload the Collection tab draws the new sprite, caught or as a silhouette', HUNTING, async ($, on) => {
     const files = oneModsterForest()
     await start($, on, files)
     const pane = await paneOn($, 'collection')
@@ -225,7 +228,7 @@ describe('register: reload', () => {
     await pane.unmount()
   })
 
-  test('after a reload the Biomes tab draws the new background', async ($, on) => {
+  test('after a reload the Biomes tab draws the new background', HUNTING, async ($, on) => {
     const files = sceneForest()
     // No particles, so the scene's cells depend only on the background
     const biome = JSON.parse(files['biomes/whispering-forest/biome.json']!)
@@ -241,7 +244,7 @@ describe('register: reload', () => {
     await pane.unmount()
   })
 
-  test('two reloads at once share one load', async ($, on) => {
+  test('two reloads at once share one load', HUNTING, async ($, on) => {
     await start($, on, twoBiomes())
     const [first, second] = await Promise.all([reload($), reload($)])
     expect(second).toBe(first)

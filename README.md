@@ -59,17 +59,21 @@ claude plugin install modster-hunter --marketplace danielpg95/modster-hunter
 ```
 
 Or, inside a session: `/plugin marketplace add danielpg95/modster-hunter`, then
-`/plugin install modster-hunter@modster-hunter`. Start a new session to play.
+`/plugin install modster-hunter@modster-hunter`. Start a new session and type
+`/modsters hunt` to play.
 
 ## How to play
 
 | Key or command | What it does |
 | --- | --- |
+| `/modsters hunt` | Start hunting: Modsters show up while Claude works |
+| `/modsters stop` | Stop hunting |
 | `1` / `2` | Throw / run while a Modster is up |
 | `/modsters` | Your collection, the biomes, stats, catchers and settings |
-| `/modsters hunt` | A bigger encounter pane, for a better view |
+| `/modsters pane` | A bigger encounter pane, for a better view |
 | `/modsters reload` | Load your own Modsters after you add or change them |
-| `/config` | Where the game shows: band, pane, spinner, status line |
+| `/modsters help` | Every command |
+| `/config` | Auto start, and where the game shows: band, pane, spinner, status line |
 
 ## Contributing
 

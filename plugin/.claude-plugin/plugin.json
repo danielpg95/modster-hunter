@@ -10,6 +10,12 @@
   "license": "MIT",
   "keywords": ["mod", "game"],
   "userConfig": {
+    "autoStart": {
+      "type": "boolean",
+      "title": "Auto start",
+      "description": "Start hunting every session. /modsters hunt turns it on, /modsters stop turns it off",
+      "default": false
+    },
     "includeBuiltins": {
       "type": "boolean",
       "title": "Include built-in content",
@@ -44,7 +50,7 @@
     "encounterPane": {
       "type": "string",
       "title": "Encounter pane",
-      "description": "off, when-opened (reopens after /modsters hunt) or always (every session). Changing it ends an encounter in progress",
+      "description": "off, when-opened (reopens after /modsters pane) or always (every session). Changing it ends an encounter in progress",
       "options": ["off", "when-opened", "always"],
       "default": "when-opened"
     },

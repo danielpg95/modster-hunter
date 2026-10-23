@@ -6,6 +6,9 @@ import { twoBiomes } from './fixtures/two-biomes'
 import { validSprite } from './fixtures/valid-sprite'
 import { validUserModster } from './fixtures/valid-user-modster'
 
+// The game runs only while autoStart is on (decision 0038); these tests play it
+const HUNTING = { options: { autoStart: true } }
+
 // P4-03, decision 0032: `o` in the Collection and Biomes tabs turns the selected
 // item off or on by writing the user's settings.json, then reloads content.
 
@@ -48,7 +51,7 @@ async function pressForToast(pane: any, key: string, toasts: string[]): Promise<
 const caught = () => ({ v: 1, count: 1, shinyCount: 0, firstCaughtAt: 1, lastCaughtAt: 1, bestTier: 'common', biomes: {} })
 
 describe('register: toggle', () => {
-  test('o turns a built-in Modster off in the user settings.json, never in the plugin folder', async ($, on) => {
+  test('o turns a built-in Modster off in the user settings.json, never in the plugin folder', HUNTING, async ($, on) => {
     const files = twoBiomes()
     const before = { ...files }
     const user: Record<string, string> = {}
@@ -72,7 +75,7 @@ describe('register: toggle', () => {
     await pane.unmount()
   })
 
-  test('an uncaught Modster is not named in the toast', async ($, on) => {
+  test('an uncaught Modster is not named in the toast', HUNTING, async ($, on) => {
     const { toasts } = await start($, on, twoBiomes())
     const pane = await paneOn($, 'collection')
     await pane.press({ key: 'down' })
@@ -80,7 +83,7 @@ describe('register: toggle', () => {
     await pane.unmount()
   })
 
-  test('turning off the session\'s biome moves to another one', async ($, on) => {
+  test('turning off the session\'s biome moves to another one', HUNTING, async ($, on) => {
     const user: Record<string, string> = {}
     const { toasts } = await start($, on, twoBiomes(), user)
     const pane = await paneOn($, 'biomes')
@@ -97,7 +100,7 @@ describe('register: toggle', () => {
     await pane.unmount()
   })
 
-  test('the last biome, or a Modster it depends on alone, is never turned off (0032 point 8)', async ($, on) => {
+  test('the last biome, or a Modster it depends on alone, is never turned off (0032 point 8)', HUNTING, async ($, on) => {
     const user: Record<string, string> = {}
     const { toasts } = await start($, on, oneModsterForest(), user, { 'caught:sproutling': caught() })
     const pane = await paneOn($, 'collection')
@@ -109,7 +112,7 @@ describe('register: toggle', () => {
     await pane.unmount()
   })
 
-  test('a settings.json that is not valid is left alone', async ($, on) => {
+  test('a settings.json that is not valid is left alone', HUNTING, async ($, on) => {
     const user: Record<string, string> = { [SETTINGS]: '{ not json' }
     const { toasts } = await start($, on, twoBiomes(), user)
     const pane = await paneOn($, 'collection')
@@ -121,7 +124,7 @@ describe('register: toggle', () => {
     await pane.unmount()
   })
 
-  test('only the user\'s own items show how to delete them', async ($, on) => {
+  test('only the user\'s own items show how to delete them', HUNTING, async ($, on) => {
     const user: Record<string, string> = {
       'content/modsters/blobby/modster.json': JSON.stringify({ ...validUserModster(), id: 'blobby', name: 'Blobby' }),
       'content/modsters/blobby/sprite.sprite.json': JSON.stringify(validSprite()),

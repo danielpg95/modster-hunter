@@ -11,6 +11,9 @@ import { validSprite } from './fixtures/valid-sprite'
 import { CATCH } from '../hooks/constants'
 import { throwingMs } from '../hooks/game'
 
+// The game runs only while autoStart is on (decision 0038); these tests play it
+const HUNTING = { options: { autoStart: true } }
+
 // A throw that lands plays the whole catch animation (decision 0035); a miss is shorter
 const CATCH_THROW_MS = throwingMs('caught', CATCH.rocksToCatch)
 
@@ -41,7 +44,7 @@ function twoBiomes(): Record<string, string> {
 }
 
 describe('register', () => {
-  test('registers /modsters on session start', async ($, on) => {
+  test('registers /modsters on session start', HUNTING, async ($, on) => {
     const names: string[] = []
     on('session.start', ($, e) => ({ cwd: e.cwd }))
     on('command.register', ($, e) => {
@@ -55,7 +58,7 @@ describe('register', () => {
     expect(names).toEqual(['modsters'])
   })
 
-  test('with no biome to play, one message shows at start and from /modsters', async ($, on) => {
+  test('with no biome to play, one message shows at start and from /modsters', HUNTING, async ($, on) => {
     on('session.start', ($, e) => ({ cwd: e.cwd }))
     on('command.register', ($, e) => ({ value: { command: e.name } }))
     const { toasts } = stubContentFs(on, {})
@@ -66,7 +69,7 @@ describe('register', () => {
     expect(await collectionHeader($)).toEqual({ title: 'No biome', note: message })
   })
 
-  test('user content loads from ~/.claude/modster-hunter/content, PNG sprites included (0007, 0016)', { options: { includeBuiltins: false } }, async ($, on) => {
+  test('user content loads from ~/.claude/modster-hunter/content, PNG sprites included (0007, 0016)', { options: { autoStart: true, includeBuiltins: false } }, async ($, on) => {
     on('session.start', ($, e) => ({ cwd: e.cwd }))
     on('command.register', ($, e) => ({ value: { command: e.name } }))
     const user = userPngMeadow()
@@ -79,7 +82,7 @@ describe('register', () => {
     expect(JSON.parse(user['cache/sprites/blobby.sprite.json'] ?? '{}')).toMatchObject({ v: 1, source: { frames: 2 }, sprite: { width: 8, height: 8 } })
   })
 
-  test('with built-ins off and no user biome, the message names the user folder', { options: { includeBuiltins: false } }, async ($, on) => {
+  test('with built-ins off and no user biome, the message names the user folder', { options: { autoStart: true, includeBuiltins: false } }, async ($, on) => {
     on('session.start', ($, e) => ({ cwd: e.cwd }))
     on('command.register', ($, e) => ({ value: { command: e.name } }))
     stubContentFs(on, twoBiomes())
@@ -90,7 +93,7 @@ describe('register', () => {
     )
   })
 
-  test('the biome picked at session start stays after /clear, /resume and /branch', async ($, on) => {
+  test('the biome picked at session start stays after /clear, /resume and /branch', HUNTING, async ($, on) => {
     on('session.start', ($, e) => ({ cwd: e.cwd }))
     on('command.register', ($, e) => ({ value: { command: e.name } }))
     stubContentFs(on, twoBiomes())
@@ -107,7 +110,7 @@ describe('register', () => {
     }
   })
 
-  test('a repeated session start in the same process keeps the biome', async ($, on) => {
+  test('a repeated session start in the same process keeps the biome', HUNTING, async ($, on) => {
     on('session.start', ($, e) => ({ cwd: e.cwd }))
     on('command.register', ($, e) => ({ value: { command: e.name } }))
     stubContentFs(on, twoBiomes())
@@ -124,7 +127,7 @@ describe('register', () => {
   })
 
   // The band, drawn on the terminal surface, through every phase (P2-07)
-  test('the band walks a Modster through appearing, waiting, throw, the dot count, caught, and back to idle', async ($, on) => {
+  test('the band walks a Modster through appearing, waiting, throw, the dot count, caught, and back to idle', HUNTING, async ($, on) => {
     const { ui, clock } = await startBand($, on)
     expect((await ui.find({ type: 'Text', text: /Whispering Forest/ }))?.type).toBe('Text')
     expect(await ui.find({ type: 'Raster' })).toBeUndefined()
@@ -157,7 +160,7 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('an encounter left alone wanders off after the idle timeout', { options: { encounterIdleTimeoutSec: 5 } }, async ($, on) => {
+  test('an encounter left alone wanders off after the idle timeout', { options: { autoStart: true, encounterIdleTimeoutSec: 5 } }, async ($, on) => {
     const { ui, clock } = await startBand($, on)
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await clock.advance(3_000 + BAND_TICK)
@@ -167,7 +170,7 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('a Modster appears while only a background subagent runs, and not after it stops (0018)', async ($, on) => {
+  test('a Modster appears while only a background subagent runs, and not after it stops (0018)', HUNTING, async ($, on) => {
     // What Claude Code itself would answer beneath the mod
     on('classic.SubagentStart', () => ({}))
     on('classic.SubagentStop', () => ({}))
@@ -185,7 +188,7 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('a short band uses the compact layout: no sprite, never more lines than maxRows', async ($, on) => {
+  test('a short band uses the compact layout: no sprite, never more lines than maxRows', HUNTING, async ($, on) => {
     const { ui, clock } = await startBand($, on)
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await clock.advance(4_000 + BAND_TICK)
@@ -201,21 +204,21 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('the idle line can be turned off', { options: { showIdleLine: false } }, async ($, on) => {
+  test('the idle line can be turned off', { options: { autoStart: true, showIdleLine: false } }, async ($, on) => {
     const { ui, clock } = await startBand($, on)
     expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeUndefined()
     await ui.unmount()
   })
 
   // The biome idle scene (decision 0026)
-  test('between encounters the band draws the biome scene above the idle line', async ($, on) => {
+  test('between encounters the band draws the biome scene above the idle line', HUNTING, async ($, on) => {
     const { ui } = await startBand($, on, sceneForest())
     expect(await ui.find({ type: 'Raster', key: 'scene' })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeDefined()
     await ui.unmount()
   })
 
-  test('the scene moves only while Claude works, and holds still between turns', async ($, on) => {
+  test('the scene moves only while Claude works, and holds still between turns', HUNTING, async ($, on) => {
     const blits = sceneBlits(on)
     const { ui, clock } = await startBand($, on, sceneForest())
     await clock.advance(2_000)
@@ -233,7 +236,7 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('a background subagent moves the scene too (0018)', async ($, on) => {
+  test('a background subagent moves the scene too (0018)', HUNTING, async ($, on) => {
     on('classic.SubagentStart', () => ({}))
     const blits = sceneBlits(on)
     const { ui, clock } = await startBand($, on, sceneForest())
@@ -243,7 +246,7 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('an encounter replaces the scene and stops it; the scene comes back after', async ($, on) => {
+  test('an encounter replaces the scene and stops it; the scene comes back after', HUNTING, async ($, on) => {
     const blits = sceneBlits(on)
     const { ui, clock } = await startBand($, on, sceneForest())
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
@@ -261,7 +264,7 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('a band too short for the scene shows the idle line alone', async ($, on) => {
+  test('a band too short for the scene shows the idle line alone', HUNTING, async ($, on) => {
     const { ui } = await startBand($, on, sceneForest())
     await ui.redraw({ ...BAND_PROPS, maxRows: 4 } as any) // 4 scene rows + the line need 5
     expect(await ui.find({ type: 'Raster' })).toBeUndefined()
@@ -271,7 +274,7 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('the idle scene can be turned off, leaving the idle line', { options: { showIdleScene: false } }, async ($, on) => {
+  test('the idle scene can be turned off, leaving the idle line', { options: { autoStart: true, showIdleScene: false } }, async ($, on) => {
     const blits = sceneBlits(on)
     const { ui, clock } = await startBand($, on, sceneForest())
     expect(await ui.find({ type: 'Raster' })).toBeUndefined()
@@ -283,7 +286,7 @@ describe('register', () => {
   })
 
   // /clear fires session.end, which stops the timers, and no session.start (P5-15)
-  test('after /clear, a throw once Claude stops settles, and Modsters keep coming', async ($, on) => {
+  test('after /clear, a throw once Claude stops settles, and Modsters keep coming', HUNTING, async ($, on) => {
     const { ui, clock } = await startBand($, on)
     await clearSession($)
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
@@ -302,7 +305,7 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('after /clear, a throw once Claude stops never stays on the throw: a miss offers Throw again', async ($, on) => {
+  test('after /clear, a throw once Claude stops never stays on the throw: a miss offers Throw again', HUNTING, async ($, on) => {
     // The test engine can't script Math.random: at a 1% catch rate the throw misses
     // 99 times in 100, and either way the throw must settle
     const files = oneModsterForest()
@@ -322,7 +325,7 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('after /clear, an encounter that was up is dropped and stats go to the new session', async ($, on) => {
+  test('after /clear, an encounter that was up is dropped and stats go to the new session', HUNTING, async ($, on) => {
     const store: Record<string, unknown> = {}
     on('store.get', ($, e) => ({ value: structuredClone(store[e.key]) }))
     on('store.set', ($, e) => {
@@ -346,7 +349,7 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('the scene stops at session end', async ($, on) => {
+  test('the scene stops at session end', HUNTING, async ($, on) => {
     const blits = sceneBlits(on)
     const { ui, clock } = await startBand($, on, sceneForest())
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
@@ -358,7 +361,7 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('a catch is saved to the collection on top of what another session saved (0009)', async ($, on) => {
+  test('a catch is saved to the collection on top of what another session saved (0009)', HUNTING, async ($, on) => {
     // The store, answered from a map the test can read back. mock.store keeps its map to itself,
     // and the test engine has no $.store, so this stands in for it with the same get/set/keys.
     // Another Claude Code session already caught 5 Sproutlings in another biome.
@@ -389,7 +392,7 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('a Modster already in the collection appears with the caught mark (P5-10)', async ($, on) => {
+  test('a Modster already in the collection appears with the caught mark (P5-10)', HUNTING, async ($, on) => {
     // Same in-memory stand-in for $.store as the catch test above
     const store: Record<string, unknown> = {
       'caught:sproutling': { v: 1, count: 1, shinyCount: 0, firstCaughtAt: 1, lastCaughtAt: 1, bestTier: 'common', biomes: { 'whispering-forest': 1 } },
@@ -406,7 +409,7 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('a first encounter has no caught mark, even after the catch (P5-10)', async ($, on) => {
+  test('a first encounter has no caught mark, even after the catch (P5-10)', HUNTING, async ($, on) => {
     const store: Record<string, unknown> = {}
     on('store.get', ($, e) => ({ value: structuredClone(store[e.key]) }))
     on('store.set', ($, e) => {
@@ -425,7 +428,7 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('pressing Run shows the card, saves a run, and clears the band after it (0020)', async ($, on) => {
+  test('pressing Run shows the card, saves a run, and clears the band after it (0020)', HUNTING, async ($, on) => {
     // Same in-memory stand-in for $.store as the catch test above
     const store: Record<string, unknown> = {}
     on('store.get', ($, e) => ({ value: structuredClone(store[e.key]) }))

@@ -5,6 +5,9 @@ import { catcherFiles } from './fixtures/catcher-files'
 import { oneModsterForest } from './fixtures/one-modster-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
 
+// The game runs only while autoStart is on (decision 0038); these tests play it
+const HUNTING = { options: { autoStart: true } }
+
 // The Catchers tab (decision 0035 point 9, P5-30): `4: Catchers` in /modsters.
 // The fixture catchers are `jar` (a red lid over a blue body) and `net` (a rope tile).
 
@@ -60,7 +63,7 @@ function colorsIn(cells: string): Set<number> {
 }
 
 describe('register: Catchers tab', () => {
-  test('lists every catcher with the jar first and in use, and previews it', async ($, on) => {
+  test('lists every catcher with the jar first and in use, and previews it', HUNTING, async ($, on) => {
     await start($, on)
     const pane = await mountPane($)
     await pane.press({ key: 'catchers' })
@@ -75,7 +78,7 @@ describe('register: Catchers tab', () => {
     await pane.unmount()
   })
 
-  test('the preview loops a catch while the tab shows, and stops on another tab', async ($, on) => {
+  test('the preview loops a catch while the tab shows, and stops on another tab', HUNTING, async ($, on) => {
     const { clock, blits } = await start($, on, { 'caught:sproutling': caught })
     const pane = await mountPane($)
     await pane.press({ key: 'catchers' })
@@ -90,7 +93,7 @@ describe('register: Catchers tab', () => {
     await pane.unmount()
   })
 
-  test('u makes the selected catcher the one in use and saves it as prefs:catcher', async ($, on) => {
+  test('u makes the selected catcher the one in use and saves it as prefs:catcher', HUNTING, async ($, on) => {
     const stored: Record<string, unknown> = {}
     const { clock, toasts } = await start($, on, stored)
     const pane = await mountPane($)
@@ -105,7 +108,7 @@ describe('register: Catchers tab', () => {
     await pane.unmount()
   })
 
-  test('the next throw uses the new catcher; a throw in progress keeps its own', async ($, on) => {
+  test('the next throw uses the new catcher; a throw in progress keeps its own', HUNTING, async ($, on) => {
     const { clock, blits } = await start($, on)
     const band = await mountBand($)
     const pane = await mountPane($)
@@ -135,7 +138,7 @@ describe('register: Catchers tab', () => {
     await pane.unmount()
   })
 
-  test("the player's own catcher is marked yours, with the delete hint (0032 point 7)", async ($, on) => {
+  test("the player's own catcher is marked yours, with the delete hint (0032 point 7)", HUNTING, async ($, on) => {
     const user: Record<string, string> = {}
     for (const [path, text] of Object.entries(catcherFiles())) {
       if (path.startsWith('catchers/net/')) user[`content/${path.replace('catchers/net/', 'catchers/sack/')}`] = path.endsWith('catcher.json') ? text.replace(/"net"/g, '"sack"') : text

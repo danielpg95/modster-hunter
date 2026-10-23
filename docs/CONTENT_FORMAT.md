@@ -319,12 +319,13 @@ biome entry naming a disabled Modster is dropped without an issue.
 
 | Key | Type | Default | What it does |
 | --- | --- | --- | --- |
+| `autoStart` | boolean | `false` | Run the game. Off: nothing draws outside `/modsters`. `/modsters hunt` turns it on, `/modsters stop` turns it off, and a returning player's first session after the update turns it on once (decision 0038) |
 | `includeBuiltins` | boolean | `true` | Load the biomes and Modsters that ship with the mod. Built-in catchers load either way (decision 0035) |
 | `encounterIdleTimeoutSec` | number | `90` | Seconds without a throw before an encounter's Modster wanders off |
 | `showIdleLine` | boolean | `true` | Show the current biome in the band between encounters |
 | `showIdleScene` | boolean | `true` | Draw the biome's scene between encounters when the biome has one and it fits: in the band above the idle line (decision 0026), or in the encounter pane above its idle text (0027). It moves only while Claude works |
 | `showInBand` | boolean | `true` | Draw the game in the band. Off: one row (Throw, Run) during encounters only, nothing between them (decision 0023) |
-| `encounterPane` | `off`, `when-opened`, `always` | `when-opened` | When the encounter pane opens: never (`/modsters hunt` says it's off), after `/modsters hunt` until closed by hand (0019), or every session (0023) |
+| `encounterPane` | `off`, `when-opened`, `always` | `when-opened` | When the encounter pane opens, while `autoStart` is on: never (`/modsters pane` says it's off), after `/modsters pane` until closed by hand (0019), or every session (0023; 0038) |
 | `showInSpinner` | boolean | `true` | Name the Modster in the spinner line while Claude works (0023) |
 | `showInStatusLine` | boolean | `true` | Show the encounter in the status line while one is up; cleared between encounters (0023) |
 | `sounds` | boolean | `false` | Play sounds (P5-02) |

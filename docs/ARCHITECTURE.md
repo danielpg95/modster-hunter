@@ -50,15 +50,15 @@ plugin/
 
 | Event | Purpose |
 | --- | --- |
-| `session.start` | Register `/modsters`, load content, pick the biome, restore `$.state`, clear the status line, and open the encounter pane as `encounterPane` says: if `prefs:huntPane` says so (0019), every session, or never (0023) |
-| `classic.SessionStart` (`clear`, `resume`, `fork`) | Re-copy stored values into `$.state` (reset by those commands); open the encounter pane as at `session.start` (0019, 0023); after a `session.end` (which they fire), restart the game on the same biome under the new session id (P5-15) |
+| `session.start` | Register `/modsters` (with its subcommands as the typeahead hint), load content, pick the biome, restore `$.state`, show the welcome toast once (`prefs:welcomed`, turning `autoStart` on for a returning player, 0038), clear the status line, and, only while `autoStart` is on, start the game and open the encounter pane as `encounterPane` says: if `prefs:huntPane` says so (0019), every session, or never (0023). While off, close an encounter pane left open |
+| `classic.SessionStart` (`clear`, `resume`, `fork`) | Re-copy stored values into `$.state` (reset by those commands); while `autoStart` is on, open the encounter pane as at `session.start` (0019, 0023) and, after a `session.end` (which they fire), restart the game on the same biome under the new session id (P5-15) |
 | `turn.start` / `turn.complete` | Tell the scheduler a turn is running / ended |
 | `classic.SubagentStart` / `classic.SubagentStop` | Tell the scheduler a subagent is running / stopped, by `agent_id`; work time includes it (0018) |
 | `ui.render` `{ component: 'AbovePrompt' }` | Draw the encounter, or the idle line with the biome's scene above it (0026); one row during encounters only with `showInBand` off (0023) |
 | `ui.render` `{ component: 'Pane' }` (our id) | Draw the collection pane (P3), or the encounter pane `modster-hunt` (0015), with the biome's scene between encounters (0027) |
 | `ui.render` `{ component: 'Spinner' }` | Name the Modster in the main turn's spinner while an encounter is up (`showInSpinner`, 0023) |
 | `ui.close` | The encounter pane closed: redraw so the band takes the encounter back (0015); a close by hand stores `prefs:huntPane` `open: false` (0019) |
-| `command.run` `{ command: 'modsters' }` | Open the pane; `hunt` opens the encounter pane (0015) and stores `prefs:huntPane` `open: true` (0019); answers that it's off with `encounterPane: off` (0023); subcommands like `reload` |
+| `command.run` `{ command: 'modsters' }` | Open the collection pane; `hunt` and `stop` turn the game on and off through `$.config.set` on `autoStart` (0038); `pane` opens the encounter pane (0015), starting the game if it's off, and stores `prefs:huntPane` `open: true` (0019), or answers that it's off with `encounterPane: off` (0023); `reload` reloads content; `help` and an unknown word reply with the commands (0038) |
 | `session.end` | Clear running turn and subagents, stop timers, clear the status line, flush stats (≤ 1.5 s total budget) |
 
 ## Where state lives
@@ -67,6 +67,7 @@ plugin/
 | --- | --- | --- |
 | Content registry, current biome | Module variable | Rebuilt on load; cheap |
 | Current encounter (machine state) | Module variable in `register.tsx` | Not persisted (decision 0005); the band redraws via `$.ui.invalidate` when a step changes it, and `/clear` (which resets `$.state`) leaves it alone |
+| Whether the game runs (`autoStart`) | `userConfig`, read once per load, kept in a module variable `hunting` | `/modsters hunt` and `stop` write it through `$.config.set` and start or stop the game at once (decision 0038) |
 | Display settings (`showInBand`, `encounterPane`, `showInSpinner`, `showInStatusLine`) | `userConfig`, read once per load | A change in `/config` reloads the module (decision 0023) |
 | Status line | `$.ui.status`, updated when an encounter step changes it | Shown only while an encounter is up (decision 0023) |
 | Collection, stats | `$.store` | Persists across sessions (decision 0009); session `stats:` keys idle 24 hours fold into `stats:total` (0029) |
@@ -74,7 +75,8 @@ plugin/
 | The Collection tab's records and selection | Module variables in `register.tsx` | Render hooks can't wait on `$.store`, so `caught:*` records are read at session start, on `/modsters` and after a catch (P3-02) |
 | The Biomes tab's selected biome | A module variable in `register.tsx` | Starts on the session's biome; kept across tabs and reopening (P3-03). Its odds and caught counts come from the same records as the Collection tab. Its scene runs on its own timer while the tab draws it (0028) |
 | The Stats tab's summed stats | A module variable in `register.tsx` | Read, after folding idle session keys (0029), when the tab is pressed or `/modsters` opens on it (P3-04) |
-| Whether the encounter pane reopens (`prefs:huntPane`) | `$.store` | Set by `/modsters hunt`, cleared by a close by hand (decision 0019) |
+| Whether the encounter pane reopens (`prefs:huntPane`) | `$.store` | Set by `/modsters pane`, cleared by a close by hand (decision 0019); used only while `autoStart` is on (0038) |
+| Whether the welcome toast was shown (`prefs:welcomed`, `{ v: 1 }`) | `$.store` | Written once, at the first session start, before `autoStart` changes (decision 0038) |
 | The catcher in use (`prefs:catcher`, `{ v: 1, id }`) | `$.store` | Set by `u` in the Catchers tab, read at session start; missing or unknown means `jar` (decision 0035 points 9–10). A throw keeps the catcher it started with |
 | The Catchers tab's selection and preview | Module variables in `register.tsx` | Starts on the catcher in use (P5-30). The preview loops a catch on the Modster caught last, or a silhouette, on its own timer while the tab shows it |
 | User content | Files in `~/.claude/modster-hunter/content/` | Editable by hand, by the editor and by Claude |
