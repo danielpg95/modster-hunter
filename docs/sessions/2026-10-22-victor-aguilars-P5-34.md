@@ -39,9 +39,11 @@ and keep it updated.
   each (a short idle, then throw, three rocks and the click with sparkles) at 4×
   and 12 fps on a dark background. They're drawn by the mod's own `prepareCatch`,
   `catchFrame` and `throwingMs` through a one-off script, on Musketail and
-  Lamparito at first. Then, asked by @victor-aguilars, each catcher got a
-  different Modster: the Puzzle Cube now plays on Glowcap, a Crystal Grotto
-  common, picked so it gives away little and ties to a biome the README shows.
+  Lamparito at first. Then, asked by @victor-aguilars, the section shows three
+  more Modsters instead: Hootlet in the Seed pod (forest common), Echobat in the
+  Lantern (grotto uncommon) and Glowcap in the Puzzle Cube (grotto common). Each
+  caption names the Modster and the catcher. All three come from the two biomes
+  the README shows.
 - Verified: `claude plugin validate ./plugin --strict` passes, and so does
   `node tools/check-tracking.mjs`.
 
