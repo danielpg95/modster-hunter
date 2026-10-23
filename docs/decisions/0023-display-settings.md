@@ -1,6 +1,6 @@
 # 0023 — Display settings: one toggle per place, a pane picker, and a one-line band that keeps Throw
 
-- **Status:** Accepted (amends 0002 point 3, 0015 points 2 and 5, 0019 point 5; point 7 amended by P3-01: the `/modsters` reply is gone, and the collection pane's Settings tab says "Change where the game shows in /config"; point 4 amended by 0038: `always` waits for `autoStart`, and the `off` reply is `/modsters pane`'s)
+- **Status:** Accepted (amends 0002 point 3, 0015 points 2 and 5, 0019 point 5; point 7 amended by P3-01: the `/modsters` reply is gone, and the collection pane's Settings tab says "Change where the game shows in /config"; point 4 amended by 0038: `always` waits for `autoStart`, and the `off` reply is `/modsters pane`'s; point 7 amended by 0040: options change in the Settings tab, opened by `/modsters settings`)
 - **Date:** 2026-10-10
 - **Decided by:** @danielpg95 (choices made in the P5-08 planning session; details drafted by Claude)
 

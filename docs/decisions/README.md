@@ -36,7 +36,7 @@ settled questions and avoid making assumptions about open ones.
 | [0020](0020-run-from-an-encounter.md) | The player can run from an encounter with `2: Run` | Accepted |
 | [0021](0021-sprites-up-to-48x48.md) | Sprites up to 48×48; the compact band shows when they don't fit | Accepted (point 5 superseded by 0033) |
 | [0022](0022-up-to-two-types.md) | A Modster has one or two types, the first one primary | Accepted |
-| [0023](0023-display-settings.md) | Display settings: one toggle per place, a pane picker, and a one-line band that keeps Throw | Accepted (point 7 amended by P3-01; point 4 by 0038) |
+| [0023](0023-display-settings.md) | Display settings: one toggle per place, a pane picker, and a one-line band that keeps Throw | Accepted (point 7 amended by P3-01 and 0040; point 4 by 0038) |
 | [0024](0024-encounter-pane-focus.md) | `/modsters hunt` gives the encounter pane the keys, and the pane says how to switch | Accepted (amended by 0038: the command is `/modsters pane`) |
 | [0025](0025-user-content-helper.md) | The content skill ships a Node helper that converts, draws, previews and checks | Accepted |
 | [0026](0026-biome-idle-scene.md) | Between encounters the band shows the biome as an animated scene with particles | Accepted (amended by 0027) |
@@ -51,7 +51,7 @@ settled questions and avoid making assumptions about open ones.
 | [0035](0035-catchers.md) | Throws play a catcher animation, and players can make their own catchers | Accepted (P5-27 added `rimIndex`; P5-30: `u: Use`, tab `4: Catchers`; amended by 0036) |
 | [0036](0036-puzzle-cube-catcher.md) | A fifth built-in catcher, the Puzzle Cube | Accepted |
 | [0037](0037-portable-core-and-hosts.md) | Claude Code users first, then a portable core shared by other hosts | Proposed |
-| [0038](0038-opt-in-hunting.md) | The game runs only while `autoStart` is on; `/modsters hunt` and `stop` flip it | Accepted |
-| [0039](0039-modsters-runs-immediately.md) | `/modsters` runs at once, even while Claude works | Proposed |
-| [0040](0040-in-game-settings.md) | `/modsters settings` opens a Settings tab where players change every option | Proposed |
-| [0041](0041-auto-start-on-by-default.md) | Auto start is on by default; one welcome toast says how to stop | Proposed |
+| [0038](0038-opt-in-hunting.md) | The game runs only while `autoStart` is on; `/modsters hunt` and `stop` flip it | Accepted (default, point 2 and welcome texts superseded by 0041; amended by 0040) |
+| [0039](0039-modsters-runs-immediately.md) | `/modsters` runs at once, even while Claude works | Accepted |
+| [0040](0040-in-game-settings.md) | `/modsters settings` opens a Settings tab where players change every option | Accepted |
+| [0041](0041-auto-start-on-by-default.md) | Auto start is on by default; one welcome toast says how to stop | Accepted |

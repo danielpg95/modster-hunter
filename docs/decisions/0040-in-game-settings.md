@@ -1,9 +1,8 @@
 # 0040 — `/modsters settings` opens a Settings tab where players change every option
 
-- **Status:** Proposed — settled by @danielpg95 (maintainer)
+- **Status:** Accepted (amends 0023 point 7, 0038 points 6 and 7)
 - **Date:** 2026-10-22
-- **Proposed by:** @victor-aguilars (drafted by Claude)
-- **Amends:** 0023 point 7, 0038 points 6 and 7 (on acceptance)
+- **Decided by:** @danielpg95 (accepted with PR #154; proposed by @victor-aguilars, drafted by Claude)
 
 ## Context
 
@@ -82,7 +81,7 @@ Option 1 (@victor-aguilars, 2026-10-22):
 
 ## Consequences
 
-- When accepted: 0023's and 0038's status lines and index rows say
+- 0023's and 0038's status lines and index rows say
   "amended by 0040". CONTENT_FORMAT.md's `userConfig` section says the options
   can be changed in `/modsters settings`. ARCHITECTURE.md adds the Settings
   tab's selection to its state table and `settings` to the `command.run` row.

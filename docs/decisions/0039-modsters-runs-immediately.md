@@ -1,8 +1,8 @@
 # 0039 — `/modsters` runs at once, even while Claude works
 
-- **Status:** Proposed — settled by @danielpg95 in the P5-35 PR review
+- **Status:** Accepted
 - **Date:** 2026-10-22
-- **Proposed by:** @victor-aguilars (drafted by Claude)
+- **Decided by:** @danielpg95 (accepted with PR #153; proposed by @victor-aguilars, drafted by Claude)
 
 ## Context
 
