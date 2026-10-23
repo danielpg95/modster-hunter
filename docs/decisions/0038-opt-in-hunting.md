@@ -1,9 +1,8 @@
 # 0038 — The game runs only while `autoStart` is on; `/modsters hunt` and `stop` flip it
 
-- **Status:** Proposed — settled by @danielpg95 (maintainer)
+- **Status:** Accepted (amends 0002, 0015 point 1, 0019 points 1 and 3, 0023 point 4, 0024 point 1)
 - **Date:** 2026-10-22
-- **Proposed by:** @victor-aguilars (drafted by Claude)
-- **Amends:** 0002, 0015 point 1, 0019 points 1 and 3, 0023 point 4, 0024 point 1 (on acceptance)
+- **Decided by:** @danielpg95 (accepted by merging PR #150; proposed by @victor-aguilars, drafted by Claude)
 
 ## Context
 
@@ -91,8 +90,8 @@ single switch and a cleaned-up set of commands:
 
 ## Consequences
 
-- When accepted: 0002, 0015, 0019, 0023 and 0024 get "amended by 0038" on their
-  status lines and index rows. CLAUDE.md golden rule 6 gains "and only while
+- 0002, 0015, 0019, 0023 and 0024 say "amended by 0038" on their status lines
+  and index rows. In P5-35: CLAUDE.md golden rule 6 gains "and only while
   hunting is on". CONTENT_FORMAT.md's `encounterPane` row and the
   `userConfig` description say `/modsters pane`.
   `plugin.json` gains `autoStart`. `docs/ARCHITECTURE.md` adds `autoStart`

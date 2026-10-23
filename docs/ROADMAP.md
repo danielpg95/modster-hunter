@@ -731,7 +731,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 #### [ ] P5-35 — Opt-in hunting, commands and a welcome toast
 - **Depends on:** —
 - **Size:** M
-- **Goal:** the game runs only while the `autoStart` setting is on. `/modsters hunt` and `/modsters stop` flip it, the encounter pane moves to `/modsters pane`, `/modsters help` and the typeahead list the commands, and a one-time welcome toast explains it (decision 0038, asked by @victor-aguilars, 2026-10-22). Start only once 0038 is accepted.
+- **Goal:** the game runs only while the `autoStart` setting is on. `/modsters hunt` and `/modsters stop` flip it, the encounter pane moves to `/modsters pane`, `/modsters help` and the typeahead list the commands, and a one-time welcome toast explains it (decision 0038, asked by @victor-aguilars, 2026-10-22).
 - **Done when:**
   - [ ] `plugin.json` has `autoStart` (boolean, default `false`) and CONTENT_FORMAT.md documents it. `prefs:welcomed` is a pure store helper under `plugin/hooks/store/` with tests.
   - [ ] While `autoStart` is off: no band, spinner text, status line, encounter, spawn countdown, encounter pane or `turn` stat. Register tests cover each.
