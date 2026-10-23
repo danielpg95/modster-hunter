@@ -32,3 +32,4 @@ list when you finish a task.
 - **P5-09** — Sprite miniatures (spike)
 - **P5-17** — Player-defined tiers (spike)
 - **P5-18** — Live Stats tab
+- **P5-35** — Opt-in hunting and a welcome toast (waits for decision 0038)

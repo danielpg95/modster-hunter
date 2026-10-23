@@ -51,3 +51,4 @@ settled questions and avoid making assumptions about open ones.
 | [0035](0035-catchers.md) | Throws play a catcher animation, and players can make their own catchers | Accepted (P5-27 added `rimIndex`; P5-30: `u: Use`, tab `4: Catchers`; amended by 0036) |
 | [0036](0036-puzzle-cube-catcher.md) | A fifth built-in catcher, the Puzzle Cube | Accepted |
 | [0037](0037-portable-core-and-hosts.md) | Claude Code users first, then a portable core shared by other hosts | Proposed |
+| [0038](0038-opt-in-hunting.md) | The game is off until the player starts it with `/modsters hunt` | Proposed |

@@ -728,6 +728,18 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] The README stays lean: a short pitch, Biomes, Catchers, Install, a How to play table of the keys and main commands (`1`/`2`, `/modsters`, `hunt`, `reload`, `/config`), Contributing with run-from-source, and License (asked by @victor-aguilars, 2026-10-22).
   - [ ] `node tools/check-tracking.mjs` passes.
 
+#### [ ] P5-35 — Opt-in hunting and a welcome toast
+- **Depends on:** —
+- **Size:** M
+- **Goal:** the game stays off until the player runs `/modsters hunt`, `/modsters stop` turns it off, the encounter pane moves to `/modsters pane`, and a one-time welcome toast explains it (decision 0038, asked by @victor-aguilars, 2026-10-22). Start only once 0038 is accepted.
+- **Done when:**
+  - [ ] `prefs:hunting` and `prefs:welcomed` are pure store helpers under `plugin/hooks/store/` with tests. A missing `prefs:hunting` counts as off, unless the store has `caught:` or `stats:` keys (0038 point 2).
+  - [ ] While hunting is off: no band, spinner text, status line, encounter, spawn countdown, encounter pane or `turn` stat. Register tests cover each.
+  - [ ] `/modsters hunt`, `/modsters stop` and `/modsters pane` reply and behave as 0038 points 3–5 say. `stop` ends an encounter without a result and closes the pane as a close by the mod. Register tests cover each, with the fake clock.
+  - [ ] The welcome toast shows once per player, with the new-player or returning-player text (0038 point 7). A register test covers both and a second session.
+  - [ ] Docs follow 0038's consequences: decision status lines and index rows, CLAUDE.md rule 6, CONTENT_FORMAT.md, ARCHITECTURE.md, and the README's How to play table.
+  - [ ] `claude plugin test ./plugin` and `claude plugin validate ./plugin --strict` pass. Checked by hand on a fresh install: the toast shows, nothing draws until `/modsters hunt`, and `/modsters stop` clears everything.
+
 ---
 
 ## Phase 6 — Beyond the terminal
