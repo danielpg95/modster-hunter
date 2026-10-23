@@ -41,8 +41,8 @@ and keep it updated.
   `catchFrame` and `throwingMs` through a one-off script, on Musketail and
   Lamparito at first. Then, asked by @victor-aguilars, the section shows three
   more Modsters instead: Hootlet in the Seed pod (forest common), Echobat in the
-  Lantern (grotto uncommon) and Glowcap in the Puzzle Cube (grotto common). Each
-  caption names the Modster and the catcher. All three come from the two biomes
+  Lantern (grotto uncommon) and Glowcap in the Puzzle Cube (grotto common). Captions name
+  only the catcher (asked by @victor-aguilars). All three come from the two biomes
   the README shows.
 - Verified: `claude plugin validate ./plugin --strict` passes, and so does
   `node tools/check-tracking.mjs`.
