@@ -34,6 +34,12 @@ and keep it updated.
 - The two README Modsters show only their name and their real dex `entry` from
   `modster.json` (asked by @victor-aguilars). The rarity, the biome and the old
   made-up blurbs are gone.
+- Added a Catchers section (asked by @victor-aguilars, "showcase some Modster
+  pods"): `docs/previews/readme-catch-{pod,lantern,puzzle-cube}.gif`, one catch
+  each (a short idle, then throw, three rocks and the click with sparkles) at 4×
+  and 12 fps on a dark background. They're drawn by the mod's own `prepareCatch`,
+  `catchFrame` and `throwingMs` through a one-off script, on Musketail and
+  Lamparito only, so no other Modster gets spoiled.
 - Verified: `claude plugin validate ./plugin --strict` passes, and so does
   `node tools/check-tracking.mjs`.
 

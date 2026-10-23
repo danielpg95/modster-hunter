@@ -38,6 +38,18 @@ Each session drops you into one biome at random, each with its own Modsters:
 
 Two more are out there for you to find.
 
+## Catchers
+
+Every throw plays a catcher. Pick yours in `/modsters`, on the Catchers tab:
+
+<table align="center">
+  <tr>
+    <td align="center"><img src="docs/previews/readme-catch-pod.gif" alt="Musketail shrinks into a seed pod, which rocks three times and sparkles" height="128"><br><b>Seed pod</b></td>
+    <td align="center"><img src="docs/previews/readme-catch-lantern.gif" alt="Lamparito is drawn into a brass lantern, which rocks three times and sparkles" height="128"><br><b>Lantern</b></td>
+    <td align="center"><img src="docs/previews/readme-catch-puzzle-cube.gif" alt="Musketail goes into a scrambled puzzle cube, which comes out solved" height="128"><br><b>Puzzle Cube</b></td>
+  </tr>
+</table>
+
 ## Install
 
 You need Claude Code **v2.1.292 or later** (`claude --version`), in a terminal.
