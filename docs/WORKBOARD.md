@@ -19,6 +19,7 @@ this file lists only tasks someone has claimed.
 | P5-21 | @victor-aguilars | in-progress | p5-21-saltbreeze-roster | 2026-10-14 | 2026-10-16 | Pick a concept for the second common (#033); Peekashell and Sir Kelpsie are in the partial PR |
 | P5-34 | @victor-aguilars | in-progress | p5-34-readme-install | 2026-10-22 | 2026-10-22 | Hand check on a second computer: fresh install of 0.1.0 from the marketplace, then tick the items (README merged in #149) |
 | P5-36 | @victor-aguilars | in-review | p5-36-in-game-settings | 2026-10-22 | 2026-10-22 | Merge #155, #156, then the P5-36 PR; then close the task |
+| P5-37 | @victor-aguilars | in-progress | p5-37-english-names | 2026-10-22 | 2026-10-22 | Rename the four Modsters' `name` fields and their text; keep ids |
 
 ## Up next
 
