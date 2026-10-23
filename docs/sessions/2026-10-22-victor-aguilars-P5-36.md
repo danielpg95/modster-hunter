@@ -2,7 +2,7 @@
 
 - **Task:** P5-36 — In-game settings
 - **Branch:** `p5-36-in-game-settings`
-- **Status at end:** in-review (waiting on the hand check)
+- **Status at end:** in-review (hand check passed)
 - **Last commit:** see the P5-36 PR
 
 ## Goal for this session
@@ -67,6 +67,9 @@ Build decision 0040: every "done when" item, up to the hand check.
 
 ## Next steps
 
+0. Hand check passed after the `$.state` fix (@victor-aguilars): the pane stays
+   on Settings after each change.
+
 1. Hand check with `claude --plugin-dir ./plugin`:
    - Run `/modsters settings`. Use `j` and `k`, then `o` on Auto start, on Show
      in the band, on Encounter pane (to always), on Idle timeout, and on
@@ -82,4 +85,6 @@ None
 
 ## Found along the way
 
-None
+- A "reset to defaults" key for the Settings tab came up and was set aside
+  (@victor-aguilars). Each `/config` write reloads the mod, so a reset would
+  need a queue that continues across reloads. It's a candidate roadmap task.

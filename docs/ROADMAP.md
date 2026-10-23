@@ -751,7 +751,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Each change takes effect at once, as 0040 point 5 says (Auto start like hunt and stop, display rows redraw, built-in content reloads, idle timeout from the next encounter). Register tests cover each kind.
   - [x] `/modsters settings` opens the pane on the Settings tab with focus. The typeahead hint and `/modsters help` list it, and the help and the pane-off reply point to `/modsters settings` (0040 points 1 and 6).
   - [x] Docs follow 0040's consequences: decision status lines and index rows, CONTENT_FORMAT.md, ARCHITECTURE.md, and the README.
-  - [ ] `claude plugin test ./plugin` and `claude plugin validate ./plugin --strict` pass. Checked by hand: changing each kind of row in the tab updates `/config`, and the pane stays on the Settings tab after a change.
+  - [x] `claude plugin test ./plugin` and `claude plugin validate ./plugin --strict` pass. Checked by hand: changing each kind of row in the tab updates `/config`, and the pane stays on the Settings tab after a change (passed after the `$.state` fix, @victor-aguilars, 2026-10-22).
 
 ---
 
