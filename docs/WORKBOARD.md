@@ -18,6 +18,7 @@ this file lists only tasks someone has claimed.
 | P5-19 | @danielpg95 | in-review | p5-19-forest-roster | 2026-10-14 | 2026-10-16 | Check the forest live with `/modsters hunt`, then merge PR #112 |
 | P5-21 | @victor-aguilars | in-progress | p5-21-saltbreeze-roster | 2026-10-14 | 2026-10-16 | Pick a concept for the second common (#033); Peekashell and Sir Kelpsie are in the partial PR |
 | P5-34 | @victor-aguilars | in-progress | p5-34-readme-install | 2026-10-22 | 2026-10-22 | Hand check on a second computer: fresh install of 0.1.0 from the marketplace, then tick the items (README merged in #149) |
+| P5-36 | @victor-aguilars | in-progress | p5-36-in-game-settings | 2026-10-22 | 2026-10-22 | Pure setting-rows module in `plugin/hooks/render/` with tests |
 
 ## Up next
 
@@ -32,4 +33,3 @@ list when you finish a task.
 - **P5-09** — Sprite miniatures (spike)
 - **P5-17** — Player-defined tiers (spike)
 - **P5-18** — Live Stats tab
-- **P5-36** — In-game settings
