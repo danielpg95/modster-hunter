@@ -1,7 +1,7 @@
 {
   "name": "modster-art-spike",
   "displayName": "Modster art spike (P5-39)",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Throwaway P5-39 spike: test richer, animated Modster art in a desktop Svg.",
   "author": { "name": "victor-aguilars" },
   "license": "MIT"

@@ -113,33 +113,34 @@ def looped(groups, dur):
 
 
 def variants(width, height, scale):
+    """Round 2: the Code tab drew embedded PNGs only in image mode (no isInteractive), so every
+    variant is drawn that way, with one interactive control."""
     base = art(width, height)
     fs = frames(base)
     w, h = fs[0].size
     dur = len(fs) / FPS
     size = f'{width}x{height}'
     still = png(fs[0])
-    out = [
-        (f'{size} PNG, still', svg(w, h, scale, image(still, w, h)), True),
-        (f'{size} PNG, still, image mode (no isInteractive)', svg(w, h, scale, image(still, w, h)), False),
-        (f'{size} 4 PNG frames, SMIL visibility', svg(w, h, scale, looped([image(png(f), w, h) for f in fs], dur)), True),
-        (f'{size} 4 PNG frames, SMIL visibility, image mode', svg(w, h, scale, looped([image(png(f), w, h) for f in fs], dur)), False),
-    ]
     # One sheet, moved one frame at a time behind a frame-sized window
     xs = ';'.join(str(-i * w) for i in range(len(fs)))
     keys = ';'.join(str(round(i / len(fs), 4)) for i in range(len(fs)))
     move = f'<animate attributeName="x" values="{xs}" keyTimes="{keys}" calcMode="discrete" dur="{dur}s" repeatCount="indefinite"/>'
     sheet_body = f'<svg x="0" y="0" width="{w}" height="{h}" viewBox="0 0 {w} {h}" overflow="hidden"><image href="data:image/png;base64,{png(sheet(fs))}" x="0" y="0" width="{w * len(fs)}" height="{h}"{PIXELATED}>{move}</image></svg>'
-    out.append((f'{size} one sprite-sheet PNG, SMIL x', svg(w, h, scale, sheet_body), True))
-    out.append((f'{size} APNG (the PNG animates itself)', svg(w, h, scale, image(apng(fs), w, h)), True))
     # Vector motion on a raster: a smooth bob, not frame steps
     bob = f'<g><animateTransform attributeName="transform" type="translate" values="0 0;0 2;0 0" dur="{dur}s" repeatCount="indefinite"/>{image(png(base), base.width, base.height)}</g>'
-    out.append((f'{size} one PNG, smooth SMIL bob', svg(w, h, scale, bob), True))
+    out = [
+        (f'{size} one sprite-sheet PNG, SMIL steps (should bob)', svg(w, h, scale, sheet_body), False),
+        (f'{size} 4 PNG frames, SMIL shows one at a time (should bob)', svg(w, h, scale, looped([image(png(f), w, h) for f in fs], dur)), False),
+    ]
     if width == 144:
-        out.append((f'{size} PNG, still, no pixelated hint (browser smoothing)', svg(w, h, scale, image(still, w, h, crisp=False)), True))
-        out.append((f'{size} paths, still (how 0042 draws today)', svg(w, h, scale, paths(fs[0])), True))
-        four = svg(w, h, scale, looped([paths(f) for f in fs], dur))
-        out.append((f'{size} 4 frames as paths ({len(four)} chars: over the limit, not drawn)' if len(four) > LIMIT else f'{size} 4 frames as paths', four, True))
+        out += [
+            (f'{size} APNG, the PNG animates itself (should bob)', svg(w, h, scale, image(apng(fs), w, h)), False),
+            (f'{size} one PNG, smooth SMIL bob (should glide)', svg(w, h, scale, bob), False),
+            (f'{size} PNG, still', svg(w, h, scale, image(still, w, h)), False),
+            (f'{size} PNG, still, no pixelated hint (may look blurry)', svg(w, h, scale, image(still, w, h, crisp=False)), False),
+            (f'{size} paths, still (how 0042 draws today)', svg(w, h, scale, paths(fs[0])), False),
+            (f'{size} control: PNG, still, isInteractive (was blank)', svg(w, h, scale, image(still, w, h)), True),
+        ]
     return out
 
 
@@ -157,7 +158,7 @@ def main():
     # A preview page for a browser, with every variant
     page = '<!doctype html><meta charset=utf-8><title>P5-39 variants</title><body style="background:#1e1e1e;color:#ccc;font:12px sans-serif">'
     for i, r in enumerate(rows):
-        page += f'<p>{i + 1}. {r["label"]} · {r["chars"]} chars</p>{r["source"]}'
+        page += f'<p>{chr(65 + i)}. {r["label"]} · {r["chars"]} chars</p>{r["source"]}'
     (HERE / 'preview.html').write_text(page)
 
 

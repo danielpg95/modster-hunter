@@ -27,18 +27,23 @@ export const register: Register = (on) => {
     const { Box, Text, Svg } = $.ui.resolve(e)
     return (
       <Box flexDirection="column">
-        <Text dimColor>Each one should show Tidecrown; the animated ones bob. Note any that are blank, blurry or still.</Text>
-        {VARIANTS.map((variant, i) => (
-          <Box key={`variant-${i}`} flexDirection="column">
-            <Text bold>{`${i + 1}. ${variant.label}`}</Text>
-            <Text dimColor>{`${variant.chars} characters${variant.interactive ? '' : ' · drawn as an image'}`}</Text>
-            {variant.source ? (
-              <Svg source={variant.source} alt={`Test ${i + 1}: ${variant.label}`} {...(variant.interactive ? { isInteractive: true } : {})} />
-            ) : (
-              <Text dimColor>Not drawn: over the 131072-character Svg limit.</Text>
-            )}
-          </Box>
-        ))}
+        <Text dimColor>Round 2. Each letter's picture is right under its label. Note which are blank, blurry or still.</Text>
+        {VARIANTS.map((variant, i) => {
+          const letter = String.fromCharCode(65 + i)
+          return (
+            <Box key={`variant-${i}`} flexDirection="column">
+              <Text> </Text>
+              <Text bold>{`${letter}. ${variant.label}`}</Text>
+              <Text dimColor>{`${variant.chars} characters · ${variant.interactive ? 'isInteractive' : 'image mode'} · picture below`}</Text>
+              {variant.source ? (
+                <Svg source={variant.source} alt={`Test ${letter}: ${variant.label}`} {...(variant.interactive ? { isInteractive: true } : {})} />
+              ) : (
+                <Text dimColor>Not drawn: over the 131072-character Svg limit.</Text>
+              )}
+              <Text dimColor>{`— end of ${letter} —`}</Text>
+            </Box>
+          )
+        })}
       </Box>
     )
   })
