@@ -763,7 +763,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `plugin.json`'s version goes up so players get the new names. `claude plugin test ./plugin` and `claude plugin validate ./plugin --strict` pass.
   - [x] `node tools/check-tracking.mjs` passes.
 
-#### [ ] P5-38 — Desktop: catch, collection and scenes as Svg
+#### [x] P5-38 — Desktop: catch, collection and scenes as Svg
 - **Depends on:** P5-06
 - **Size:** M
 - **Goal:** finish the Desktop Code tab (decision 0042 point 4): what P5-06 leaves as text.
@@ -771,8 +771,18 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] The catch animation plays as an `Svg` on desktop (decision 0043).
   - [x] The collection's Modster and catcher previews draw as an `Svg` on desktop.
   - [x] The biome idle scene draws as an `Svg` on desktop, within the band's `maxRows` (decision 0044).
-  - [ ] `DESKTOP.rowPx` and `DESKTOP.columnPx` are measured in the Code tab, and the values are noted in 0042 and 0044.
+  - [x] `DESKTOP.rowPx` and `DESKTOP.columnPx` are measured in the Code tab, and the values are noted in 0042 and 0044 (checked by eye, 2026-10-27).
 
+
+#### [ ] P5-39 — Richer art on desktop (spike)
+- **Depends on:** P5-38
+- **Size:** S
+- **Goal:** know whether, and how, the Desktop app can show Modsters with more detail than the terminal's 48×32 sprites (decision 0033) allow, before anyone draws for it.
+- **Done when:**
+  - [ ] A spike checks in the Code tab whether an `Svg` can show an embedded PNG (`<image href="data:image/png;base64,…">`) and animate it, and notes what the sandboxed frame allows; a screenshot of a 96×64, 4-frame test sheet.
+  - [ ] Sizes are measured against the 131072-character `Svg` limit: a high-detail sprite as paths (0042) and as an embedded PNG, for the largest built-in Modster's size at 2× and 3×.
+  - [ ] A decision picks an approach (for example an optional desktop-only sprite in `modster.json`, vector art, or staying with today's sprites), covering how the terminal and desktop versions stay recognisably the same Modster, and the `CONTENT_FORMAT.md` change if any.
+  - [ ] If one is picked, roadmap tasks implement it and add the art.
 ---
 
 ## Phase 6 — Beyond the terminal
