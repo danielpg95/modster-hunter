@@ -774,15 +774,43 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `DESKTOP.rowPx` and `DESKTOP.columnPx` are measured in the Code tab, and the values are noted in 0042 and 0044 (checked by eye, 2026-10-27).
 
 
-#### [ ] P5-39 — Richer art on desktop (spike)
+#### [x] P5-39 — Richer art on desktop (spike)
 - **Depends on:** P5-38
 - **Size:** S
 - **Goal:** know whether, and how, the Desktop app can show Modsters with more detail than the terminal's 48×32 sprites (decision 0033) allow, before anyone draws for it.
 - **Done when:**
   - [x] A spike checks in the Code tab whether an `Svg` can show an embedded PNG (`<image href="data:image/png;base64,…">`) and animate it, and notes what the sandboxed frame allows; a screenshot of a 96×64, 4-frame test sheet.
   - [x] Sizes are measured against the 131072-character `Svg` limit: a high-detail sprite as paths (0042) and as an embedded PNG, for the largest built-in Modster's size at 2× and 3×.
-  - [ ] A decision picks an approach (for example an optional desktop-only sprite in `modster.json`, vector art, or staying with today's sprites), covering how the terminal and desktop versions stay recognisably the same Modster, and the `CONTENT_FORMAT.md` change if any.
-  - [ ] If one is picked, roadmap tasks implement it and add the art.
+  - [x] A decision picks an approach (for example an optional desktop-only sprite in `modster.json`, vector art, or staying with today's sprites), covering how the terminal and desktop versions stay recognisably the same Modster, and the `CONTENT_FORMAT.md` change if any (decision 0045, Proposed).
+  - [x] If one is picked, roadmap tasks implement it and add the art (P5-40, P5-41, P5-42).
+
+#### [ ] P5-40 — Desktop sprites: format, loader and validator
+- **Depends on:** P5-39
+- **Size:** M
+- **Goal:** a Modster's `modster.json` can name a 2× or 3× PNG desktop sheet (decision 0045), loaded and checked, and nothing draws it yet.
+- **Done when:**
+  - [ ] `CONTENT_FORMAT.md` documents `desktopSprite` (`file`, `scale`) and its rules (0045 points 1–3).
+  - [ ] The loader reads the PNG's bytes and keeps them with the Modster; one that breaks a rule is dropped with a content issue and the Modster still loads; tests cover each rule (frames, size per frame, scale, 64 colours, alpha, 48 KiB).
+  - [ ] `tools/check-content.mjs` checks built-in desktop sprites and their credits rows.
+  - [ ] The terminal output is unchanged: the existing tests pass as they are.
+
+#### [ ] P5-41 — Draw desktop sprites on desktop
+- **Depends on:** P5-40
+- **Size:** M
+- **Goal:** on the desktop surface, a Modster with a desktop sprite shows it in the band, the encounter pane, the Collection tab, the catch and the catcher preview (decision 0045 points 4–5).
+- **Done when:**
+  - [ ] A pure renderer makes the image-mode Svg: the embedded sheet stepped by SMIL at `sprite.fps`, pixelated, in the terminal sprite's box; render tests check its frames, timing and size.
+  - [ ] The Collection tab's silhouette is the same sheet through a gray filter.
+  - [ ] Checked in the Code tab first: `catchSvg`'s SMIL motion and colour filter run in an image-mode Svg. The catch then draws the Modster from the sheet.
+  - [ ] Checked in the Code tab: band, pane, Collection tab, catch and catcher preview, with a Modster that has a desktop sprite and one that doesn't.
+
+#### [ ] P5-42 — Tidecrown's desktop sprite, and the contributor skills
+- **Depends on:** P5-40
+- **Size:** S
+- **Goal:** Tidecrown (#036) ships with a 3× desktop sheet and a terminal sprite reduced from it, and the skills know about desktop sprites.
+- **Done when:**
+  - [ ] Tidecrown's desktop sheet and terminal sprite are original art, credited, and pass the validator; the PR shows both side by side, every frame (0045 point 6).
+  - [ ] The `add-modster` contributor skill and the mod's `create-modster-content` skill explain desktop sprites and how to keep both versions the same Modster.
 ---
 
 ## Phase 6 — Beyond the terminal

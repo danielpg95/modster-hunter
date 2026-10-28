@@ -58,3 +58,4 @@ settled questions and avoid making assumptions about open ones.
 | [0042](0042-desktop-svg-sprites.md) | On the desktop app, sprites are one animated Svg each | Proposed (point 4: the catch animation in 0043, the biome scenes in 0044) |
 | [0043](0043-desktop-vector-catch.md) | On the desktop app, a throw plays as one vector Svg | Proposed |
 | [0044](0044-desktop-vector-scenes.md) | On the desktop app, a biome's idle scene is one vector Svg | Proposed |
+| [0045](0045-desktop-sprites.md) | A Modster may have a desktop sprite: a 2× or 3× PNG sheet | Proposed |

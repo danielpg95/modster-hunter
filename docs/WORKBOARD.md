@@ -19,7 +19,6 @@ this file lists only tasks someone has claimed.
 | P5-21 | @victor-aguilars | in-progress | p5-21-inkspector | 2026-10-14 | 2026-10-27 | Merge the Inkspector (#034) PR; then pick a Tidecrown (#036) design (axolotl king on hold, needs a higher-contrast reference) |
 | P5-34 | @victor-aguilars | in-progress | p5-34-readme-install | 2026-10-22 | 2026-10-22 | Hand check on a second computer: fresh install of 0.1.0 from the marketplace, then tick the items (README merged in #149) |
 | P5-36 | @victor-aguilars | in-review | p5-36-in-game-settings | 2026-10-22 | 2026-10-22 | Merge #155, #156, then the P5-36 PR; then close the task |
-| P5-39 | @victor-aguilars | in-progress | p5-39-desktop-art | 2026-10-27 | 2026-10-27 | Write the decision on desktop art (embedded PNG in image-mode Svg works; findings in spikes/p5-39-desktop-art) |
 
 ## Up next
 
@@ -33,3 +32,4 @@ list when you finish a task.
 - **P5-09** — Sprite miniatures (spike)
 - **P5-17** — Player-defined tiers (spike)
 - **P5-18** — Live Stats tab
+- **P5-40** — Desktop sprites: format, loader and validator
