@@ -19,6 +19,7 @@ this file lists only tasks someone has claimed.
 | P5-21 | @victor-aguilars | in-progress | p5-21-kelpsie-closeup | 2026-10-14 | 2026-10-22 | Open the PR for the Kelpsie redraw and Flexton (#033); then design Puffloaf (#034) and Tidecrown (#036) |
 | P5-34 | @victor-aguilars | in-progress | p5-34-readme-install | 2026-10-22 | 2026-10-22 | Hand check on a second computer: fresh install of 0.1.0 from the marketplace, then tick the items (README merged in #149) |
 | P5-36 | @victor-aguilars | in-review | p5-36-in-game-settings | 2026-10-22 | 2026-10-22 | Merge #155, #156, then the P5-36 PR; then close the task |
+| P5-06 | @victor-aguilars | in-progress | p5-06-desktop-svg | 2026-10-27 | 2026-10-27 | Spike: draw one sprite as `Svg` in the Desktop Code tab and test how to animate it |
 
 ## Up next
 
@@ -29,7 +30,6 @@ list when you finish a task.
 - **P5-02** — Sounds
 - **P5-03** — Extended stats and milestones
 - **P5-05** — Light skill catch experiment
-- **P5-06** — Desktop app support
 - **P5-09** — Sprite miniatures (spike)
 - **P5-17** — Player-defined tiers (spike)
 - **P5-18** — Live Stats tab
