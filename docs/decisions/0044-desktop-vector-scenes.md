@@ -76,6 +76,12 @@ Option 1.
   than the terminal.
 - Two estimates, `columnPx` and `rowPx`, decide how big the scene is. P5-38's
   last item measures both in the Code tab and notes them in 0042 and here.
+- **Checked 2026-10-27 (P5-38),** by eye in the Code tab on 0.1.8, from a
+  screenshot of Whispering Forest in the band: the 48 px tile repeats every
+  ~382 CSS px (8 per sprite pixel, so no shrinking), the strip fills the band's
+  width with no gap, and the 12 px strip (96 CSS px) and the idle line fit the
+  band. `columnPx` 8 and `rowPx` 20 stay. Whether the surface trims a slightly
+  wider strip can't be told without the desktop's real `bodyColumns`.
 - If the band is wider than `bodyColumns × columnPx`, the scene stops short of
   the right edge; if it's narrower, the surface cuts it.
 - The particles' start positions match the terminal's, but on desktop they

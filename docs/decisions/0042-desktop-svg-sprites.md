@@ -51,4 +51,8 @@ P5-06 brings the game to the Desktop app's Code tab. The P5-06 spike found:
   next to the idle sprite.
 - If `rowPx` is wrong, the band's sprite may look too small or crowd the band.
   Measure it in the Code tab and update `DESKTOP.rowPx`.
+- **Checked 2026-10-27 (P5-38),** by eye in the Code tab on 0.1.8: with `rowPx`
+  20 the band's sprite, and the biome strip with its idle line (0044), sit
+  within the band. The mod still isn't told a desktop row's height, so it stays
+  an estimate.
 - 0001 and 0012 stay as they are for the terminal.
