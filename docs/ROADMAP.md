@@ -769,8 +769,8 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Goal:** finish the Desktop Code tab (decision 0042 point 4): what P5-06 leaves as text.
 - **Done when:**
   - [x] The catch animation plays as an `Svg` on desktop (decision 0043).
-  - [ ] The collection's Modster and catcher previews draw as an `Svg` on desktop.
-  - [ ] The biome idle scene draws as an `Svg` on desktop, within the band's `maxRows` (decision 0044).
+  - [x] The collection's Modster and catcher previews draw as an `Svg` on desktop.
+  - [x] The biome idle scene draws as an `Svg` on desktop, within the band's `maxRows` (decision 0044).
   - [ ] `DESKTOP.rowPx` and `DESKTOP.columnPx` are measured in the Code tab, and the values are noted in 0042 and 0044.
 
 ---
