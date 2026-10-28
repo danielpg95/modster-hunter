@@ -85,6 +85,16 @@ export const BAND = {
 } as const
 
 /**
+ * Desktop Code tab (P5-06): sprites drawn as `Svg`, sized in CSS pixels per sprite pixel.
+ * `rowPx` is an estimate of one band row, used to keep the band's sprite inside `maxRows`.
+ */
+export const DESKTOP = {
+  paneScale: 4,
+  bandScale: 2,
+  rowPx: 20,
+} as const
+
+/**
  * The biome idle scene, decision 0026. Particle speeds are pixels per tick at
  * `particleFps`; `sway` is how far a particle rocks sideways, in pixels.
  */

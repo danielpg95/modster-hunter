@@ -114,6 +114,40 @@ describe('register: encounter pane', () => {
     await pane.unmount()
   })
 
+  test('on the desktop surface the pane draws the Modster as an animated Svg, and Throw still works (P5-06)', HUNTING, async ($, on) => {
+    const clock = await start($, on)
+    const pane = await $.ui.mount({ plugin: 'modster-hunter', surface: 'desktop', component: 'Pane', requestId: 'modster-hunt', props: PANE_PROPS })
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(3_250)
+    const svg = await pane.find({ type: 'Svg' })
+    expect(svg?.props.alt).toBe('Sproutling')
+    expect(svg?.props.isInteractive).toBe(true)
+    expect(svg?.props.source).toContain('<svg ')
+    expect(await pane.find({ type: 'Raster' })).toBeUndefined()
+
+    await clock.advance(1_000)
+    await pane.press({ key: 'throw' })
+    await clock.advance(250 + CATCH_THROW_MS)
+    expect(await pane.find({ type: 'Text', text: 'Caught Sproutling!' })).toBeDefined()
+    await pane.unmount()
+  })
+
+  test('on the desktop surface the band draws the Modster as an Svg beside its text, within maxRows (P5-06)', HUNTING, async ($, on) => {
+    const clock = await start($, on)
+    const band = await $.ui.mount({ plugin: 'modster-hunter', surface: 'desktop', component: 'AbovePrompt', props: BAND_PROPS })
+    expect(await band.find({ type: 'Svg' })).toBeUndefined()
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(3_250)
+    const svg = await band.find({ type: 'Svg' })
+    expect(svg?.props.alt).toBe('Sproutling')
+    // The 8 px sprite fits the 7-row band at bandScale (16 px)
+    expect([svg?.props.width, svg?.props.height]).toEqual([16, 16])
+    expect(await band.find({ type: 'Raster' })).toBeUndefined()
+    await clock.advance(1_000)
+    expect(await band.find({ type: 'Button', key: 'throw' })).toBeDefined()
+    await band.unmount()
+  })
+
   test('the band steps aside while the pane is shown, and takes the encounter back when it isn\'t', HUNTING, async ($, on) => {
     let paneShown = true
     const clock = await start($, on, () =>

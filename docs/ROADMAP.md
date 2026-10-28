@@ -432,7 +432,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 #### [ ] P5-06 — Desktop app support
 - **Depends on:** P2-07, P3-02
 - **Size:** L
-- **Goal:** draw sprites as `Svg` when `e.surface` is `desktop`.
+- **Goal:** draw sprites as `Svg` when `e.surface` is `desktop` (decision 0042).
 - **Done when:**
   - [ ] Band and pane work in the Desktop app's Code tab.
 
@@ -763,11 +763,22 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `plugin.json`'s version goes up so players get the new names. `claude plugin test ./plugin` and `claude plugin validate ./plugin --strict` pass.
   - [x] `node tools/check-tracking.mjs` passes.
 
+#### [ ] P5-38 — Desktop: catch, collection and scenes as Svg
+- **Depends on:** P5-06
+- **Size:** M
+- **Goal:** finish the Desktop Code tab (decision 0042 point 4): what P5-06 leaves as text.
+- **Done when:**
+  - [ ] The catch animation plays as an `Svg` on desktop.
+  - [ ] The collection's Modster and catcher previews draw as an `Svg` on desktop.
+  - [ ] The biome idle scene draws as an `Svg` on desktop, within the band's `maxRows`.
+  - [ ] `DESKTOP.rowPx` is measured in the Code tab, and the value is noted in 0042.
+
 ---
 
 ## Phase 6 — Beyond the terminal
 
 Decision 0037 (Proposed): the mod ships first, then the game core moves out so other hosts can use it. Start these only once 0037 is accepted.
+
 
 #### [ ] P6-01 — Extract the host-neutral core
 - **Depends on:** P5-07

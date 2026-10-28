@@ -55,3 +55,4 @@ settled questions and avoid making assumptions about open ones.
 | [0039](0039-modsters-runs-immediately.md) | `/modsters` runs at once, even while Claude works | Accepted |
 | [0040](0040-in-game-settings.md) | `/modsters settings` opens a Settings tab where players change every option | Accepted |
 | [0041](0041-auto-start-on-by-default.md) | Auto start is on by default; one welcome toast says how to stop | Accepted |
+| [0042](0042-desktop-svg-sprites.md) | On the desktop app, sprites are one animated Svg each | Proposed |

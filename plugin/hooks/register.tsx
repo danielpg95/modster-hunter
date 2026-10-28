@@ -1,5 +1,5 @@
 import type { EngineInterface, Register, Timer } from 'claude-code'
-import { BAND, CATCH, COLLECTION, CONTENT, USER_CONTENT, WELCOME_TOAST_MS } from './constants'
+import { BAND, CATCH, COLLECTION, CONTENT, DESKTOP, USER_CONTENT, WELCOME_TOAST_MS } from './constants'
 import {
   cachedSheetLoader,
   formatIssue,
@@ -60,7 +60,9 @@ import {
   readDisplaySettings,
   sceneCells,
   settingsLines,
+  pixelsToSvg,
   spriteCells,
+  spriteRgba,
   statsLines,
   TOGGLE_HOTKEY,
   itemNotes,
@@ -150,6 +152,7 @@ const USER_FOLDER_LABEL = `~/${USER_CONTENT.contentFolder}/`
 const SPRITE_KEY = 'sprite'
 // Keyed by id, checked against the sprite it was made from: a reload may change a sprite
 const cellsByModster = new Map<string, { sprite: LoadedModster['sprite']; cells: string[] }>()
+const svgByModster = new Map<string, { sprite: LoadedModster['sprite']; svg: string }>()
 const spriteSites = new Set<string>() // requestIds
 let frameTimer: Timer | undefined
 let frameModster: LoadedModster | undefined
@@ -364,7 +367,7 @@ export const register: Register = (on, options) => {
     const view = bandView({
       maxRows: e.props.maxRows,
       columns: e.props.bodyColumns,
-      // Raster is terminal only (0012; Svg for the desktop app is P5-06)
+      // Raster is terminal only (0012); the desktop app gets an Svg beside the compact text (P5-06)
       canDrawSprite: e.surface === 'terminal',
       showIdleLine,
       // The band turned off still keeps Throw on screen during an encounter (0023 point 3)
@@ -428,7 +431,26 @@ export const register: Register = (on, options) => {
         </Box>
       )
     }
-    if (view.kind === 'compact') return <Box flexDirection="column">{view.lines.map(line)}</Box>
+    if (view.kind === 'compact') {
+      const lines = <Box flexDirection="column">{view.lines.map(line)}</Box>
+      // P5-06: the Desktop Code tab draws the Modster as an Svg beside the text, scaled
+      // down when needed so it stays within the band's maxRows (rowPx is an estimate)
+      if (e.surface !== 'desktop' || !modster || !band || currentPlan().band === 'one-row') return lines
+      const { Svg } = $.ui.resolve(e)
+      const scale = Math.min(DESKTOP.bandScale, (e.props.maxRows * DESKTOP.rowPx) / modster.sprite.height)
+      return (
+        <Box flexDirection="row" columnGap={BAND.gapColumns}>
+          <Svg
+            source={svgFor(modster)}
+            alt={modster.modster.name}
+            width={Math.round(modster.sprite.width * scale)}
+            height={Math.round(modster.sprite.height * scale)}
+            isInteractive
+          />
+          {lines}
+        </Box>
+      )
+    }
 
     // Full layout: the sprite, then the text block beside it. Only chosen on the
     // terminal (canDrawSprite); the check narrows the surface so Raster resolves
@@ -554,6 +576,25 @@ export const register: Register = (on, options) => {
         )}
       </Box>
     )
+    if (e.surface === 'desktop') {
+      // P5-06: the Desktop Code tab has Svg but no Raster; the text keeps the compact layout
+      removeSite(e.requestId)
+      const { Svg } = $.ui.resolve(e)
+      const lines = view.kind === 'compact' ? view.lines : []
+      return (
+        <Box flexDirection="column">
+          {header}
+          <Svg
+            source={svgFor(modster)}
+            alt={modster.modster.name}
+            width={modster.sprite.width * DESKTOP.paneScale}
+            height={modster.sprite.height * DESKTOP.paneScale}
+            isInteractive
+          />
+          {lines.map(line)}
+        </Box>
+      )
+    }
     if (view.kind !== 'full' || e.surface !== 'terminal') {
       removeSite(e.requestId)
       const lines = view.kind === 'compact' ? view.lines : []
@@ -1198,6 +1239,17 @@ function cellsFor(loaded: LoadedModster): string[] {
   const cells = spriteCells(loaded.sprite)
   cellsByModster.set(loaded.modster.id, { sprite: loaded.sprite, cells })
   return cells
+}
+
+// P5-06: every frame in one SVG, looped by SMIL on the surface, since blit only repaints Raster and Image
+function svgFor(loaded: LoadedModster): string {
+  const cached = svgByModster.get(loaded.modster.id)
+  if (cached?.sprite === loaded.sprite) return cached.svg
+  const { width, height } = loaded.sprite
+  const frames = spriteRgba(loaded.sprite).map((rgba) => ({ width, height, rgba }))
+  const svg = pixelsToSvg(frames, { scale: 1, fps: loaded.modster.sprite.fps ?? CONTENT.modster.defaultFps })
+  svgByModster.set(loaded.modster.id, { sprite: loaded.sprite, svg })
+  return svg
 }
 
 function currentModster(): LoadedModster | undefined {
