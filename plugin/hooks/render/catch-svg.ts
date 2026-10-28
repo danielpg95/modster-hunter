@@ -15,6 +15,8 @@ export interface CatchSvgOptions {
   scale: number
   /** Over this many characters there's no Svg (0043 point 8); defaults to DESKTOP.svgMaxChars */
   maxChars?: number
+  /** Loop the throw forever, holding its last frame this long between plays (the Catchers tab's preview) */
+  loopPauseMs?: number
 }
 
 /** How long a throw plays: the throw itself, then a catch's `caught` beat (0035 point 5). */
@@ -23,12 +25,12 @@ export function catchLengthMs(outcome: CatchOutcome, rocks: number): number {
 }
 
 /** The throw as SVG, or undefined when it comes out over `maxChars`. */
-export function catchSvg(art: CatchArt, outcome: CatchOutcome, rocks: number, { scale, maxChars = DESKTOP.svgMaxChars }: CatchSvgOptions): string | undefined {
+export function catchSvg(art: CatchArt, outcome: CatchOutcome, rocks: number, { scale, maxChars = DESKTOP.svgMaxChars, loopPauseMs }: CatchSvgOptions): string | undefined {
   const length = catchLengthMs(outcome, rocks)
   const times: number[] = []
   for (let t = 0; t < length; t += DESKTOP.catchSampleMs) times.push(t)
   times.push(length)
-  const timing = new Timing(times, length)
+  const timing = new Timing(times, length, loopPauseMs)
   const samples = times.map((ms) => {
     const at = catchBeatAt(ms, outcome, rocks)
     const beat = art.beats[at.beat]
@@ -228,10 +230,16 @@ interface TransformTrack {
 class Timing {
   private readonly keys: string[]
   private readonly dur: string
+  private readonly loops: boolean
 
-  constructor(times: number[], length: number) {
-    this.keys = times.map((t) => String(+(t / length).toFixed(4)))
-    this.dur = `${+(length / 1000).toFixed(3)}s`
+  /** Plays once and holds the end; with `loopPauseMs`, holds the end that long and plays again. */
+  constructor(times: number[], length: number, loopPauseMs?: number) {
+    const total = length + (loopPauseMs ?? 0)
+    this.loops = loopPauseMs !== undefined
+    this.keys = times.map((t) => String(+(t / total).toFixed(4)))
+    // A loop's pause holds the last sample to the end, where linear keyTimes must reach 1
+    if (this.loops) this.keys.push('1')
+    this.dur = `${+(total / 1000).toFixed(3)}s`
   }
 
   /** Blends between samples. */
@@ -249,7 +257,8 @@ class Timing {
     return this.track(values, 'discrete')
   }
 
-  private track(values: string[], mode: 'linear' | 'discrete'): Track {
+  private track(sampled: string[], mode: 'linear' | 'discrete'): Track {
+    const values = this.loops ? [...sampled, sampled.at(-1) ?? ''] : sampled
     const first = values[0] ?? ''
     if (values.every((v) => v === first)) return { value: first, animate: () => '' }
     // Keep the samples where something changes: a run of one value needs only its ends
@@ -262,13 +271,13 @@ class Timing {
       })
     const list = kept.map((k) => k.value).join(';')
     const keyTimes = kept.map((k) => k.key).join(';')
-    const dur = this.dur
+    const timing = `keyTimes="${keyTimes}" calcMode="${mode}" dur="${this.dur}" ${this.loops ? 'repeatCount="indefinite"' : 'fill="freeze"'}`
     return {
       value: first,
       animate: (attribute, type) =>
         type
-          ? `<animateTransform attributeName="${attribute}" type="${type}" values="${list}" keyTimes="${keyTimes}" calcMode="${mode}" dur="${dur}" fill="freeze"/>`
-          : `<animate attributeName="${attribute}" values="${list}" keyTimes="${keyTimes}" calcMode="${mode}" dur="${dur}" fill="freeze"/>`,
+          ? `<animateTransform attributeName="${attribute}" type="${type}" values="${list}" ${timing}/>`
+          : `<animate attributeName="${attribute}" values="${list}" ${timing}/>`,
     }
   }
 }

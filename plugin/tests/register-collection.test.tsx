@@ -5,7 +5,7 @@ import { oneModsterForest } from './fixtures/one-modster-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
 import { sceneForest } from './fixtures/scene-forest'
 import { twoBiomes } from './fixtures/two-biomes'
-import { CATCH } from '../hooks/constants'
+import { CATCH, DESKTOP } from '../hooks/constants'
 import { throwingMs } from '../hooks/game'
 
 // The game runs only while autoStart is on (decision 0038); these tests play it
@@ -59,8 +59,8 @@ async function start($: any, on: On, panes: () => UiPane[] = () => [], files = o
   return { clock, opens }
 }
 
-const mountPane = ($: any, props: Partial<typeof PANE_PROPS> = {}) =>
-  $.ui.mount({ plugin: 'modster-hunter', surface: 'terminal', component: 'Pane', requestId: 'modster-collection', props: { ...PANE_PROPS, ...props } })
+const mountPane = ($: any, props: Partial<typeof PANE_PROPS> = {}, surface = 'terminal') =>
+  $.ui.mount({ plugin: 'modster-hunter', surface, component: 'Pane', requestId: 'modster-collection', props: { ...PANE_PROPS, ...props } })
 const mountBand = ($: any) => $.ui.mount({ plugin: 'modster-hunter', surface: 'terminal', component: 'AbovePrompt', props: BAND_PROPS })
 
 const TAB_KEYS = ['collection', 'biomes', 'stats', 'catchers', 'settings']
@@ -525,6 +525,26 @@ describe('register: collection pane', () => {
     await $.turn.start({ text: 'again', turnId: 't2' } as any)
     await pane.press({ key: 'stats' })
     expect((await statsRows(pane))[1]).toBe('Catch ratio —  Turns 2')
+    await pane.unmount()
+  })
+
+  test('on desktop the selected Modster is an Svg above its details: a still silhouette, then its looping idle once caught (P5-38)', HUNTING, async ($, on) => {
+    const blits = collectionBlits(on)
+    await start($, on, () => [], collectionForest(3), { 'caught:mon-02': record() })
+    const pane = await mountPane($, DOCK, 'desktop')
+    const silhouette = await pane.find({ type: 'Svg' })
+    // An uncaught Modster's name isn't given away, even to a screen reader
+    expect(silhouette?.props.alt).toBe('An uncaught Modster')
+    expect(silhouette?.props.source).not.toContain('<animate')
+    expect(await pane.find({ type: 'Raster' })).toBeUndefined()
+
+    await pane.press({ key: 'down' })
+    const caught = await pane.find({ type: 'Svg' })
+    expect(caught?.props.alt).toBe('Mon 02')
+    // The fixture sprite is 8×8, drawn at DESKTOP.collectionScale
+    expect([caught?.props.width, caught?.props.height]).toEqual([8 * DESKTOP.collectionScale, 8 * DESKTOP.collectionScale])
+    expect(caught?.props.source).not.toBe(silhouette?.props.source)
+    expect(blits).toHaveLength(0)
     await pane.unmount()
   })
 })

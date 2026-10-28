@@ -245,6 +245,9 @@ let catcherPreview: { requestId: string; key: string; catcher: LoadedCatcher; sp
 let catcherPreviewTimer: Timer | undefined
 let isBlittingPreview = false
 const silhouettes = new Map<string, string>()
+// Desktop's Svg versions of the collection's silhouettes and the Catchers tab's preview (P5-38)
+const silhouetteSvgs = new Map<string, { sprite: Sprite; svg: string }>()
+const catcherPreviewSvgs = new Map<string, { catcher: LoadedCatcher; frames: Sprite['frames']; svg: string | undefined }>()
 let collectionSite: string | undefined
 let collectionSpriteModster: LoadedModster | undefined
 let collectionFrame = 0
@@ -804,6 +807,26 @@ export const register: Register = (on, options) => {
             {text}
           </Box>
         )
+      } else if (modster && e.surface === 'desktop') {
+        // P5-38: the same looped catch as one vector Svg above the text (0043); the surface plays it
+        dropCatcherPreview(e.requestId)
+        const { Svg } = $.ui.resolve(e)
+        const sprite = caughtId === undefined ? silhouetteSprite(modster.sprite) : modster.sprite
+        const source = catcherPreviewSvg(loadedCatcher, modster, sprite)
+        if (source) {
+          detail = (
+            <Box key="detail" flexDirection="column">
+              <Svg
+                source={source}
+                alt={`${selected.name} catching a Modster`}
+                width={sprite.width * DESKTOP.collectionScale}
+                height={sprite.height * DESKTOP.collectionScale}
+                isInteractive
+              />
+              {text}
+            </Box>
+          )
+        }
       } else {
         dropCatcherPreview(e.requestId)
       }
@@ -1082,6 +1105,22 @@ export const register: Register = (on, options) => {
             <Box key="sprite-box" width={box.columns} height={box.rows} alignItems="center" justifyContent="center">
               <Raster key={COLLECTION_SPRITE_KEY} columns={loaded.sprite.width} rows={Math.ceil(loaded.sprite.height / 2)} cells={collectionCells(loaded, selected)} />
             </Box>
+            {text}
+          </Box>
+        )
+      } else if (loaded && e.surface === 'desktop') {
+        // P5-38: an Svg above the text (0042); a caught Modster loops its idle frames, the silhouette holds still
+        dropCollectionSite(e.requestId)
+        const { Svg } = $.ui.resolve(e)
+        detail = (
+          <Box key="detail" flexDirection="column">
+            <Svg
+              source={selected.record ? svgFor(loaded) : silhouetteSvgFor(loaded)}
+              alt={selected.record ? loaded.modster.name : 'An uncaught Modster'}
+              width={loaded.sprite.width * DESKTOP.collectionScale}
+              height={loaded.sprite.height * DESKTOP.collectionScale}
+              isInteractive
+            />
             {text}
           </Box>
         )
@@ -1891,6 +1930,31 @@ function useCatcher($: EngineInterface, entry: CatcherEntry): void {
   queueWrite($, (store) => store.set(CATCHER_KEY, catcherPref(entry.id)))
   $.ui.toast(`Modster Hunter: catching with the ${entry.name} from the next throw`)
   $.ui.invalidate('ui.render')
+}
+
+/** The Collection tab's silhouette as a still Svg (P5-38), made once per Modster. */
+function silhouetteSvgFor(loaded: LoadedModster): string {
+  const cached = silhouetteSvgs.get(loaded.modster.id)
+  if (cached?.sprite === loaded.sprite) return cached.svg
+  const { width, height } = loaded.sprite
+  const rgba = spriteRgba(loaded.sprite, silhouettePalette(loaded.sprite))[0] ?? new Uint8Array(width * height * 4)
+  const svg = pixelsToSvg([{ width, height, rgba }], { scale: 1, fps: 1 })
+  silhouetteSvgs.set(loaded.modster.id, { sprite: loaded.sprite, svg })
+  return svg
+}
+
+/**
+ * The Catchers tab's preview on desktop (P5-38): a catch by `catcher` on `sprite`, looped with
+ * the terminal's pause, as one vector Svg (0043). Undefined when it's over the Svg limit.
+ */
+function catcherPreviewSvg(catcher: LoadedCatcher, modster: LoadedModster, sprite: Sprite): string | undefined {
+  const key = `${catcher.catcher.id}/${modster.modster.id}/${sprite === modster.sprite ? 'caught' : 'silhouette'}`
+  const cached = catcherPreviewSvgs.get(key)
+  if (cached && cached.catcher === catcher && cached.frames === sprite.frames) return cached.svg
+  const art = prepareCatch(catcher.catcher, catcher.sprite, sprite, modster.modster.sprite.fps ?? CONTENT.modster.defaultFps)
+  const svg = catchSvg(art, 'caught', CATCH.rocksToCatch, { scale: 1, loopPauseMs: CATCH.previewPauseMs })
+  catcherPreviewSvgs.set(key, { catcher, frames: sprite.frames, svg })
+  return svg
 }
 
 /** A sprite in the silhouette's one gray, for a preview before anything is caught. */

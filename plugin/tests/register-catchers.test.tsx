@@ -1,6 +1,7 @@
 import { describe, expect, mock, test } from 'claude-code/testing'
 import type { On } from 'claude-code'
-import { COLLECTION } from '../hooks/constants'
+import { CATCH, COLLECTION, DESKTOP } from '../hooks/constants'
+import { catchLengthMs } from '../hooks/render'
 import { catcherFiles } from './fixtures/catcher-files'
 import { oneModsterForest } from './fixtures/one-modster-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
@@ -47,7 +48,7 @@ async function start($: any, on: On, stored: Record<string, unknown> = {}, user:
   return { clock, blits, toasts }
 }
 
-const mountPane = ($: any) => $.ui.mount({ plugin: 'modster-hunter', surface: 'terminal', component: 'Pane', requestId: 'modster-collection', props: PANE_PROPS })
+const mountPane = ($: any, surface = 'terminal') => $.ui.mount({ plugin: 'modster-hunter', surface, component: 'Pane', requestId: 'modster-collection', props: PANE_PROPS })
 const mountBand = ($: any) => $.ui.mount({ plugin: 'modster-hunter', surface: 'terminal', component: 'AbovePrompt', props: BAND_PROPS })
 
 /** The colors a Raster's cells use, foreground and background. */
@@ -150,6 +151,23 @@ describe('register: Catchers tab', () => {
     await pane.press({ key: 'catcher-down' })
     expect(await pane.find({ type: 'Text', text: ' yours' })).toBeDefined()
     expect(await pane.find({ type: 'Text', text: 'Yours · to delete it, ask Claude: "delete my catcher sack"' })).toBeDefined()
+    await pane.unmount()
+  })
+
+  test('on desktop the preview is one looping vector Svg the surface plays: no blits (P5-38, 0043)', HUNTING, async ($, on) => {
+    const { clock, blits } = await start($, on, { 'caught:sproutling': caught })
+    const pane = await mountPane($, 'desktop')
+    await pane.press({ key: 'catchers' })
+    const preview = await pane.find({ type: 'Svg' })
+    expect(preview?.props.alt).toBe('jar catching a Modster')
+    expect(preview?.props.isInteractive).toBe(true)
+    // A catch, then the terminal's pause, again and again
+    const loopMs = catchLengthMs('caught', CATCH.rocksToCatch) + CATCH.previewPauseMs
+    expect(preview?.props.source).toContain(`dur="${loopMs / 1000}s" repeatCount="indefinite"`)
+    expect(preview?.props.source).not.toContain('fill="freeze"')
+    expect([preview?.props.width, preview?.props.height]).toEqual([8 * DESKTOP.collectionScale, 8 * DESKTOP.collectionScale])
+    await clock.advance(1_000)
+    expect(blits.filter(([key]) => key === 'catcher-preview')).toHaveLength(0)
     await pane.unmount()
   })
 })
