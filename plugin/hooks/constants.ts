@@ -92,6 +92,10 @@ export const DESKTOP = {
   paneScale: 4,
   bandScale: 2,
   rowPx: 20,
+  /** An estimate of one desktop column, for the idle scene's width (0044 point 2); measured in P5-38 */
+  columnPx: 8,
+  /** A particle's sway is drawn from this many samples of one period of its sine (0044 point 4) */
+  swaySamples: 16,
   /** The collection's Modster and the Catchers tab's preview (P5-38): a little under the pane's 4, to fit a narrow dock */
   collectionScale: 3,
   /** A throw's motion is sampled this often for its SMIL values, which blend between samples (0043 point 3) */

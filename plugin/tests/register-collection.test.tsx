@@ -457,6 +457,21 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
+  test('on desktop the Biomes tab shows the selected biome\'s scene as one moving vector Svg, with no blits (0044)', HUNTING, async ($, on) => {
+    const blits = biomesSceneBlits(on)
+    const { clock } = await start($, on, () => [], sceneForest())
+    const pane = await mountPane($, DOCK, 'desktop')
+    await pane.press({ key: 'biomes' })
+    const svg = await pane.find({ type: 'Svg' })
+    expect(svg?.props.alt).toBe('Whispering Forest scene')
+    // No turn is running: the tab's scene moves anyway (0028 point 4)
+    expect(svg?.props.source).toContain('repeatCount="indefinite"')
+    expect(svg?.props.width).toBe(120 * DESKTOP.columnPx)
+    await clock.advance(1_000)
+    expect(blits).toHaveLength(0)
+    await pane.unmount()
+  })
+
   test('another tab stops the Biomes tab\'s scene', HUNTING, async ($, on) => {
     const blits = biomesSceneBlits(on)
     const { clock } = await start($, on, () => [], sceneForest())

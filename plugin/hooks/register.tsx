@@ -38,6 +38,8 @@ import {
   catchFrame,
   catchLengthMs,
   catchSvg,
+  sceneSvg,
+  sceneSvgSize,
   catcherEntries,
   catcherRow,
   previewModsterId,
@@ -182,6 +184,8 @@ let isBlittingCatch = false
 const SCENE_KEY = 'scene'
 let scene: IdleScene | undefined
 const particlesByColumns = new Map<number, Particle[]>()
+// The desktop's scene Svgs by size and motion (0044); checked against the scene they were made from
+const sceneSvgs = new Map<string, { scene: IdleScene; drawn: { source: string; width: number; height: number } | undefined }>()
 const sceneSites = new Map<string, number>() // requestId → columns
 let sceneTimer: Timer | undefined
 let sceneTick = 0
@@ -385,7 +389,9 @@ export const register: Register = (on, options) => {
 
     if (view.kind !== 'full') removeSite(e.requestId)
     if (view.kind !== 'scene') removeSceneSite(e.requestId)
-    if (scene && showIdleScene && view.kind === 'idle') {
+    // P5-38: the desktop draws the idle scene as one vector Svg above the idle line (0044)
+    const desktopScene = e.surface === 'desktop' && view.kind === 'idle' && scene && showIdleScene ? desktopSceneSvg($, scene, e.props.bodyColumns, e.props.maxRows, sceneMoves()) : undefined
+    if (scene && showIdleScene && view.kind === 'idle' && !desktopScene) {
       const skip = `idle scene: not drawn (surface ${e.surface}, band ${e.props.maxRows} rows, scene needs ${scene.rows + 1})`
       if (skip !== loggedSceneSkip) {
         loggedSceneSkip = skip
@@ -423,7 +429,17 @@ export const register: Register = (on, options) => {
       </Box>
     )
 
-    if (view.kind === 'idle') return line(view.line, 0)
+    if (view.kind === 'idle') {
+      // The surface check narrows the table so Svg resolves
+      if (!desktopScene || e.surface !== 'desktop') return line(view.line, 0)
+      const { Svg } = $.ui.resolve(e)
+      return (
+        <Box flexDirection="column">
+          <Svg source={desktopScene.source} alt={`${biome?.name ?? 'Biome'} scene`} width={desktopScene.width} height={desktopScene.height} isInteractive />
+          {line(view.line, 0)}
+        </Box>
+      )
+    }
     if (view.kind === 'scene') {
       // Chosen only on the terminal (canDrawSprite); the check narrows the surface so Raster resolves
       if (e.surface !== 'terminal') return line(view.line, 0)
@@ -954,6 +970,13 @@ export const register: Register = (on, options) => {
         sceneView = <Raster key={BIOMES_SCENE_KEY} columns={site.columns} rows={scene.rows} cells={sceneCells(scene, site.columns, site.particles, biomesSceneTick)} />
       } else {
         dropBiomesSceneSite(e.requestId)
+        // P5-38: on desktop the selected biome's scene is one vector Svg that always moves while the tab shows (0044 point 5)
+        const desktop = e.surface === 'desktop' && showIdleScene && loadedBiome ? biomeScene(loadedBiome) : undefined
+        const drawn = desktop ? desktopSceneSvg($, desktop, e.props.bodyColumns, undefined, true) : undefined
+        if (drawn && e.surface === 'desktop') {
+          const { Svg } = $.ui.resolve(e)
+          sceneView = <Svg source={drawn.source} alt={`${selected.name} scene`} width={drawn.width} height={drawn.height} isInteractive />
+        }
       }
       const window = listWindow(entries.length, index, plan.listRows)
       const more = moreText(window)
@@ -1802,11 +1825,37 @@ function removeSceneSite(requestId: string): void {
   if (sceneSites.delete(requestId) && sceneSites.size === 0) stopScene()
 }
 
+/** Whether the idle scene moves now: while Claude works and no encounter is up (0026 point 5). */
+function sceneMoves(): boolean {
+  return machine !== undefined && !machine.encounter && (machine.turnRunning || Object.keys(machine.agents).length > 0)
+}
+
+/**
+ * The desktop's idle scene as one vector Svg (0044), sized from the band or pane's columns and,
+ * in the band, its `maxRows`; undefined when it doesn't fit. Particles are made once per width.
+ */
+function desktopSceneSvg($: EngineInterface, current: IdleScene, bodyColumns: number, maxRows: number | undefined, moving: boolean): { source: string; width: number; height: number } | undefined {
+  const size = sceneSvgSize(current, bodyColumns, maxRows)
+  if (!size) return undefined
+  const key = `${size.width}/${size.scale}/${moving}`
+  const cached = sceneSvgs.get(key)
+  if (cached && cached.scene === current) return cached.drawn
+  let particles = particlesByColumns.get(size.width)
+  if (!particles) {
+    particles = makeParticles(current, size.width, Math.random)
+    particlesByColumns.set(size.width, particles)
+  }
+  const source = sceneSvg(current, particles, { ...size, moving })
+  if (!source) $.ui.log(`idle scene: no Svg, over ${DESKTOP.svgMaxChars} characters; showing the idle line`, { to: 'debug' })
+  const drawn = source ? { source, width: size.width * size.scale, height: current.rows * 2 * size.scale } : undefined
+  sceneSvgs.set(key, { scene: current, drawn })
+  return drawn
+}
+
 /** Runs the scene's timer only while Claude works, no encounter is up and the band draws the scene (0026 point 5). */
 function updateSceneTimer($: EngineInterface): void {
-  const working = machine !== undefined && !machine.encounter && (machine.turnRunning || Object.keys(machine.agents).length > 0)
   const current = scene
-  if (!working || !current || !isAnimated(current) || sceneSites.size === 0) {
+  if (!sceneMoves() || !current || !isAnimated(current) || sceneSites.size === 0) {
     stopScene()
     return
   }

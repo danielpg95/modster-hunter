@@ -8,7 +8,7 @@ import { validBiome } from './fixtures/valid-biome'
 import { validModster } from './fixtures/valid-modster'
 import { validUserModster } from './fixtures/valid-user-modster'
 import { validSprite } from './fixtures/valid-sprite'
-import { CATCH } from '../hooks/constants'
+import { CATCH, DESKTOP } from '../hooks/constants'
 import { throwingMs } from '../hooks/game'
 
 // The game runs only while autoStart is on (decision 0038); these tests play it
@@ -285,6 +285,54 @@ describe('register', () => {
     await ui.unmount()
   })
 
+  test('on desktop the scene is one vector Svg above the idle line: still between turns, moving while Claude works (0044)', HUNTING, async ($, on) => {
+    const blits = sceneBlits(on)
+    const { ui, clock } = await startBand($, on, sceneForest(), 'desktop')
+    const still = await ui.find({ type: 'Svg' })
+    expect(still?.props.alt).toBe('Whispering Forest scene')
+    expect(still?.props.source).not.toContain('<animate')
+    // 120 columns at DESKTOP.columnPx; 4 rows (8 px) at the full scale fit the 7-row band
+    expect([still?.props.width, still?.props.height]).toEqual([120 * DESKTOP.columnPx, 8 * DESKTOP.columnPx])
+    expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeDefined()
+
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    expect((await ui.find({ type: 'Svg' }))?.props.source).toContain('repeatCount="indefinite"')
+    await clock.advance(2_000)
+    // The surface plays it: nothing is blitted or redrawn
+    expect(blits.length).toBe(0)
+
+    await $.turn.complete({ reason: 'answer', answer: 'ok', durationMs: 1 } as any)
+    expect((await ui.find({ type: 'Svg' }))?.props.source).toBe(still?.props.source)
+    await ui.unmount()
+  })
+
+  test('on desktop a band too short for the strip and a line shows the idle line alone', HUNTING, async ($, on) => {
+    const { ui } = await startBand($, on, sceneForest(), 'desktop')
+    await ui.redraw({ ...BAND_PROPS, maxRows: 1 } as any)
+    expect(await ui.find({ type: 'Svg' })).toBeUndefined()
+    expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeDefined()
+    // Two rows leave one row (rowPx) for the 8 px strip: drawn smaller than columnPx
+    await ui.redraw({ ...BAND_PROPS, maxRows: 2 } as any)
+    const scale = Math.floor(DESKTOP.rowPx / 8)
+    expect((await ui.find({ type: 'Svg' }))?.props.height).toBe(8 * scale)
+    await ui.unmount()
+  })
+
+  test('on desktop an encounter replaces the scene with the Modster', HUNTING, async ($, on) => {
+    const { ui, clock } = await startBand($, on, sceneForest(), 'desktop')
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(3_000 + BAND_TICK)
+    expect((await ui.find({ type: 'Svg' }))?.props.alt).toBe('Sproutling')
+    await ui.unmount()
+  })
+
+  test('on desktop showIdleScene off leaves the idle line alone', { options: { autoStart: true, showIdleScene: false } }, async ($, on) => {
+    const { ui } = await startBand($, on, sceneForest(), 'desktop')
+    expect(await ui.find({ type: 'Svg' })).toBeUndefined()
+    expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeDefined()
+    await ui.unmount()
+  })
+
   // /clear fires session.end, which stops the timers, and no session.start (P5-15)
   test('after /clear, a throw once Claude stops settles, and Modsters keep coming', HUNTING, async ($, on) => {
     const { ui, clock } = await startBand($, on)
@@ -491,7 +539,7 @@ async function clearSession($: any): Promise<void> {
 }
 
 /** Starts a session on the one-Modster forest with a fake clock, and mounts the band. */
-async function startBand($: any, on: On, files = oneModsterForest()) {
+async function startBand($: any, on: On, files = oneModsterForest(), surface = 'terminal') {
   on('session.start', ($, e) => ({ cwd: e.cwd }))
   on('command.register', ($, e) => ({ value: { command: e.name } }))
   stubContentFs(on, files)
@@ -506,7 +554,7 @@ async function startBand($: any, on: On, files = oneModsterForest()) {
   })
   const clock = mock.clock(on)
   await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' })
-  const ui = await $.ui.mount({ plugin: 'modster-hunter', surface: 'terminal', component: 'AbovePrompt', props: BAND_PROPS })
+  const ui = await $.ui.mount({ plugin: 'modster-hunter', surface, component: 'AbovePrompt', props: BAND_PROPS })
   // The band's timers run on the mock clock; advancing it fires them in order
   return { ui, clock }
 }
