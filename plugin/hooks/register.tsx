@@ -1,5 +1,5 @@
 import type { EngineInterface, Register, Timer } from 'claude-code'
-import { BAND, CATCH, COLLECTION, CONTENT, USER_CONTENT, WELCOME_TOAST_MS } from './constants'
+import { BAND, CATCH, COLLECTION, CONTENT, DESKTOP, USER_CONTENT, WELCOME_TOAST_MS } from './constants'
 import {
   cachedSheetLoader,
   formatIssue,
@@ -60,7 +60,9 @@ import {
   readDisplaySettings,
   sceneCells,
   settingsLines,
+  pixelsToSvg,
   spriteCells,
+  spriteRgba,
   statsLines,
   TOGGLE_HOTKEY,
   itemNotes,
@@ -150,6 +152,7 @@ const USER_FOLDER_LABEL = `~/${USER_CONTENT.contentFolder}/`
 const SPRITE_KEY = 'sprite'
 // Keyed by id, checked against the sprite it was made from: a reload may change a sprite
 const cellsByModster = new Map<string, { sprite: LoadedModster['sprite']; cells: string[] }>()
+const svgByModster = new Map<string, { sprite: LoadedModster['sprite']; svg: string }>()
 const spriteSites = new Set<string>() // requestIds
 let frameTimer: Timer | undefined
 let frameModster: LoadedModster | undefined
@@ -554,6 +557,19 @@ export const register: Register = (on, options) => {
         )}
       </Box>
     )
+    if (e.surface === 'desktop') {
+      // P5-06 spike: the Desktop Code tab has Svg but no Raster; the text keeps the compact layout
+      removeSite(e.requestId)
+      const { Svg } = $.ui.resolve(e)
+      const lines = view.kind === 'compact' ? view.lines : []
+      return (
+        <Box flexDirection="column">
+          {header}
+          <Svg source={svgFor(modster)} alt={modster.modster.name} isInteractive />
+          {lines.map(line)}
+        </Box>
+      )
+    }
     if (view.kind !== 'full' || e.surface !== 'terminal') {
       removeSite(e.requestId)
       const lines = view.kind === 'compact' ? view.lines : []
@@ -1198,6 +1214,17 @@ function cellsFor(loaded: LoadedModster): string[] {
   const cells = spriteCells(loaded.sprite)
   cellsByModster.set(loaded.modster.id, { sprite: loaded.sprite, cells })
   return cells
+}
+
+// P5-06 spike: every frame in one SVG, looped by SMIL on the surface, since blit only repaints Raster and Image
+function svgFor(loaded: LoadedModster): string {
+  const cached = svgByModster.get(loaded.modster.id)
+  if (cached?.sprite === loaded.sprite) return cached.svg
+  const { width, height } = loaded.sprite
+  const frames = spriteRgba(loaded.sprite).map((rgba) => ({ width, height, rgba }))
+  const svg = pixelsToSvg(frames, { scale: DESKTOP.svgScale, fps: loaded.modster.sprite.fps ?? CONTENT.modster.defaultFps })
+  svgByModster.set(loaded.modster.id, { sprite: loaded.sprite, svg })
+  return svg
 }
 
 function currentModster(): LoadedModster | undefined {

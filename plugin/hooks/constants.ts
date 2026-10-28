@@ -84,6 +84,11 @@ export const BAND = {
   caughtMark: '●',
 } as const
 
+/** Desktop Code tab (P5-06 spike): sprites drawn as `Svg`, CSS pixels per sprite pixel. */
+export const DESKTOP = {
+  svgScale: 4,
+} as const
+
 /**
  * The biome idle scene, decision 0026. Particle speeds are pixels per tick at
  * `particleFps`; `sway` is how far a particle rocks sideways, in pixels.
