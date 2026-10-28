@@ -770,8 +770,8 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Done when:**
   - [x] The catch animation plays as an `Svg` on desktop (decision 0043).
   - [ ] The collection's Modster and catcher previews draw as an `Svg` on desktop.
-  - [ ] The biome idle scene draws as an `Svg` on desktop, within the band's `maxRows`.
-  - [ ] `DESKTOP.rowPx` is measured in the Code tab, and the value is noted in 0042.
+  - [ ] The biome idle scene draws as an `Svg` on desktop, within the band's `maxRows` (decision 0044).
+  - [ ] `DESKTOP.rowPx` and `DESKTOP.columnPx` are measured in the Code tab, and the values are noted in 0042 and 0044.
 
 ---
 
