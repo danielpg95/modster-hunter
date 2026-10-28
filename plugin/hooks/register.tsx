@@ -36,6 +36,8 @@ import {
   biomesBody,
   catchDots,
   catchFrame,
+  catchLengthMs,
+  catchSvg,
   catcherEntries,
   catcherRow,
   previewModsterId,
@@ -169,7 +171,8 @@ let pickedCatcherId: string | undefined
 const catchArts = new Map<string, { catcher: LoadedCatcher; modster: LoadedModster; art: CatchArt }>()
 // The throw as a dot count for the text (point 7), kept current by the tick
 let shownDots: string | undefined
-let catchPlay: { art: CatchArt; outcome: CatchOutcome; rocks: number; throwAt: number; endsAt: number } | undefined
+// `svg` is the desktop's vector throw (0043), made on first draw; null when it's over the Svg limit
+let catchPlay: { art: CatchArt; outcome: CatchOutcome; rocks: number; throwAt: number; endsAt: number; svg?: string | null } | undefined
 let catchCells: string | undefined
 let catchTimer: Timer | undefined
 let isBlittingCatch = false
@@ -441,7 +444,7 @@ export const register: Register = (on, options) => {
       return (
         <Box flexDirection="row" columnGap={BAND.gapColumns}>
           <Svg
-            source={svgFor(modster)}
+            source={desktopSprite($, modster)}
             alt={modster.modster.name}
             width={Math.round(modster.sprite.width * scale)}
             height={Math.round(modster.sprite.height * scale)}
@@ -585,7 +588,7 @@ export const register: Register = (on, options) => {
         <Box flexDirection="column">
           {header}
           <Svg
-            source={svgFor(modster)}
+            source={desktopSprite($, modster)}
             alt={modster.modster.name}
             width={modster.sprite.width * DESKTOP.paneScale}
             height={modster.sprite.height * DESKTOP.paneScale}
@@ -1254,6 +1257,23 @@ function svgFor(loaded: LoadedModster): string {
   return svg
 }
 
+/**
+ * What the desktop's Svg shows: a throw as one vector Svg while it plays (0043), else the
+ * idle loop (0042). Svg has no key, so the source carries the throw: a new source is a new
+ * box, and its SMIL starts at 0 even when the last throw drew the same art.
+ */
+function desktopSprite($: EngineInterface, loaded: LoadedModster): string {
+  const play = catchPlay
+  if (play) {
+    if (play.svg === undefined) {
+      play.svg = catchSvg(play.art, play.outcome, play.rocks, { scale: 1 }) ?? null
+      if (play.svg === null) $.ui.log(`catch: no Svg for ${loaded.modster.id}, over ${DESKTOP.svgMaxChars} characters; showing the idle sprite`, { to: 'debug' })
+    }
+    if (play.svg) return play.svg.replace('<svg ', `<svg data-throw="${play.throwAt}" `)
+  }
+  return svgFor(loaded)
+}
+
 function currentModster(): LoadedModster | undefined {
   const encounter = machine?.encounter
   if (!encounter) return undefined
@@ -1486,7 +1506,7 @@ function updateCatch($: EngineInterface, now: number): void {
   // A catcher that doesn't fit the sprite area isn't drawn (0035 point 8; P5-33 shows the dot count)
   if (!art.fits) return
   const outcome: CatchOutcome = encounter.throwLands || encounter.outcome === 'caught' ? 'caught' : 'missed'
-  const endsAt = throwAt + throwingMs(outcome, rocks) + (outcome === 'caught' ? CATCH.beatMs.caught : 0)
+  const endsAt = throwAt + catchLengthMs(outcome, rocks)
   catchPlay = { art, outcome, rocks, throwAt, endsAt }
   catchCells = pixelsToCells(catchFrame(art, outcome, rocks, now - throwAt))
   catchTimer?.cancel()
@@ -1517,6 +1537,8 @@ async function blitCatchFrame($: EngineInterface): Promise<void> {
 /** Ends the animation and puts the Modster's idle frame back where it played. */
 function endCatch($: EngineInterface): void {
   stopCatch()
+  // The desktop has no blit: a redraw puts its idle Svg back (0043 point 7)
+  $.ui.invalidate('ui.render')
   const current = frameModster
   if (!current) return
   const cells = cellsFor(current)[frameIndex] ?? ''

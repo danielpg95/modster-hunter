@@ -19,7 +19,7 @@ function pixelHex(frame: Frame, x: number, y: number): string | undefined {
 
 // One frame as one path per colour: each run of a colour along a row is a 1-px-tall box.
 // Paths keep big, busy sprites well under the Svg source limit (131072 characters)
-function framePaths(frame: Frame): string {
+export function framePaths(frame: Frame): string {
   const runs = new Map<string, string>()
   for (let y = 0; y < frame.height; y++) {
     let x = 0
@@ -44,8 +44,14 @@ export function pixelsToSvg(frames: readonly Frame[], { scale, fps }: SvgOptions
   if (!first) throw new Error('pixelsToSvg needs at least one frame')
   const { width, height } = first
   const head = `<svg xmlns="http://www.w3.org/2000/svg" width="${width * scale}" height="${height * scale}" viewBox="0 0 ${width} ${height}" shape-rendering="crispEdges">`
-  if (frames.length === 1) return `${head}${framePaths(first)}</svg>`
+  return `${head}${loopedFrames(frames, fps)}</svg>`
+}
 
+/** The frames as SVG content: one frame's paths, or a group per frame that SMIL shows in turn, looping at `fps`. */
+export function loopedFrames(frames: readonly Frame[], fps: number): string {
+  const first = frames[0]
+  if (!first) return ''
+  if (frames.length === 1) return framePaths(first)
   const n = frames.length
   const keyTimes = frames.map((_, i) => +(i / n).toFixed(4)).join(';')
   const groups = frames.map((frame, i) => {
@@ -53,5 +59,5 @@ export function pixelsToSvg(frames: readonly Frame[], { scale, fps }: SvgOptions
     const animate = `<animate attributeName="visibility" values="${values}" keyTimes="${keyTimes}" calcMode="discrete" dur="${+(n / fps).toFixed(3)}s" repeatCount="indefinite"/>`
     return `<g visibility="${i === 0 ? 'visible' : 'hidden'}">${animate}${framePaths(frame)}</g>`
   })
-  return `${head}${groups.join('')}</svg>`
+  return groups.join('')
 }

@@ -3,7 +3,7 @@ import type { On, UiPane } from 'claude-code'
 import { CATCH } from '../hooks/constants'
 import type { Catcher, Sprite } from '../hooks/content'
 import { throwingMs } from '../hooks/game'
-import { catchFrame, pixelsToCells, prepareCatch, spriteCells } from '../hooks/render'
+import { catchFrame, catchSvg, pixelsToCells, prepareCatch, spriteCells } from '../hooks/render'
 import { catcherFiles } from './fixtures/catcher-files'
 import { oneModsterForest } from './fixtures/one-modster-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
@@ -25,14 +25,18 @@ const SHOWN: UiPane[] = [{ id: 'modster-hunt', title: 'Modster Hunter', isShown:
 const files = (): Record<string, string> => ({ ...oneModsterForest(), ...catcherFiles() })
 const IDLE = new Set(spriteCells(validSprite() as unknown as Sprite))
 
-/** The cells a catcher from `catcherFiles` draws on the fixture Modster, `ms` into a catch. */
-function expectedCells(id: 'jar' | 'net', ms: number): string {
+/** A catcher from `catcherFiles` prepared on the fixture Modster. */
+function preparedArt(id: 'jar' | 'net') {
   const all = catcherFiles()
   const catcher = JSON.parse(all[`catchers/${id}/catcher.json`] ?? '{}') as Catcher
   const art = JSON.parse(all[`catchers/${id}/sprite.sprite.json`] ?? '{}') as Sprite
   // The fixture Modster has no fps, so it animates at the default 6
-  const prepared = prepareCatch(catcher, art, validSprite() as unknown as Sprite, 6)
-  return pixelsToCells(catchFrame(prepared, 'caught', CATCH.rocksToCatch, ms))
+  return prepareCatch(catcher, art, validSprite() as unknown as Sprite, 6)
+}
+
+/** The cells a catcher from `catcherFiles` draws on the fixture Modster, `ms` into a catch. */
+function expectedCells(id: 'jar' | 'net', ms: number): string {
+  return pixelsToCells(catchFrame(preparedArt(id), 'caught', CATCH.rocksToCatch, ms))
 }
 
 /** Starts a session with a fake clock and a store; records the sprite's blits as [site, cells]. */
@@ -62,9 +66,9 @@ async function start($: any, on: On, content = files(), stored: Record<string, u
   return { clock, blits }
 }
 
-const mountBand = ($: any) => $.ui.mount({ plugin: 'modster-hunter', surface: 'terminal', component: 'AbovePrompt', props: BAND_PROPS })
-const mountPane = ($: any) =>
-  $.ui.mount({ plugin: 'modster-hunter', surface: 'terminal', component: 'Pane', requestId: 'modster-hunt', props: PANE_PROPS })
+const mountBand = ($: any, surface = 'terminal') => $.ui.mount({ plugin: 'modster-hunter', surface, component: 'AbovePrompt', props: BAND_PROPS })
+const mountPane = ($: any, surface = 'terminal') =>
+  $.ui.mount({ plugin: 'modster-hunter', surface, component: 'Pane', requestId: 'modster-hunt', props: PANE_PROPS })
 
 /** Runs a turn until the Modster waits for a throw. */
 async function untilWaiting($: any, clock: { advance: (ms: number) => Promise<void> }): Promise<void> {
@@ -157,6 +161,40 @@ describe('register: catch animation', () => {
     await clock.advance(1_000)
     expect(blits).toHaveLength(0)
     expect(await band.find({ type: 'Text', text: '● ○ ○' })).toBeDefined()
+    await band.unmount()
+  })
+
+  test('on desktop a throw swaps the idle Svg for the vector catch, marked with the throw, and back when it ends (0043)', HUNTING, async ($, on) => {
+    const { clock } = await start($, on, files(), {}, () => SHOWN)
+    await $.command.run({ command: 'modsters', args: 'pane' } as any)
+    const pane = await mountPane($, 'desktop')
+    await untilWaiting($, clock)
+    const idle = (await pane.find({ type: 'Svg' }))?.props.source
+
+    const throwAt = clock.now()
+    await pane.press({ key: 'throw' })
+    const thrown = await pane.find({ type: 'Svg' })
+    const expected = catchSvg(preparedArt('jar'), 'caught', CATCH.rocksToCatch, { scale: 1 }) ?? ''
+    expect(thrown?.props.source).toBe(expected.replace('<svg ', `<svg data-throw="${throwAt}" `))
+    expect(thrown?.props.isInteractive).toBe(true)
+    // Mid-throw nothing changes: the surface plays it
+    await clock.advance(1_000)
+    expect((await pane.find({ type: 'Svg' }))?.props.source).toBe(thrown?.props.source)
+
+    await clock.advance(CATCH_THROW_MS + CATCH.beatMs.caught)
+    expect((await pane.find({ type: 'Svg' }))?.props.source).toBe(idle)
+    await pane.unmount()
+  })
+
+  test('on desktop the band plays the vector catch too, at the band scale', HUNTING, async ($, on) => {
+    const { clock } = await start($, on)
+    const band = await mountBand($, 'desktop')
+    await untilWaiting($, clock)
+    const throwAt = clock.now()
+    await band.press({ key: 'throw' })
+    const svg = await band.find({ type: 'Svg' })
+    expect(svg?.props.source).toContain(`data-throw="${throwAt}"`)
+    expect([svg?.props.width, svg?.props.height]).toEqual([16, 16])
     await band.unmount()
   })
 })

@@ -4,6 +4,7 @@ export { readDisplaySettings, type DisplaySettings, type EncounterPaneMode } fro
 export { catchDots } from './catch-dots'
 export { resolveBeats, type ResolvedBeat, type ResolvedBeats } from './catch-beats'
 export { catchFrame, prepareCatch, type CatchArt } from './catch-frame'
+export { catchLengthMs, catchSvg, type CatchSvgOptions } from './catch-svg'
 export { DEFAULT_COLOR, pixelsToCells, type Frame } from './pixels-to-cells'
 export { pixelsToSvg, type SvgOptions } from './pixels-to-svg'
 export { paneHint, type PaneHintInput } from './pane-hint'

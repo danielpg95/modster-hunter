@@ -70,18 +70,23 @@ export function catchFrame(art: CatchArt, outcome: CatchOutcome, rocks: number, 
   const modsterFrame = Math.floor((Math.max(0, ms) * art.modsterFps) / 1000) % art.modster.frames.length
   const pose = modsterPose(art, beat, at)
 
-  // The Modster goes into or comes out of the opening in front of the catcher
-  const modsterOnTop = beat.place === 'behind' || beat.modster === 'shrink-in' || beat.modster === 'pop-out'
-  if (modsterOnTop) drawCatcher(canvas, art, beat, at, pose)
+  const onTop = modsterOnTop(beat)
+  if (onTop) drawCatcher(canvas, art, beat, at, pose)
   if (pose) drawModster(canvas, art, modsterFrame, pose)
-  if (!modsterOnTop) drawCatcher(canvas, art, beat, at, pose)
+  if (!onTop) drawCatcher(canvas, art, beat, at, pose)
   if (at.beat === 'caught') drawSparkles(canvas, art, beat, at, pose)
   return { width: art.width, height: art.height, rgba: canvas.rgba }
 }
 
-// ---------- the Modster ----------
+/** Whether the Modster draws over the catcher: it goes into or comes out of the opening in front of it. */
+export function modsterOnTop(beat: ResolvedBeat): boolean {
+  return beat.place === 'behind' || beat.modster === 'shrink-in' || beat.modster === 'pop-out'
+}
 
-interface Pose {
+// ---------- the Modster ----------
+// The pose and motion functions below are also sampled by catchSvg (decision 0043 point 3)
+
+export interface Pose {
   scale: number
   /** Where the sprite's center lands */
   anchor: [number, number]
@@ -90,7 +95,7 @@ interface Pose {
   dim: boolean
 }
 
-function modsterPose(art: CatchArt, beat: ResolvedBeat, at: CatchBeatAt): Pose | undefined {
+export function modsterPose(art: CatchArt, beat: ResolvedBeat, at: CatchBeatAt): Pose | undefined {
   const center: [number, number] = [art.width / 2, art.height / 2]
   const u = at.progress
   const plain: Pose = { scale: 1, anchor: center, white: 0, dim: false }
@@ -161,14 +166,19 @@ function drawCatcher(canvas: Canvas, art: CatchArt, beat: ResolvedBeat, at: Catc
  * when the preset makes them. It glows only while the Modster is inside it.
  */
 function beatFrame(art: CatchArt, beat: ResolvedBeat, at: CatchBeatAt): Uint8Array {
-  const list = beat.frames ?? [0]
-  const index = list[Math.min(list.length - 1, Math.floor(at.progress * list.length))] ?? 0
-  const { frames } = beat.modster === 'hidden' ? art.lit : art.catcher
+  const { lit, index } = beatFrameIndex(beat, at)
+  const { frames } = lit ? art.lit : art.catcher
   return frames[index] ?? frames[0] ?? new Uint8Array()
 }
 
+/** Which catcher frame a beat shows now, and whether it's the lit copy. */
+export function beatFrameIndex(beat: ResolvedBeat, at: CatchBeatAt): { lit: boolean; index: number } {
+  const list = beat.frames ?? [0]
+  return { lit: beat.modster === 'hidden', index: list[Math.min(list.length - 1, Math.floor(at.progress * list.length))] ?? 0 }
+}
+
 /** The catcher's resting place: bottom center of the area. */
-function restingAt(art: CatchArt): [number, number] {
+export function restingAt(art: CatchArt): [number, number] {
   return [Math.floor((art.width - art.catcher.width) / 2), art.height - art.catcher.height]
 }
 
@@ -178,7 +188,7 @@ function mouth(art: CatchArt): [number, number] {
   return [art.width / 2, y + art.lidRows]
 }
 
-interface Motion {
+export interface Motion {
   x: number
   y: number
   angle: number
@@ -211,7 +221,7 @@ function drawAnchored(canvas: Canvas, art: CatchArt, beat: ResolvedBeat, at: Cat
   }
 }
 
-function anchoredMotion(art: CatchArt, beat: ResolvedBeat, at: CatchBeatAt): Motion {
+export function anchoredMotion(art: CatchArt, beat: ResolvedBeat, at: CatchBeatAt): Motion {
   const [x, y] = restingAt(art)
   const still: Motion = { x, y, angle: 0, lidDx: 0, lidDy: 0, body: true, white: 0 }
   const made = beat.frames === undefined
@@ -259,7 +269,7 @@ function throwStart(art: CatchArt, beat: ResolvedBeat, x: number, y: number): [n
 
 // ---------- a stretch shape: the frame tiled over the Modster's outline ----------
 
-interface Dome {
+export interface Dome {
   cx: number
   /** The bottom row */
   by: number
@@ -268,7 +278,7 @@ interface Dome {
 }
 
 /** The Modster's outline plus a margin, kept inside the area so the whole rounded edge shows. */
-function dome(art: CatchArt): Dome {
+export function dome(art: CatchArt): Dome {
   const { x0, y0, x1, y1 } = art.bounds
   const margin = CATCH.stretchMarginPx
   const left = Math.max(0, x0 - margin)
@@ -278,7 +288,7 @@ function dome(art: CatchArt): Dome {
   return { cx: (left + right + 1) / 2, by, rx: (right - left + 1) / 2, ry: Math.max(1, by - top) }
 }
 
-interface StretchMotion {
+export interface StretchMotion {
   shape: Dome
   /** Shifts the tile sideways, so the mesh moves with a shaking Modster */
   shift: number
@@ -322,7 +332,7 @@ function drawStretch(canvas: Canvas, art: CatchArt, beat: ResolvedBeat, at: Catc
   }
 }
 
-function stretchMotion(art: CatchArt, beat: ResolvedBeat, at: CatchBeatAt, pose: Pose | undefined): StretchMotion | undefined {
+export function stretchMotion(art: CatchArt, beat: ResolvedBeat, at: CatchBeatAt, pose: Pose | undefined): StretchMotion | undefined {
   const full = dome(art)
   const base: StretchMotion = { shape: full, shift: 0, showTo: Infinity, tear: 0, spread: 0, fall: 0, knot: false }
   const u = at.progress
@@ -363,23 +373,27 @@ function stretchMotion(art: CatchArt, beat: ResolvedBeat, at: CatchBeatAt, pose:
 // ---------- sparkles on a catch ----------
 
 function drawSparkles(canvas: Canvas, art: CatchArt, beat: ResolvedBeat, at: CatchBeatAt, pose: Pose | undefined): void {
-  if (at.progress >= 1) return
+  const core = rgbaOf(CATCH.sparkleCore).slice(0, 3)
+  const arms = rgbaOf(CATCH.sparkleArms).slice(0, 3)
+  for (const { x, y, size } of sparkles(art, beat, at, pose)) {
+    canvas.put(x, y, core, 0)
+    for (let k = 1; k <= size; k++) for (const [dx, dy] of [[k, 0], [-k, 0], [0, k], [0, -k]] as const) canvas.put(x + dx, y + dy, arms, 0)
+  }
+}
+
+/** The sparkles of a `caught` beat: where each core pixel is, and how long its arms are. None once the beat ends. */
+export function sparkles(art: CatchArt, beat: ResolvedBeat, at: CatchBeatAt, pose: Pose | undefined): { x: number; y: number; size: number }[] {
+  if (at.progress >= 1) return []
   const shape = dome(art)
   const scale = pose && pose.scale < 1 ? pose.scale : 1
   const [, top] = restingAt(art)
   const center: [number, number] = beat.place === 'stretch' ? [shape.cx, shape.by - shape.ry * scale] : [art.width / 2, top + 2]
   const r = 3 + at.progress * 9
   const size = at.progress < 0.6 ? 2 : 1
-  const points = [[-1, -1], [1, -1], [-1.4, 0.2], [1.4, 0.2], [0, -1.4]] as const
-  const core = rgbaOf(CATCH.sparkleCore).slice(0, 3)
-  const arms = rgbaOf(CATCH.sparkleArms).slice(0, 3)
-  for (const [ax, ay] of points) {
-    const x = Math.round(center[0] + ax * r)
-    const y = Math.round(center[1] + ay * r)
-    canvas.put(x, y, core, 0)
-    for (let k = 1; k <= size; k++) for (const [dx, dy] of [[k, 0], [-k, 0], [0, k], [0, -k]] as const) canvas.put(x + dx, y + dy, arms, 0)
-  }
+  return SPARKLE_POINTS.map(([ax, ay]) => ({ x: Math.round(center[0] + ax * r), y: Math.round(center[1] + ay * r), size }))
 }
+
+const SPARKLE_POINTS = [[-1, -1], [1, -1], [-1.4, 0.2], [1.4, 0.2], [0, -1.4]] as const
 
 // ---------- helpers ----------
 
