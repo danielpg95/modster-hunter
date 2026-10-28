@@ -23,3 +23,27 @@ Start a new Code tab session and run `/art-spike`. Afterwards:
 claude plugin uninstall modster-art-spike@modster-art-spike
 claude plugin marketplace remove modster-art-spike
 ```
+
+## Findings (2026-10-27, Desktop Code tab)
+
+Round 1 (0.0.1) and round 2 (0.0.2), checked by @victor-aguilars:
+
+- **An embedded PNG (`<image href="data:image/png;base64,…">`) is blank in an
+  `isInteractive` Svg**, the script-less sandboxed frame (round 1 variants 1, 3,
+  5; round 2 control H). The frame blocks `data:` images.
+- **Drawn as an image (no `isInteractive`) it shows, and SMIL runs**: frames
+  switched by `visibility`, a sprite sheet stepped by animating `x`, and a smooth
+  `animateTransform` all move. An APNG animates by itself too.
+- Crisp at 2 CSS px per art pixel, with or without `image-rendering: pixelated`.
+- The 96×64 variants were blurry because the test art was resampled from
+  144×91, not because of the surface.
+
+Sizes against the 131072-character limit (4-frame idle, palette PNG):
+
+| Tidecrown at | One sprite-sheet PNG | 4 PNG frames | APNG | Paths, 1 frame | Paths, 4 frames |
+| --- | --- | --- | --- | --- | --- |
+| 144×91 (~3× Geodon's 46×32) | 3,657 | 11,010 | 52,409 | 88,150 | 315,007 (over) |
+| 96×64 (~2×) | 2,853 | 8,605 | 35,935 | — | — |
+
+A sprite-sheet PNG is the cheapest by far: a 3× animated Modster costs under 4k
+characters, about 3% of the limit.

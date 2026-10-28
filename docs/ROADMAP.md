@@ -779,8 +779,8 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Size:** S
 - **Goal:** know whether, and how, the Desktop app can show Modsters with more detail than the terminal's 48×32 sprites (decision 0033) allow, before anyone draws for it.
 - **Done when:**
-  - [ ] A spike checks in the Code tab whether an `Svg` can show an embedded PNG (`<image href="data:image/png;base64,…">`) and animate it, and notes what the sandboxed frame allows; a screenshot of a 96×64, 4-frame test sheet.
-  - [ ] Sizes are measured against the 131072-character `Svg` limit: a high-detail sprite as paths (0042) and as an embedded PNG, for the largest built-in Modster's size at 2× and 3×.
+  - [x] A spike checks in the Code tab whether an `Svg` can show an embedded PNG (`<image href="data:image/png;base64,…">`) and animate it, and notes what the sandboxed frame allows; a screenshot of a 96×64, 4-frame test sheet.
+  - [x] Sizes are measured against the 131072-character `Svg` limit: a high-detail sprite as paths (0042) and as an embedded PNG, for the largest built-in Modster's size at 2× and 3×.
   - [ ] A decision picks an approach (for example an optional desktop-only sprite in `modster.json`, vector art, or staying with today's sprites), covering how the terminal and desktop versions stay recognisably the same Modster, and the `CONTENT_FORMAT.md` change if any.
   - [ ] If one is picked, roadmap tasks implement it and add the art.
 ---
