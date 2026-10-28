@@ -12,7 +12,7 @@ const HUNTING = { options: { autoStart: true } }
 // P4-03, decision 0032: `o` in the Collection and Biomes tabs turns the selected
 // item off or on by writing the user's settings.json, then reloads content.
 
-const PANE_PROPS = { title: 'Modster collection', isFocused: true, bodyColumns: 120, placement: 'dock', scroll: { offset: 0, bodyRows: 30 }, view: {} }
+const PANE_PROPS = { title: 'Modster collection', isFocused: true, bodyColumns: 120, placement: 'dock' as const, scroll: { offset: 0, bodyRows: 30 }, view: {} }
 const SETTINGS = 'content/settings.json'
 
 /** Starts a session on built-in `files` and the user folder `user` (paths under ~/.claude/modster-hunter/). */

@@ -63,8 +63,9 @@ Option 3.
    each clipped to one side and moved apart and down.
 6. **Sparkles** are small paths in `CATCH.sparkleCore` and `CATCH.sparkleArms`,
    moved and faded with SMIL.
-7. **Starting and ending.** The `Svg`'s key carries the throw's `throwAt`, so a
-   new throw mounts a new element and its SMIL clock starts at 0. The mod calls
+7. **Starting and ending.** `Svg` has no key, so the source carries the throw:
+   its root gets `data-throw="<throwAt>"`. A new source is a new box, so its SMIL
+   clock starts at 0, even when the last throw drew the same art. The mod calls
    `$.ui.invalidate('ui.render')` once when a throw starts and once when it ends,
    never per frame. On the terminal nothing changes.
 8. **Size.** The band and pane draw it at the scale 0042 sets for the

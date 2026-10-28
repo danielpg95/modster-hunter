@@ -92,6 +92,10 @@ export const DESKTOP = {
   paneScale: 4,
   bandScale: 2,
   rowPx: 20,
+  /** A throw's motion is sampled this often for its SMIL values, which blend between samples (0043 point 3) */
+  catchSampleMs: 1000 / 24,
+  /** The most an `Svg` source may hold; a bigger throw keeps the idle Svg and dots (0043 point 8) */
+  svgMaxChars: 131072,
 } as const
 
 /**
