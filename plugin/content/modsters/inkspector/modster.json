@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "inkspector",
+  "name": "Inkspector",
+  "description": "Inspects every tide pool for clues. The culprit is always the crab.",
+  "rarity": "uncommon",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 34,
+    "types": ["water", "dark"],
+    "category": "Inspector Modster",
+    "heightM": 0.8,
+    "weightKg": 6,
+    "entry": "One eye stays behind the lens, the other watches the room. It has never missed a clue, only the culprit, which is always a crab."
+  },
+  "sprite": {
+    "file": "sprite.sprite.json",
+    "fps": 2
+  }
+}
