@@ -429,12 +429,12 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Done when:**
   - [ ] Playtested; a decision accepts or rejects it.
 
-#### [ ] P5-06 — Desktop app support
+#### [x] P5-06 — Desktop app support
 - **Depends on:** P2-07, P3-02
 - **Size:** L
 - **Goal:** draw sprites as `Svg` when `e.surface` is `desktop` (decision 0042).
 - **Done when:**
-  - [ ] Band and pane work in the Desktop app's Code tab.
+  - [x] Band and pane work in the Desktop app's Code tab.
 
 #### [ ] P5-07 — Release v1.0
 - **Depends on:** P4-05

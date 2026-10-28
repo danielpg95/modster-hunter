@@ -626,6 +626,8 @@ export const register: Register = (on, options) => {
   on('ui.render', { component: 'Pane' }, ($, e, next) => {
     if (e.requestId !== COLLECTION_PANE_ID) return next(e)
     const { Box, Text, Button } = $.ui.resolve(e)
+    // The desktop pane is narrow in pixels, so a summary row that doesn't fit wraps instead of clipping its buttons (P5-06)
+    const summaryWrap = e.surface === 'desktop' ? { flexWrap: 'wrap' as const } : {}
     const biome = sessionBiome()?.biome
     const title = biome ? biome.name : 'No biome'
     const layout = collectionLayout({
@@ -729,7 +731,7 @@ export const register: Register = (on, options) => {
         $.ui.invalidate('ui.render')
       }
       const summary = (
-        <Box key="summary" flexDirection="row" columnGap={COLLECTION.gapColumns}>
+        <Box key="summary" flexDirection="row" columnGap={COLLECTION.gapColumns} {...summaryWrap}>
           <Text bold>{`Catchers ${entries.length}`}</Text>
           <Button key="catcher-up" label="Up" hotkey="k" plain dimColor onPress={() => select(entries[index - 1])} />
           <Button key="catcher-down" label="Down" hotkey="j" plain dimColor onPress={() => select(entries[index + 1])} />
@@ -833,7 +835,7 @@ export const register: Register = (on, options) => {
       }
       return (
         <Box key="settings" flexDirection="column">
-          <Box key="settings-summary" flexDirection="row" columnGap={COLLECTION.gapColumns}>
+          <Box key="settings-summary" flexDirection="row" columnGap={COLLECTION.gapColumns} {...summaryWrap}>
             <Text bold>Settings</Text>
             <Button key="setting-up" label="Up" hotkey="k" plain dimColor onPress={() => select(fields[index - 1])} />
             <Button key="setting-down" label="Down" hotkey="j" plain dimColor onPress={() => select(fields[index + 1])} />
@@ -894,7 +896,7 @@ export const register: Register = (on, options) => {
         $.ui.invalidate('ui.render')
       }
       const summary = (
-        <Box key="summary" flexDirection="row" columnGap={COLLECTION.gapColumns}>
+        <Box key="summary" flexDirection="row" columnGap={COLLECTION.gapColumns} {...summaryWrap}>
           <Text bold>{`Biomes ${entries.length}`}</Text>
           <Button key="biome-up" label="Up" hotkey="k" plain dimColor onPress={() => select(entries[index - 1])} />
           <Button key="biome-down" label="Down" hotkey="j" plain dimColor onPress={() => select(entries[index + 1])} />
@@ -1000,7 +1002,7 @@ export const register: Register = (on, options) => {
         $.ui.invalidate('ui.render')
       }
       const summary = (
-        <Box key="summary" flexDirection="row" columnGap={COLLECTION.gapColumns}>
+        <Box key="summary" flexDirection="row" columnGap={COLLECTION.gapColumns} {...summaryWrap}>
           <Text bold>{`Caught ${caught}/${entries.length}`}</Text>
           <Button key="up" label="Up" hotkey="k" plain dimColor onPress={() => select(entries[index - 1])} />
           <Button key="down" label="Down" hotkey="j" plain dimColor onPress={() => select(entries[index + 1])} />
