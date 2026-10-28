@@ -137,4 +137,16 @@ describe('register: toggle', () => {
     expect(await pane.find({ type: 'Text', text: 'Yours · to delete it, ask Claude: "delete my Modster blobby"' })).toBeDefined()
     await pane.unmount()
   })
+
+  test('on desktop the Biomes summary row wraps, so the o toggle stays in the narrow pane (P5-06)', HUNTING, async ($, on) => {
+    await start($, on, twoBiomes())
+    for (const surface of ['desktop', 'terminal'] as const) {
+      const pane = await $.ui.mount({ plugin: 'modster-hunter', surface, component: 'Pane', requestId: 'modster-collection', props: PANE_PROPS })
+      await pane.press({ key: 'biomes' })
+      expect(await pane.find({ type: 'Button', key: 'biome-toggle' })).toBeDefined()
+      const summary = await pane.find({ type: 'Box', key: 'summary' })
+      expect(summary?.props.flexWrap).toBe(surface === 'desktop' ? 'wrap' : undefined)
+      await pane.unmount()
+    }
+  })
 })
