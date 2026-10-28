@@ -84,9 +84,14 @@ export const BAND = {
   caughtMark: '●',
 } as const
 
-/** Desktop Code tab (P5-06 spike): sprites drawn as `Svg`, CSS pixels per sprite pixel. */
+/**
+ * Desktop Code tab (P5-06): sprites drawn as `Svg`, sized in CSS pixels per sprite pixel.
+ * `rowPx` is an estimate of one band row, used to keep the band's sprite inside `maxRows`.
+ */
 export const DESKTOP = {
-  svgScale: 4,
+  paneScale: 4,
+  bandScale: 2,
+  rowPx: 20,
 } as const
 
 /**
