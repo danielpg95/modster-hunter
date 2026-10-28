@@ -145,6 +145,19 @@ describe('catchSvg', () => {
     }
   })
 
+  test('with loopPauseMs it plays, holds its end for the pause, and starts over', () => {
+    const svg = catchSvg(art('jar'), 'caught', 3, { scale: 1, loopPauseMs: CATCH.previewPauseMs }) ?? ''
+    const loopMs = catchLengthMs('caught', 3) + CATCH.previewPauseMs
+    for (const tag of svg.match(/<animate[^>]*\/>/g) ?? []) {
+      expect(tag).toContain('repeatCount="indefinite"')
+      expect(tag).not.toContain('fill="freeze"')
+      if (!tag.includes('attributeName="visibility"')) expect(tag).toContain(`dur="${loopMs / 1000}s"`)
+    }
+    // The pause holds the last frame: sparkles gone, the Modster still inside
+    expect(trackAt(svg, 'modster', 'display', loopMs - 100)).toBe('none')
+    expect(trackAt(svg, 'modster', 'display', 1)).toBe('inline')
+  })
+
   test('over maxChars there is no Svg (0043 point 8)', () => {
     expect(catchSvg(art('jar'), 'caught', 3, { scale: 1, maxChars: 100 })).toBeUndefined()
   })
