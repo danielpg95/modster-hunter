@@ -1,0 +1,12 @@
+{
+  "name": "modster-art-spike",
+  "description": "Throwaway P5-39 spike for Modster Hunter. Remove once the spike is done.",
+  "owner": { "name": "victor-aguilars" },
+  "plugins": [
+    {
+      "name": "modster-art-spike",
+      "source": "./mod",
+      "description": "/art-spike opens a pane of test Svgs for the Desktop Code tab."
+    }
+  ]
+}
