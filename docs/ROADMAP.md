@@ -922,8 +922,8 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Size:** S
 - **Goal:** on desktop the idle tag is sometimes missing on a session's first load (reported by @danielpg95, 2026-10-29). Its 5 s show starts when the session starts, so when the Code tab draws the band later, or the encounter pane holds the band aside, the tag fades unseen. Decision 0047 says it shows "when the biome comes into view"; time it from the band's first desktop draw instead.
 - **Done when:**
-  - [ ] The tag's show and fade start the first time the band draws the desktop scene (or the tag alone) after the biome comes into view: at session start, and when an encounter ends.
-  - [ ] Register tests cover a band first drawn after `IDLE_TAG.showMs`, a band held aside by the encounter pane, and the existing timing.
+  - [x] The tag's show and fade start the first time the band draws the desktop scene (or the tag alone) after the biome comes into view: at session start, and when an encounter ends.
+  - [x] Register tests cover a band first drawn after `IDLE_TAG.showMs`, a band held aside by the encounter pane, and the existing timing.
   - [ ] Checked in the Code tab: the tag shows on a session's first load.
 ---
 

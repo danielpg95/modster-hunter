@@ -1,7 +1,7 @@
 {
   "name": "modster-hunter",
   "displayName": "Modster Hunter",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "Catch Modsters while you wait for Claude.",
   "author": {
     "name": "Daniel Pena"
