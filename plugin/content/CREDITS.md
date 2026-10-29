@@ -6,11 +6,13 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | Asset | Author | License | Notes |
 | --- | --- | --- | --- |
 | `modsters/sproutling/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Shellsprout, redrawn as a seed snail in P5-19; replaces @victor-aguilars' provisional design |
-| `modsters/sproutling/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Shellsprout's desktop sheet (P5-46, decision 0045), reduced from @danielpg95's reference |
+| `modsters/sproutling/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Shellsprout's desktop sheet (P5-46, decision 0045), reduced from @danielpg95's reference; the sprout's bending sway added in P5-55 |
 | `modsters/mossbeast/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Mossmaul, redrawn as a moss bear cub in P5-19; replaces @victor-aguilars' provisional design |
-| `modsters/mossbeast/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Mossmaul's desktop sheet (P5-53, decision 0045), reduced from @danielpg95's reference; a breathing bob and a blink |
+| `modsters/mossbeast/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Mossmaul's desktop sheet (P5-53, decision 0045), reduced from @danielpg95's reference; a breathing bob and a blink, eased in P5-55 |
 | `modsters/acornsprite/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Acornsprite, redrawn as an acorn fairy in P5-19; replaces @victor-aguilars' provisional design |
+| `modsters/acornsprite/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Acornsprite's desktop sheet (P5-55, decision 0045), reduced from @danielpg95's reference; flapping wings, a hover and a blink |
 | `modsters/elderbark/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Elderbark, redrawn in P5-19 from @danielpg95's reference; replaces @victor-aguilars' design |
+| `modsters/elderbark/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Elderbark's desktop sheet (P5-55, decision 0045), reduced from @danielpg95's reference; a crystal pulse, twinkling sparkles and a falling leaf |
 | `modsters/ranactus/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
 | `modsters/fuescorpion/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
 | `modsters/reyrayo/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
@@ -18,13 +20,16 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/lamparito/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
 | `modsters/dunebun/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
 | `modsters/hootlet/sprite.png` | @danielpg95 and @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Hootlet, redrawn in P5-23 from @danielpg95's reference, keeping @victor-aguilars' design (leafy owlet with a head sprout) |
+| `modsters/hootlet/desktop.png` | @danielpg95 and @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Hootlet's desktop sheet (P5-55, decision 0045), reduced from @danielpg95's reference, keeping @victor-aguilars' design; a body bob and a blink |
 | `modsters/crabbit/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Crabbit, redrawn in P5-24 from @victor-aguilars' reference |
 | `modsters/sunmane/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Sunmane, redrawn in P5-24 from @victor-aguilars' reference as a close-up (head, mane and tail) |
 | `modsters/twiggle/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Twiggle, redrawn in P5-24 from @victor-aguilars' reference |
 | `modsters/flopple/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Flopple, redrawn in P5-24 from @victor-aguilars' reference |
 | `modsters/serpentide/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Serpentide, redrawn in P5-24 from @victor-aguilars' reference as a close-up; the water ring is hand-drawn |
 | `modsters/sporrow/sprite.png` | @danielpg95 and @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Sporrow, redrawn in P5-19 from @danielpg95's reference, keeping @victor-aguilars' design (puppet fungus) |
+| `modsters/sporrow/desktop.png` | @danielpg95 and @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Sporrow's desktop sheet (P5-55, decision 0045), reduced from @danielpg95's reference, keeping @victor-aguilars' design; bending thread arms, drifting spores and a blink |
 | `modsters/fernox/sprite.png` | @danielpg95 and @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Fernox, redrawn in P5-19 from @danielpg95's reference, keeping @victor-aguilars' design (fern-tail fox kit) |
+| `modsters/fernox/desktop.png` | @danielpg95 and @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Fernox's desktop sheet (P5-55, decision 0045), reduced from @danielpg95's reference, keeping @victor-aguilars' design; a bending tail wag and a blink |
 | `modsters/shardling/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Shardling, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/glowcap/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Glowcap, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/mossmole/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Mossmole, redrawn in P5-26 from @danielpg95's reference |
@@ -36,8 +41,11 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/amethowl/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Amethowl, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/geolem/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Geolem, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/pinekin/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | P5-19 |
+| `modsters/pinekin/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Pinekin's desktop sheet (P5-55, decision 0045), reduced from @danielpg95's reference; a body bob and a blink |
 | `modsters/hollowmask/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | P5-19 |
+| `modsters/hollowmask/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Hollowmask's desktop sheet (P5-55, decision 0045), reduced from @danielpg95's reference; a tail swing and a blink |
 | `modsters/musketail/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | P5-19 |
+| `modsters/musketail/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Musketail's desktop sheet (P5-55, decision 0045), reduced from @danielpg95's reference; a sword poke, a feather sway and a wink |
 | `modsters/sir-kelpsie/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Sir Kelpsie, a waist-up close-up from @victor-aguilars' reference (redrawn 2026-10-22); pupil, shield ridges and rim, and plume sway are hand-drawn |
 | `modsters/peekashell/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Peekashell, from @victor-aguilars' reference; the pupil, barnacles and shell swing are hand-drawn |
 | `modsters/flexton/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Flexton, from @victor-aguilars' reference; the eye, grin and arm flex are hand-drawn |
