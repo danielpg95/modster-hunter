@@ -117,6 +117,23 @@ export const DESKTOP = {
   sheetPixels: 4,
 } as const
 
+/** The desktop's idle tag (decision 0047): sizes in CSS pixels, times in ms. */
+export const IDLE_TAG = {
+  showMs: 5000,
+  fadeMs: 800,
+  pulseMs: 1600,
+  fontPx: 12,
+  // An estimate of one character's width at fontPx, for the backing's width
+  charPx: 7.4,
+  padX: 9,
+  height: 22,
+  dotR: 3.5,
+  gap: 6,
+  /** From the strip's bottom-left corner */
+  margin: 8,
+  backingOpacity: 0.5,
+} as const
+
 /**
  * The biome idle scene, decision 0026. Particle speeds are pixels per tick at
  * `particleFps`; `sway` is how far a particle rocks sideways, in pixels.

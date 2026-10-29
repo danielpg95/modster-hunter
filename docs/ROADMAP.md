@@ -897,14 +897,14 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Each template is tried once with a generator, and what worked or failed is noted in the skill, as the terminal prompt's P5-19 examples are.
   - [x] Added on the way (asked by @danielpg95): Mossmaul and the glass jar ship their desktop sheets, from the two tries; a catcher's desktop glow is painted from exact shapes found when the sheet loads, since the colour-match filter from P5-47 lit nothing in a real browser.
 
-#### [ ] P5-54 — Desktop idle label in the scene
+#### [x] P5-54 — Desktop idle label in the scene
 - **Depends on:** P5-48
 - **Size:** S
 - **Goal:** on desktop, the band's idle line ("Whispering Forest · listening for Modsters") becomes part of the scene, which reads less like a terminal (asked by @danielpg95, 2026-10-28).
 - **Done when:**
-  - [ ] A decision amends 0026's idle line for desktop: the biome's name in a small tag in the strip's corner, in its accent colour on a translucent backing, with a dot that pulses while Claude works; whether the tag fades after a while; and what stays for `showIdleLine` and the terminal.
-  - [ ] `sceneSvg` draws the tag (SVG text in the image), and the text row under the scene goes away on desktop, so the band is a row shorter. Render and register tests cover it.
-  - [ ] Checked in the Code tab, light and dark.
+  - [x] A decision amends 0026's idle line for desktop: the biome's name in a small tag in the strip's corner, in its accent colour on a translucent backing, with a dot that pulses while Claude works; whether the tag fades after a while; and what stays for `showIdleLine` and the terminal.
+  - [x] `sceneSvg` draws the tag (SVG text in the image), and the text row under the scene goes away on desktop, so the band is a row shorter. Render and register tests cover it.
+  - [x] Checked in the Code tab, light and dark.
 ---
 
 ## Phase 6 — Beyond the terminal

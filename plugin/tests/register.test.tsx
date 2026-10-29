@@ -9,7 +9,7 @@ import { validBiome } from './fixtures/valid-biome'
 import { validModster } from './fixtures/valid-modster'
 import { validUserModster } from './fixtures/valid-user-modster'
 import { validSprite } from './fixtures/valid-sprite'
-import { CATCH, DESKTOP } from '../hooks/constants'
+import { CATCH, DESKTOP, IDLE_TAG } from '../hooks/constants'
 import { throwingMs } from '../hooks/game'
 
 // The game runs only while autoStart is on (decision 0038); these tests play it
@@ -237,13 +237,15 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('on desktop the band draws a biome\'s desktop background as its scene, an image above the idle line (0045 point 4)', HUNTING, async ($, on) => {
+  test('on desktop the band draws a biome\'s desktop background as its scene, an image, with its name as a tag in it (0045 point 4, 0047)', HUNTING, async ($, on) => {
     const { ui } = await startBand($, on, desktopOnlyForest(), 'desktop')
     const svg = await ui.find({ type: 'Svg' })
     expect(svg?.props.alt).toBe('Whispering Forest scene')
     expect(svg?.props.source).toContain('<image href="data:image/png;base64,')
     expect(svg?.props.isInteractive).toBeUndefined()
-    expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeDefined()
+    // No text row under it on desktop: the name is a tag inside the scene (0047)
+    expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeUndefined()
+    expect(svg?.props.source).toContain('>Whispering Forest</text>')
     await ui.unmount()
   })
 
@@ -335,7 +337,7 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('on desktop the scene is one vector Svg above the idle line: still between turns, moving while Claude works (0044)', HUNTING, async ($, on) => {
+  test('on desktop the scene is one vector Svg with the name tag in it: still between turns, moving while Claude works (0044, 0047)', HUNTING, async ($, on) => {
     const blits = sceneBlits(on)
     const { ui, clock } = await startBand($, on, sceneForest(), 'desktop')
     const still = await ui.find({ type: 'Svg' })
@@ -346,7 +348,7 @@ describe('register', () => {
     expect([still?.props.width, still?.props.height]).toEqual([undefined, 8 * DESKTOP.columnPx])
     expect(still?.props.source).toContain(`width="${Math.ceil(120 * DESKTOP.sceneOvershoot) * DESKTOP.columnPx}"`)
     expect(still?.props.source).toContain('preserveAspectRatio="xMinYMin slice"')
-    expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeUndefined()
 
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     expect((await ui.find({ type: 'Svg' }))?.props.source).toContain('repeatCount="indefinite"')
@@ -359,15 +361,45 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('on desktop a band too short for the strip and a line shows the idle line alone', HUNTING, async ($, on) => {
+  test('on desktop a short band draws the strip smaller, with no row kept for a line (0047)', HUNTING, async ($, on) => {
     const { ui } = await startBand($, on, sceneForest(), 'desktop')
+    // One row (rowPx) fits the 8 px strip at a smaller scale than columnPx
     await ui.redraw({ ...BAND_PROPS, maxRows: 1 } as any)
-    expect(await ui.find({ type: 'Svg' })).toBeUndefined()
-    expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeDefined()
-    // Two rows leave one row (rowPx) for the 8 px strip: drawn smaller than columnPx
+    expect((await ui.find({ type: 'Svg' }))?.props.height).toBe(8 * Math.floor(DESKTOP.rowPx / 8))
     await ui.redraw({ ...BAND_PROPS, maxRows: 2 } as any)
-    const scale = Math.floor(DESKTOP.rowPx / 8)
-    expect((await ui.find({ type: 'Svg' }))?.props.height).toBe(8 * scale)
+    expect((await ui.find({ type: 'Svg' }))?.props.height).toBe(8 * Math.floor((2 * DESKTOP.rowPx) / 8))
+    expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeUndefined()
+    await ui.unmount()
+  })
+
+  test('on desktop the name tag fades once the biome has been shown, and a turn does not bring it back (0047)', HUNTING, async ($, on) => {
+    const { ui, clock } = await startBand($, on, sceneForest(), 'desktop')
+    expect((await ui.find({ type: 'Svg' }))?.props.source).toContain('>Whispering Forest</text>')
+    await clock.advance(IDLE_TAG.showMs)
+    expect((await ui.find({ type: 'Svg' }))?.props.source).toContain('<animate attributeName="opacity" from="1" to="0"')
+    await clock.advance(IDLE_TAG.fadeMs)
+    expect((await ui.find({ type: 'Svg' }))?.props.source).not.toContain('<text')
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await $.turn.complete({ reason: 'answer', answer: 'ok', durationMs: 1 } as any)
+    expect((await ui.find({ type: 'Svg' }))?.props.source).not.toContain('<text')
+    await ui.unmount()
+  })
+
+  test('on desktop the tag pulses while Claude works, and shows again when an encounter ends (0047)', HUNTING, async ($, on) => {
+    const { ui, clock } = await startBand($, on, oneModsterForest(), 'desktop')
+    // No scene: the tag alone
+    expect((await ui.find({ type: 'Svg' }))?.props.alt).toBe('Whispering Forest')
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    expect((await ui.find({ type: 'Svg' }))?.props.source).toContain('values="1;0.3;1"')
+    // An encounter comes and goes: it appears after 3 s, is caught, then its card ends
+    await clock.advance(4_000 + BAND_TICK)
+    expect((await ui.find({ type: 'Svg' }))?.props.alt).toBe('Sproutling')
+    await ui.press({ key: 'throw' })
+    // The turn ends, so no next Modster comes before the check
+    await $.turn.complete({ reason: 'answer', answer: 'ok', durationMs: 1 } as any)
+    // The throw, the caught beat, then the result card
+    await clock.advance(CATCH_THROW_MS + CATCH.beatMs.caught + 5_000)
+    expect((await ui.find({ type: 'Svg' }))?.props.alt).toBe('Whispering Forest')
     await ui.unmount()
   })
 
@@ -379,10 +411,12 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('on desktop showIdleScene off leaves the idle line alone', { options: { autoStart: true, showIdleScene: false } }, async ($, on) => {
+  test('on desktop showIdleScene off leaves the name tag alone (0047)', { options: { autoStart: true, showIdleScene: false } }, async ($, on) => {
     const { ui } = await startBand($, on, sceneForest(), 'desktop')
-    expect(await ui.find({ type: 'Svg' })).toBeUndefined()
-    expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeDefined()
+    const tag = await ui.find({ type: 'Svg' })
+    expect(tag?.props.alt).toBe('Whispering Forest')
+    expect(tag?.props.source).not.toContain('<image')
+    expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeUndefined()
     await ui.unmount()
   })
 

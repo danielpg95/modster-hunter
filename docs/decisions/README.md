@@ -39,7 +39,7 @@ settled questions and avoid making assumptions about open ones.
 | [0023](0023-display-settings.md) | Display settings: one toggle per place, a pane picker, and a one-line band that keeps Throw | Accepted (point 7 amended by P3-01 and 0040; point 4 by 0038) |
 | [0024](0024-encounter-pane-focus.md) | `/modsters hunt` gives the encounter pane the keys, and the pane says how to switch | Accepted (amended by 0038: the command is `/modsters pane`) |
 | [0025](0025-user-content-helper.md) | The content skill ships a Node helper that converts, draws, previews and checks | Accepted |
-| [0026](0026-biome-idle-scene.md) | Between encounters the band shows the biome as an animated scene with particles | Accepted (amended by 0027) |
+| [0026](0026-biome-idle-scene.md) | Between encounters the band shows the biome as an animated scene with particles | Accepted (amended by 0027; point 4 on desktop by 0047) |
 | [0027](0027-pane-idle-scene.md) | Between encounters the encounter pane shows the biome's idle scene | Accepted |
 | [0028](0028-biomes-tab-scene.md) | The Biomes tab shows the selected biome's idle scene | Accepted |
 | [0029](0029-stats-compaction.md) | The Stats tab folds session stats idle for 24 hours into `stats:total` | Accepted |
@@ -60,3 +60,4 @@ settled questions and avoid making assumptions about open ones.
 | [0044](0044-desktop-vector-scenes.md) | On the desktop app, a biome's idle scene is one vector Svg | Proposed (point 4 amended by 0046 on desktop) |
 | [0045](0045-desktop-sprites.md) | Desktop first: new built-in art is hi-res pixel art for the Desktop app | Accepted |
 | [0046](0046-desktop-particle-art.md) | On desktop, a biome may draw its particles with its own art | Accepted |
+| [0047](0047-desktop-idle-tag.md) | On desktop, the idle line is a name tag in the scene that fades | Accepted |
