@@ -66,7 +66,6 @@ export function catchSvg(art: CatchArt, outcome: CatchOutcome, rocks: number, { 
   // Desktop sheets (0045 point 5) are embedded once and reused, so a throw stays under the Svg limit
   if (art.modster.sheet) defs.push(sheetImage('ms', art.modster.sheet))
   if (art.catcher.sheet) defs.push(sheetImage('cs', art.catcher.sheet))
-  if (art.lit.glow) defs.push(glowFilter(art.lit.glow))
   if (art.modster.sheet && silhouette) defs.push(`<filter id="sil"><feFlood flood-color="${silhouette}"/><feComposite in2="SourceAlpha" operator="in"/></filter>`)
 
   // ---------- the Modster: its idle loop, moved, scaled and tinted ----------
@@ -375,9 +374,10 @@ function catcherFrame(art: CatchArt, key: { lit: boolean; index: number }, rows:
   if (sheet) {
     const q = sheet.width / width
     const index = key.index < sheet.frames ? key.index : 0
-    const glow = key.lit && art.lit.glow ? ' filter="url(#glow)"' : ''
+    const glow = key.lit && art.lit.glow ? art.lit.glow : undefined
+    const lit = glow?.paths[index] ? `<path fill="${glow.to}" d="${glow.paths[index]}"/>` : ''
     const view = `${index * sheet.width} ${num(rows.from * q)} ${sheet.width} ${num((rows.to - rows.from) * q)}`
-    return `<svg x="0" y="${num(rows.from)}" width="${num(width)}" height="${num(rows.to - rows.from)}" viewBox="${view}" preserveAspectRatio="none"><use href="#cs"${glow}/></svg>`
+    return `<svg x="0" y="${num(rows.from)}" width="${num(width)}" height="${num(rows.to - rows.from)}" viewBox="${view}" preserveAspectRatio="none"><use href="#cs"/>${lit}</svg>`
   }
   const { frames: list } = key.lit ? art.lit : art.catcher
   const rgba = list[key.index] ?? list[0]
@@ -398,24 +398,6 @@ function modsterSheet(sheet: DesktopSheet, fps: number, silhouette: boolean): st
       ? `<animate attributeName="x" values="${Array.from({ length: sheet.frames }, (_, i) => -i * sheet.width).join(';')}" keyTimes="${Array.from({ length: sheet.frames }, (_, i) => +(i / sheet.frames).toFixed(4)).join(';')}" calcMode="discrete" dur="${+(sheet.frames / fps).toFixed(3)}s" repeatCount="indefinite"/>`
       : ''
   return `<svg width="${num(sheet.width / q)}" height="${num(sheet.height / q)}" viewBox="0 0 ${sheet.width} ${sheet.height}"><use href="#ms"${silhouette ? ' filter="url(#sil)"' : ''}>${step}</use></svg>`
-}
-
-/**
- * Repaints one exact colour, `from`, in `to` (decision 0045 point 5: `glowColor`, since a PNG has no
- * palette). Each channel becomes 1 only at its own value of `from`; their sum less 2 is 1 only where
- * all three match, and that mask is filled with `to` over the art.
- */
-function glowFilter({ from, to }: { from: string; to: string }): string {
-  const table = (value: number) => Array.from({ length: 256 }, (_, i) => (i === value ? 1 : 0)).join(' ')
-  const [r, g, b] = [1, 3, 5].map((at) => parseInt(from.slice(at, at + 2), 16))
-  return (
-    `<filter id="glow" color-interpolation-filters="sRGB">` +
-    `<feComponentTransfer in="SourceGraphic" result="hit"><feFuncR type="discrete" tableValues="${table(r!)}"/><feFuncG type="discrete" tableValues="${table(g!)}"/><feFuncB type="discrete" tableValues="${table(b!)}"/></feComponentTransfer>` +
-    `<feColorMatrix in="hit" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 -2" result="mask"/>` +
-    `<feComposite in="mask" in2="SourceAlpha" operator="in" result="only"/>` +
-    `<feFlood flood-color="${to}"/><feComposite in2="only" operator="in" result="lit"/>` +
-    `<feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="lit"/></feMerge></filter>`
-  )
 }
 
 /** The frame with the rows that fail `keep` made empty. */

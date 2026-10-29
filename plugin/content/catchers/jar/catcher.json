@@ -6,5 +6,6 @@
   "style": "contain",
   "sprite": { "file": "sprite.sprite.json" },
   "glowIndex": 9,
-  "lidRows": 4
+  "lidRows": 4,
+  "desktopSprite": { "file": "desktop.png", "frames": 1, "glowColor": "#b9e4f0", "lidRows": 20 }
 }

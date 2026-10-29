@@ -8,6 +8,7 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/sproutling/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Shellsprout, redrawn as a seed snail in P5-19; replaces @victor-aguilars' provisional design |
 | `modsters/sproutling/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Shellsprout's desktop sheet (P5-46, decision 0045), reduced from @danielpg95's reference |
 | `modsters/mossbeast/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Mossmaul, redrawn as a moss bear cub in P5-19; replaces @victor-aguilars' provisional design |
+| `modsters/mossbeast/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Mossmaul's desktop sheet (P5-53, decision 0045), reduced from @danielpg95's reference; a breathing bob and a blink |
 | `modsters/acornsprite/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Acornsprite, redrawn as an acorn fairy in P5-19; replaces @victor-aguilars' provisional design |
 | `modsters/elderbark/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Elderbark, redrawn in P5-19 from @danielpg95's reference; replaces @victor-aguilars' design |
 | `modsters/ranactus/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
@@ -50,6 +51,7 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 
 The `.sprite.json` next to each sheet is generated from it with `npm run sprite`.
 | `catchers/jar/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Glass jar, the default catcher (decision 0035); P5-29 |
+| `catchers/jar/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | The glass jar's desktop sheet (P5-53, decision 0045), reduced from @danielpg95's reference; its sealed blob glows with the caught Modster |
 | `catchers/pod/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Seed pod catcher (decision 0035); P5-29 |
 | `catchers/lantern/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Lantern catcher (decision 0035); P5-29 |
 | `catchers/net/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Net catcher, a rope tile with a rim (decision 0035); P5-29 |

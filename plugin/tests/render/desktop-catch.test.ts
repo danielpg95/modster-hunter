@@ -1,8 +1,10 @@
 import { describe, expect, test } from 'claude-code/testing'
 import { CATCH, CONTENT, DESKTOP } from '../../hooks/constants'
-import type { Catcher, Sprite } from '../../hooks/content'
+import { desktopSheet, type Catcher, type Sprite } from '../../hooks/content'
 import { catchSvg, prepareCatch, prepareDesktopCatch } from '../../hooks/render'
+import { base64FromBytes } from '../fixtures/base64-from-bytes'
 import { catcherFiles } from '../fixtures/catcher-files'
+import { desktopPng } from '../fixtures/desktop-png'
 import { desktopSheetOf } from '../fixtures/desktop-sheet-of'
 import { validSprite } from '../fixtures/valid-sprite'
 
@@ -28,7 +30,8 @@ describe('prepareDesktopCatch', () => {
     const art = prepareDesktopCatch(glowJar, { desktop: desktopSheetOf(32, 32, 2) }, { desktop: modster }, 4)
     expect([art?.width, art?.height, art?.catcher.width, art?.lidRows]).toEqual([25, 31, 8, 2])
     expect(art?.bounds).toEqual({ x0: 2, y0: 1, x1: 22, y1: 30 })
-    expect(art?.lit.glow).toEqual({ from: '#ffd54f', to: '#88cc44' })
+    // The glow goes to the Modster's colour; its shapes come from the sheet (a stand-in PNG here has none)
+    expect(art?.lit.glow?.to).toBe('#88cc44')
     expect(art?.fits).toBe(true)
   })
 
@@ -55,14 +58,16 @@ describe('catchSvg with desktop sheets', () => {
     expect(svg).toContain('<animate attributeName="x" values="0;-100;-200;-300"')
   })
 
-  test('a lit desktop catcher repaints its glowColor through an exact colour-match filter', () => {
-    const art = prepareDesktopCatch(glowJar, { desktop: desktopSheetOf(32, 32, 2) }, { sprite }, 6)
+  test('a lit desktop catcher paints its glowColor pixels, found in the sheet, in the Modster\'s colour', () => {
+    // A 32×32, 2-frame sheet: a 4×2 block of the glow colour in each frame
+    const png = desktopPng(32, 32, 2, (x, y) => (x % 32 >= 10 && x % 32 < 14 && y >= 20 && y < 22 ? [0xff, 0xd5, 0x4f, 255] : [40, 40, 40, 255]))
+    const sheet = desktopSheet(base64FromBytes(png), { frames: 2, field: 'f', file: 'jar' }, CONTENT.desktop.catcher)
+    if (!sheet.ok) throw new Error('sheet')
+    const art = prepareDesktopCatch(glowJar, { desktop: sheet.value }, { sprite }, 6)
+    expect(art?.lit.glow?.paths).toEqual(['M10 20h4v1h-4zM10 21h4v1h-4z', 'M42 20h4v1h-4zM42 21h4v1h-4z'])
     const svg = art && catchSvg(art, 'caught', CATCH.rocksToCatch, { scale: 1 })
-    expect(svg).toContain('<filter id="glow"')
-    expect(svg).toContain('filter="url(#glow)"')
-    // 0xff, 0xd5, 0x4f: each channel's table is 1 only at its own value
-    const tables = [...(svg ?? '').matchAll(/tableValues="([^"]*)"/g)].map((m) => m[1]?.split(' ').indexOf('1'))
-    expect(tables).toEqual([0xff, 0xd5, 0x4f])
+    expect(svg).toContain('<path fill="#2b8a3e" d="M10 20h4v1h-4zM10 21h4v1h-4z"/>'.replace('#2b8a3e', art?.lit.glow?.to ?? ''))
+    expect(svg).not.toContain('<filter id="glow"')
   })
 
   test('a desktop Modster before any catch is painted with the silhouette filter and holds still', () => {

@@ -224,7 +224,7 @@ test('--desktop --preview writes a browser page: the GIF and the mod\'s own Svg 
   assert.match(html, /data%3Aimage%2Fpng%3Bbase64%2C/)
 })
 
-test('a catcher\'s preview plays throws on Shellsprout and Mossmaul, with its catcher.json', () => {
+test('a catcher\'s preview plays throws on Shellsprout and Dunebun, with its catcher.json', () => {
   const path = writePng('catcher.png', 32, 16, () => [60, 60, 200, 255])
   const json = join(dir, 'catcher.json')
   writeFileSync(json, JSON.stringify({ style: 'contain', desktopSprite: { file: 'catcher.png', frames: 2, lidRows: 4 } }))
@@ -233,6 +233,6 @@ test('a catcher\'s preview plays throws on Shellsprout and Mossmaul, with its ca
   assert.equal(code, 0, stderr)
   const html = readFileSync(page, 'utf8')
   assert.match(html, /catches Shellsprout \(desktop art\)/)
-  assert.match(html, /misses Mossmaul \(terminal art\)/)
+  assert.match(html, /misses Dunebun \(terminal art\)/)
   assert.match(html, /data:image\/svg\+xml;utf8,/)
 })

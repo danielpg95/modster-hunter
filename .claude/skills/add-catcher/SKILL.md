@@ -54,7 +54,39 @@ at most 4× the smallest built-in Modster's terminal size.
      scratchpad, never the repo.
    - **Organic ones** (a net, a pod, a jar with a creature-like lid) are better
      from a reference, as in the `add-modster` skill: `ref-sprite --desktop`
-     for desktop art, without it for terminal art.
+     for desktop art, without it for terminal art. The reference prompt:
+
+     ```
+     Detailed pixel art game item: "<Name>", <what it is in one line>, seen in
+     three-quarter view from slightly above, alone.
+     <Shape, materials and colours: glass, wood, cord, metal, leaves>.
+     <Each part that opens or moves (lid, cork, flaps, hinge), drawn as its
+     own piece with a visible seam where it meets the body>.
+     <The part that lights up with what it holds, if any, drawn empty and
+     clear>.
+
+     • About 80 pixels tall, crisp square pixels: no anti-aliasing, no blur,
+       no gradients, no glow.
+     • 2–3 shading tones per colour, lit from the top left, a clean dark
+       outline 1–2 pixels thick.
+     • Up to 64 colours.
+     • A plain, flat, light-grey background: no hands, no creature inside, no
+       scenery, no shadow. The whole object visible, centred, with space
+       around it.
+     ```
+
+     The seam matters: `lidRows` lifts the top rows as the lid, so a lid
+     that's a clear band at the top opens cleanly. Ask for "empty" glass, or
+     the generator fills it with something.
+
+     What P5-53's try (the glass jar) taught:
+     - **It worked:** clean glass, a cork with a crisp seam (good `lidRows`),
+       and an empty jar, as asked.
+     - **Paint the glow part in.** An empty jar has nothing to light up. Paint
+       a small shape inside in its own colour (the jar's sealed blob,
+       `#b9e4f0`) and point `glowColor` at it. Pointing it at the glass itself
+       lights the whole jar.
+     - **Cut by colour,** as for Modsters: `--edges none --clear "<background>"`.
    - Movement reads better as mid-motion poses than as colour swaps.
    - Desktop sheets: frames side by side, every pixel fully opaque or clear,
      saved with pngjs at `{ deflateLevel: 9, deflateStrategy: 1 }`.
@@ -72,8 +104,8 @@ at most 4× the smallest built-in Modster's terminal size.
      ```
 
      It checks every 0045 rule and plays real throws (a catch and a miss) on
-     Shellsprout, which has desktop art, and on Mossmaul, which has terminal
-     art, drawn as images the way the Code tab draws them. A throw over the
+     Shellsprout, which has desktop art, and on Dunebun, the smallest built-in,
+     which has terminal art, drawn as images the way the Code tab draws them. A throw over the
      Svg limit or that doesn't fit says so.
    - Terminal: `node plugin/skills/create-modster-content/scripts/modster-content.mjs preview-catcher plugin/content/catchers/<id> --out preview.html`.
 

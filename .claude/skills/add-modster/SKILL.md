@@ -294,12 +294,67 @@ contributor makes a detailed reference of their own design, `ref-sprite`
 reduces it, and you clean it up and animate it. Show the user every pass and
 wait for their approval before it goes in.
 
-1. **Ask for a reference.** The same prompt rules as for terminal art above
-   (house style, every design field, the biome as context only), with the
-   desktop's room: detailed pixel art about 100–120 pixels tall, full
-   shading and texture, a clear dark outline, a big readable face, up to 64
-   colours, the whole body visible with space around it. A busy scene is fine
-   if the creature has a clear outline: the tools cut it out.
+1. **Write the reference prompt** from the agreed design and give it to the
+   contributor. Fill every slot from the design fields, as for terminal art
+   above (concept, `description` and `dex.entry` as visible details and
+   pose, `dex.types` as palette and materials, category and size as
+   proportions, the biome as context only). Unlike the terminal prompt, it
+   asks for the detail a desktop sheet keeps instead of chunky blocks:
+
+   ```
+   Detailed pixel art game sprite of "<Name>", <concept in one line>,
+   <view: front, or three-quarter facing left or right>, <pose>.
+   It lives in <biome name> (<biome description>), so <how its home shows on
+   the creature: materials, textures, colours, adaptations>.
+   <Body: shape, main colours, texture (fur, moss, bark, scales)>.
+   <2–3 bold features that make it this Modster: what they are, their colours>.
+   <Face: eye shape and colour, nose, mouth, expression>.
+   <Props or accessories, if any: what, where, how they're held>.
+
+   • About 120 pixels tall (at most 128 wide), crisp square pixels: no
+     anti-aliasing, no blur, no gradients, no glow.
+   • 2–3 shading tones per colour, lit from the top left, with texture in the
+     materials.
+   • A clean dark outline around the whole body, 1–2 pixels thick.
+   • Big eyes with a shine and a clear face that still reads when small.
+   • Up to 64 colours.
+   • A plain, flat, light-grey background: no scenery, no shadow, no frame.
+     The whole body visible, centred, with space around it.
+   ```
+
+   For a livelier idle, add: "Show it three times side by side at the same
+   size and position: resting, mid-blink, and <a small motion: a breath, an
+   ear flick, a sway>. Only the <part> changes between the three; no motion
+   lines or effects." Each pose becomes a frame, so the animation isn't
+   limited to 1-pixel scripted moves.
+
+   What P5-53's try (Mossmaul) taught:
+   - **Detail comes through:** fur texture, shaded moss with flowers,
+     readable eyes. Far beyond what the terminal prompt gives.
+   - **The poses work:** a real drawn blink and breath. But the generator
+     also turned the head in the breath pose, and added motion lines; the
+     "only the … changes" and "no motion lines" lines are there for that.
+   - **Cut by colour, not outline.** Generated art often has parts with no
+     dark edge (Mossmaul's moss), and the outline cut-out leaks straight
+     through them. With the plain background the prompt asks for, use
+     `--edges none --clear "<background colour>"` (sample it from a corner).
+   - **One palette for all poses.** Reduce the poses with one shared palette
+     and the same crop box, anchored on the feet, so the frames don't flicker
+     in colour or jump. Keep the largest shape per frame (drops stray
+     effects).
+   - **Use extra poses for parts, not whole frames.** Each pose comes back
+     as a slightly different drawing (another moss pattern, a turned head),
+     so whole poses as frames flicker. Build every frame from the rest pose,
+     and take only the changed part from another pose, such as the closed eyes
+     for a blink.
+   - **Move the body as one.** Moving one part against the body read badly:
+     the moss rising alone looked like it levitated, and the moss swaying
+     looked odd. A body bob worked: everything above the paws 1 px up for two
+     frames, paws planted. Mossmaul's idle is rest, up, up, rest, rest, blink
+     at 4 fps. A busy scene still works if the
+   creature has a clear outline (Shellsprout's reference was a whole forest
+   scene), since `ref-sprite` cuts it out, but a plain background saves the
+   cleanup.
 2. **Convert and crop:** turn it into a PNG (`sips -s format png ref.jpg --out
    ref.png` on macOS), look at it, and pick a crop around the subject with a
    little margin.
@@ -321,8 +376,10 @@ wait for their approval before it goes in.
    Repeat with other values until the cut-out is clean.
 4. **Animate** in a scratchpad script (never the repo) on `base.png`: 2–8
    frames side by side, all the same size. Small, readable moves at this
-   size: a part swaying 1 px, a blink (paint the eyes in the face colour and
-   draw a closed-eye curve), a bob. Keep every pixel fully opaque or fully
+   size: a body bob (everything above the feet 1 px up, the feet planted), a
+   blink (closed eyes from a blink pose, or the eyes painted in the face
+   colour with a closed-eye curve), a sway of a loose part that isn't fixed
+   to the body (Shellsprout's sprout). Keep every pixel fully opaque or fully
    clear. Write the sheet with pngjs at `{ deflateLevel: 9, deflateStrategy: 1 }`;
    default compression made Shellsprout's 4 frames 49 KiB, maximum made them 12.
 5. **Check and preview:**
