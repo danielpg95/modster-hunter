@@ -15,6 +15,16 @@
 // 4. Keeps only the largest connected shape, dropping stray specks.
 // With --grid it also writes a letter grid (palette + one row per line) for hand
 // edits; --from-grid turns an edited grid back into a PNG.
+//
+// --desktop makes a desktop sheet's base (decision 0045): up to 128×128, up to 64
+// colors (default 48), and no terminal notes. Busy backgrounds leave pieces that
+// the outline didn't stop (sky between leaves, ground under feet):
+//   --clear "#8fd3f0,#6b4a2b"  clears pixels within --tolerance (default 48) of
+//                              these colors that reach the outside; enclosed ones
+//                              stay, since they're usually highlights
+//   --trim-edges 190           clears pixels on the outer edge at least this bright
+//                              (pale specks left by a light background)
+// Every PNG it writes is fully compressed: a desktop sheet has a 48 KiB budget.
 import { readFileSync, writeFileSync } from 'node:fs'
 import pngjs from 'pngjs'
 
@@ -156,7 +166,58 @@ export function refSprite(png, { crop, size, colors = 24, dark = 70, edges } = {
   return { image, palette }
 }
 
+/**
+ * Clears pixels whose color is within `tolerance` of one of `colors` and that reach the
+ * outside (the image edge or a transparent pixel) through such pixels. Enclosed matches stay.
+ */
+export function clearReaching(image, palette, colors, tolerance = 48) {
+  const { width: W, height: H, pixels } = image
+  const near = palette.map((p) => colors.some((c) => dist2(p, c) <= tolerance * tolerance))
+  const matches = (k) => pixels[k] >= 0 && near[pixels[k]]
+  const out = new Uint8Array(W * H)
+  const stack = []
+  for (let k = 0; k < W * H; k++) {
+    const x = k % W, y = (k / W) | 0
+    if (pixels[k] < 0 || x === 0 || y === 0 || x === W - 1 || y === H - 1) { out[k] = 1; stack.push(k) }
+  }
+  while (stack.length) {
+    const k = stack.pop()
+    const x = k % W, y = (k / W) | 0
+    for (const n of [x > 0 ? k - 1 : -1, x < W - 1 ? k + 1 : -1, y > 0 ? k - W : -1, y < H - 1 ? k + W : -1]) {
+      if (n < 0 || out[n] || !matches(n)) continue
+      out[n] = 1
+      stack.push(n)
+    }
+  }
+  for (let k = 0; k < W * H; k++) if (out[k] && matches(k)) pixels[k] = -1
+  return image
+}
+
+/** Clears pixels on the outer edge at least `brightness` bright (0–255 luma), twice, so a 2-px fringe goes too. */
+export function trimEdges(image, palette, brightness) {
+  const { width: W, height: H, pixels } = image
+  for (let pass = 0; pass < 2; pass++) {
+    const clear = []
+    for (let k = 0; k < W * H; k++) {
+      if (pixels[k] < 0 || lum(...palette[pixels[k]]) < brightness) continue
+      const x = k % W, y = (k / W) | 0
+      const edge = [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => {
+        const nx = x + dx, ny = y + dy
+        return nx < 0 || ny < 0 || nx >= W || ny >= H || pixels[ny * W + nx] < 0
+      })
+      if (edge) clear.push(k)
+    }
+    for (const k of clear) pixels[k] = -1
+  }
+  return image
+}
+
 const hex = (c) => '#' + c.map((v) => v.toString(16).padStart(2, '0')).join('')
+const parseHex = (text) => {
+  const m = text.trim().match(/^#?([0-9a-fA-F]{6})$/)
+  if (!m) throw new Error(`"${text}" is not a color like #8fd3f0`)
+  return [0, 2, 4].map((o) => parseInt(m[1].slice(o, o + 2), 16))
+}
 
 /** A letter grid: palette lines (`a #rrggbb`), a blank line, then one row per pixel row ('.' = transparent). */
 export function toGrid({ image, palette }) {
@@ -200,7 +261,7 @@ export function toPng({ image, palette }) {
     const p = image.pixels[k]
     png.data.set(p < 0 ? [0, 0, 0, 0] : [...palette[p], 255], k * 4)
   }
-  return pngjs.PNG.sync.write(png)
+  return pngjs.PNG.sync.write(png, { deflateLevel: 9, deflateStrategy: 1 })
 }
 
 function main(argv) {
@@ -209,10 +270,12 @@ function main(argv) {
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
     if (a === '--grid') opts.grid = true
+    else if (a === '--desktop') opts.desktop = true
     else if (a.startsWith('--')) opts[a.slice(2)] = argv[++i]
     else files.push(a)
   }
-  const usage = 'usage: ref-sprite <ref.png> --crop X,Y,W,H --size WxH [--colors 24] [--dark 70] [--edges top,left,right,bottom] [--out file.png] [--grid]\n       ref-sprite --from-grid <file.grid.txt> [--out file.png]'
+  const usage = 'usage: ref-sprite <ref.png> --crop X,Y,W,H --size WxH [--colors 24] [--dark 70] [--edges top,left,right,bottom] [--out file.png] [--grid]\n' +
+    '                  [--desktop] [--clear "#rrggbb,…"] [--tolerance 48] [--trim-edges 190]\n       ref-sprite --from-grid <file.grid.txt> [--out file.png]'
   if (opts['from-grid']) {
     const result = fromGrid(readFileSync(opts['from-grid'], 'utf8'))
     const out = opts.out ?? opts['from-grid'].replace(/\.grid\.txt$|\.txt$/, '') + '.png'
@@ -226,9 +289,22 @@ function main(argv) {
   if ([x, y, w, h, sw, sh].some((n) => !Number.isInteger(n) || n < 0) || !w || !h || !sw || !sh) { console.error(usage); return 2 }
   const png = pngjs.PNG.sync.read(readFileSync(files[0]))
   if (x + w > png.width || y + h > png.height) { console.error(`--crop goes past the ${png.width}×${png.height} image`); return 2 }
-  const colors = opts.colors ? Number(opts.colors) : 24
-  if (colors > 24) console.warn('note: built-in sprites use at most 24 colors (decision 0034)')
-  if (sh > 32) console.warn('note: sprites are at most 32 px tall (decision 0033)')
+  const colors = opts.colors ? Number(opts.colors) : opts.desktop ? 48 : 24
+  if (opts.desktop) {
+    // Decision 0045: hi-res pixel art, up to 128×128 and 64 colors
+    if (colors > 64) { console.error('--colors: desktop art has at most 64 colors (decision 0045)'); return 2 }
+    if (sw > 128 || sh > 128) console.warn('note: a desktop Modster is at most 128×128 per frame (decision 0045)')
+  } else {
+    if (colors > 24) console.warn('note: built-in sprites use at most 24 colors (decision 0034)')
+    if (sh > 32) console.warn('note: sprites are at most 32 px tall (decision 0033)')
+  }
+  let clear
+  try {
+    clear = opts.clear ? opts.clear.split(',').map(parseHex) : []
+  } catch (error) {
+    console.error(`--clear: ${error.message}`)
+    return 2
+  }
   const result = refSprite(png, {
     crop: { x, y, w, h },
     size: { w: sw, h: sh },
@@ -236,6 +312,9 @@ function main(argv) {
     dark: opts.dark ? Number(opts.dark) : 70,
     edges: opts.edges ? opts.edges.split(',') : undefined,
   })
+  if (clear.length) clearReaching(result.image, result.palette, clear, opts.tolerance ? Number(opts.tolerance) : 48)
+  if (opts['trim-edges']) trimEdges(result.image, result.palette, Number(opts['trim-edges']))
+  if (clear.length || opts['trim-edges']) keepLargest(result.image)
   const out = opts.out ?? files[0].replace(/\.png$/i, '') + '.base.png'
   writeFileSync(out, toPng(result))
   let note = ''

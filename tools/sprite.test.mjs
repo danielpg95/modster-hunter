@@ -211,3 +211,28 @@ test('--desktop needs a known kind and frames in its range', () => {
   assert.match(run(path, '--frames', '2', '--desktop', 'sprite').stderr, /--desktop must be modster, background or catcher/)
   assert.match(run(path, '--frames', '1', '--desktop', 'modster').stderr, /--frames must be 2–8 for modster desktop art/)
 })
+
+test('--desktop --preview writes a browser page: the GIF and the mod\'s own Svg at every size', () => {
+  const path = writePng('preview.png', 48, 24, (x) => (x % 24 < 12 ? [200, 60, 60, 255] : undefined))
+  const page = join(dir, 'preview.html')
+  const { code, stderr } = run(path, '--frames', '2', '--fps', '4', '--desktop', 'modster', '--preview', page)
+  assert.equal(code, 0, stderr)
+  const html = readFileSync(page, 'utf8')
+  assert.match(html, /data:image\/gif;base64,/)
+  assert.match(html, /pane, 1×/)
+  assert.match(html, /uncaught silhouette/)
+  assert.match(html, /<image href="data:image\/png;base64,/)
+})
+
+test('a catcher\'s preview plays throws on Shellsprout and Mossmaul, with its catcher.json', () => {
+  const path = writePng('catcher.png', 32, 16, () => [60, 60, 200, 255])
+  const json = join(dir, 'catcher.json')
+  writeFileSync(json, JSON.stringify({ style: 'contain', desktopSprite: { file: 'catcher.png', frames: 2, lidRows: 4 } }))
+  const page = join(dir, 'catcher.html')
+  const { code, stderr } = run(path, '--frames', '2', '--desktop', 'catcher', '--catcher', json, '--preview', page)
+  assert.equal(code, 0, stderr)
+  const html = readFileSync(page, 'utf8')
+  assert.match(html, /catches Shellsprout \(desktop art\)/)
+  assert.match(html, /misses Mossmaul \(terminal art\)/)
+  assert.match(html, /data:image\/svg\+xml;base64,/)
+})

@@ -1,6 +1,6 @@
 ---
 name: add-modster
-description: Add a new built-in Modster (creature) to the Modster Hunter repo's plugin/content/ — design, pixel-art sprite sheet, modster.json, conversion, credits, and validation. Use when a contributor wants to create, draw or add a Modster to the built-in content. Not for a player's own Modsters in ~/.claude/modster-hunter/content/ (that's the mod's create-modster-content skill).
+description: Add a new built-in Modster (creature) to the Modster Hunter repo's plugin/content/ — design, desktop art, a terminal sprite or both, modster.json, credits, and validation. Use when a contributor wants to create, draw or add a Modster to the built-in content. Not for a player's own Modsters in ~/.claude/modster-hunter/content/ (that's the mod's create-modster-content skill).
 ---
 
 # Add a built-in Modster
@@ -8,6 +8,25 @@ description: Add a new built-in Modster (creature) to the Modster Hunter repo's 
 Built-in content lives in `plugin/content/`. Follow `docs/CONTENT_FORMAT.md` and
 `.claude/rules/content.md`. (Players adding their *own* Modsters use the
 mod's `create-modster-content` skill in `plugin/skills/`.)
+
+## Desktop, terminal or both
+
+A Modster can have desktop art (`desktopSprite`), a terminal sprite (`sprite`),
+or both (decision 0045). Ask the user which, before the design:
+
+- **Desktop** (the default for new built-ins): hi-res pixel art for the Desktop
+  app, up to 128×128 per frame, up to 64 colours, 2–8 frames, at most 48 KiB.
+  On the terminal it shows as text. Since Saltbreeze Bay was filled (P5-21),
+  built-in art is made this way.
+- **Terminal:** today's sprite, at most 48×32 and 24 colours (0033, 0034). On
+  desktop it's drawn as vectors at the same size.
+- **Both:** make the desktop sheet first, then reduce the terminal sprite from
+  it. Never draw the terminal one first and blow it up: they must be the same
+  design, and the detail lives in the desktop one.
+
+The steps below say which parts belong to which. [Desktop art from a reference
+image](#desktop-art-from-a-reference-image) is the desktop path;
+[From a reference image](#from-a-reference-image) is the terminal one.
 
 ## Before you start
 
@@ -31,13 +50,19 @@ mod's `create-modster-content` skill in `plugin/skills/`.)
    - Dex: one or two types (from the 18 in decision 0017; the first is the
      primary one, decision 0022), category ("Seed Modster"),
      height, weight, and the entry text (≤ 240 chars).
-   - Look: color scheme (≤ 24 colors, decision 0034), size, and a 2–4 frame idle animation.
-     Every Modster, any tier, is at most 32 px tall (even) and 48 px wide
-     (decision 0033). Pick the size the design needs within that. Tell the
-     user where each size shows: up to 14 px tall in the band of an 80×24
-     terminal, up to 30 px at 140×40, and the full 32 px in the encounter pane
-     (`/modsters hunt`) and the collection. Taller than the band shows the
-     compact text band there.
+   - Look: color scheme, size, and the idle animation.
+     - **Desktop:** up to 128×128 per frame, up to 64 colours, 2–8 frames at
+       its own fps. It shows at 1 CSS px per pixel in the pane, 0.75 in the
+       Collection and 0.5 in the band, so a 128 px Modster is as big on screen
+       as a 32 px terminal one is today. Use the room for detail: shading,
+       texture, a readable face.
+     - **Terminal:** ≤ 24 colors (decision 0034) and a 2–4 frame idle. Every
+       Modster, any tier, is at most 32 px tall (even) and 48 px wide (decision
+       0033). Pick the size the design needs within that. Tell the user where
+       each size shows: up to 14 px tall in the band of an 80×24 terminal, up
+       to 30 px at 140×40, and the full 32 px in the encounter pane (`/modsters
+       hunt`) and the collection. Taller than the band shows the compact text
+       band there.
 
    Check `plugin/content/modsters/` so the id and look are new. A reference
    the contributor made themselves (drawn or generated) can be converted as
@@ -45,7 +70,10 @@ mod's `create-modster-content` skill in `plugin/skills/`.)
    (an existing game's creature, someone else's art) is for ideas only: the
    art must be original and not recognizable as an existing creature.
 2. **Create the folder** `plugin/content/modsters/<id>/`.
-3. **Make the sprite sheet** `sprite.png`: frames side by side, equal size,
+3. **Make the art.** For desktop (or both, first), follow [Desktop art from a
+   reference image](#desktop-art-from-a-reference-image), which ends with
+   `desktop.png` checked and previewed; for desktop only, skip on to step 5.
+   For a terminal sprite, read on. **Make the sprite sheet** `sprite.png`: frames side by side, equal size,
    transparent background. Prefer [From a reference image](#from-a-reference-image):
    it gives the most detail and keeps the roster's style consistent. Draw from
    scratch only for small, simple Modsters or when the contributor has no
@@ -66,9 +94,12 @@ mod's `create-modster-content` skill in `plugin/skills/`.)
 
    If a few passes still don't read well, say so and suggest a human artist
    in a pixel editor (Aseprite, LibreSprite, Piskel) rather than iterating.
-4. **Convert:** `npm run sprite -- plugin/content/modsters/<id>/sprite.png --frames N`.
+4. **Convert** the terminal sprite: `npm run sprite -- plugin/content/modsters/<id>/sprite.png --frames N`.
    Never hand-edit the output.
-5. **Write `modster.json`** from `docs/templates/content/modster.json`. Leave
+5. **Write `modster.json`** from `docs/templates/content/modster.json`, with
+   `"sprite": { "file": "sprite.sprite.json", "fps": … }` for terminal art and
+   `"desktopSprite": { "file": "desktop.png", "frames": N, "fps": … }` for
+   desktop art; desktop only leaves `sprite` out. Leave
    `rarity` to the intended tier (required, decision 0030). Leave `maxAttempts`
    and `catchRate` as `null` unless the user asks for an override (decision 0004). Fill in every `dex` field; `dex.number` is the
    next free number among the official built-in Modsters (decision 0017).
@@ -77,18 +108,23 @@ mod's `create-modster-content` skill in `plugin/skills/`.)
    `biome.json`, with its own `"rarity"` only if it belongs to another tier
    there. Show the user the biome's resulting odds table (tier share and
    percent per Modster).
-7. **Credit it** in `plugin/content/CREDITS.md`.
+7. **Credit it** in `plugin/content/CREDITS.md`: one row per file
+   (`sprite.png`, `desktop.png`). `check:content` fails without the desktop row.
 8. **Validate:** `npm run check:content` (prints the biome's odds table) and
    `claude plugin test ./plugin`.
-9. **Preview:** the band only draws in an interactive session, so ask the
-   user to run `claude --plugin-dir ./plugin` (the biome is random; restart
-   until it's the right one, or use `/modsters hunt`). Adjust colors that read
+9. **Preview in the game:** the band only draws in an interactive session.
+   For terminal art, ask the user to run `claude --plugin-dir ./plugin` (the
+   biome is random; restart until it's the right one, or use `/modsters
+   hunt`). For desktop art, it's the Desktop app's Code tab: offer to point
+   their install at this checkout (`claude plugin marketplace add <repo>`,
+   then `/reload-plugins`) and switch it back after. Adjust colors that read
    poorly on a dark or light background.
 10. **Show it in the PR:** the PR description needs a preview of every new or
-    changed Modster: its sprite enlarged, every frame, on a dark and a light
-    background (the PR template's "Content and art" checklist). Save the
-    preview from step 3 and ask the user to attach it to the description, or
-    attach it yourself if you can upload images.
+    changed Modster: its art enlarged, every frame, on a dark and a light
+    background (the PR template's "Content and art" checklist). Commit the
+    preview image to `docs/previews/<id>.png` (or `.gif`) and embed it with a
+    raw GitHub link pinned to the commit:
+    `![<id>](https://raw.githubusercontent.com/danielpg95/modster-hunter/<sha>/docs/previews/<id>.png)`.
 
 ## From a reference image
 
@@ -250,4 +286,60 @@ P5-19 Whispering Forest roster was made.
    for wings or arms instead of sliding them, and keep a blink. Redraw
    outlines after moving a part so they stay closed.
 7. Continue with step 4 (convert) above.
+
+## Desktop art from a reference image
+
+The desktop path (decision 0045), worked out on Shellsprout (P5-46). The
+contributor makes a detailed reference of their own design, `ref-sprite`
+reduces it, and you clean it up and animate it. Show the user every pass and
+wait for their approval before it goes in.
+
+1. **Ask for a reference.** The same prompt rules as for terminal art above
+   (house style, every design field, the biome as context only), with the
+   desktop's room: detailed pixel art about 100–120 pixels tall, full
+   shading and texture, a clear dark outline, a big readable face, up to 64
+   colours, the whole body visible with space around it. A busy scene is fine
+   if the creature has a clear outline: the tools cut it out.
+2. **Convert and crop:** turn it into a PNG (`sips -s format png ref.jpg --out
+   ref.png` on macOS), look at it, and pick a crop around the subject with a
+   little margin.
+3. **Reduce it:**
+
+   ```bash
+   npm run ref-sprite -- ref.png --crop X,Y,W,H --size WxH --desktop --out base.png
+   ```
+
+   Keep the crop's aspect for `--size`, at most 128 on each side; 48 colours
+   is the default (`--colors`, up to 64). Look at it enlarged on dark and
+   light. Background the outline didn't stop shows up as stray sky or ground:
+   - `--clear "#8fd3f0,#6b4a2b"` clears pixels near those colours that reach
+     the outside (sky between leaves, dirt under the feet). Sample the
+     colours from the reference. Enclosed matches stay; they're usually
+     highlights.
+   - `--trim-edges 190` clears pale specks left on the outer edge.
+
+   Repeat with other values until the cut-out is clean.
+4. **Animate** in a scratchpad script (never the repo) on `base.png`: 2–8
+   frames side by side, all the same size. Small, readable moves at this
+   size: a part swaying 1 px, a blink (paint the eyes in the face colour and
+   draw a closed-eye curve), a bob. Keep every pixel fully opaque or fully
+   clear. Write the sheet with pngjs at `{ deflateLevel: 9, deflateStrategy: 1 }`;
+   default compression made Shellsprout's 4 frames 49 KiB, maximum made them 12.
+5. **Check and preview:**
+
+   ```bash
+   node tools/sprite.mjs desktop.png --frames N --fps F --desktop modster --preview preview.html
+   ```
+
+   It checks every 0045 rule (size, frames, colours, crisp alpha, 48 KiB) and
+   writes a page with the frames enlarged and the mod's own Svg at pane,
+   Collection and band size, plus the uncaught silhouette. Open the page for
+   the user, unasked, and wait for approval.
+6. **Save it** as `plugin/content/modsters/<id>/desktop.png`. For both
+   versions, make the terminal sprite now from a frame of the desktop sheet:
+   `npm run ref-sprite -- desktop.png --crop 0,0,W,H --size …` (no
+   `--desktop`: at most 48×32 and 24 colours), then finish it by hand as in
+   [From a reference image](#from-a-reference-image) step 5. It keeps the
+   design, not the frame count: give it its own 2–4 frame idle.
+7. Continue with step 5 (`modster.json`) above.
 

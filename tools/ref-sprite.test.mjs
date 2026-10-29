@@ -8,7 +8,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
 import pngjs from 'pngjs'
-import { cutout, buildPalette, keepLargest, refSprite, toGrid, fromGrid, toPng } from './ref-sprite.mjs'
+import { cutout, buildPalette, keepLargest, refSprite, toGrid, fromGrid, toPng, clearReaching, trimEdges } from './ref-sprite.mjs'
 
 const TOOL = new URL('./ref-sprite.mjs', import.meta.url).pathname
 const dir = mkdtempSync(join(tmpdir(), 'ref-sprite-test-'))
@@ -116,4 +116,51 @@ test('cli: bad arguments print the usage and exit 2', () => {
 test('toPng: transparent where the image is empty', () => {
   const png = pngjs.PNG.sync.read(toPng({ image: { width: 2, height: 1, pixels: Int16Array.from([0, -1]) }, palette: [[1, 2, 3]] }))
   assert.deepEqual([...png.data.slice(0, 8)], [1, 2, 3, 255, 0, 0, 0, 0])
+})
+
+/** A 6×5 image: a green shape with a sky-blue pixel inside it and sky reaching in from the top edge. */
+function skyImage() {
+  // 0 green, 1 sky, 2 white; -1 transparent
+  const rows = [
+    '1 1 1 1 1 1',
+    '0 0 1 0 0 0',
+    '0 0 0 1 0 0',
+    '0 0 0 0 0 0',
+    '- 2 0 0 0 -',
+  ]
+  const pixels = Int16Array.from(rows.flatMap((row) => row.split(' ').map((c) => (c === '-' ? -1 : Number(c)))))
+  return { image: { width: 6, height: 5, pixels }, palette: [[40, 160, 60], [143, 211, 240], [250, 250, 250]] }
+}
+
+test('clearReaching: a color reaching the outside is cleared; an enclosed one stays', () => {
+  const { image, palette } = skyImage()
+  clearReaching(image, palette, [[140, 210, 235]], 20)
+  const at = (x, y) => image.pixels[y * 6 + x]
+  // The top row and the sky pixel touching it are gone
+  assert.deepEqual([at(0, 0), at(5, 0), at(2, 1)], [-1, -1, -1])
+  // The sky pixel enclosed by green stays: it reads as a highlight
+  assert.equal(at(3, 2), 1)
+  assert.equal(at(0, 1), 0)
+})
+
+test('trimEdges: pale pixels on the outer edge go, the rest stays', () => {
+  const { image, palette } = skyImage()
+  trimEdges(image, palette, 240)
+  // The white pixel on the bottom edge is cleared; the light-blue top row (luma about 195) isn't that bright
+  assert.equal(image.pixels[4 * 6 + 1], -1)
+  assert.equal(image.pixels[0], 1)
+})
+
+test('cli: --desktop takes 48 colors by default, refuses more than 64, and --clear needs real colors', () => {
+  const ref = join(dir, 'desk-ref.png')
+  writeFileSync(ref, pngjs.PNG.sync.write(reference()))
+  const ok = spawnSync(process.execPath, [TOOL, ref, '--crop', '0,0,60,40', '--size', '30x20', '--desktop', '--clear', '#ffffff', '--out', join(dir, 'desk.png')], { encoding: 'utf8' })
+  assert.equal(ok.status, 0, ok.stderr)
+  assert.doesNotMatch(ok.stderr, /decision 0033|decision 0034/)
+  const tooMany = spawnSync(process.execPath, [TOOL, ref, '--crop', '0,0,60,40', '--size', '30x20', '--desktop', '--colors', '65'], { encoding: 'utf8' })
+  assert.equal(tooMany.status, 2)
+  assert.match(tooMany.stderr, /at most 64 colors/)
+  const bad = spawnSync(process.execPath, [TOOL, ref, '--crop', '0,0,60,40', '--size', '30x20', '--clear', 'skyblue'], { encoding: 'utf8' })
+  assert.equal(bad.status, 2)
+  assert.match(bad.stderr, /is not a color/)
 })
