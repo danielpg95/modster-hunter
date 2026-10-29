@@ -50,6 +50,8 @@ export interface LoadedBiome {
   background?: Sprite
   /** Its `desktopBackground`, when it passed decision 0045's checks */
   desktopBackground?: DesktopSheet
+  /** Its `desktopParticles`, when they passed decision 0046's checks */
+  desktopParticles?: DesktopSheet
   /** The biome file's name as issues show it */
   file: string
 }
@@ -256,8 +258,10 @@ async function loadBiome(at: Folder, folder: string): Promise<LoadedBiome | unde
 
   const desktopBackground =
     biome.desktopBackground && (await loadDesktopSheet(at, `biomes/${folder}`, biome.desktopBackground, 'desktopBackground', CONTENT.desktop.background, shownFile))
+  const desktopParticles =
+    biome.desktopParticles && (await loadDesktopSheet(at, `biomes/${folder}`, biome.desktopParticles, 'desktopParticles', CONTENT.desktop.particles, shownFile))
   const loaded = await loadBackground(at, folder, biome, shownFile)
-  return desktopBackground ? { ...loaded, desktopBackground } : loaded
+  return { ...loaded, ...(desktopBackground ? { desktopBackground } : {}), ...(desktopParticles ? { desktopParticles } : {}) }
 }
 
 /** The biome with its terminal background, or without it when that didn't load. */

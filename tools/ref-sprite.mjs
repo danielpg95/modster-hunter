@@ -293,7 +293,7 @@ function main(argv) {
   if (opts.desktop) {
     // Decision 0045: hi-res pixel art, up to 128×128 and 64 colors
     if (colors > 64) { console.error('--colors: desktop art has at most 64 colors (decision 0045)'); return 2 }
-    if (sw > 128 || sh > 128) console.warn('note: a desktop Modster is at most 128×128 per frame (decision 0045)')
+    if (sw > 128 || sh > 128) console.warn('note: per frame, a desktop Modster is at most 128×128, a background 192×48, a catcher 96×96 (decision 0045)')
   } else {
     if (colors > 24) console.warn('note: built-in sprites use at most 24 colors (decision 0034)')
     if (sh > 32) console.warn('note: sprites are at most 32 px tall (decision 0033)')

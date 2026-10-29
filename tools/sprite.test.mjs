@@ -208,7 +208,7 @@ test('--desktop lists every rule a sheet breaks', () => {
 
 test('--desktop needs a known kind and frames in its range', () => {
   const path = writePng('kind.png', 16, 8, () => [0, 0, 0, 255])
-  assert.match(run(path, '--frames', '2', '--desktop', 'sprite').stderr, /--desktop must be modster, background or catcher/)
+  assert.match(run(path, '--frames', '2', '--desktop', 'sprite').stderr, /--desktop must be modster, background, catcher or particles/)
   assert.match(run(path, '--frames', '1', '--desktop', 'modster').stderr, /--frames must be 2–8 for modster desktop art/)
 })
 

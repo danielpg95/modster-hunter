@@ -357,6 +357,19 @@ describe('loadContent', () => {
       expect(tooTall.biomes.get('whispering-forest')?.desktopBackground).toBe(undefined)
     })
 
+    test('a biome loads its desktopParticles; a sheet over 16×16 is listed and left out (0046)', async () => {
+      const files: Record<string, string | Uint8Array | Error> = forest()
+      const biome: Record<string, unknown> = { ...validBiome(), desktopParticles: { file: 'particles.png', frames: 2 } }
+      delete biome.background
+      files[`${ROOT}/biomes/whispering-forest/biome.json`] = JSON.stringify(biome)
+      files[`${ROOT}/biomes/whispering-forest/particles.png`] = desktopPng(8, 6, 2)
+      expect((await loadContent(memoryReader(files), ROOT)).biomes.get('whispering-forest')?.desktopParticles?.width).toBe(8)
+      files[`${ROOT}/biomes/whispering-forest/particles.png`] = desktopPng(20, 6, 2)
+      const big = await loadContent(memoryReader(files), ROOT)
+      expect(lines(big.issues)).toEqual(['biomes/whispering-forest/biome.json: desktopParticles.file points to 20×6 frames; at most 16×16'])
+      expect(big.biomes.get('whispering-forest')?.desktopParticles).toBe(undefined)
+    })
+
     test("a catcher loads its desktop sheet; one that doesn't fit the catcher is listed and the catcher keeps its terminal sprite", async () => {
       const files: Record<string, string | Uint8Array | Error> = withCatcher((catcher) => (catcher.desktopSprite = { file: 'desktop.png', frames: 2, glowColor: '#ff0000' }))
       files[`${ROOT}/catchers/firefly-jar/desktop.png`] = desktopPng(24, 24, 2)

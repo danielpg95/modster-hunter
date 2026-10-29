@@ -1,4 +1,5 @@
 import { DESKTOP, SCENE } from '../constants'
+import type { DesktopSheet } from '../content'
 import type { IdleScene, Particle } from './idle-scene'
 import { particlePixel } from './idle-scene'
 import { framePaths, loopedFrames } from './pixels-to-svg'
@@ -17,6 +18,8 @@ export interface SceneSvgOptions {
   moving: boolean
   /** Over this many characters there's no Svg (0044 point 7); defaults to DESKTOP.svgMaxChars */
   maxChars?: number
+  /** Keeps the strip's size and crops it at the right when the box is narrower, instead of shrinking it */
+  crop?: boolean
 }
 
 /**
@@ -33,10 +36,26 @@ export function sceneSvgSize(scene: IdleScene, bodyColumns: number, maxRows?: nu
 }
 
 /** The strip as SVG, or undefined when it comes out over `maxChars`. */
-export function sceneSvg(scene: IdleScene, particles: readonly Particle[], { width, scale, moving, maxChars = DESKTOP.svgMaxChars }: SceneSvgOptions): string | undefined {
+export function sceneSvg(scene: IdleScene, particles: readonly Particle[], { width, scale, moving, maxChars = DESKTOP.svgMaxChars, crop }: SceneSvgOptions): string | undefined {
   const height = scene.rows * 2
   const defs: string[] = []
   let body = ''
+
+  const sheet = scene.sheet
+  if (sheet) {
+    // A desktop background (0045 point 9): the sheet embedded once, a quarter of its pixels per
+    // strip pixel, frames stepped by SMIL; an embedded image makes this an image-mode Svg
+    const q = DESKTOP.sheetPixels
+    const tw = sheet.width / q
+    const th = sheet.height / q
+    const step =
+      moving && sheet.frames > 1
+        ? `<animate attributeName="x" values="${Array.from({ length: sheet.frames }, (_, i) => -i * sheet.width).join(';')}" keyTimes="${Array.from({ length: sheet.frames }, (_, i) => +(i / sheet.frames).toFixed(4)).join(';')}" calcMode="discrete" dur="${num(sheet.frames / scene.artFps)}s" repeatCount="indefinite"/>`
+        : ''
+    const image = `<image href="data:image/png;base64,${sheet.png}" width="${sheet.width * sheet.frames}" height="${sheet.height}" image-rendering="pixelated" style="image-rendering:pixelated">${step}</image>`
+    defs.push(`<pattern id="bg" patternUnits="userSpaceOnUse" width="${num(tw)}" height="${num(th)}"><svg width="${num(tw)}" height="${num(th)}" viewBox="0 0 ${sheet.width} ${sheet.height}">${image}</svg></pattern>`)
+    body += `<rect width="${width}" height="${num(Math.min(th, height))}" fill="url(#bg)"/>`
+  }
 
   const art = scene.art
   if (art) {
@@ -50,10 +69,15 @@ export function sceneSvg(scene: IdleScene, particles: readonly Particle[], { wid
   const look = scene.particles
   if (look) {
     const color = `#${look.rgb.map((c) => c.toString(16).padStart(2, '0')).join('')}`
-    body += particles.map((particle) => (moving ? movingParticle(particle, look.style, color, width, height) : stillParticle(particle, look.style, color, width, height))).join('')
+    // A biome's own particle art (0046), embedded once; else squares in the particle colour (0044 point 4)
+    const art = scene.particleSheet
+    if (art) defs.push(`<image id="pt" href="data:image/png;base64,${art.png}" width="${art.width * art.frames}" height="${art.height}" image-rendering="pixelated" style="image-rendering:pixelated"/>`)
+    const mark = (particle: Particle) => (x: number, y: number) => (art ? particleArt(art, particle, x, y, moving) : `<rect fill="${color}" x="${x}" y="${y}" width="1" height="1"/>`)
+    body += particles.map((particle) => (moving ? movingParticle(particle, look.style, mark(particle), width, height) : stillParticle(particle, look.style, mark(particle), width, height))).join('')
   }
 
-  const head = `<svg xmlns="http://www.w3.org/2000/svg" width="${width * scale}" height="${height * scale}" viewBox="0 0 ${width} ${height}" shape-rendering="crispEdges">`
+  const fit = crop ? ' preserveAspectRatio="xMinYMin slice"' : ''
+  const head = `<svg xmlns="http://www.w3.org/2000/svg" width="${width * scale}" height="${height * scale}" viewBox="0 0 ${width} ${height}"${fit} shape-rendering="crispEdges">`
   const svg = `${head}${defs.length > 0 ? `<defs>${defs.join('')}</defs>` : ''}${body}</svg>`
   return svg.length > maxChars ? undefined : svg
 }
@@ -61,12 +85,33 @@ export function sceneSvg(scene: IdleScene, particles: readonly Particle[], { wid
 type Style = NonNullable<IdleScene['particles']>['style']
 
 /** Where the terminal draws it at tick 0; a sparkle that starts dark isn't drawn. */
-function stillParticle(particle: Particle, style: Style, color: string, width: number, height: number): string {
+function stillParticle(particle: Particle, style: Style, mark: Mark, width: number, height: number): string {
   const at = particlePixel(particle, style, 0, width, height)
-  return at ? `<rect fill="${color}" x="${at.x}" y="${at.y}" width="1" height="1"/>` : ''
+  return at ? mark(at.x, at.y) : ''
 }
 
-function movingParticle(particle: Particle, style: Style, color: string, width: number, height: number): string {
+/** Draws one particle with its top left pixel at (x, y): a square, or the biome's particle art. */
+type Mark = (x: number, y: number) => string
+
+/**
+ * One particle as the biome's art (0046 point 2): a one-frame window on the shared sheet, centred on
+ * the pixel a square would fill, a quarter of the sheet's pixels per strip pixel. Moving, its frames
+ * step at the particle rate, each particle from its own frame so they don't flip in step.
+ */
+function particleArt(sheet: DesktopSheet, particle: Particle, x: number, y: number, moving: boolean): string {
+  const q = DESKTOP.sheetPixels
+  const w = sheet.width / q
+  const h = sheet.height / q
+  const first = Math.floor(particle.phase * sheet.frames) % sheet.frames
+  const order = Array.from({ length: sheet.frames }, (_, i) => -((first + i) % sheet.frames) * sheet.width)
+  const step =
+    moving && sheet.frames > 1
+      ? `<animate attributeName="x" values="${order.join(';')}" keyTimes="${order.map((_, i) => +(i / sheet.frames).toFixed(4)).join(';')}" calcMode="discrete" dur="${num(sheet.frames / SCENE.particleFps)}s" repeatCount="indefinite"/>`
+      : ''
+  return `<svg x="${num(x + 0.5 - w / 2)}" y="${num(y + 0.5 - h / 2)}" width="${num(w)}" height="${num(h)}" viewBox="0 0 ${sheet.width} ${sheet.height}"><use href="#pt" x="${order[0]}">${step}</use></svg>`
+}
+
+function movingParticle(particle: Particle, style: Style, mark: Mark, width: number, height: number): string {
   const motion = SCENE.motion[style]
   const tickS = 1 / SCENE.particleFps
   const sx = Math.sign(motion.dx)
@@ -76,7 +121,7 @@ function movingParticle(particle: Particle, style: Style, color: string, width: 
   const offsets: [number, number][] = [[0, 0]]
   if (sx !== 0) offsets.push([-sx * width, 0])
   if (sy !== 0) for (const [x] of [...offsets]) offsets.push([x, -sy * height])
-  let dot = offsets.map(([x, y]) => `<rect fill="${color}" x="${x}" y="${y}" width="1" height="1"/>`).join('')
+  let dot = offsets.map(([x, y]) => mark(x, y)).join('')
 
   if (style === 'sparkle') {
     // On for `on` ticks out of every `period`, shifted by its phase (idle-scene's particlePixel)

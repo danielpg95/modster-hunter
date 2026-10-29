@@ -57,5 +57,6 @@ settled questions and avoid making assumptions about open ones.
 | [0041](0041-auto-start-on-by-default.md) | Auto start is on by default; one welcome toast says how to stop | Accepted |
 | [0042](0042-desktop-svg-sprites.md) | On the desktop app, sprites are one animated Svg each | Proposed (point 4: the catch animation in 0043, the biome scenes in 0044) |
 | [0043](0043-desktop-vector-catch.md) | On the desktop app, a throw plays as one vector Svg | Proposed |
-| [0044](0044-desktop-vector-scenes.md) | On the desktop app, a biome's idle scene is one vector Svg | Proposed |
+| [0044](0044-desktop-vector-scenes.md) | On the desktop app, a biome's idle scene is one vector Svg | Proposed (point 4 amended by 0046 on desktop) |
 | [0045](0045-desktop-sprites.md) | Desktop first: new built-in art is hi-res pixel art for the Desktop app | Accepted |
+| [0046](0046-desktop-particle-art.md) | On desktop, a biome may draw its particles with its own art | Accepted |

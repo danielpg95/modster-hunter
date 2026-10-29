@@ -5,7 +5,7 @@
 //
 //   node tools/sprite.mjs <sheet.png> --frames N [--out file.sprite.json]
 //   node tools/sprite.mjs <animation.gif> [--out file.sprite.json]
-//   node tools/sprite.mjs <desktop.png> --frames N --desktop modster|background|catcher
+//   node tools/sprite.mjs <desktop.png> --frames N --desktop modster|background|catcher|particles
 //                         [--fps F] [--preview page.html] [--catcher catcher.json]
 //
 // With --desktop it converts nothing: it checks desktop art against decision
@@ -26,7 +26,7 @@ const { CONTENT } = await import('../plugin/hooks/constants.ts')
 
 const USAGE = 'usage: node tools/sprite.mjs <sheet.png> --frames N [--out file.sprite.json]\n' +
   '       node tools/sprite.mjs <animation.gif> [--out file.sprite.json]\n' +
-  '       node tools/sprite.mjs <desktop.png> --frames N --desktop modster|background|catcher [--fps F] [--preview page.html] [--catcher catcher.json]'
+  '       node tools/sprite.mjs <desktop.png> --frames N --desktop modster|background|catcher|particles [--fps F] [--preview page.html] [--catcher catcher.json]'
 
 function fail(message) {
   console.error(message)
@@ -91,7 +91,7 @@ console.log(`${out}: ${sprite.width}×${sprite.height}, ${sprite.frames.length} 
 
 /** Checks desktop art (decision 0045) and exits: 0 when it fits, 1 with every problem. */
 async function checkDesktop(art) {
-  if (!['modster', 'background', 'catcher'].includes(art)) fail(`--desktop must be modster, background or catcher (it is "${art}")\n${USAGE}`)
+  if (!['modster', 'background', 'catcher', 'particles'].includes(art)) fail(`--desktop must be modster, background, catcher or particles (it is "${art}")\n${USAGE}`)
   const rules = CONTENT.desktop[art]
   if (kind !== '.png') fail(`${input}: desktop art is a .png sheet`)
   if (args.values.out !== undefined) fail('--out is not used with --desktop: the desktop uses the PNG as it is')
@@ -103,7 +103,7 @@ async function checkDesktop(art) {
   for (const issue of result.issues) console.error(formatIssue(issue))
   if (!result.ok) process.exit(1)
   const { width, height, colors } = result.value
-  console.log(`${input}: ${count} frames of ${width}×${height}, ${colors.length} colours, ${(bytes.length / 1024).toFixed(1)} KiB: fits ${art} desktop art (0045)`)
+  console.log(`${input}: ${count} frames of ${width}×${height}, ${colors.length} colours, ${(bytes.length / 1024).toFixed(1)} KiB: fits ${art} desktop art (${art === 'particles' ? '0046' : '0045'})`)
   if (args.values.preview !== undefined) {
     const { desktopPreviewPage } = await import('./desktop-preview.mjs')
     const fps = args.values.fps === undefined ? CONTENT.modster.defaultFps : Number(args.values.fps)

@@ -71,6 +71,8 @@ const INVALID: [string, (biome: Biome) => void, string][] = [
   ['five desktopBackground frames is an error: 1–4 (0045 point 4)', (b) => (b.desktopBackground = { file: 'desktop.png', frames: 5 }), 'desktopBackground.frames'],
   ['a desktopBackground fps is an error: it plays at backgroundFps', (b) => (b.desktopBackground = { file: 'desktop.png', frames: 2, fps: 4 }), 'desktopBackground.fps'],
   ['a desktopBackground that is a .sprite.json is an error', (b) => (b.desktopBackground = { file: 'scene.sprite.json', frames: 2 }), 'desktopBackground.file'],
+  ['desktopParticles without particles is an error (0046)', (b) => { b.desktopParticles = { file: 'particles.png', frames: 2 }; delete b.particles }, 'desktopParticles'],
+  ['nine desktopParticles frames is an error: 1–8', (b) => (b.desktopParticles = { file: 'particles.png', frames: 9 }), 'desktopParticles.frames'],
 ]
 
 describe('validateBiome', () => {
@@ -92,6 +94,11 @@ describe('validateBiome', () => {
     biome.description = 'd'.repeat(120)
     entries(biome)[0] = { id: 'sproutling', maxAttempts: 10, catchRate: 0.01 }
     entries(biome)[1] = { id: 'mossbeast', maxAttempts: 1, catchRate: 1 }
+    expect(validateBiome(biome, where).issues).toEqual([])
+  })
+
+  test('desktopParticles with particles is valid (decision 0046)', () => {
+    const biome = { ...validBiome(), desktopParticles: { file: 'particles.png', frames: 4 } }
     expect(validateBiome(biome, where).issues).toEqual([])
   })
 

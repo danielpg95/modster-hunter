@@ -1,5 +1,5 @@
-import { SCENE } from '../constants'
-import type { Biome, ParticleStyle, Sprite } from '../content'
+import { DESKTOP, SCENE } from '../constants'
+import type { Biome, DesktopSheet, ParticleStyle, Sprite } from '../content'
 import type { RandomSource } from '../game'
 import { pixelsToCells } from './pixels-to-cells'
 import { rgbaOf, spriteRgba } from './sprite-cells'
@@ -13,6 +13,10 @@ export interface IdleScene {
   rows: number
   /** The background's frames as RGBA; absent for a particle-only strip */
   art?: { width: number; height: number; frames: Uint8Array[] }
+  /** A desktop background instead (decision 0045 point 4), drawn by `sceneSvg` only */
+  sheet?: DesktopSheet
+  /** The biome's particle art on desktop (decision 0046), drawn by `sceneSvg` only */
+  particleSheet?: DesktopSheet
   particles?: { style: ParticleStyle; rgb: number[]; density: number }
   /** Background frames per second */
   artFps: number
@@ -43,6 +47,23 @@ export function idleScene(biome: Pick<Biome, 'accentColor' | 'backgroundFps' | '
     ...(particles ? { particles } : {}),
     artFps,
     timerFps: Math.max(animatedArt ? artFps : 0, particles ? SCENE.particleFps : 0),
+  }
+}
+
+/**
+ * The scene the desktop draws for a biome with a `desktopBackground` (decision 0045 points 4
+ * and 9): the sheet in place of the terminal background, a quarter of its pixels per strip
+ * pixel, with the biome's particles. Its frames step by SMIL, so only particles need a timer.
+ */
+export function desktopIdleScene(biome: Pick<Biome, 'accentColor' | 'backgroundFps' | 'particles'>, sheet: DesktopSheet): IdleScene {
+  const base = idleScene(biome)
+  const particles = base?.particles
+  return {
+    rows: Math.ceil(sheet.height / DESKTOP.sheetPixels / 2),
+    sheet,
+    ...(particles ? { particles } : {}),
+    artFps: biome.backgroundFps ?? SCENE.defaultFps,
+    timerFps: particles ? SCENE.particleFps : 0,
   }
 }
 

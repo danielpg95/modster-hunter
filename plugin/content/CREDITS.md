@@ -42,6 +42,8 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/flexton/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Flexton, from @victor-aguilars' reference; the eye, grin and arm flex are hand-drawn |
 | `modsters/inkspector/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Inkspector, from @victor-aguilars' reference; the lens eye, coat, belt and tentacles are hand-drawn, with a lens-eye blink |
 | `biomes/whispering-forest/background.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Idle scene (decision 0026) |
+| `biomes/whispering-forest/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Whispering Forest's desktop background (P5-48, decision 0045), reduced from @danielpg95's reference; the undergrowth sways |
+| `biomes/whispering-forest/particles.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Whispering Forest's falling leaf on desktop (P5-48, decision 0046): it turns and flips as it falls |
 | `biomes/saltbreeze-bay/background.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Idle scene (decision 0026) |
 | `biomes/dustwind-expanse/background.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Idle scene (decision 0026) |
 | `biomes/crystal-grotto/background.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Idle scene (decision 0026) |
