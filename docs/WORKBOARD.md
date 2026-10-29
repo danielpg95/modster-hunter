@@ -35,3 +35,4 @@ list when you finish a task.
 - **P5-18** — Live Stats tab
 - **P5-50** — Player skill: desktop, terminal or both
 - **P5-52** — Desktop interaction (spike)
+- **P5-53** — Desktop reference prompts for Modsters and catchers
