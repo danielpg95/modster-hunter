@@ -402,7 +402,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 ## Phase 5 — Extras, polish and release
 
 #### [ ] P5-01 — Shiny variants
-- **Depends on:** P2-10
+- **Depends on:** P2-10, P5-43
 - **Size:** M
 - **Goal:** a small chance (default 1/256, per-Modster override) of a recolored shiny, via an alternate palette in `.sprite.json`.
 - **Done when:**
@@ -782,35 +782,90 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] A spike checks in the Code tab whether an `Svg` can show an embedded PNG (`<image href="data:image/png;base64,…">`) and animate it, and notes what the sandboxed frame allows; a screenshot of a 96×64, 4-frame test sheet.
   - [x] Sizes are measured against the 131072-character `Svg` limit: a high-detail sprite as paths (0042) and as an embedded PNG, for the largest built-in Modster's size at 2× and 3×.
   - [x] A decision picks an approach (for example an optional desktop-only sprite in `modster.json`, vector art, or staying with today's sprites), covering how the terminal and desktop versions stay recognisably the same Modster, and the `CONTENT_FORMAT.md` change if any (decision 0045, Proposed).
-  - [x] If one is picked, roadmap tasks implement it and add the art (P5-40, P5-41, P5-42).
+  - [x] If one is picked, roadmap tasks implement it and add the art (P5-40, P5-41, P5-42; replaced by P5-43..P5-51 on 2026-10-28, when the project went desktop-first).
 
-#### [ ] P5-40 — Desktop sprites: format, loader and validator
+#### [ ] P5-43 — Desktop-first decision
 - **Depends on:** P5-39
-- **Size:** M
-- **Goal:** a Modster's `modster.json` can name a 2× or 3× PNG desktop sheet (decision 0045), loaded and checked, and nothing draws it yet.
+- **Size:** S
+- **Goal:** state the cut to desktop-first art and set the desktop quality bar from scratch, by reworking decision 0045 (asked by @danielpg95, 2026-10-28). Only the P5-39 spike's technical findings carry over: an image-mode Svg, SMIL and the 131072-character limit.
 - **Done when:**
-  - [ ] `CONTENT_FORMAT.md` documents `desktopSprite` (`file`, `scale`) and its rules (0045 points 1–3).
-  - [ ] The loader reads the PNG's bytes and keeps them with the Modster; one that breaks a rule is dropped with a content issue and the Modster still loads; tests cover each rule (frames, size per frame, scale, 64 colours, alpha, 48 KiB).
-  - [ ] `tools/check-content.mjs` checks built-in desktop sprites and their credits rows.
+  - [ ] 0045 is rewritten and Accepted. It states the cut: after P5-21, built-in Modsters, biomes and catchers are desktop art. Terminal art is optional and welcome from the community, and 0033 and 0034 apply only to terminal sprites.
+  - [ ] It sets the Modster bar: hi-res pixel art drawn pixelated, up to 128×128 per frame, a sheet of 2–8 frames at its own `fps`, at most 48 KiB.
+  - [ ] It settles the colour cap and alpha (default: 64 colours, each pixel opaque or clear), backgrounds (default: up to 48 px tall, edges that tile, 1–4 frames, at most 24 KiB), catchers (default: up to 96×96, at most 24 KiB, with `lidRows`, `glowIndex` and `rimIndex` restated for a PNG) and the display scales for the band, pane and Collection.
+  - [ ] It says each piece of content has desktop art, terminal art or both. With both, they're the same design. A terminal player sees the compact text layout for a desktop-only Modster, the idle line alone for a desktop-only biome, and the default catcher for a desktop-only catcher.
+  - [ ] The README and the plugin's description no longer say the game lives in your terminal.
+
+#### [ ] P5-44 — Desktop art: format, loader and validator
+- **Depends on:** P5-43
+- **Size:** M
+- **Goal:** content can carry desktop art (decision 0045), loaded and checked, and nothing draws it yet.
+- **Done when:**
+  - [ ] `CONTENT_FORMAT.md` documents `desktopSprite` for Modsters and catchers and `desktopBackground` for biomes, and the terminal `sprite` is optional when desktop art is there.
+  - [ ] The loader keeps the PNG bytes. Art that breaks a rule is dropped with a content issue; tests cover every rule.
+  - [ ] `tools/check-content.mjs` and `tools/sprite.mjs` check desktop sheets.
   - [ ] The terminal output is unchanged: the existing tests pass as they are.
 
-#### [ ] P5-41 — Draw desktop sprites on desktop
-- **Depends on:** P5-40
-- **Size:** M
-- **Goal:** on the desktop surface, a Modster with a desktop sprite shows it in the band, the encounter pane, the Collection tab, the catch and the catcher preview (decision 0045 points 4–5).
-- **Done when:**
-  - [ ] A pure renderer makes the image-mode Svg: the embedded sheet stepped by SMIL at `sprite.fps`, pixelated, in the terminal sprite's box; render tests check its frames, timing and size.
-  - [ ] The Collection tab's silhouette is the same sheet through a gray filter.
-  - [ ] Checked in the Code tab first: `catchSvg`'s SMIL motion and colour filter run in an image-mode Svg. The catch then draws the Modster from the sheet.
-  - [ ] Checked in the Code tab: band, pane, Collection tab, catch and catcher preview, with a Modster that has a desktop sprite and one that doesn't.
-
-#### [ ] P5-42 — Tidecrown's desktop sprite, and the contributor skills
-- **Depends on:** P5-40
+#### [ ] P5-45 — Terminal fallbacks for desktop-only content
+- **Depends on:** P5-44
 - **Size:** S
-- **Goal:** Tidecrown (#036) ships with a 3× desktop sheet and a terminal sprite reduced from it, and the skills know about desktop sprites.
+- **Goal:** content with only desktop art still plays on the terminal (decision 0045).
 - **Done when:**
-  - [ ] Tidecrown's desktop sheet and terminal sprite are original art, credited, and pass the validator; the PR shows both side by side, every frame (0045 point 6).
-  - [ ] The `add-modster` contributor skill and the mod's `create-modster-content` skill explain desktop sprites and how to keep both versions the same Modster.
+  - [ ] A desktop-only Modster shows the compact text layout in the band, pane and collection.
+  - [ ] A desktop-only biome shows the idle line alone, and a desktop-only catcher falls back to the default catcher.
+  - [ ] Tests cover each case.
+
+#### [ ] P5-46 — Draw desktop Modster sheets
+- **Depends on:** P5-44
+- **Size:** M
+- **Goal:** on the desktop surface, a Modster with a desktop sheet shows it in the band, the encounter pane, the Collection tab and the catcher preview.
+- **Done when:**
+  - [ ] A pure renderer makes the image-mode Svg: the sheet stepped by SMIL at its `fps`, pixelated, at 0045's scales. Render tests check its frames, timing and size.
+  - [ ] The Collection tab's silhouette is the same sheet through a gray filter.
+  - [ ] Checked in the Code tab with a Modster that has a desktop sheet and one that doesn't.
+
+#### [ ] P5-47 — Catch animation with desktop art
+- **Depends on:** P5-46
+- **Size:** M
+- **Goal:** a throw on desktop draws the Modster's and the catcher's desktop sheets (decision 0043).
+- **Done when:**
+  - [ ] Checked in the Code tab first: `catchSvg`'s SMIL motion and filters run in an image-mode Svg.
+  - [ ] The throw uses both desktop sheets, and falls back to today's art for content without them. Render tests cover it.
+  - [ ] A throw with the largest allowed Modster and catcher stays under the 131072-character limit.
+
+#### [ ] P5-48 — Desktop biome backgrounds
+- **Depends on:** P5-44
+- **Size:** S
+- **Goal:** the idle scene tiles a biome's `desktopBackground` on desktop (decision 0044).
+- **Done when:**
+  - [ ] `sceneSvg` tiles it within the band's `maxRows`, and the Biomes tab shows it. Tests cover it.
+  - [ ] Checked in the Code tab.
+
+#### [ ] P5-49 — Contributor skills: desktop, terminal or both
+- **Depends on:** P5-44
+- **Size:** M
+- **Goal:** contributors can make built-in desktop art, terminal art or both for Modsters, biomes and catchers.
+- **Done when:**
+  - [ ] `add-modster` and `add-biome` ask for desktop, terminal or both, and a new `add-catcher` contributor skill exists.
+  - [ ] The desktop path aims for detail: hi-res pixel art up to 128×128 with full shading, worked from a reference image, previewed at pane and band scale before approval.
+  - [ ] For "both", the terminal sprite is reduced from the desktop design, not the other way round.
+
+#### [ ] P5-50 — Player skill: desktop, terminal or both
+- **Depends on:** P5-44, P5-45
+- **Size:** S
+- **Goal:** players' own Modsters, biomes and catchers can be desktop art, terminal art or both.
+- **Done when:**
+  - [ ] `create-modster-content` offers the three, recommends desktop for detailed art and terminal for terminal players, and explains the terminal fallback.
+  - [ ] `plugin.json`'s version goes up.
+
+#### [ ] P5-51 — First desktop art set
+- **Depends on:** P5-21, P5-47, P5-48, P5-49
+- **Size:** M
+- **Goal:** the first built-in desktop art, made with the new skills: Tidecrown (#036), Saltbreeze Bay's background and one catcher.
+- **Done when:**
+  - [ ] Tidecrown's desktop sheet (from @victor-aguilars's detailed design), Saltbreeze Bay's `desktopBackground` and one catcher's `desktopSprite` are original, credited and pass the validator.
+  - [ ] A preview of each in the PR description, every frame, dark and light.
+  - [ ] Checked in the Code tab: band, pane, Collection, Biomes tab and a throw.
+
 ---
 
 ## Phase 6 — Beyond the terminal
