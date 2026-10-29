@@ -1,5 +1,5 @@
 import { describe, expect, mock, test } from 'claude-code/testing'
-import type { On } from 'claude-code'
+import type { On, UiPane } from 'claude-code'
 import { encodePng } from './fixtures/encode-png'
 import { desktopOnlyForest } from './fixtures/desktop-only-forest'
 import { oneModsterForest } from './fixtures/one-modster-forest'
@@ -385,6 +385,35 @@ describe('register', () => {
     await ui.unmount()
   })
 
+  test('on desktop the name tag waits for the band: a band first drawn late still shows it, then it fades (P5-56)', HUNTING, async ($, on) => {
+    const clock = await startSession($, on, sceneForest())
+    // The Code tab draws the band seconds after session start on a first load
+    await clock.advance(IDLE_TAG.showMs + IDLE_TAG.fadeMs + 2_000)
+    const ui = await $.ui.mount({ plugin: 'modster-hunter', surface: 'desktop', component: 'AbovePrompt', props: BAND_PROPS as any })
+    expect((await ui.find({ type: 'Svg' }))?.props.source).toContain('>Whispering Forest</text>')
+    await clock.advance(IDLE_TAG.showMs)
+    expect((await ui.find({ type: 'Svg' }))?.props.source).toContain('<animate attributeName="opacity" from="1" to="0"')
+    await clock.advance(IDLE_TAG.fadeMs)
+    expect((await ui.find({ type: 'Svg' }))?.props.source).not.toContain('<text')
+    await ui.unmount()
+  })
+
+  test('on desktop the name tag waits while the encounter pane holds the band aside (0015, P5-56)', HUNTING, async ($, on) => {
+    let paneShown = true
+    const pane: UiPane = { id: 'modster-hunt', title: 'Modster Hunter', isShown: true, isFocused: false, isPlaced: true }
+    const panes = (): UiPane[] => (paneShown ? [pane] : [])
+    on('ui.panes', () => ({ value: panes() }))
+    const { ui, clock } = await startBand($, on, sceneForest(), 'desktop')
+    expect(await ui.find({ type: 'Svg' })).toBeUndefined()
+    await clock.advance(IDLE_TAG.showMs + IDLE_TAG.fadeMs + 2_000)
+    paneShown = false
+    await ui.redraw(BAND_PROPS as any)
+    expect((await ui.find({ type: 'Svg' }))?.props.source).toContain('>Whispering Forest</text>')
+    await clock.advance(IDLE_TAG.showMs + IDLE_TAG.fadeMs)
+    expect((await ui.find({ type: 'Svg' }))?.props.source).not.toContain('<text')
+    await ui.unmount()
+  })
+
   test('on desktop the tag pulses while Claude works, and shows again when an encounter ends (0047)', HUNTING, async ($, on) => {
     const { ui, clock } = await startBand($, on, oneModsterForest(), 'desktop')
     // No scene: the tag alone
@@ -627,6 +656,14 @@ async function clearSession($: any): Promise<void> {
 
 /** Starts a session on the one-Modster forest with a fake clock, and mounts the band. */
 async function startBand($: any, on: On, files = oneModsterForest(), surface = 'terminal') {
+  const clock = await startSession($, on, files)
+  const ui = await $.ui.mount({ plugin: 'modster-hunter', surface, component: 'AbovePrompt', props: BAND_PROPS })
+  // The band's timers run on the mock clock; advancing it fires them in order
+  return { ui, clock }
+}
+
+/** Starts a session with `files` and nothing drawn yet; returns the mock clock. */
+async function startSession($: any, on: On, files: Record<string, string>) {
   on('session.start', ($, e) => ({ cwd: e.cwd }))
   on('command.register', ($, e) => ({ value: { command: e.name } }))
   stubContentFs(on, files)
@@ -641,7 +678,5 @@ async function startBand($: any, on: On, files = oneModsterForest(), surface = '
   })
   const clock = mock.clock(on)
   await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' })
-  const ui = await $.ui.mount({ plugin: 'modster-hunter', surface, component: 'AbovePrompt', props: BAND_PROPS })
-  // The band's timers run on the mock clock; advancing it fires them in order
-  return { ui, clock }
+  return clock
 }

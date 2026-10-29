@@ -198,8 +198,8 @@ let isBlittingCatch = false
 // site; it moves only while Claude works and holds still otherwise (point 5).
 const SCENE_KEY = 'scene'
 let scene: IdleScene | undefined
-// The desktop's idle tag (0047): shown as the biome comes into view, then fading, then gone
-let idleTagPhase: 'shown' | 'fading' | 'gone' = 'gone'
+// The desktop's idle tag (0047): waiting for the band's first draw, shown, then fading, then gone
+let idleTagPhase: 'waiting' | 'shown' | 'fading' | 'gone' = 'gone'
 let idleTagTimer: Timer | undefined
 // A biome without an accent colour gets a light grey tag
 const IDLE_TAG_COLOR = '#d0d0d0'
@@ -462,6 +462,7 @@ export const register: Register = (on, options) => {
       if (e.surface !== 'desktop') return line(view.line, 0)
       const { Svg } = $.ui.resolve(e)
       // On desktop the idle line is a tag in the scene that fades once the biome is shown (0047)
+      if (tag) startIdleTag($)
       if (desktopScene) {
         return <Svg source={desktopScene.source} alt={`${biome?.name ?? 'Biome'} scene`} height={desktopScene.height} {...(desktopScene.image ? {} : { isInteractive: true })} />
       }
@@ -1529,12 +1530,23 @@ function currentIdleTag(biome: Biome | undefined): IdleTag | undefined {
 }
 
 /**
- * Shows the idle tag as the biome comes into view (0047 point 2): for `IDLE_TAG.showMs`, then a
- * redraw that fades it and one that drops it. The mod times it, since an image restarts its
- * animation on every redraw and turns redraw the band.
+ * Shows the idle tag as the biome comes into view (0047 point 2). Its clock waits for the band's
+ * first desktop draw (`startIdleTag`): at a session's first load the Code tab can draw the band
+ * seconds after session start, and the encounter pane holds the band aside (P5-56).
  */
-function showIdleTag($: EngineInterface): void {
+function showIdleTag(): void {
   idleTagTimer?.cancel()
+  idleTagTimer = undefined
+  idleTagPhase = 'waiting'
+}
+
+/**
+ * Starts a waiting tag's clock as the band first draws it: `IDLE_TAG.showMs`, then a redraw that
+ * fades it and one that drops it. The mod times it, since an image restarts its animation on every
+ * redraw and turns redraw the band.
+ */
+function startIdleTag($: EngineInterface): void {
+  if (idleTagPhase !== 'waiting') return
   idleTagPhase = 'shown'
   idleTagTimer = $.clock.after(IDLE_TAG.showMs, () => {
     idleTagPhase = 'fading'
@@ -1550,7 +1562,7 @@ function showIdleTag($: EngineInterface): void {
 /** Shows `loaded`'s idle scene in the band, from its first frame. */
 function setScene($: EngineInterface, loaded: LoadedBiome | undefined): void {
   stopScene()
-  if (loaded) showIdleTag($)
+  if (loaded) showIdleTag()
   scene = loaded && idleScene(loaded.biome, loaded.background)
   sheetScene = loaded && withDesktopArt(loaded, scene)
   loggedSceneSkip = undefined
@@ -1595,7 +1607,7 @@ async function advanceMachine($: EngineInterface, action: MachineAction): Promis
   }
   machine = step.state
   // The biome comes back into view: its tag shows again (0047 point 2)
-  if (hadEncounter && !machine.encounter) showIdleTag($)
+  if (hadEncounter && !machine.encounter) showIdleTag()
   if (pendingIdleTimeoutMs !== undefined && !machine.encounter) {
     machineContext = { ...machineContext, idleTimeoutMs: pendingIdleTimeoutMs }
     pendingIdleTimeoutMs = undefined
