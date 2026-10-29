@@ -860,10 +860,11 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 
 #### [ ] P5-50 — Player skill: desktop, terminal or both
 - **Depends on:** P5-44, P5-45
-- **Size:** S
+- **Size:** M
 - **Goal:** players' own Modsters, biomes and catchers can be desktop art, terminal art or both.
 - **Done when:**
   - [ ] `create-modster-content` offers the three, recommends desktop for detailed art and terminal for terminal players, and explains the terminal fallback.
+  - [ ] Its helper `modster-content.mjs`, which ships with the mod, gets desktop modes, so players can follow the desktop path without the repo's tools (asked by @danielpg95, 2026-10-28): reduce a reference image, check a desktop sheet against 0045 and 0046, and write the preview page (Modsters, backgrounds, particles, catcher throws). It stays offline, with no installs. Tests cover them.
   - [ ] `plugin.json`'s version goes up.
 
 #### [ ] P5-51 — First desktop art set
