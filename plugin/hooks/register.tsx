@@ -159,7 +159,7 @@ const cellsByModster = new Map<string, { sprite: LoadedModster['sprite']; cells:
 const svgByModster = new Map<string, { sprite: LoadedModster['sprite']; svg: string }>()
 const spriteSites = new Set<string>() // requestIds
 let frameTimer: Timer | undefined
-let frameModster: LoadedModster | undefined
+let frameModster: DrawnModster | undefined
 let frameIndex = 0
 let isBlitting = false
 
@@ -253,7 +253,7 @@ const silhouettes = new Map<string, string>()
 const silhouetteSvgs = new Map<string, { sprite: Sprite; svg: string }>()
 const catcherPreviewSvgs = new Map<string, { catcher: LoadedCatcher; frames: Sprite['frames']; svg: string | undefined }>()
 let collectionSite: string | undefined
-let collectionSpriteModster: LoadedModster | undefined
+let collectionSpriteModster: DrawnModster | undefined
 let collectionFrame = 0
 let collectionTimer: Timer | undefined
 let isBlittingCollection = false
@@ -377,8 +377,9 @@ export const register: Register = (on, options) => {
     const view = bandView({
       maxRows: e.props.maxRows,
       columns: e.props.bodyColumns,
-      // Raster is terminal only (0012); the desktop app gets an Svg beside the compact text (P5-06)
-      canDrawSprite: e.surface === 'terminal',
+      // Raster is terminal only (0012); the desktop app gets an Svg beside the compact text (P5-06).
+      // A Modster with no terminal sprite gets the compact text (0045 point 10)
+      canDrawSprite: e.surface === 'terminal' && (!modster || hasSprite(modster)),
       showIdleLine,
       // The band turned off still keeps Throw on screen during an encounter (0023 point 3)
       ...(currentPlan().band === 'one-row' ? { oneRow: true } : {}),
@@ -457,7 +458,8 @@ export const register: Register = (on, options) => {
       const lines = <Box flexDirection="column">{view.lines.map(line)}</Box>
       // P5-06: the Desktop Code tab draws the Modster as an Svg beside the text, scaled
       // down when needed so it stays within the band's maxRows (rowPx is an estimate)
-      if (e.surface !== 'desktop' || !modster || !band || currentPlan().band === 'one-row') return lines
+      // A Modster with desktop art only stays text until P5-46 draws it (0045 point 10)
+      if (e.surface !== 'desktop' || !modster || !hasSprite(modster) || !band || currentPlan().band === 'one-row') return lines
       const { Svg } = $.ui.resolve(e)
       const scale = Math.min(DESKTOP.bandScale, (e.props.maxRows * DESKTOP.rowPx) / modster.sprite.height)
       return (
@@ -478,8 +480,9 @@ export const register: Register = (on, options) => {
     // terminal (canDrawSprite); the check narrows the surface so Raster resolves
     if (e.surface !== 'terminal') return next(e)
     const { Raster } = $.ui.resolve(e)
-    const cells = modster ? cellsFor(modster) : []
-    if (modster) addSite($, e.requestId, modster)
+    const drawn = modster && hasSprite(modster) ? modster : undefined
+    const cells = drawn ? cellsFor(drawn) : []
+    if (drawn) addSite($, e.requestId, drawn)
     return (
       <Box flexDirection="row" columnGap={BAND.gapColumns}>
         <Raster key={SPRITE_KEY} columns={view.spriteColumns} rows={view.spriteRows} cells={catchCells ?? cells[frameIndex] ?? cells[0] ?? ''} />
@@ -563,7 +566,9 @@ export const register: Register = (on, options) => {
 
     removeSceneSite(e.requestId)
     // The sprite's normal size, as in the band: 2x looked far too big in a real terminal (0015)
-    const fits = () => Math.ceil(modster.sprite.height / 2) <= rows && modster.sprite.width + BAND.gapColumns + BAND.textColumns <= columns
+    const sprite = modster.sprite
+    // No terminal sprite means the compact text (0045 point 10)
+    const fits = () => sprite !== undefined && Math.ceil(sprite.height / 2) <= rows && sprite.width + BAND.gapColumns + BAND.textColumns <= columns
     const view = bandView({
       maxRows: rows,
       columns,
@@ -606,13 +611,15 @@ export const register: Register = (on, options) => {
       return (
         <Box flexDirection="column">
           {header}
-          <Svg
-            source={desktopSprite($, modster)}
-            alt={modster.modster.name}
-            width={modster.sprite.width * DESKTOP.paneScale}
-            height={modster.sprite.height * DESKTOP.paneScale}
-            isInteractive
-          />
+          {hasSprite(modster) ? (
+            <Svg
+              source={desktopSprite($, modster)}
+              alt={modster.modster.name}
+              width={modster.sprite.width * DESKTOP.paneScale}
+              height={modster.sprite.height * DESKTOP.paneScale}
+              isInteractive
+            />
+          ) : null}
           {lines.map(line)}
         </Box>
       )
@@ -627,6 +634,8 @@ export const register: Register = (on, options) => {
         </Box>
       )
     }
+    // The full layout is chosen only with a terminal sprite (fits)
+    if (!hasSprite(modster)) return next(e)
     const { Raster } = $.ui.resolve(e)
     const cells = cellsFor(modster)
     addSite($, e.requestId, modster)
@@ -741,7 +750,7 @@ export const register: Register = (on, options) => {
 
     /** The Catchers tab: a summary line with k/j/u, the list, and the selected catcher's preview (decision 0035 point 9). */
     function catchersView(rows: number) {
-      const inUse = content ? catcherInUse(content.catchers, pickedCatcherId, CATCH.defaultCatcher)?.catcher.id : undefined
+      const inUse = content ? catcherInUse(content.catchers, pickedCatcherId, CATCH.defaultCatcher, hasCatcherSprite)?.catcher.id : undefined
       const entries = content ? catcherEntries([...content.catchers.values()].map((loaded) => loaded.catcher), inUse, content.userIds.catchers) : []
       // A selected catcher that no longer loads falls back to the one in use
       const at = (id: string | undefined) => entries.findIndex((entry) => entry.id === id)
@@ -775,8 +784,12 @@ export const register: Register = (on, options) => {
       }
       // The preview plays on the Modster caught last, or a silhouette when none is caught yet
       const all = content ? [...content.modsters.values(), ...content.off.modsters.values()] : []
-      const caughtId = previewModsterId(collectionRecords, new Set(all.map((loaded) => loaded.modster.id)))
-      const modster = all.find((loaded) => loaded.modster.id === caughtId) ?? all[0]
+      // Only terminal art can be previewed until desktop throws draw desktop art (0045 point 10)
+      const drawable = all.filter(hasSprite)
+      const caughtId = previewModsterId(collectionRecords, new Set(drawable.map((loaded) => loaded.modster.id)))
+      const shown = drawable.find((loaded) => loaded.modster.id === caughtId) ?? drawable[0]
+      const previewCatcher = hasCatcherSprite(loadedCatcher) ? loadedCatcher : undefined
+      const modster = previewCatcher && shown
       const lines: BandLine[] = [
         [{ text: selected.name, bold: true }],
         ...(selected.description ? [[{ text: selected.description, dim: true }] as BandLine] : []),
@@ -812,10 +825,10 @@ export const register: Register = (on, options) => {
         </Box>
       )
       let detail = text
-      if (plan.sprite !== 'none' && modster && e.surface === 'terminal') {
+      if (plan.sprite !== 'none' && modster && previewCatcher && e.surface === 'terminal') {
         const { Raster } = $.ui.resolve(e)
         const sprite = caughtId === undefined ? silhouetteSprite(modster.sprite) : modster.sprite
-        const cells = catcherPreviewCells($, e.requestId, loadedCatcher, modster, sprite)
+        const cells = catcherPreviewCells($, e.requestId, previewCatcher, modster, sprite)
         const beside = plan.sprite === 'beside'
         detail = (
           <Box key="detail" flexDirection={beside ? 'row' : 'column'} {...(beside ? { columnGap: COLLECTION.gapColumns } : {})}>
@@ -823,12 +836,12 @@ export const register: Register = (on, options) => {
             {text}
           </Box>
         )
-      } else if (modster && e.surface === 'desktop') {
+      } else if (modster && previewCatcher && e.surface === 'desktop') {
         // P5-38: the same looped catch as one vector Svg above the text (0043); the surface plays it
         dropCatcherPreview(e.requestId)
         const { Svg } = $.ui.resolve(e)
         const sprite = caughtId === undefined ? silhouetteSprite(modster.sprite) : modster.sprite
-        const source = catcherPreviewSvg(loadedCatcher, modster, sprite)
+        const source = catcherPreviewSvg(previewCatcher, modster, sprite)
         if (source) {
           detail = (
             <Box key="detail" flexDirection="column">
@@ -1118,7 +1131,7 @@ export const register: Register = (on, options) => {
         </Box>
       )
       let detail = text
-      if (plan.sprite !== 'none' && box && loaded && e.surface === 'terminal') {
+      if (plan.sprite !== 'none' && box && loaded && hasSprite(loaded) && e.surface === 'terminal') {
         const { Raster } = $.ui.resolve(e)
         // Only a caught Modster animates; the silhouette holds still
         setCollectionSite($, e.requestId, selected.record ? loaded : undefined)
@@ -1131,7 +1144,7 @@ export const register: Register = (on, options) => {
             {text}
           </Box>
         )
-      } else if (loaded && e.surface === 'desktop') {
+      } else if (loaded && hasSprite(loaded) && e.surface === 'desktop') {
         // P5-38: an Svg above the text (0042); a caught Modster loops its idle frames, the silhouette holds still
         dropCollectionSite(e.requestId)
         const { Svg } = $.ui.resolve(e)
@@ -1300,7 +1313,14 @@ async function changeSetting($: EngineInterface, field: SettingField): Promise<v
   $.ui.invalidate('ui.render')
 }
 
-function cellsFor(loaded: LoadedModster): string[] {
+/** A loaded Modster with terminal art; one with desktop art only has no `sprite` (0045 point 2). */
+type DrawnModster = LoadedModster & { sprite: Sprite }
+
+function hasSprite(loaded: LoadedModster): loaded is DrawnModster {
+  return loaded.sprite !== undefined
+}
+
+function cellsFor(loaded: DrawnModster): string[] {
   const cached = cellsByModster.get(loaded.modster.id)
   if (cached?.sprite === loaded.sprite) return cached.cells
   const cells = spriteCells(loaded.sprite)
@@ -1309,12 +1329,12 @@ function cellsFor(loaded: LoadedModster): string[] {
 }
 
 // P5-06: every frame in one SVG, looped by SMIL on the surface, since blit only repaints Raster and Image
-function svgFor(loaded: LoadedModster): string {
+function svgFor(loaded: DrawnModster): string {
   const cached = svgByModster.get(loaded.modster.id)
   if (cached?.sprite === loaded.sprite) return cached.svg
   const { width, height } = loaded.sprite
   const frames = spriteRgba(loaded.sprite).map((rgba) => ({ width, height, rgba }))
-  const svg = pixelsToSvg(frames, { scale: 1, fps: loaded.modster.sprite.fps ?? CONTENT.modster.defaultFps })
+  const svg = pixelsToSvg(frames, { scale: 1, fps: loaded.modster.sprite?.fps ?? CONTENT.modster.defaultFps })
   svgByModster.set(loaded.modster.id, { sprite: loaded.sprite, svg })
   return svg
 }
@@ -1324,7 +1344,7 @@ function svgFor(loaded: LoadedModster): string {
  * idle loop (0042). Svg has no key, so the source carries the throw: a new source is a new
  * box, and its SMIL starts at 0 even when the last throw drew the same art.
  */
-function desktopSprite($: EngineInterface, loaded: LoadedModster): string {
+function desktopSprite($: EngineInterface, loaded: DrawnModster): string {
   const play = catchPlay
   if (play) {
     if (play.svg === undefined) {
@@ -1357,8 +1377,9 @@ function currentEncounter(): BandEncounter | undefined {
     name: modster.modster.name,
     tier: encounter.tier,
     attemptsLeft: encounter.attemptsLeft,
-    spriteWidth: modster.sprite.width,
-    spriteHeight: modster.sprite.height,
+      // Unused without a terminal sprite: the band then draws the compact text (0045 point 10)
+    spriteWidth: modster.sprite?.width ?? 0,
+    spriteHeight: modster.sprite?.height ?? 0,
     ...(encounter.outcome ? { outcome: encounter.outcome } : {}),
     ...(encounter.fledBecause ? { fledBecause: encounter.fledBecause } : {}),
     ...(shownDots ? { dots: shownDots } : {}),
@@ -1521,7 +1542,7 @@ function queueWrite($: EngineInterface, write: (store: StatsStorePort) => Promis
 }
 
 /** Notes that `requestId` draws the sprite, and keeps the frame loop running for it. */
-function addSite($: EngineInterface, requestId: string, loaded: LoadedModster): void {
+function addSite($: EngineInterface, requestId: string, loaded: DrawnModster): void {
   spriteSites.add(requestId)
   if (frameModster?.modster.id !== loaded.modster.id) {
     frameIndex = 0
@@ -1529,12 +1550,12 @@ function addSite($: EngineInterface, requestId: string, loaded: LoadedModster): 
     frameTimer?.cancel()
     frameTimer = undefined
   }
-  if (frameTimer || loaded.sprite.frames.length < 2) return
-  frameTimer = $.clock.every(Math.max(1, Math.round(1000 / (loaded.modster.sprite.fps ?? 6))), () => {
+  if (frameTimer || !loaded.sprite || loaded.sprite.frames.length < 2) return
+  frameTimer = $.clock.every(Math.max(1, Math.round(1000 / (loaded.modster.sprite?.fps ?? 6))), () => {
     const current = frameModster
     // Skip a tick while the last blits are in flight (P1-03), or during a throw: the
     // catcher plays, or with none drawn the Modster holds still (0035 point 8)
-    if (!current || isBlitting || spriteSites.size === 0 || catchPlay || machine?.encounter?.phase === 'throwing') return
+    if (!current || !hasSprite(current) || isBlitting || spriteSites.size === 0 || catchPlay || machine?.encounter?.phase === 'throwing') return
     isBlitting = true
     frameIndex = (frameIndex + 1) % current.sprite.frames.length
     const blits = [...spriteSites].map((site) =>
@@ -1562,8 +1583,9 @@ function updateCatch($: EngineInterface, now: number): void {
   }
   if (catchPlay?.throwAt === throwAt) return
   const modster = currentModster()
-  const catcher = content && catcherInUse(content.catchers, pickedCatcherId, CATCH.defaultCatcher)
-  if (!modster || !catcher) return
+  const catcher = content && catcherInUse(content.catchers, pickedCatcherId, CATCH.defaultCatcher, hasCatcherSprite)
+  // Without terminal art on both sides the throw plays as the dot count (0035 point 8, 0045 point 10)
+  if (!modster || !hasSprite(modster) || !catcher || !hasCatcherSprite(catcher)) return
   const art = catchArtFor(catcher, modster)
   // A catcher that doesn't fit the sprite area isn't drawn (0035 point 8; P5-33 shows the dot count)
   if (!art.fits) return
@@ -1615,11 +1637,18 @@ function stopCatch(): void {
 }
 
 /** The decoded art for a catcher on a Modster, made once and remade when either changed. */
-function catchArtFor(catcher: LoadedCatcher, modster: LoadedModster): CatchArt {
+/** A loaded catcher with terminal art; one with desktop art only has no `sprite` (0045 point 2). */
+type DrawnCatcher = LoadedCatcher & { sprite: Sprite }
+
+function hasCatcherSprite(loaded: LoadedCatcher): loaded is DrawnCatcher {
+  return loaded.sprite !== undefined
+}
+
+function catchArtFor(catcher: DrawnCatcher, modster: DrawnModster): CatchArt {
   const key = `${catcher.catcher.id}/${modster.modster.id}`
   const cached = catchArts.get(key)
   if (cached && cached.catcher === catcher && cached.modster === modster) return cached.art
-  const art = prepareCatch(catcher.catcher, catcher.sprite, modster.sprite, modster.modster.sprite.fps ?? CONTENT.modster.defaultFps)
+  const art = prepareCatch(catcher.catcher, catcher.sprite, modster.sprite, modster.modster.sprite?.fps ?? CONTENT.modster.defaultFps)
   catchArts.set(key, { catcher, modster, art })
   return art
 }
@@ -1915,6 +1944,7 @@ function spriteBox(): { columns: number; rows: number } {
   let columns = 0
   let rows = 0
   for (const { sprite } of [...(content?.modsters.values() ?? []), ...(content?.off.modsters.values() ?? [])]) {
+    if (!sprite) continue
     columns = Math.max(columns, sprite.width)
     rows = Math.max(rows, Math.ceil(sprite.height / 2))
   }
@@ -1922,7 +1952,7 @@ function spriteBox(): { columns: number; rows: number } {
 }
 
 /** The Collection tab's sprite cells: the current frame when caught, else the still silhouette. */
-function collectionCells(loaded: LoadedModster, entry: CollectionEntry): string {
+function collectionCells(loaded: DrawnModster, entry: CollectionEntry): string {
   if (entry.record) {
     const cells = cellsFor(loaded)
     const frame = collectionSpriteModster?.modster.id === loaded.modster.id ? collectionFrame : 0
@@ -1937,14 +1967,14 @@ function collectionCells(loaded: LoadedModster, entry: CollectionEntry): string 
 }
 
 /** Animates `loaded` in the collection pane; undefined (a silhouette) holds it still. */
-function setCollectionSite($: EngineInterface, requestId: string, loaded: LoadedModster | undefined): void {
+function setCollectionSite($: EngineInterface, requestId: string, loaded: DrawnModster | undefined): void {
   collectionSite = requestId
   if (collectionSpriteModster?.modster.id === loaded?.modster.id) return
   stopCollectionFrames()
   collectionFrame = 0
   collectionSpriteModster = loaded
   if (!loaded || loaded.sprite.frames.length < 2) return
-  collectionTimer = $.clock.every(Math.max(1, Math.round(1000 / (loaded.modster.sprite.fps ?? 6))), () => {
+  collectionTimer = $.clock.every(Math.max(1, Math.round(1000 / (loaded.modster.sprite?.fps ?? 6))), () => {
     const current = collectionSpriteModster
     const site = collectionSite
     // Skip a tick while the last blit is in flight (P1-03)
@@ -1982,7 +2012,7 @@ function useCatcher($: EngineInterface, entry: CatcherEntry): void {
 }
 
 /** The Collection tab's silhouette as a still Svg (P5-38), made once per Modster. */
-function silhouetteSvgFor(loaded: LoadedModster): string {
+function silhouetteSvgFor(loaded: DrawnModster): string {
   const cached = silhouetteSvgs.get(loaded.modster.id)
   if (cached?.sprite === loaded.sprite) return cached.svg
   const { width, height } = loaded.sprite
@@ -1996,11 +2026,11 @@ function silhouetteSvgFor(loaded: LoadedModster): string {
  * The Catchers tab's preview on desktop (P5-38): a catch by `catcher` on `sprite`, looped with
  * the terminal's pause, as one vector Svg (0043). Undefined when it's over the Svg limit.
  */
-function catcherPreviewSvg(catcher: LoadedCatcher, modster: LoadedModster, sprite: Sprite): string | undefined {
+function catcherPreviewSvg(catcher: DrawnCatcher, modster: DrawnModster, sprite: Sprite): string | undefined {
   const key = `${catcher.catcher.id}/${modster.modster.id}/${sprite === modster.sprite ? 'caught' : 'silhouette'}`
   const cached = catcherPreviewSvgs.get(key)
   if (cached && cached.catcher === catcher && cached.frames === sprite.frames) return cached.svg
-  const art = prepareCatch(catcher.catcher, catcher.sprite, sprite, modster.modster.sprite.fps ?? CONTENT.modster.defaultFps)
+  const art = prepareCatch(catcher.catcher, catcher.sprite, sprite, modster.modster.sprite?.fps ?? CONTENT.modster.defaultFps)
   const svg = catchSvg(art, 'caught', CATCH.rocksToCatch, { scale: 1, loopPauseMs: CATCH.previewPauseMs })
   catcherPreviewSvgs.set(key, { catcher, frames: sprite.frames, svg })
   return svg
@@ -2015,12 +2045,12 @@ function silhouetteSprite(sprite: Sprite): Sprite {
  * The Catchers tab's preview cells now: a catch by `catcher` on `modster`, looped on a timer
  * at CATCH.fps with a pause after each. Another catcher or Modster starts it over.
  */
-function catcherPreviewCells($: EngineInterface, requestId: string, catcher: LoadedCatcher, modster: LoadedModster, sprite: Sprite): string {
+function catcherPreviewCells($: EngineInterface, requestId: string, catcher: DrawnCatcher, modster: DrawnModster, sprite: Sprite): string {
   const key = `${catcher.catcher.id}/${modster.modster.id}/${sprite === modster.sprite ? 'caught' : 'silhouette'}`
   const shown = catcherPreview
   if (shown && shown.requestId === requestId && shown.key === key && shown.catcher === catcher && shown.sprite.frames === sprite.frames) return shown.cells
   stopCatcherPreview()
-  const art = prepareCatch(catcher.catcher, catcher.sprite, sprite, modster.modster.sprite.fps ?? CONTENT.modster.defaultFps)
+  const art = prepareCatch(catcher.catcher, catcher.sprite, sprite, modster.modster.sprite?.fps ?? CONTENT.modster.defaultFps)
   const cells = pixelsToCells(catchFrame(art, 'caught', CATCH.rocksToCatch, 0))
   catcherPreview = { requestId, key, catcher, sprite, art, tick: 0, cells }
   const loopMs = throwingMs('caught', CATCH.rocksToCatch) + CATCH.beatMs.caught + CATCH.previewPauseMs

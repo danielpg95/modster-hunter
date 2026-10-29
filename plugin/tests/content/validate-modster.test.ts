@@ -90,6 +90,14 @@ describe('validateModster', () => {
     }
   })
 
+  test('a Modster may have desktop art only: a desktopSprite and no sprite (0045 point 2)', () => {
+    const { sprite: _terminal, ...modster } = validModster()
+    expect(validateModster({ ...modster, desktopSprite: { file: 'desktop.png', frames: 2 } }, where).issues).toEqual([])
+    expect(validateModster(modster, where).issues.map((issue) => `${issue.field} ${issue.problem}`)).toEqual([
+      'sprite is required, unless a desktopSprite gives the Modster desktop art only (decision 0045)',
+    ])
+  })
+
   test('only the required fields are enough', () => {
     const modster = { schemaVersion: 1, id: 'sproutling', name: 'S', rarity: 'common', sprite: { file: 'sprite.sprite.json' } }
     expect(validateModster(modster, where).ok).toBe(true)

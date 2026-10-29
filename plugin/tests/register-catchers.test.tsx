@@ -2,7 +2,9 @@ import { describe, expect, mock, test } from 'claude-code/testing'
 import type { On } from 'claude-code'
 import { CATCH, COLLECTION, DESKTOP } from '../hooks/constants'
 import { catchLengthMs } from '../hooks/render'
+import { base64FromBytes } from './fixtures/base64-from-bytes'
 import { catcherFiles } from './fixtures/catcher-files'
+import { desktopPng } from './fixtures/desktop-png'
 import { oneModsterForest } from './fixtures/one-modster-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
 
@@ -137,6 +139,30 @@ describe('register: Catchers tab', () => {
     expect(blits.some(([key, cells]) => key === 'sprite' && colorsIn(cells).has(ROPE))).toBe(true)
     await band.unmount()
     await pane.unmount()
+  })
+
+  test('a picked catcher with desktop art only plays as the default jar, which shows as in use (0045 point 10)', HUNTING, async ($, on) => {
+    const glow = { schemaVersion: 1, id: 'glow', name: 'Glow', style: 'contain', desktopSprite: { file: 'desktop.png', frames: 1 } }
+    const user = {
+      'content/catchers/glow/catcher.json': JSON.stringify(glow),
+      'content/catchers/glow/desktop.png': base64FromBytes(desktopPng(24, 24, 1)),
+    }
+    const { clock, blits } = await start($, on, { 'prefs:catcher': { v: 1, id: 'glow' } }, user)
+    const pane = await mountPane($)
+    await pane.press({ key: 'catchers' })
+    expect(await pane.find({ type: 'Text', text: 'Catchers 3' })).toBeDefined()
+    expect(await pane.find({ type: 'Text', text: ' ✓ in use' })).toBeDefined()
+    expect(await pane.find({ type: 'Text', text: 'Glass jar' })).toBeUndefined()
+    await pane.unmount()
+
+    const band = await mountBand($)
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(4_250)
+    blits.length = 0
+    await band.press({ key: 'throw' })
+    await clock.advance(1_000)
+    expect(blits.some(([key, cells]) => key === 'sprite' && colorsIn(cells).has(BLUE))).toBe(true)
+    await band.unmount()
   })
 
   test("the player's own catcher is marked yours, with the delete hint (0032 point 7)", HUNTING, async ($, on) => {

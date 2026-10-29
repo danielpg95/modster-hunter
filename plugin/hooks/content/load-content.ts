@@ -38,7 +38,8 @@ export interface LoadOptions {
 
 export interface LoadedModster {
   modster: Modster
-  sprite: Sprite
+  /** Its terminal sprite; absent for desktop-only art (decision 0045 point 2) */
+  sprite?: Sprite
   /** Its `desktopSprite`, when it passed decision 0045's checks */
   desktop?: DesktopSheet
 }
@@ -55,7 +56,8 @@ export interface LoadedBiome {
 
 export interface LoadedCatcher {
   catcher: Catcher
-  sprite: Sprite
+  /** Its terminal sprite; absent for desktop-only art (decision 0045 point 2) */
+  sprite?: Sprite
   /** Its `desktopSprite`, when it passed decision 0045's checks */
   desktop?: DesktopSheet
 }
@@ -135,15 +137,20 @@ async function loadModster(at: Folder, folder: string): Promise<LoadedModster | 
   const modster = json && keep(validateModster(json.value, { file: at.label + file, folder, userContent }), at.issues)
   if (!modster) return undefined
 
-  const spriteFile = `modsters/${folder}/${modster.sprite.file}`
-  const sprite = await loadSprite(at, spriteFile, modster.sprite.frames, { cacheKey: modster.id })
-  if (!sprite) {
-    // A Modster can't appear without its sprite, so it's skipped too
-    at.issues.push(issueFor(at.label + file, 'sprite.file', `points to a sprite that didn't load: ${at.label + spriteFile}`))
-    return undefined
+  let sprite: Sprite | undefined
+  if (modster.sprite) {
+    const spriteFile = `modsters/${folder}/${modster.sprite.file}`
+    sprite = await loadSprite(at, spriteFile, modster.sprite.frames, { cacheKey: modster.id })
+    if (!sprite) {
+      // A Modster can't appear without the sprite it names, so it's skipped too
+      at.issues.push(issueFor(at.label + file, 'sprite.file', `points to a sprite that didn't load: ${at.label + spriteFile}`))
+      return undefined
+    }
   }
   const desktop = modster.desktopSprite && (await loadDesktopSheet(at, `modsters/${folder}`, modster.desktopSprite, 'desktopSprite', CONTENT.desktop.modster, at.label + file))
-  return desktop ? { modster, sprite, desktop } : { modster, sprite }
+  // Desktop art only, and it didn't load: nothing is left to draw (0045 point 8)
+  if (!sprite && !desktop) return undefined
+  return { modster, ...(sprite ? { sprite } : {}), ...(desktop ? { desktop } : {}) }
 }
 
 async function loadCatchers(at: Folder): Promise<Map<string, LoadedCatcher>> {
@@ -162,22 +169,27 @@ async function loadCatcher(at: Folder, folder: string): Promise<LoadedCatcher | 
   const catcher = json && keep(validateCatcher(json.value, { file: shownFile, folder, userContent }), at.issues)
   if (!catcher) return undefined
 
-  const spriteFile = `catchers/${folder}/${catcher.sprite.file}`
-  const maxFrames = CONTENT.catcher.framesMax
-  const sprite = await loadSprite(at, spriteFile, catcher.sprite.frames, { cacheKey: `${catcher.id}.catcher`, maxFrames })
-  if (!sprite) {
-    at.issues.push(issueFor(shownFile, 'sprite.file', `points to a sprite that didn't load: ${at.label + spriteFile}`))
-    return undefined
+  let sprite: Sprite | undefined
+  if (catcher.sprite) {
+    const spriteFile = `catchers/${folder}/${catcher.sprite.file}`
+    const maxFrames = CONTENT.catcher.framesMax
+    sprite = await loadSprite(at, spriteFile, catcher.sprite.frames, { cacheKey: `${catcher.id}.catcher`, maxFrames })
+    if (!sprite) {
+      at.issues.push(issueFor(shownFile, 'sprite.file', `points to a sprite that didn't load: ${at.label + spriteFile}`))
+      return undefined
+    }
+    const spriteIssues = checkCatcherSprite(catcher, sprite, shownFile)
+    at.issues.push(...spriteIssues)
+    if (spriteIssues.length > 0) return undefined
   }
-  const spriteIssues = checkCatcherSprite(catcher, sprite, shownFile)
-  at.issues.push(...spriteIssues)
-  if (spriteIssues.length > 0) return undefined
 
-  const desktop = catcher.desktopSprite && (await loadDesktopSheet(at, `catchers/${folder}`, catcher.desktopSprite, 'desktopSprite', CONTENT.desktop.catcher, shownFile))
-  if (!desktop) return { catcher, sprite }
-  const desktopIssues = checkCatcherDesktop(catcher, desktop, shownFile)
+  const loaded = catcher.desktopSprite && (await loadDesktopSheet(at, `catchers/${folder}`, catcher.desktopSprite, 'desktopSprite', CONTENT.desktop.catcher, shownFile))
+  const desktopIssues = loaded ? checkCatcherDesktop(catcher, loaded, shownFile) : []
   at.issues.push(...desktopIssues)
-  return desktopIssues.length === 0 ? { catcher, sprite, desktop } : { catcher, sprite }
+  const desktop = desktopIssues.length === 0 ? loaded : undefined
+  // Desktop art only, and it didn't load: nothing is left to draw (0045 point 8)
+  if (!sprite && !desktop) return undefined
+  return { catcher, ...(sprite ? { sprite } : {}), ...(desktop ? { desktop } : {}) }
 }
 
 /**

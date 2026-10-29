@@ -38,7 +38,7 @@ describe('loadContent', () => {
     const content = await loadContent(memoryReader(forest()), ROOT)
     expect([...content.biomes.keys()]).toEqual(['whispering-forest'])
     expect([...content.modsters.keys()]).toEqual(['mossbeast', 'pinewraith', 'sproutling'])
-    expect(content.modsters.get('sproutling')?.sprite.width).toBe(8)
+    expect(content.modsters.get('sproutling')?.sprite?.width).toBe(8)
     expect(content.issues).toEqual([])
   })
 
@@ -229,7 +229,7 @@ describe('loadContent', () => {
   test('a valid catcher loads with its sprite, next to the biomes and Modsters (decision 0035)', async () => {
     const content = await loadContent(memoryReader(withCatcher()), ROOT)
     expect([...content.catchers.keys()]).toEqual(['firefly-jar'])
-    expect(content.catchers.get('firefly-jar')?.sprite.frames.length).toBe(2)
+    expect(content.catchers.get('firefly-jar')?.sprite?.frames.length).toBe(2)
     expect(content.modsters.size).toBe(3)
     expect(content.issues).toEqual([])
   })
@@ -299,7 +299,7 @@ describe('loadContent', () => {
       const content = await loadContent(memoryReader(withDesktop(desktopPng(24, 20, 2))), ROOT)
       expect(content.issues).toEqual([])
       const loaded = content.modsters.get('sproutling')
-      expect([loaded?.sprite.width, loaded?.desktop?.width, loaded?.desktop?.height, loaded?.desktop?.frames]).toEqual([8, 24, 20, 2])
+      expect([loaded?.sprite?.width, loaded?.desktop?.width, loaded?.desktop?.height, loaded?.desktop?.frames]).toEqual([8, 24, 20, 2])
     })
 
     test('a missing, unreadable or invalid desktop sheet is listed, and the Modster loads with its terminal sprite (point 8)', async () => {
@@ -311,9 +311,34 @@ describe('loadContent', () => {
       for (const [png, problem] of cases) {
         const content = await loadContent(memoryReader(withDesktop(png)), ROOT)
         expect(lines(content.issues)).toEqual([`modsters/sproutling/modster.json: desktopSprite.file ${problem}`])
-        expect(content.modsters.get('sproutling')?.sprite.width).toBe(8)
+        expect(content.modsters.get('sproutling')?.sprite?.width).toBe(8)
         expect(content.modsters.get('sproutling')?.desktop).toBe(undefined)
       }
+    })
+
+    test('a Modster with desktop art only loads with no terminal sprite; if its sheet fails it is skipped (0045 points 2 and 8)', async () => {
+      const files = withDesktop(desktopPng(24, 20, 2))
+      const { sprite: _terminal, ...modster } = validUserModster()
+      files[`${ROOT}/modsters/sproutling/modster.json`] = JSON.stringify({ ...modster, desktopSprite: { file: 'desktop.png', frames: 2 } })
+      const loaded = await loadContent(memoryReader(files), ROOT)
+      expect(loaded.issues).toEqual([])
+      expect([loaded.modsters.get('sproutling')?.sprite, loaded.modsters.get('sproutling')?.desktop?.width]).toEqual([undefined, 24])
+
+      delete files[`${ROOT}/modsters/sproutling/desktop.png`]
+      const skipped = await loadContent(memoryReader(files), ROOT)
+      expect(skipped.modsters.has('sproutling')).toBe(false)
+      expect(lines(skipped.issues)[0]).toBe('modsters/sproutling/modster.json: desktopSprite.file points to modsters/sproutling/desktop.png, which is missing')
+    })
+
+    test('a catcher with desktop art only loads with no terminal sprite', async () => {
+      const files: Record<string, string | Uint8Array | Error> = withCatcher((catcher) => {
+        delete catcher.sprite
+        catcher.desktopSprite = { file: 'desktop.png', frames: 2 }
+      })
+      files[`${ROOT}/catchers/firefly-jar/desktop.png`] = desktopPng(24, 24, 2)
+      const content = await loadContent(memoryReader(files), ROOT)
+      expect(content.issues).toEqual([])
+      expect([content.catchers.get('firefly-jar')?.sprite, content.catchers.get('firefly-jar')?.desktop?.frames]).toEqual([undefined, 2])
     })
 
     test('a biome loads its desktopBackground; a bad one is listed and the biome loads without it', async () => {
@@ -340,7 +365,7 @@ describe('loadContent', () => {
       files[`${ROOT}/catchers/firefly-jar/desktop.png`] = desktopPng(24, 24, 2, (x, y) => (x === 0 && y === 0 ? [0, 0, 255, 255] : undefined))
       const content = await loadContent(memoryReader(files), ROOT)
       expect(lines(content.issues)).toEqual(["catchers/firefly-jar/catcher.json: desktopSprite.glowColor is #ff0000, which isn't a colour in the desktop sheet"])
-      expect(content.catchers.get('firefly-jar')?.sprite.frames.length).toBe(2)
+      expect(content.catchers.get('firefly-jar')?.sprite?.frames.length).toBe(2)
       expect(content.catchers.get('firefly-jar')?.desktop).toBe(undefined)
     })
   })

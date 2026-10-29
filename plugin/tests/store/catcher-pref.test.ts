@@ -20,4 +20,11 @@ describe('catcher pref', () => {
     expect(catcherInUse(catchers, undefined, 'jar')).toBe('Glass jar')
     expect(catcherInUse(new Map([['net', 'Net']]), undefined, 'jar')).toBe(undefined)
   })
+
+  test('catcherInUse skips a catcher that is not playable, picked or default (0045 point 10)', () => {
+    const catchers = new Map([['jar', 'Glass jar'], ['glow', 'Glow']])
+    const playable = (name: string) => name !== 'Glow'
+    expect(catcherInUse(catchers, 'glow', 'jar', playable)).toBe('Glass jar')
+    expect(catcherInUse(new Map([['jar', 'Glow']]), undefined, 'jar', playable)).toBe(undefined)
+  })
 })

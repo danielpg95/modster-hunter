@@ -65,8 +65,8 @@ export interface Modster {
   catchRate?: number | null
   shinyChance?: number | null
   dex?: ModsterDex
-  /** `file` is a `.png` only in user content, and then `frames` is set (decision 0016) */
-  sprite: { file: string; frames?: number; fps?: number }
+  /** `file` is a `.png` only in user content, and then `frames` is set (decision 0016). Optional with a `desktopSprite` (0045 point 2) */
+  sprite?: { file: string; frames?: number; fps?: number }
   /** Hi-res art for the Desktop app (decision 0045 point 3) */
   desktopSprite?: { file: string; frames: number; fps?: number }
 }
@@ -117,8 +117,8 @@ export interface Catcher {
   name: string
   description?: string
   style: CatcherStyle
-  /** As a Modster's, without `fps`: beat lengths are fixed (0035 point 5) */
-  sprite: { file: string; frames?: number }
+  /** As a Modster's, without `fps`: beat lengths are fixed (0035 point 5). Optional with a `desktopSprite` (0045 point 2) */
+  sprite?: { file: string; frames?: number }
   beats?: Partial<Record<CatcherBeatName, CatcherBeat>>
   glowIndex?: number
   rimIndex?: number
