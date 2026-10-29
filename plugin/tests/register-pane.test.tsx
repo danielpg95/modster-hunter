@@ -1,5 +1,6 @@
 import { describe, expect, mock, test } from 'claude-code/testing'
 import type { On, UiPane } from 'claude-code'
+import { desktopOnlyForest } from './fixtures/desktop-only-forest'
 import { oneModsterForest } from './fixtures/one-modster-forest'
 import { sceneForest } from './fixtures/scene-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
@@ -111,6 +112,22 @@ describe('register: encounter pane', () => {
     expect(await pane.find({ type: 'Text', text: '○ ○ ○' })).toBeDefined()
     await clock.advance(CATCH_THROW_MS)
     expect(await pane.find({ type: 'Text', text: 'Caught Sproutling!' })).toBeDefined()
+    await pane.unmount()
+  })
+
+  test('a Modster with desktop art only shows in the pane as text, on the terminal and desktop, and Throw works (0045 point 10)', HUNTING, async ($, on) => {
+    const clock = await start($, on, () => [], desktopOnlyForest())
+    const pane = await mountPane($)
+    const desktop = await $.ui.mount({ plugin: 'modster-hunter', surface: 'desktop', component: 'Pane', requestId: 'modster-hunt', props: PANE_PROPS as any })
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(4_250)
+    expect(await pane.find({ type: 'Raster' })).toBeUndefined()
+    expect(await desktop.find({ type: 'Svg' })).toBeUndefined()
+    expect(await pane.find({ type: 'Text', text: /Sproutling/ })).toBeDefined()
+    await pane.press({ key: 'throw' })
+    await clock.advance(250 + CATCH_THROW_MS)
+    expect(await pane.find({ type: 'Text', text: 'Caught Sproutling!' })).toBeDefined()
+    await desktop.unmount()
     await pane.unmount()
   })
 

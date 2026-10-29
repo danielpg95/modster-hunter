@@ -6,7 +6,8 @@ import { IssueList } from './issue-list'
 import type { Modster, Validation } from './types'
 
 const KEYS = ['schemaVersion', 'id', 'name', 'description', 'rarity', 'maxAttempts', 'catchRate', 'shinyChance', 'dex', 'sprite', 'desktopSprite']
-const REQUIRED = ['schemaVersion', 'id', 'name', 'rarity', 'sprite']
+// `sprite` or `desktopSprite`: at least one (decision 0045 point 2)
+const REQUIRED = ['schemaVersion', 'id', 'name', 'rarity']
 const SPRITE_KEYS = ['file', 'frames', 'fps']
 const DESKTOP_KEYS = ['file', 'frames', 'fps']
 // `type` is listed only so its rename error isn't doubled by "not a known field" (decision 0022)
@@ -39,6 +40,9 @@ export function validateModster(input: unknown, where: { file: string; folder: s
   checkDex(input.dex, where.userContent === true, issues)
   checkSprite(input.sprite, where.userContent === true, issues)
   checkDesktopSprite(input.desktopSprite, issues)
+  if (!Object.hasOwn(input, 'sprite') && !Object.hasOwn(input, 'desktopSprite')) {
+    issues.error('sprite', 'is required, unless a desktopSprite gives the Modster desktop art only (decision 0045)')
+  }
 
   return issues.result(input as unknown as Modster)
 }

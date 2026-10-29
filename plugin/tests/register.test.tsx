@@ -1,6 +1,7 @@
 import { describe, expect, mock, test } from 'claude-code/testing'
 import type { On } from 'claude-code'
 import { encodePng } from './fixtures/encode-png'
+import { desktopOnlyForest } from './fixtures/desktop-only-forest'
 import { oneModsterForest } from './fixtures/one-modster-forest'
 import { sceneForest } from './fixtures/scene-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
@@ -201,6 +202,38 @@ describe('register', () => {
     expect(await ui.find({ type: 'Text', text: 'A wild Sproutling appeared!' })).toBeDefined()
     await ui.redraw({ ...BAND_PROPS, maxRows: 0 } as any)
     expect(await ui.find({ type: 'Text', text: /Sproutling/ })).toBeUndefined()
+    await ui.unmount()
+  })
+
+  // Content with desktop art only (decision 0045 point 10)
+  test('a Modster with desktop art only plays on the terminal in the compact text, and is caught', HUNTING, async ($, on) => {
+    const { ui, clock } = await startBand($, on, desktopOnlyForest())
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(4_000 + BAND_TICK)
+    expect(await ui.find({ type: 'Raster' })).toBeUndefined()
+    expect(await ui.find({ type: 'Text', text: /Sproutling/ })).toBeDefined()
+    await ui.press({ key: 'throw' })
+    await clock.advance(BAND_TICK)
+    // No terminal art to animate the throw: the dot count plays (0035 point 8)
+    expect(await ui.find({ type: 'Text', text: '○ ○ ○' })).toBeDefined()
+    await clock.advance(CATCH_THROW_MS)
+    expect(await ui.find({ type: 'Text', text: 'Caught Sproutling!' })).toBeDefined()
+    await ui.unmount()
+  })
+
+  test('on desktop a Modster with desktop art only shows its text, with no Svg until desktop sheets draw', HUNTING, async ($, on) => {
+    const { ui, clock } = await startBand($, on, desktopOnlyForest(), 'desktop')
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(4_000 + BAND_TICK)
+    expect(await ui.find({ type: 'Svg' })).toBeUndefined()
+    expect(await ui.find({ type: 'Button', key: 'throw' })).toBeDefined()
+    await ui.unmount()
+  })
+
+  test('a biome with a desktop background only shows the idle line alone on the terminal', HUNTING, async ($, on) => {
+    const { ui } = await startBand($, on, desktopOnlyForest())
+    expect(await ui.find({ type: 'Raster' })).toBeUndefined()
+    expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeDefined()
     await ui.unmount()
   })
 

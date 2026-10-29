@@ -805,15 +805,15 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `tools/check-content.mjs` and `tools/sprite.mjs` check desktop sheets.
   - [x] The terminal output is unchanged: the existing tests pass as they are.
 
-#### [ ] P5-45 — Terminal fallbacks for desktop-only content
+#### [x] P5-45 — Terminal fallbacks for desktop-only content
 - **Depends on:** P5-44
 - **Size:** M
 - **Goal:** content with only desktop art still plays on the terminal (decision 0045).
 - **Done when:**
-  - [ ] The terminal `sprite` is optional for a Modster or catcher with a `desktopSprite` (decision 0045 point 2): the validator, `CONTENT_FORMAT.md` and the loaded types allow it, and every place that reads a loaded sprite handles its absence (moved from P5-44).
-  - [ ] A desktop-only Modster shows the compact text layout in the band, pane and collection.
-  - [ ] A desktop-only biome shows the idle line alone, and a desktop-only catcher falls back to the default catcher.
-  - [ ] Tests cover each case.
+  - [x] The terminal `sprite` is optional for a Modster or catcher with a `desktopSprite` (decision 0045 point 2): the validator, `CONTENT_FORMAT.md` and the loaded types allow it, and every place that reads a loaded sprite handles its absence (moved from P5-44).
+  - [x] A desktop-only Modster shows the compact text layout in the band, pane and collection.
+  - [x] A desktop-only biome shows the idle line alone, and a desktop-only catcher falls back to the default catcher.
+  - [x] Tests cover each case.
 
 #### [ ] P5-46 — Draw desktop Modster sheets
 - **Depends on:** P5-44

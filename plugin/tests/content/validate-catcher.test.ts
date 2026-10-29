@@ -121,6 +121,14 @@ describe('validateCatcher', () => {
     ])
   })
 
+  test('a catcher may have desktop art only: a desktopSprite and no sprite (0045 point 2)', () => {
+    const { sprite: _terminal, ...catcher } = validCatcher()
+    expect(validateCatcher({ ...catcher, desktopSprite: { file: 'desktop.png', frames: 2 } }, where).issues).toEqual([])
+    expect(issuesAt(validateCatcher(catcher, where), 'sprite').map((issue) => issue.problem)).toEqual([
+      'is required, unless a desktopSprite gives the catcher desktop art only (decision 0045)',
+    ])
+  })
+
   test('user content may name a PNG sheet with up to 16 frames', () => {
     const catcher = { ...validCatcher(), sprite: { file: 'sprite.png', frames: 16 } }
     expect(validateCatcher(catcher, { ...where, userContent: true }).issues).toEqual([])

@@ -208,6 +208,7 @@ function previewCatcher(argv) {
     fail(`${file}: ${error.message}`)
   }
   const catcher = valueOf(validateCatcher(value, { file: 'catcher.json', folder: basename(folder), userContent: true }))
+  if (!catcher.sprite) fail(`${file}: has desktop art only; this preview draws the terminal sprite`)
   const sprite = loadSprite(join(folder, catcher.sprite.file), catcher.sprite.frames, CONTENT.catcher.framesMax)
   const spriteIssues = checkCatcherSprite(catcher, sprite, 'catcher.json')
   for (const issue of spriteIssues) console.error(formatIssue(issue))
@@ -218,6 +219,7 @@ function previewCatcher(argv) {
     const dir = join(BUILT_IN_ROOT, 'modsters', id)
     if (!existsSync(join(dir, 'modster.json'))) fail(`--on: "${id}" isn't a built-in Modster`)
     const modster = JSON.parse(readFileSync(join(dir, 'modster.json'), 'utf8'))
+    if (!modster.sprite) fail(`--on: "${id}" has desktop art only; pick a Modster with a terminal sprite`)
     return {
       name: modster.name,
       sprite: JSON.parse(readFileSync(join(dir, modster.sprite.file), 'utf8')),

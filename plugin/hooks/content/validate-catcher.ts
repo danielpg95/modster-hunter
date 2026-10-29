@@ -6,7 +6,8 @@ import { IssueList } from './issue-list'
 import type { Catcher, ContentIssue, DesktopSheet, Sprite, Validation } from './types'
 
 const KEYS = ['schemaVersion', 'id', 'name', 'description', 'style', 'sprite', 'beats', 'glowIndex', 'rimIndex', 'lidRows', 'desktopSprite']
-const REQUIRED = ['schemaVersion', 'id', 'name', 'style', 'sprite']
+// `sprite` or `desktopSprite`: at least one (decision 0045 point 2)
+const REQUIRED = ['schemaVersion', 'id', 'name', 'style']
 const SPRITE_KEYS = ['file', 'frames']
 const DESKTOP_KEYS = ['file', 'frames', 'glowColor', 'rimColor', 'lidRows']
 const BEAT_KEYS = ['frames', 'place', 'modster', 'path']
@@ -38,6 +39,9 @@ export function validateCatcher(input: unknown, where: { file: string; folder: s
   checkNumber(input, 'rimIndex', paletteIndex, issues)
   checkNumber(input, 'lidRows', { min: RULES.lidRowsMin, max: RULES.lidRowsMax, integer: true }, issues)
   checkDesktopSprite(input.desktopSprite, issues)
+  if (!Object.hasOwn(input, 'sprite') && !Object.hasOwn(input, 'desktopSprite')) {
+    issues.error('sprite', 'is required, unless a desktopSprite gives the catcher desktop art only (decision 0045)')
+  }
 
   return issues.result(input as unknown as Catcher)
 }

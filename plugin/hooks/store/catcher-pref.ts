@@ -16,7 +16,14 @@ export function readCatcherId(raw: unknown): string | undefined {
   return value.v === 1 && typeof value.id === 'string' ? value.id : undefined
 }
 
-/** The catcher to play: the picked one when it loaded, else the default (0035 point 10), else none. */
-export function catcherInUse<T>(catchers: ReadonlyMap<string, T>, pickedId: string | undefined, defaultId: string): T | undefined {
-  return (pickedId === undefined ? undefined : catchers.get(pickedId)) ?? catchers.get(defaultId)
+/**
+ * The catcher to play: the picked one when it loaded and `playable` allows it, else the
+ * default (0035 point 10), else none. A catcher with desktop art only isn't playable
+ * until desktop throws draw it, so the default plays instead (0045 point 10).
+ */
+export function catcherInUse<T>(catchers: ReadonlyMap<string, T>, pickedId: string | undefined, defaultId: string, playable: (catcher: T) => boolean = () => true): T | undefined {
+  const picked = pickedId === undefined ? undefined : catchers.get(pickedId)
+  if (picked !== undefined && playable(picked)) return picked
+  const fallback = catchers.get(defaultId)
+  return fallback !== undefined && playable(fallback) ? fallback : undefined
 }

@@ -51,7 +51,8 @@ for (const { biome } of content.biomes.values()) {
 }
 if (content.biomes.size > 0 && !tiersSeen.has('legendary')) problems.push('no biome has a legendary Modster (P2-09)')
 for (const [id, { sprite }] of content.modsters) {
-  if (sprite.frames.length < 2 || sprite.frames.length > 4) {
+  // Desktop art only has no terminal sprite to count (0045 point 2)
+  if (sprite && sprite.frames.length < 2 || sprite.frames.length > 4) {
     problems.push(`modsters/${id}: ${sprite.frames.length} frames; built-in sprites have 2–4 (P2-09)`)
   }
 }
@@ -70,8 +71,10 @@ for (const [id, { modster }] of content.modsters) {
 const credits = readFileSync(new URL('../plugin/content/CREDITS.md', import.meta.url), 'utf8')
 if (!content.catchers.has(CATCH.defaultCatcher)) problems.push(`catchers/${CATCH.defaultCatcher}: the default catcher must ship (0035 point 10)`)
 for (const [id, { catcher, sprite }] of content.catchers) {
+  // Terminal throws only: desktop art draws its own (P5-47)
+  if (!sprite) continue
   const tooSmall = [...content.modsters.values()].filter(
-    (loaded) => !prepareCatch(catcher, sprite, loaded.sprite, loaded.modster.sprite.fps ?? CONTENT.modster.defaultFps).fits,
+    (loaded) => loaded.sprite && !prepareCatch(catcher, sprite, loaded.sprite, loaded.modster.sprite?.fps ?? CONTENT.modster.defaultFps).fits,
   )
   if (tooSmall.length > 0) problems.push(`catchers/${id}: doesn't fit ${tooSmall.map((loaded) => loaded.modster.id).join(', ')}; built-in catchers fit every built-in Modster (P5-29)`)
   if (!credits.includes(`\`catchers/${id}/sprite.png\``)) problems.push(`catchers/${id}: no row in plugin/content/CREDITS.md`)

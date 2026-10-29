@@ -169,7 +169,7 @@ default (decision 0004).
 | `catchRate` | no | 0.01–1.0, or `null` for the tier default |
 | `shinyChance` | no | 0–1, or `null` for the default (P5-01) |
 | `dex` | no | The dex entry, see below (decision 0017). Built-in Modsters need every field |
-| `sprite.file` | yes | A `.sprite.json` in this folder. User content may name a `.png` sheet instead (decision 0016) |
+| `sprite.file` | yes, unless `desktopSprite` | A `.sprite.json` in this folder. User content may name a `.png` sheet instead (decision 0016). A Modster with only a `desktopSprite` has desktop art only (see [Desktop art](#desktop-art)) |
 | `sprite.frames` | with a `.png` | Integer 1–8: how many frames sit side by side in the sheet. Required with a `.png`, an error with a `.sprite.json` |
 | `sprite.fps` | no | 1–12. Default 6 |
 | `desktopSprite.file` | no | A `.png` sheet in this folder: hi-res art for the Desktop app, built-in or user content. See [Desktop art](#desktop-art) |
@@ -223,7 +223,7 @@ picks one in `/modsters`; it only changes how a throw looks.
 | `name` | yes | 1–32 chars |
 | `description` | no | ≤ 120 chars; shown in the Catchers tab |
 | `style` | yes | `contain`, `cover` or `custom` (see [Styles](#styles)) |
-| `sprite.file` | yes | A `.sprite.json` in this folder. User content may name a `.png` sheet instead, as for a Modster |
+| `sprite.file` | yes, unless `desktopSprite` | A `.sprite.json` in this folder. User content may name a `.png` sheet instead, as for a Modster. Without it the catcher has desktop art only |
 | `sprite.frames` | with a `.png` | Integer 1–16, as for a Modster. Required with a `.png`, an error with a `.sprite.json` |
 | `beats` | with `custom` | An object with any of the six beats below. With `contain` or `cover`, only what differs from the preset |
 | `glowIndex` | no | Integer 1–63: a palette index painted in the Modster's most common bright color while the Modster is inside, in beats where its `modster` is `hidden`. Otherwise it shows its own color, so draw it as the empty catcher. Must be inside the sprite's palette |
@@ -321,8 +321,14 @@ allowed in built-in and user content.
   still loads with its terminal art.
 - With both, the terminal and desktop art are the same design, but each has its
   own size, frames and fps.
-- For now the terminal `sprite` is still required. P5-45 makes it optional for
-  content with desktop art.
+- A Modster or catcher needs a terminal `sprite`, a `desktopSprite`, or both.
+  A biome's `background` and `desktopBackground` are both optional.
+- Content with desktop art only still plays on the terminal (decision 0045
+  point 10): a Modster shows as text, a biome shows its idle line, and a
+  catcher is replaced by the default catcher. On the desktop it shows the same
+  way until desktop art is drawn there (P5-46 to P5-48).
+- A `sprite` that's named but doesn't load still skips the Modster or catcher,
+  even when it has desktop art.
 
 ## User PNG sheets
 

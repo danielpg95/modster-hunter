@@ -2,6 +2,7 @@ import { describe, expect, mock, test } from 'claude-code/testing'
 import type { On, UiPane } from 'claude-code'
 import { collectionForest } from './fixtures/collection-forest'
 import { oneModsterForest } from './fixtures/one-modster-forest'
+import { desktopOnlyForest } from './fixtures/desktop-only-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
 import { sceneForest } from './fixtures/scene-forest'
 import { twoBiomes } from './fixtures/two-biomes'
@@ -273,6 +274,17 @@ describe('register: collection pane', () => {
     const up = await pane.find({ type: 'Button', key: 'up' })
     const down = await pane.find({ type: 'Button', key: 'down' })
     expect([up?.props.hotkey, up?.props.label, down?.props.hotkey, down?.props.label]).toEqual(['k', 'Up', 'j', 'Down'])
+    await pane.unmount()
+  })
+
+  test('a Modster with desktop art only shows its entry as text, with no sprite on the terminal or desktop (0045 point 10)', HUNTING, async ($, on) => {
+    await start($, on, () => [], desktopOnlyForest(), { 'caught:sproutling': record() })
+    const pane = await mountPane($, DOCK)
+    expect(await pane.find({ type: 'Raster', key: 'collection-sprite' })).toBeUndefined()
+    expect(await pane.find({ type: 'Text', text: /Sproutling/ })).toBeDefined()
+    const desktop = await mountPane($, DOCK, 'desktop')
+    expect(await desktop.find({ type: 'Svg' })).toBeUndefined()
+    await desktop.unmount()
     await pane.unmount()
   })
 
