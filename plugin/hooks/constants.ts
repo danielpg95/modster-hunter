@@ -256,6 +256,15 @@ export const CONTENT = {
     lidRowsMin: 1,
     lidRowsMax: 31,
   },
+  // Decision 0045: desktop art, a PNG sheet embedded as-is, frames side by side
+  desktop: {
+    /** Opaque colours across all frames (point 6) */
+    colorsMax: 64,
+    modster: { widthMax: 128, heightMax: 128, framesMin: 2, framesMax: 8, bytesMax: 48 * 1024 },
+    // 0045 sets no width: 192 is the terminal's 48 at the desktop's 4× finer pixels (point 9)
+    background: { widthMax: 192, heightMax: 48, framesMin: 1, framesMax: 4, bytesMax: 24 * 1024 },
+    catcher: { widthMax: 96, heightMax: 96, framesMin: 1, framesMax: 16, bytesMax: 24 * 1024, lidRowsMax: 95 },
+  },
 } as const
 
 /** Modster types and their badge colors, decision 0017 point 2. Flavor only: no effect on odds. */

@@ -795,21 +795,22 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] It says each piece of content has desktop art, terminal art or both. With both, they're the same design. A terminal player sees the compact text layout for a desktop-only Modster, the idle line alone for a desktop-only biome, and the default catcher for a desktop-only catcher.
   - [x] The README and the plugin's description no longer say the game lives in your terminal.
 
-#### [ ] P5-44 — Desktop art: format, loader and validator
+#### [x] P5-44 — Desktop art: format, loader and validator
 - **Depends on:** P5-43
 - **Size:** M
 - **Goal:** content can carry desktop art (decision 0045), loaded and checked, and nothing draws it yet.
 - **Done when:**
-  - [ ] `CONTENT_FORMAT.md` documents `desktopSprite` for Modsters and catchers and `desktopBackground` for biomes, and the terminal `sprite` is optional when desktop art is there.
-  - [ ] The loader keeps the PNG bytes. Art that breaks a rule is dropped with a content issue; tests cover every rule.
-  - [ ] `tools/check-content.mjs` and `tools/sprite.mjs` check desktop sheets.
-  - [ ] The terminal output is unchanged: the existing tests pass as they are.
+  - [x] `CONTENT_FORMAT.md` documents `desktopSprite` for Modsters and catchers and `desktopBackground` for biomes. (Making the terminal `sprite` optional moved to P5-45 on 2026-10-28, with the fallbacks that need it.)
+  - [x] The loader keeps the PNG bytes. Art that breaks a rule is dropped with a content issue; tests cover every rule.
+  - [x] `tools/check-content.mjs` and `tools/sprite.mjs` check desktop sheets.
+  - [x] The terminal output is unchanged: the existing tests pass as they are.
 
 #### [ ] P5-45 — Terminal fallbacks for desktop-only content
 - **Depends on:** P5-44
 - **Size:** S
 - **Goal:** content with only desktop art still plays on the terminal (decision 0045).
 - **Done when:**
+  - [ ] The terminal `sprite` is optional for a Modster or catcher with a `desktopSprite` (decision 0045 point 2): the validator, `CONTENT_FORMAT.md` and the loaded types allow it, and every place that reads a loaded sprite handles its absence (moved from P5-44).
   - [ ] A desktop-only Modster shows the compact text layout in the band, pane and collection.
   - [ ] A desktop-only biome shows the idle line alone, and a desktop-only catcher falls back to the default catcher.
   - [ ] Tests cover each case.

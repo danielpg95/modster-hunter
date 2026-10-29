@@ -3,6 +3,7 @@ import { MODSTER_TYPES } from '../../hooks/constants'
 import { validateModster } from '../../hooks/content'
 import { issuesAt } from '../fixtures/issues-at'
 import { validModster } from '../fixtures/valid-modster'
+import { validUserModster } from '../fixtures/valid-user-modster'
 
 const where = { file: 'modsters/sproutling/modster.json', folder: 'sproutling' }
 
@@ -63,6 +64,14 @@ const INVALID: [string, (modster: Modster) => void, string][] = [
   ['a dex weight over 10,000 kg is an error', (m) => (dex(m).weightKg = 10_001), 'dex.weightKg'],
   ['an empty dex entry is an error', (m) => (dex(m).entry = ''), 'dex.entry'],
   ['a dex entry over 240 characters is an error', (m) => (dex(m).entry = 'e'.repeat(241)), 'dex.entry'],
+  ['a desktopSprite that is not an object is an error', (m) => (m.desktopSprite = 'desktop.png'), 'desktopSprite'],
+  ['a desktopSprite without frames is an error (0045)', (m) => (m.desktopSprite = { file: 'desktop.png' }), 'desktopSprite.frames'],
+  ['a desktopSprite that is a .sprite.json is an error', (m) => (m.desktopSprite = { file: 'desktop.sprite.json', frames: 4 }), 'desktopSprite.file'],
+  ['a desktopSprite in another folder is an error', (m) => (m.desktopSprite = { file: 'art/desktop.png', frames: 4 }), 'desktopSprite.file'],
+  ['a one-frame desktopSprite is an error: 2–8 frames (0045 point 3)', (m) => (m.desktopSprite = { file: 'desktop.png', frames: 1 }), 'desktopSprite.frames'],
+  ['a nine-frame desktopSprite is an error', (m) => (m.desktopSprite = { file: 'desktop.png', frames: 9 }), 'desktopSprite.frames'],
+  ['a desktopSprite fps over 12 is an error', (m) => (m.desktopSprite = { file: 'desktop.png', frames: 4, fps: 13 }), 'desktopSprite.fps'],
+  ['an unknown desktopSprite field is an error', (m) => (m.desktopSprite = { file: 'desktop.png', frames: 4, scale: 2 }), 'desktopSprite.scale'],
 ]
 
 describe('validateModster', () => {
@@ -70,6 +79,15 @@ describe('validateModster', () => {
     const result = validateModster(validModster(), where)
     expect(result.ok).toBe(true)
     expect(result.issues).toEqual([])
+  })
+
+  test('a desktopSprite with 2–8 frames and an fps is valid, built-in or user (decision 0045)', () => {
+    for (const [userContent, valid] of [[false, validModster], [true, validUserModster]] as const) {
+      for (const frames of [2, 8]) {
+        const modster = { ...valid(), desktopSprite: { file: 'desktop.png', frames, fps: 8 } }
+        expect(validateModster(modster, { ...where, userContent }).issues).toEqual([])
+      }
+    }
   })
 
   test('only the required fields are enough', () => {

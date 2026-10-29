@@ -5,6 +5,10 @@
 //
 //   node tools/sprite.mjs <sheet.png> --frames N [--out file.sprite.json]
 //   node tools/sprite.mjs <animation.gif> [--out file.sprite.json]
+//   node tools/sprite.mjs <desktop.png> --frames N --desktop modster|background|catcher
+//
+// With --desktop it converts nothing: it checks desktop art against decision
+// 0045 with the mod's own `desktopSheet`, since the desktop embeds the PNG as-is.
 //
 // Needs Node 22.18+ (type stripping) and `npm install` (pngjs, omggif).
 import './ts-resolve.mjs'
@@ -14,10 +18,12 @@ import { parseArgs } from 'node:util'
 import omggif from 'omggif'
 import pngjs from 'pngjs'
 
-const { spriteFromSheet, formatIssue } = await import('../plugin/hooks/content/index.ts')
+const { desktopSheet, spriteFromSheet, formatIssue } = await import('../plugin/hooks/content/index.ts')
+const { CONTENT } = await import('../plugin/hooks/constants.ts')
 
 const USAGE = 'usage: node tools/sprite.mjs <sheet.png> --frames N [--out file.sprite.json]\n' +
-  '       node tools/sprite.mjs <animation.gif> [--out file.sprite.json]'
+  '       node tools/sprite.mjs <animation.gif> [--out file.sprite.json]\n' +
+  '       node tools/sprite.mjs <desktop.png> --frames N --desktop modster|background|catcher'
 
 function fail(message) {
   console.error(message)
@@ -26,7 +32,7 @@ function fail(message) {
 
 let args
 try {
-  args = parseArgs({ allowPositionals: true, options: { frames: { type: 'string' }, out: { type: 'string' } } })
+  args = parseArgs({ allowPositionals: true, options: { frames: { type: 'string' }, out: { type: 'string' }, desktop: { type: 'string' } } })
 } catch (error) {
   fail(`${error.message}\n${USAGE}`)
 }
@@ -40,6 +46,8 @@ try {
 } catch (error) {
   fail(`${input}: ${error.message}`)
 }
+
+if (args.values.desktop !== undefined) checkDesktop(args.values.desktop)
 
 let sheet
 let frames
@@ -74,6 +82,24 @@ if (!result.ok) process.exit(1)
 const sprite = result.value
 writeFileSync(out, `${JSON.stringify(sprite, null, 2)}\n`)
 console.log(`${out}: ${sprite.width}×${sprite.height}, ${sprite.frames.length} frames, ${sprite.palette.length - 1} colors`)
+
+/** Checks desktop art (decision 0045) and exits: 0 when it fits, 1 with every problem. */
+function checkDesktop(art) {
+  if (!['modster', 'background', 'catcher'].includes(art)) fail(`--desktop must be modster, background or catcher (it is "${art}")\n${USAGE}`)
+  const rules = CONTENT.desktop[art]
+  if (kind !== '.png') fail(`${input}: desktop art is a .png sheet`)
+  if (args.values.out !== undefined) fail('--out is not used with --desktop: the desktop uses the PNG as it is')
+  const count = Number(args.values.frames)
+  if (!Number.isInteger(count) || count < rules.framesMin || count > rules.framesMax) {
+    fail(`--frames must be ${rules.framesMin}–${rules.framesMax} for ${art} desktop art (it is ${args.values.frames ?? 'missing'})`)
+  }
+  const result = desktopSheet(bytes.toString('base64'), { frames: count, field: 'desktop art', file: basename(input) }, rules)
+  for (const issue of result.issues) console.error(formatIssue(issue))
+  if (!result.ok) process.exit(1)
+  const { width, height, colors } = result.value
+  console.log(`${input}: ${count} frames of ${width}×${height}, ${colors.length} colours, ${(bytes.length / 1024).toFixed(1)} KiB: fits ${art} desktop art (0045)`)
+  process.exit(0)
+}
 
 /**
  * Plays the GIF onto a canvas, honoring each frame's disposal, and lays the

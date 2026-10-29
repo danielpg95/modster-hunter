@@ -67,6 +67,10 @@ const INVALID: [string, (biome: Biome) => void, string][] = [
   ['catchRate above 1 is an error', (b) => (entries(b)[0]!.catchRate = 1.5), 'modsters[0].catchRate'],
   ['an unknown top-level field is an error', (b) => (b.colour = '#ffffff'), 'colour'],
   ['an unknown entry field is an error', (b) => (entries(b)[0]!.wieght = 3), 'modsters[0].wieght'],
+  ['a desktopBackground without frames is an error (0045)', (b) => (b.desktopBackground = { file: 'desktop.png' }), 'desktopBackground.frames'],
+  ['five desktopBackground frames is an error: 1–4 (0045 point 4)', (b) => (b.desktopBackground = { file: 'desktop.png', frames: 5 }), 'desktopBackground.frames'],
+  ['a desktopBackground fps is an error: it plays at backgroundFps', (b) => (b.desktopBackground = { file: 'desktop.png', frames: 2, fps: 4 }), 'desktopBackground.fps'],
+  ['a desktopBackground that is a .sprite.json is an error', (b) => (b.desktopBackground = { file: 'scene.sprite.json', frames: 2 }), 'desktopBackground.file'],
 ]
 
 describe('validateBiome', () => {
@@ -89,6 +93,13 @@ describe('validateBiome', () => {
     entries(biome)[0] = { id: 'sproutling', maxAttempts: 10, catchRate: 0.01 }
     entries(biome)[1] = { id: 'mossbeast', maxAttempts: 1, catchRate: 1 }
     expect(validateBiome(biome, where).issues).toEqual([])
+  })
+
+  test('a desktopBackground with 1–4 frames is valid (decision 0045)', () => {
+    for (const frames of [1, 4]) {
+      const biome = { ...validBiome(), desktopBackground: { file: 'desktop.png', frames } }
+      expect(validateBiome(biome, where).issues).toEqual([])
+    }
   })
 
   test('the scene fields and their bounds are valid (decision 0026)', () => {

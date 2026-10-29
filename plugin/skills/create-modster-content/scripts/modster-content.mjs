@@ -252,6 +252,9 @@ async function check(argv) {
       async readText(path) {
         return existsSync(path) ? readFileSync(path, 'utf8') : undefined
       },
+      async readBase64(path) {
+        return existsSync(path) ? readFileSync(path).toString('base64') : undefined
+      },
     },
     builtInRoot: BUILT_IN_ROOT,
     includeBuiltins: !args.values['without-builtins'],

@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'claude-code/testing'
 import { formatIssue, loadContent, type SheetLoader, type Sprite } from '../../hooks/content'
 import { memoryReader } from '../fixtures/memory-reader'
+import { desktopPng } from '../fixtures/desktop-png'
 import { encodeFrame } from '../fixtures/encode-frame'
 import { validBiome } from '../fixtures/valid-biome'
 import { validCatcher } from '../fixtures/valid-catcher'
@@ -283,6 +284,65 @@ describe('loadContent', () => {
     expect(asked).toEqual([
       { path: `${ROOT}/catchers/firefly-jar/sprite.png`, file: '~/c/catchers/firefly-jar/sprite.png', cacheKey: 'firefly-jar.catcher', frames: 2, maxFrames: 16 },
     ])
+  })
+
+  describe('desktop art (decision 0045)', () => {
+    /** The forest with sproutling's `desktopSprite` and the files given */
+    function withDesktop(png?: Uint8Array | Error, frames = 2): Record<string, string | Uint8Array | Error> {
+      const files: Record<string, string | Uint8Array | Error> = forest()
+      files[`${ROOT}/modsters/sproutling/modster.json`] = JSON.stringify({ ...validUserModster(), desktopSprite: { file: 'desktop.png', frames } })
+      if (png) files[`${ROOT}/modsters/sproutling/desktop.png`] = png
+      return files
+    }
+
+    test('a Modster with a valid desktop sheet loads it beside its terminal sprite', async () => {
+      const content = await loadContent(memoryReader(withDesktop(desktopPng(24, 20, 2))), ROOT)
+      expect(content.issues).toEqual([])
+      const loaded = content.modsters.get('sproutling')
+      expect([loaded?.sprite.width, loaded?.desktop?.width, loaded?.desktop?.height, loaded?.desktop?.frames]).toEqual([8, 24, 20, 2])
+    })
+
+    test('a missing, unreadable or invalid desktop sheet is listed, and the Modster loads with its terminal sprite (point 8)', async () => {
+      const cases: [Uint8Array | Error | undefined, string][] = [
+        [undefined, 'points to modsters/sproutling/desktop.png, which is missing'],
+        [new Error('file is over 4 MiB'), 'points to modsters/sproutling/desktop.png, which could not be read: file is over 4 MiB'],
+        [desktopPng(130, 8, 2), 'points to 130×8 frames; at most 128×128'],
+      ]
+      for (const [png, problem] of cases) {
+        const content = await loadContent(memoryReader(withDesktop(png)), ROOT)
+        expect(lines(content.issues)).toEqual([`modsters/sproutling/modster.json: desktopSprite.file ${problem}`])
+        expect(content.modsters.get('sproutling')?.sprite.width).toBe(8)
+        expect(content.modsters.get('sproutling')?.desktop).toBe(undefined)
+      }
+    })
+
+    test('a biome loads its desktopBackground; a bad one is listed and the biome loads without it', async () => {
+      const files: Record<string, string | Uint8Array | Error> = forest()
+      const biome: Record<string, unknown> = { ...validBiome(), desktopBackground: { file: 'desktop.png', frames: 1 } }
+      delete biome.background
+      files[`${ROOT}/biomes/whispering-forest/biome.json`] = JSON.stringify(biome)
+      files[`${ROOT}/biomes/whispering-forest/desktop.png`] = desktopPng(64, 40, 1)
+      const loaded = await loadContent(memoryReader(files), ROOT)
+      expect(loaded.issues).toEqual([])
+      expect(loaded.biomes.get('whispering-forest')?.desktopBackground?.height).toBe(40)
+
+      files[`${ROOT}/biomes/whispering-forest/desktop.png`] = desktopPng(64, 49, 1)
+      const tooTall = await loadContent(memoryReader(files), ROOT)
+      expect(lines(tooTall.issues)).toEqual(['biomes/whispering-forest/biome.json: desktopBackground.file points to 64×49 frames; at most 192×48'])
+      expect(tooTall.biomes.get('whispering-forest')?.desktopBackground).toBe(undefined)
+    })
+
+    test("a catcher loads its desktop sheet; one that doesn't fit the catcher is listed and the catcher keeps its terminal sprite", async () => {
+      const files: Record<string, string | Uint8Array | Error> = withCatcher((catcher) => (catcher.desktopSprite = { file: 'desktop.png', frames: 2, glowColor: '#ff0000' }))
+      files[`${ROOT}/catchers/firefly-jar/desktop.png`] = desktopPng(24, 24, 2)
+      expect((await loadContent(memoryReader(files), ROOT)).catchers.get('firefly-jar')?.desktop?.colors).toEqual(['#ff0000'])
+
+      files[`${ROOT}/catchers/firefly-jar/desktop.png`] = desktopPng(24, 24, 2, (x, y) => (x === 0 && y === 0 ? [0, 0, 255, 255] : undefined))
+      const content = await loadContent(memoryReader(files), ROOT)
+      expect(lines(content.issues)).toEqual(["catchers/firefly-jar/catcher.json: desktopSprite.glowColor is #ff0000, which isn't a colour in the desktop sheet"])
+      expect(content.catchers.get('firefly-jar')?.sprite.frames.length).toBe(2)
+      expect(content.catchers.get('firefly-jar')?.desktop).toBe(undefined)
+    })
   })
 
   test('catchersOnly loads the catchers and nothing else', async () => {

@@ -1,9 +1,10 @@
 import { CONTENT } from '../constants'
 import { checkBiomeReferences } from './check-biome-references'
 import { checkTierBalance } from './check-tier-balance'
-import type { Biome, Catcher, ContentIssue, Modster, Sprite, Validation } from './types'
+import { desktopSheet, type DesktopSheetRules } from './desktop-sheet'
+import type { Biome, Catcher, ContentIssue, DesktopSheet, Modster, Sprite, Validation } from './types'
 import { validateBiome } from './validate-biome'
-import { checkCatcherSprite, validateCatcher } from './validate-catcher'
+import { checkCatcherDesktop, checkCatcherSprite, validateCatcher } from './validate-catcher'
 import { validateModster } from './validate-modster'
 import { validateSprite } from './validate-sprite'
 
@@ -13,6 +14,8 @@ export interface ContentReader {
   listFolders(path: string): Promise<string[]>
   /** The file's text, or undefined when it doesn't exist. May reject (e.g. over 4 MiB). */
   readText(path: string): Promise<string | undefined>
+  /** The file's bytes as base64 (desktop art, decision 0045), or undefined when it doesn't exist. May reject. */
+  readBase64(path: string): Promise<string | undefined>
 }
 
 /**
@@ -36,12 +39,16 @@ export interface LoadOptions {
 export interface LoadedModster {
   modster: Modster
   sprite: Sprite
+  /** Its `desktopSprite`, when it passed decision 0045's checks */
+  desktop?: DesktopSheet
 }
 
 export interface LoadedBiome {
   /** After `resolveReferences`, entries naming a Modster that didn't load are dropped */
   biome: Biome
   background?: Sprite
+  /** Its `desktopBackground`, when it passed decision 0045's checks */
+  desktopBackground?: DesktopSheet
   /** The biome file's name as issues show it */
   file: string
 }
@@ -49,6 +56,8 @@ export interface LoadedBiome {
 export interface LoadedCatcher {
   catcher: Catcher
   sprite: Sprite
+  /** Its `desktopSprite`, when it passed decision 0045's checks */
+  desktop?: DesktopSheet
 }
 
 /** Everything that loaded, by id, and every problem found on the way. */
@@ -133,7 +142,8 @@ async function loadModster(at: Folder, folder: string): Promise<LoadedModster | 
     at.issues.push(issueFor(at.label + file, 'sprite.file', `points to a sprite that didn't load: ${at.label + spriteFile}`))
     return undefined
   }
-  return { modster, sprite }
+  const desktop = modster.desktopSprite && (await loadDesktopSheet(at, `modsters/${folder}`, modster.desktopSprite, 'desktopSprite', CONTENT.desktop.modster, at.label + file))
+  return desktop ? { modster, sprite, desktop } : { modster, sprite }
 }
 
 async function loadCatchers(at: Folder): Promise<Map<string, LoadedCatcher>> {
@@ -161,7 +171,41 @@ async function loadCatcher(at: Folder, folder: string): Promise<LoadedCatcher | 
   }
   const spriteIssues = checkCatcherSprite(catcher, sprite, shownFile)
   at.issues.push(...spriteIssues)
-  return spriteIssues.length === 0 ? { catcher, sprite } : undefined
+  if (spriteIssues.length > 0) return undefined
+
+  const desktop = catcher.desktopSprite && (await loadDesktopSheet(at, `catchers/${folder}`, catcher.desktopSprite, 'desktopSprite', CONTENT.desktop.catcher, shownFile))
+  if (!desktop) return { catcher, sprite }
+  const desktopIssues = checkCatcherDesktop(catcher, desktop, shownFile)
+  at.issues.push(...desktopIssues)
+  return desktopIssues.length === 0 ? { catcher, sprite, desktop } : { catcher, sprite }
+}
+
+/**
+ * Desktop art named by `ref`, checked against decision 0045. Art that can't be
+ * read or breaks a rule is reported and left out: what names it still loads
+ * with its terminal art (point 8).
+ */
+async function loadDesktopSheet(
+  at: Folder,
+  folder: string,
+  ref: { file: string; frames: number },
+  field: string,
+  rules: DesktopSheetRules,
+  shownFile: string,
+): Promise<DesktopSheet | undefined> {
+  const path = `${folder}/${ref.file}`
+  let png: string | undefined
+  try {
+    png = await at.reader.readBase64(`${at.root}/${path}`)
+  } catch (error) {
+    at.issues.push(issueFor(shownFile, `${field}.file`, `points to ${at.label + path}, which could not be read: ${errorMessage(error)}`))
+    return undefined
+  }
+  if (png === undefined) {
+    at.issues.push(issueFor(shownFile, `${field}.file`, `points to ${at.label + path}, which is missing`))
+    return undefined
+  }
+  return keep(desktopSheet(png, { frames: ref.frames, field: `${field}.file`, file: shownFile }, rules), at.issues)
 }
 
 /** A `.sprite.json`, or a PNG sheet when `frames` is set (only when the validator allowed a PNG). */
@@ -198,6 +242,14 @@ async function loadBiome(at: Folder, folder: string): Promise<LoadedBiome | unde
   const biome = json && keep(validateBiome(json.value, { file: shownFile, folder }), at.issues)
   if (!biome) return undefined
 
+  const desktopBackground =
+    biome.desktopBackground && (await loadDesktopSheet(at, `biomes/${folder}`, biome.desktopBackground, 'desktopBackground', CONTENT.desktop.background, shownFile))
+  const loaded = await loadBackground(at, folder, biome, shownFile)
+  return desktopBackground ? { ...loaded, desktopBackground } : loaded
+}
+
+/** The biome with its terminal background, or without it when that didn't load. */
+async function loadBackground(at: Folder, folder: string, biome: Biome, shownFile: string): Promise<LoadedBiome> {
   if (biome.background === undefined) return { biome, file: shownFile }
   const backgroundFile = `biomes/${folder}/${biome.background}`
   const backgroundJson = await readJson(at, backgroundFile)
