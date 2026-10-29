@@ -905,6 +905,16 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] A decision amends 0026's idle line for desktop: the biome's name in a small tag in the strip's corner, in its accent colour on a translucent backing, with a dot that pulses while Claude works; whether the tag fades after a while; and what stays for `showIdleLine` and the terminal.
   - [x] `sceneSvg` draws the tag (SVG text in the image), and the text row under the scene goes away on desktop, so the band is a row shorter. Render and register tests cover it.
   - [x] Checked in the Code tab, light and dark.
+
+#### [ ] P5-55 — Desktop art for the Whispering Forest roster
+- **Depends on:** P5-53
+- **Size:** M
+- **Goal:** every Whispering Forest Modster has a desktop sheet, so the forest is the first biome fully migrated to desktop art (asked by @danielpg95, 2026-10-29). Shellsprout and Mossmaul already have theirs; the other 8 keep their designs and dex entries.
+- **Done when:**
+  - [ ] Hootlet, Pinekin, Fernox, Hollowmask, Sporrow, Acornsprite, Musketail and Elderbark each ship a `desktopSprite` made from a reference with `add-modster`'s desktop prompt: the same design as the terminal sprite, sized by tier, with an idle animation, approved by @danielpg95 one at a time.
+  - [ ] A credits row for every new sheet in `plugin/content/CREDITS.md`, keeping co-credits where a design is someone else's.
+  - [ ] `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
+  - [ ] Checked in the Code tab: the band, the encounter pane and the Collection tab.
 ---
 
 ## Phase 6 — Beyond the terminal
