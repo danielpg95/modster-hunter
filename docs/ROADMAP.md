@@ -916,6 +916,15 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] A credits row for every new sheet in `plugin/content/CREDITS.md`, keeping co-credits where a design is someone else's.
   - [x] `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
   - [x] Checked in the Code tab: the band, the encounter pane and the Collection tab.
+
+#### [ ] P5-56 — The idle tag waits until the band shows it
+- **Depends on:** P5-54
+- **Size:** S
+- **Goal:** on desktop the idle tag is sometimes missing on a session's first load (reported by @danielpg95, 2026-10-29). Its 5 s show starts when the session starts, so when the Code tab draws the band later, or the encounter pane holds the band aside, the tag fades unseen. Decision 0047 says it shows "when the biome comes into view"; time it from the band's first desktop draw instead.
+- **Done when:**
+  - [ ] The tag's show and fade start the first time the band draws the desktop scene (or the tag alone) after the biome comes into view: at session start, and when an encounter ends.
+  - [ ] Register tests cover a band first drawn after `IDLE_TAG.showMs`, a band held aside by the encounter pane, and the existing timing.
+  - [ ] Checked in the Code tab: the tag shows on a session's first load.
 ---
 
 ## Phase 6 — Beyond the terminal
