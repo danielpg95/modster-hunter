@@ -825,17 +825,17 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] One built-in Modster ships a desktop sheet, ahead of P5-51 (asked by @danielpg95, 2026-10-28): original art, approved by @danielpg95, credited, passing `node tools/check-content.mjs`.
   - [x] Checked in the Code tab with that Modster and one without a desktop sheet.
 
-#### [ ] P5-47 — Catch animation with desktop art
+#### [x] P5-47 — Catch animation with desktop art
 - **Depends on:** P5-46
 - **Size:** M
 - **Goal:** a throw on desktop, and the Catchers tab's looping preview, draw the Modster's and the catcher's desktop sheets (decision 0043).
 - **Done when:**
-  - [ ] Checked in the Code tab first: `catchSvg`'s SMIL motion and filters run in an image-mode Svg.
-  - [ ] The throw uses both desktop sheets, and falls back to today's art for content without them. Render tests cover it.
-  - [ ] The Catchers tab's preview uses them too (moved from P5-46).
-  - [ ] A throw with the largest allowed Modster and catcher stays under the 131072-character limit.
-  - [ ] The puzzle cube catcher (decision 0036) ships a desktop sheet, ahead of P5-51 (asked by @danielpg95, 2026-10-28): original art, approved by @danielpg95, credited, passing `node tools/check-content.mjs`.
-  - [ ] Checked in the Code tab: a throw and the Catchers tab preview with Shellsprout and the puzzle cube, and with content that has no desktop sheet.
+  - [x] Checked in the Code tab first: `catchSvg`'s SMIL motion and filters run in an image-mode Svg.
+  - [x] The throw uses both desktop sheets, and falls back to today's art for content without them. Render tests cover it.
+  - [x] The Catchers tab's preview uses them too (moved from P5-46).
+  - [x] A throw with the largest allowed Modster and catcher stays under the 131072-character limit.
+  - [x] The puzzle cube catcher (decision 0036) ships a desktop sheet, ahead of P5-51 (asked by @danielpg95, 2026-10-28): original art, approved by @danielpg95, credited, passing `node tools/check-content.mjs`.
+  - [x] Checked in the Code tab: a throw and the Catchers tab preview with Shellsprout and the puzzle cube, and with content that has no desktop sheet.
 
 #### [ ] P5-48 — Desktop biome backgrounds
 - **Depends on:** P5-44

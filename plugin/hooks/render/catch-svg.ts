@@ -1,4 +1,5 @@
 import { CATCH, DESKTOP } from '../constants'
+import type { DesktopSheet } from '../content'
 import { catchBeatAt, throwingMs, type CatchOutcome } from '../game'
 import { anchoredMotion, beatFrameIndex, dome, modsterOnTop, modsterPose, sparkles, stretchMotion, type CatchArt, type StretchMotion } from './catch-frame'
 import type { Frame } from './pixels-to-cells'
@@ -17,6 +18,14 @@ export interface CatchSvgOptions {
   maxChars?: number
   /** Loop the throw forever, holding its last frame this long between plays (the Catchers tab's preview) */
   loopPauseMs?: number
+  /** Paints a desktop sheet Modster in this one colour: the Catchers tab's preview before any catch */
+  silhouette?: string
+  /**
+   * Starts the Svg this far into the throw: its first values are the throw's state then. An Svg drawn
+   * as an image restarts its SMIL on every redraw and shows its plain values for a moment first, so a
+   * redraw mid-throw starts a new Svg where the throw is (P5-47, checked in the Code tab)
+   */
+  fromMs?: number
 }
 
 /** How long a throw plays: the throw itself, then a catch's `caught` beat (0035 point 5). */
@@ -25,12 +34,17 @@ export function catchLengthMs(outcome: CatchOutcome, rocks: number): number {
 }
 
 /** The throw as SVG, or undefined when it comes out over `maxChars`. */
-export function catchSvg(art: CatchArt, outcome: CatchOutcome, rocks: number, { scale, maxChars = DESKTOP.svgMaxChars, loopPauseMs }: CatchSvgOptions): string | undefined {
+export function catchSvg(art: CatchArt, outcome: CatchOutcome, rocks: number, { scale, maxChars = DESKTOP.svgMaxChars, loopPauseMs, silhouette, fromMs = 0 }: CatchSvgOptions): string | undefined {
   const length = catchLengthMs(outcome, rocks)
+  const start = Math.min(Math.max(0, fromMs), length)
   const times: number[] = []
-  for (let t = 0; t < length; t += DESKTOP.catchSampleMs) times.push(t)
+  for (let t = start; t < length; t += DESKTOP.catchSampleMs) times.push(t)
   times.push(length)
-  const timing = new Timing(times, length, loopPauseMs)
+  const timing = new Timing(
+    times.map((t) => t - start),
+    length - start,
+    loopPauseMs,
+  )
   const samples = times.map((ms) => {
     const at = catchBeatAt(ms, outcome, rocks)
     const beat = art.beats[at.beat]
@@ -49,6 +63,11 @@ export function catchSvg(art: CatchArt, outcome: CatchOutcome, rocks: number, { 
 
   const defs: string[] = []
   const { width, height } = art
+  // Desktop sheets (0045 point 5) are embedded once and reused, so a throw stays under the Svg limit
+  if (art.modster.sheet) defs.push(sheetImage('ms', art.modster.sheet))
+  if (art.catcher.sheet) defs.push(sheetImage('cs', art.catcher.sheet))
+  if (art.lit.glow) defs.push(glowFilter(art.lit.glow))
+  if (art.modster.sheet && silhouette) defs.push(`<filter id="sil"><feFlood flood-color="${silhouette}"/><feComposite in2="SourceAlpha" operator="in"/></filter>`)
 
   // ---------- the Modster: its idle loop, moved, scaled and tinted ----------
   const modsterFrames = art.modster.frames.map((rgba) => ({ width: art.modster.width, height: art.modster.height, rgba }))
@@ -62,7 +81,10 @@ export function catchSvg(art: CatchArt, outcome: CatchOutcome, rocks: number, { 
       { 'data-part': 'modster-move', transform: timing.transform(poses.map((p) => (p ? `${num(p.anchor[0] - (art.modster.width / 2) * p.scale)} ${num(p.anchor[1] - (art.modster.height / 2) * p.scale)}` : '0 0')), 'translate') },
       group(
         { transform: timing.transform(poses.map((p) => num(p?.scale ?? 1)), 'scale') },
-        group(modsterFilter ? { filter: modsterFilter } : {}, loopedFrames(modsterFrames, art.modsterFps)),
+        group(
+          modsterFilter ? { filter: modsterFilter } : {},
+          art.modster.sheet ? modsterSheet(art.modster.sheet, art.modsterFps, silhouette !== undefined) : loopedFrames(modsterFrames, art.modsterFps),
+        ),
       ),
     ),
   )
@@ -98,19 +120,16 @@ function anchoredLayer(art: CatchArt, samples: Sample[], timing: Timing, defs: s
   const motions = held(samples.map((s) => s.anchored))
   const tint = filter(defs, 'ct', motions.map((m) => colorMatrix(m?.white ?? 0, 1)), timing)
   const frames = usedFrames(samples.filter((s) => s.anchored))
-  const frameGroups = (rows: (row: number) => boolean) =>
+  const frameGroups = (rows: { from: number; to: number }) =>
     frames
       .map((key) => {
-        const { frames: list } = key.lit ? art.lit : art.catcher
-        const rgba = list[key.index] ?? list[0]
-        if (!rgba) return ''
-        const paths = framePaths(cropRows({ width, height, rgba }, rows))
-        if (paths === '') return ''
-        return group({ display: timing.discrete(samples.map((s) => shownAs(sameFrame(s.frame, key)))) }, paths)
+        const content = catcherFrame(art, key, rows)
+        if (content === '') return ''
+        return group({ display: timing.discrete(samples.map((s) => shownAs(sameFrame(s.frame, key)))) }, content)
       })
       .join('')
-  const body = frameGroups((row) => row >= art.lidRows)
-  const lid = art.lidRows > 0 ? frameGroups((row) => row < art.lidRows) : ''
+  const body = frameGroups({ from: art.lidRows, to: height })
+  const lid = art.lidRows > 0 ? frameGroups({ from: 0, to: art.lidRows }) : ''
   return group(
     { display: timing.discrete(samples.map((s) => shownAs(s.anchored !== undefined))) },
     group(
@@ -141,10 +160,9 @@ function stretchLayer(art: CatchArt, samples: Sample[], timing: Timing, defs: st
   // The tile, moved with the dome's left edge and a shaking Modster
   const tileFrames = usedFrames(samples.filter((s) => s.stretch))
     .map((key) => {
-      const { frames: list } = key.lit ? art.lit : art.catcher
-      const rgba = list[key.index] ?? list[0]
-      if (!rgba) return ''
-      return group({ display: timing.discrete(samples.map((s) => shownAs(sameFrame(s.frame, key)))) }, framePaths({ width: tw, height: th, rgba }))
+      const content = catcherFrame(art, key, { from: 0, to: th })
+      if (content === '') return ''
+      return group({ display: timing.discrete(samples.map((s) => shownAs(sameFrame(s.frame, key)))) }, content)
     })
     .join('')
   const tileX = timing.linear(motions.map((m) => num(Math.floor(m.shape.cx - m.shape.rx) - m.shift)))
@@ -346,6 +364,59 @@ function litFrame(art: CatchArt, frame: { lit: boolean; index: number }): { lit:
 }
 
 const sameFrame = (a: { lit: boolean; index: number }, b: { lit: boolean; index: number }): boolean => a.lit === b.lit && a.index === b.index
+
+/**
+ * One catcher frame, rows `from` to `to` (terminal pixels; the lid or the body),
+ * in the catcher's own coordinates: paths for terminal art, or the shared desktop
+ * sheet seen through a window on that frame, its glow colour repainted when lit.
+ */
+function catcherFrame(art: CatchArt, key: { lit: boolean; index: number }, rows: { from: number; to: number }): string {
+  const { width, height, sheet } = art.catcher
+  if (sheet) {
+    const q = sheet.width / width
+    const index = key.index < sheet.frames ? key.index : 0
+    const glow = key.lit && art.lit.glow ? ' filter="url(#glow)"' : ''
+    const view = `${index * sheet.width} ${num(rows.from * q)} ${sheet.width} ${num((rows.to - rows.from) * q)}`
+    return `<svg x="0" y="${num(rows.from)}" width="${num(width)}" height="${num(rows.to - rows.from)}" viewBox="${view}" preserveAspectRatio="none"><use href="#cs"${glow}/></svg>`
+  }
+  const { frames: list } = key.lit ? art.lit : art.catcher
+  const rgba = list[key.index] ?? list[0]
+  if (!rgba) return ''
+  return framePaths(cropRows({ width, height, rgba }, (row) => row >= rows.from && row < rows.to))
+}
+
+/** A desktop sheet, embedded once under `id` for every `use` of it; pixelated, as the desktop draws sheets. */
+function sheetImage(id: string, sheet: DesktopSheet): string {
+  return `<image id="${id}" href="data:image/png;base64,${sheet.png}" width="${sheet.width * sheet.frames}" height="${sheet.height}" image-rendering="pixelated" style="image-rendering:pixelated"/>`
+}
+
+/** The Modster's sheet in its area, stepped a frame at a time at `fps` (as `desktopSheetSvg`); a silhouette holds frame 0. */
+function modsterSheet(sheet: DesktopSheet, fps: number, silhouette: boolean): string {
+  const q = CATCH.desktopPixels
+  const step =
+    sheet.frames > 1 && !silhouette
+      ? `<animate attributeName="x" values="${Array.from({ length: sheet.frames }, (_, i) => -i * sheet.width).join(';')}" keyTimes="${Array.from({ length: sheet.frames }, (_, i) => +(i / sheet.frames).toFixed(4)).join(';')}" calcMode="discrete" dur="${+(sheet.frames / fps).toFixed(3)}s" repeatCount="indefinite"/>`
+      : ''
+  return `<svg width="${num(sheet.width / q)}" height="${num(sheet.height / q)}" viewBox="0 0 ${sheet.width} ${sheet.height}"><use href="#ms"${silhouette ? ' filter="url(#sil)"' : ''}>${step}</use></svg>`
+}
+
+/**
+ * Repaints one exact colour, `from`, in `to` (decision 0045 point 5: `glowColor`, since a PNG has no
+ * palette). Each channel becomes 1 only at its own value of `from`; their sum less 2 is 1 only where
+ * all three match, and that mask is filled with `to` over the art.
+ */
+function glowFilter({ from, to }: { from: string; to: string }): string {
+  const table = (value: number) => Array.from({ length: 256 }, (_, i) => (i === value ? 1 : 0)).join(' ')
+  const [r, g, b] = [1, 3, 5].map((at) => parseInt(from.slice(at, at + 2), 16))
+  return (
+    `<filter id="glow" color-interpolation-filters="sRGB">` +
+    `<feComponentTransfer in="SourceGraphic" result="hit"><feFuncR type="discrete" tableValues="${table(r!)}"/><feFuncG type="discrete" tableValues="${table(g!)}"/><feFuncB type="discrete" tableValues="${table(b!)}"/></feComponentTransfer>` +
+    `<feColorMatrix in="hit" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 -2" result="mask"/>` +
+    `<feComposite in="mask" in2="SourceAlpha" operator="in" result="only"/>` +
+    `<feFlood flood-color="${to}"/><feComposite in2="only" operator="in" result="lit"/>` +
+    `<feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="lit"/></feMerge></filter>`
+  )
+}
 
 /** The frame with the rows that fail `keep` made empty. */
 function cropRows(frame: Frame, keep: (row: number) => boolean): Frame {

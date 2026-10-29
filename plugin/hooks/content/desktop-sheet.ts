@@ -1,4 +1,4 @@
-import { CONTENT } from '../constants'
+import { CATCH, CONTENT } from '../constants'
 import { decodePng } from '../vendor/png'
 import { IssueList } from './issue-list'
 import type { DesktopSheet, Validation } from './types'
@@ -55,7 +55,41 @@ export function desktopSheet(png: string, sheet: { frames: number; field: string
   const { colorsMax } = CONTENT.desktop
   if (colors.size > colorsMax) issues.error(field, `has ${colors.size} opaque colours; at most ${colorsMax}`)
 
-  return issues.result({ png, width, height: image.height, frames, colors: [...colors] })
+  const measured = measure(image.data, image.width, width, image.height)
+  return issues.result({ png, width, height: image.height, frames, colors: [...colors], ...measured })
+}
+
+/**
+ * What a throw needs from the pixels, measured once so nothing keeps them:
+ * the opaque bounds across every frame, and frame 0's main colour (as
+ * `catch-frame`'s own `mainColor` and `opaqueBounds` find them for terminal art).
+ */
+function measure(data: Uint8Array, sheetWidth: number, width: number, height: number): Pick<DesktopSheet, 'bounds' | 'mainColor'> {
+  let x0 = width
+  let y0 = height
+  let x1 = -1
+  let y1 = -1
+  const counts = new Map<number, number>()
+  for (let y = 0; y < height; y++) {
+    for (let sx = 0; sx < sheetWidth; sx++) {
+      const at = (y * sheetWidth + sx) * 4
+      if (data[at + 3]! < 128) continue
+      const x = sx % width
+      x0 = Math.min(x0, x)
+      x1 = Math.max(x1, x)
+      y0 = Math.min(y0, y)
+      y1 = Math.max(y1, y)
+      if (sx >= width) continue
+      const key = (data[at]! << 16) | (data[at + 1]! << 8) | data[at + 2]!
+      counts.set(key, (counts.get(key) ?? 0) + 1)
+    }
+  }
+  const ranked = [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([key]) => key)
+  const bright = ranked.find((key) => ((key >> 16) & 255) + ((key >> 8) & 255) + (key & 255) > CATCH.glowMinBrightness)
+  const main = bright ?? ranked[0] ?? 0xffffff
+  // A blank sheet: the whole frame
+  const bounds = x1 < 0 ? { x0: 0, y0: 0, x1: width - 1, y1: height - 1 } : { x0, y0, x1, y1 }
+  return { bounds, mainColor: `#${main.toString(16).padStart(6, '0')}` }
 }
 
 /** Width and height from a PNG's IHDR, or undefined when it isn't one (`decodePng` then says why). */

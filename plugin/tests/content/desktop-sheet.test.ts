@@ -20,6 +20,8 @@ describe('desktopSheet', () => {
     if (!result.ok) return
     expect([result.value.width, result.value.height, result.value.frames]).toEqual([16, 12, 2])
     expect(result.value.colors).toEqual(['#ff0000'])
+    // One red pixel at each frame's top left: a throw aims at it, and it's the main colour
+    expect([result.value.bounds, result.value.mainColor]).toEqual([{ x0: 0, y0: 0, x1: 0, y1: 0 }, '#ff0000'])
     expect(result.value.png).toBe(base64(png))
   })
 

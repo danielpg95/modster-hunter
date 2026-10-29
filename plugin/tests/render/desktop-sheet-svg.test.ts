@@ -3,7 +3,7 @@ import { DESKTOP } from '../../hooks/constants'
 import type { DesktopSheet } from '../../hooks/content'
 import { desktopSheetSvg } from '../../hooks/render'
 
-const sheet = (frames: number): DesktopSheet => ({ png: 'UE5H', width: 96, height: 80, frames, colors: ['#ff0000'] })
+const sheet = (frames: number): DesktopSheet => ({ png: 'UE5H', width: 96, height: 80, frames, colors: ['#ff0000'], bounds: { x0: 0, y0: 0, x1: 95, y1: 79 }, mainColor: '#ff0000' })
 
 describe('desktopSheetSvg', () => {
   test('a 4-frame sheet shows one frame, stepped left by a frame width at its fps (decision 0045 point 9)', () => {
