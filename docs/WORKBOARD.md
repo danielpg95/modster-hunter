@@ -25,11 +25,10 @@ this file lists only tasks someone has claimed.
 Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
-- **P5-01** — Shiny variants
 - **P5-02** — Sounds
 - **P5-03** — Extended stats and milestones
 - **P5-05** — Light skill catch experiment
 - **P5-09** — Sprite miniatures (spike)
 - **P5-17** — Player-defined tiers (spike)
 - **P5-18** — Live Stats tab
-- **P5-40** — Desktop sprites: format, loader and validator
+- **P5-43** — Desktop-first decision
