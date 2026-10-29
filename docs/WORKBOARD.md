@@ -33,3 +33,4 @@ list when you finish a task.
 - **P5-17** — Player-defined tiers (spike)
 - **P5-18** — Live Stats tab
 - **P5-44** — Desktop art: format, loader and validator
+- **P5-52** — Desktop interaction (spike)
