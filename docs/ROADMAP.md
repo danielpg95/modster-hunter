@@ -784,16 +784,16 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] A decision picks an approach (for example an optional desktop-only sprite in `modster.json`, vector art, or staying with today's sprites), covering how the terminal and desktop versions stay recognisably the same Modster, and the `CONTENT_FORMAT.md` change if any (decision 0045, Proposed).
   - [x] If one is picked, roadmap tasks implement it and add the art (P5-40, P5-41, P5-42; replaced by P5-43..P5-51 on 2026-10-28, when the project went desktop-first).
 
-#### [ ] P5-43 — Desktop-first decision
+#### [x] P5-43 — Desktop-first decision
 - **Depends on:** P5-39
 - **Size:** S
 - **Goal:** state the cut to desktop-first art and set the desktop quality bar from scratch, by reworking decision 0045 (asked by @danielpg95, 2026-10-28). Only the P5-39 spike's technical findings carry over: an image-mode Svg, SMIL and the 131072-character limit.
 - **Done when:**
-  - [ ] 0045 is rewritten and Accepted. It states the cut: after P5-21, built-in Modsters, biomes and catchers are desktop art. Terminal art is optional and welcome from the community, and 0033 and 0034 apply only to terminal sprites.
-  - [ ] It sets the Modster bar: hi-res pixel art drawn pixelated, up to 128×128 per frame, a sheet of 2–8 frames at its own `fps`, at most 48 KiB.
-  - [ ] It settles the colour cap and alpha (default: 64 colours, each pixel opaque or clear), backgrounds (default: up to 48 px tall, edges that tile, 1–4 frames, at most 24 KiB), catchers (default: up to 96×96, at most 24 KiB, with `lidRows`, `glowIndex` and `rimIndex` restated for a PNG) and the display scales for the band, pane and Collection.
-  - [ ] It says each piece of content has desktop art, terminal art or both. With both, they're the same design. A terminal player sees the compact text layout for a desktop-only Modster, the idle line alone for a desktop-only biome, and the default catcher for a desktop-only catcher.
-  - [ ] The README and the plugin's description no longer say the game lives in your terminal.
+  - [x] 0045 is rewritten and Accepted. It states the cut: after P5-21, built-in Modsters, biomes and catchers are desktop art. Terminal art is optional and welcome from the community, and 0033 and 0034 apply only to terminal sprites.
+  - [x] It sets the Modster bar: hi-res pixel art drawn pixelated, up to 128×128 per frame, a sheet of 2–8 frames at its own `fps`, at most 48 KiB.
+  - [x] It settles the colour cap and alpha (default: 64 colours, each pixel opaque or clear), backgrounds (default: up to 48 px tall, edges that tile, 1–4 frames, at most 24 KiB), catchers (default: up to 96×96, at most 24 KiB, with `lidRows`, `glowIndex` and `rimIndex` restated for a PNG) and the display scales for the band, pane and Collection.
+  - [x] It says each piece of content has desktop art, terminal art or both. With both, they're the same design. A terminal player sees the compact text layout for a desktop-only Modster, the idle line alone for a desktop-only biome, and the default catcher for a desktop-only catcher.
+  - [x] The README and the plugin's description no longer say the game lives in your terminal.
 
 #### [ ] P5-44 — Desktop art: format, loader and validator
 - **Depends on:** P5-43

@@ -8,7 +8,7 @@
     {
       "name": "modster-hunter",
       "source": "./plugin",
-      "description": "An idle collecting game that lives in your terminal."
+      "description": "An idle collecting game that lives above your prompt, on desktop and in the terminal."
     }
   ]
 }
