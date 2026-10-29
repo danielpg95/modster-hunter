@@ -257,3 +257,46 @@ test('check: a user folder loads like the mod loads it, with every issue', () =>
   assert.match(lopsided.stdout, /test-meadow\/biome\.json: modsters each common Modster appears 16\.0% of the time, less than each uncommon one \(20\.0%\)/)
   assert.match(lopsided.stdout, /0 errors, 1 warning/)
 })
+
+test('reduce: a reference becomes a base; --desktop allows 64 colors, more is refused (0045)', () => {
+  // A dark-outlined red disc on light grey
+  const ref = writePng('ref.png', 60, 40, (x, y) => {
+    const d = Math.hypot(x + 0.5 - 30, y + 0.5 - 20)
+    return d <= 12 ? (d > 10 ? [20, 20, 20, 255] : [200, 40, 40, 255]) : [230, 230, 230, 255]
+  })
+  const out = join(dir, 'base.png')
+  const ok = run('reduce', ref, '--crop', '0,0,60,40', '--size', '30x20', '--desktop', '--out', out)
+  assert.equal(ok.code, 0, ok.stderr)
+  const png = pngjs.PNG.sync.read(readFileSync(out))
+  assert.deepEqual([png.width, png.height], [30, 20])
+  // The background is cut away: the corners are clear, the middle is red
+  assert.equal(png.data[3], 0)
+  assert.deepEqual([...png.data.subarray((10 * 30 + 15) * 4, (10 * 30 + 15) * 4 + 4)], [200, 40, 40, 255])
+  const tooMany = run('reduce', ref, '--crop', '0,0,60,40', '--size', '30x20', '--desktop', '--colors', '65', '--out', out)
+  assert.equal(tooMany.code, 1)
+  assert.match(tooMany.stderr, /--colors must be 1–64 for desktop art/)
+})
+
+test('check-desktop: checks a sheet like the mod, and --preview writes the page with the mod\'s own Svg', () => {
+  const sheet = writePng('desk.png', 48, 24, (x) => (x % 24 < 12 ? [60, 160, 60, 255] : undefined))
+  const page = join(dir, 'desk.html')
+  const ok = run('check-desktop', sheet, '--frames', '2', '--kind', 'modster', '--preview', page)
+  assert.equal(ok.code, 0, ok.stderr)
+  assert.match(ok.stdout, /2 frames of 24×24, 1 colours, .*fits modster desktop art \(0045\)/)
+  assert.match(readFileSync(page, 'utf8'), /uncaught silhouette/)
+  const soft = writePng('soft.png', 16, 8, (x, y) => (y === 0 ? [0, 0, 0, 100] : undefined))
+  const bad = run('check-desktop', soft, '--frames', '2', '--kind', 'particles')
+  assert.equal(bad.code, 1)
+  assert.match(bad.stderr, /half-transparent pixels/)
+  assert.match(run('check-desktop', sheet, '--frames', '2', '--kind', 'sprite').stderr, /--kind must be modster, background, catcher or particles/)
+})
+
+test('check-desktop: a catcher\'s preview throws at Shellsprout and Mossmaul', () => {
+  const sheet = writePng('catch.png', 32, 16, () => [60, 60, 200, 255])
+  const page = join(dir, 'catch.html')
+  const ok = run('check-desktop', sheet, '--frames', '2', '--kind', 'catcher', '--preview', page)
+  assert.equal(ok.code, 0, ok.stderr)
+  const html = readFileSync(page, 'utf8')
+  assert.match(html, /catches Shellsprout \(desktop art\)/)
+  assert.match(html, /misses Mossmaul \(terminal art\)/)
+})

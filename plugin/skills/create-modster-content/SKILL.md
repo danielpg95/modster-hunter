@@ -13,7 +13,9 @@ which the mod loads at the start of every session next to the built-in content.
 ## Before you start
 
 - **The helper.** `scripts/modster-content.mjs` in this skill's base directory
-  (the folder holding this SKILL.md) converts, draws, previews and checks.
+  (the folder holding this SKILL.md) converts, draws, previews and checks, and
+  for desktop art reduces pictures (`reduce`) and checks sheets
+  (`check-desktop`).
   Run it as `node "<base>/scripts/modster-content.mjs" <command> …`. Built-in
   content is at `<base>/../../content/`.
 - **Node.** Run `node --version`. The helper needs 22.18 or newer. Without it,
@@ -51,6 +53,31 @@ which the mod loads at the start of every session next to the built-in content.
 - **Delete only the player's own items**, one at a time, after they confirm
   ([Delete your own](#delete-your-own)). Never delete built-in content.
 
+## Desktop, terminal or both
+
+Each Modster, biome background and catcher can have **desktop art**, **terminal
+art**, or **both**. Ask which before drawing anything:
+
+- **Desktop:** detailed pixel art for the Desktop app's Code tab. A Modster can be
+  up to 128×128 pixels with up to 64 colours, so there's room for shading,
+  texture and a real face. Recommend it to players who use the Desktop app, and
+  for anything detailed.
+- **Terminal:** today's small sprites (at most 48×32 and 24 colours), drawn in
+  the terminal's text cells. Recommend it to players who play in a terminal.
+- **Both:** make the desktop art first, then a terminal sprite reduced from it,
+  so both are the same design.
+
+Explain what the other side sees. On the terminal, a Modster with desktop art
+only shows as text (its name and tier, no picture), a biome shows just its idle
+line, and a desktop-only catcher plays as the default glass jar. On desktop, a
+Modster with terminal art only is drawn from that sprite, just smaller in
+detail.
+
+Desktop art is a PNG sheet, frames side by side, every pixel fully opaque or
+fully clear. Check every sheet with `check-desktop` before writing it in; it
+applies the same rules the mod does, and its `--preview` page shows the art as
+the Code tab will draw it.
+
 ## Make a Modster
 
 1. **Design**, one question at a time:
@@ -71,6 +98,26 @@ which the mod loads at the start of every session next to the built-in content.
    - **You draw it**: see [Drawing](#drawing). It ends in `sprite.png` plus
      `frames`.
    - Optional `"fps"` 1–12 (default 6).
+
+   **Desktop art** (`desktopSprite`) works best from a picture the player made
+   or generated of their own design. Ask for a detailed pixel-art image of
+   it, about 100–120 pixels tall, with a clear dark outline and the whole
+   body visible:
+   - Convert it to PNG if needed (`sips -s format png ref.jpg --out ref.png`
+     on a Mac), then reduce it:
+     `reduce ref.png --crop X,Y,W,H --size WxH --desktop --out <tmp>/base.png`.
+     Keep the crop's shape, at most 128 on each side. Leftover background
+     (sky, ground) goes with `--clear "#rrggbb,…"` (colours sampled from the
+     picture), and pale specks on the edge with `--trim-edges 190`.
+   - Animate it in a scratch script: 2–8 frames side by side, small moves (a
+     1-pixel sway, a blink). Save it as `modsters/<id>/desktop.png`.
+   - Check it: `check-desktop modsters/<id>/desktop.png --frames N --fps F
+     --kind modster --preview <tmp>/preview.html`. Open the page, post its
+     path in chat, and wait for the player.
+   - Use `"desktopSprite": { "file": "desktop.png", "frames": N, "fps": F }`.
+     For desktop art only, leave `sprite` out. For both, make the terminal
+     sprite from the finished desktop art (`reduce` without `--desktop`, at
+     most 48×32), then finish it as in [Drawing](#drawing).
 3. **Preview** every sprite before going on:
    `preview <sprite> [--frames N] --out <tmp>/preview.png`. Open the PNG to look
    at it, and fix colors that vanish on dark or light. After every render,
@@ -99,6 +146,25 @@ which the mod loads at the start of every session next to the built-in content.
    An optional background is a one-frame sprite: `convert bg.png --frames 1
    --out biomes/<id>/background.sprite.json`, kept subtle so Modsters stay
    readable, and `"background": "background.sprite.json"`.
+
+   **Desktop background** (`desktopBackground`): a wide, calm scene that
+   repeats left to right, up to 192×48 per frame and 1–4 frames. Ask the
+   player for a wide picture with no characters and edges that continue into
+   each other. Reduce the whole scene with `--edges none` (nothing is cut out),
+   cropping between tall things like trunks so the seam falls in a gap:
+   `reduce ref.png --crop X,Y,W,H --size 144x48 --desktop --edges none --out biomes/<id>/desktop.png`.
+   For motion, sway only loose, low things 1 pixel (ferns, grass, water) in a
+   4-frame loop; keep trees and rocks still, or the scene looks uncanny. Check
+   it with `check-desktop … --kind background --preview <tmp>/scene.html`
+   (it shows three tiles, so a bad seam shows), then
+   `"desktopBackground": { "file": "desktop.png", "frames": N }`.
+
+   **Particles** (`particles`: falling leaves, snow, sand, bubbles,
+   sparkles) give the scene most of its motion. On desktop, they can have their
+   own tiny art: `"desktopParticles": { "file": "particles.png", "frames": N }`,
+   8×8 frames (up to 16×16) that tumble as they fall, coloured like what they
+   come from, a little lighter than the background. Draw them in a scratch
+   script, and check with `check-desktop … --kind particles`.
 4. Check and finish.
 
 ## Make a catcher
@@ -154,7 +220,15 @@ only changes looks, never the odds. Format: [reference/format.md](reference/form
    player's reply. Fix colors that vanish on either background. For a
    `custom` catcher, always look at it on a large Modster before finishing,
    and if the Modster pokes out of the catcher, go back to step 2.
-6. **Check** and finish (see [Check and finish](#check-and-finish)). Tell the
+6. **Desktop art** (optional, `desktopSprite`): the same catcher in detail, up
+   to 96×96 per frame and 1–16 frames, with the same beats (every frame a beat
+   names must exist). Geometric catchers (boxes, cubes) are easiest drawn in a
+   scratch script; organic ones from a picture with `reduce --desktop`.
+   `glowColor` and `rimColor` name colours from the sheet (`#rrggbb`), and
+   `lidRows` counts the sheet's rows. Check it and watch real throws:
+   `check-desktop catchers/<id>/desktop.png --frames N --kind catcher --catcher catchers/<id>/catcher.json --preview <tmp>/throws.html`.
+   A desktop-only catcher plays as the glass jar on the terminal.
+7. **Check** and finish (see [Check and finish](#check-and-finish)). Tell the
    player to run `/modsters reload`, open `/modsters`, press `4`, select it with
    `j`/`k` and press `u`. The next throw plays it.
 
@@ -284,6 +358,10 @@ The pane can't delete files, so for a player's own item it says to ask you:
   Node 22.18+.
 - A catcher works the same way: a PNG sheet with `"frames": N`. Its preview
   needs the helper, so check it in a throw after `/modsters reload`.
+- Desktop art works without the helper too: the mod checks the PNG when it
+  loads. Reducing a picture and the preview page need the helper, so the art
+  must come finished from a pixel editor, and a broken sheet shows up only as
+  missing art in the Code tab.
 - Check by hand against [reference/format.md](reference/format.md), field by
   field. A file with an error is skipped without a message in the game, so be
   careful.
