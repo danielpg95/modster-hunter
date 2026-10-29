@@ -4,7 +4,7 @@ import { desktopOnlyForest } from './fixtures/desktop-only-forest'
 import { oneModsterForest } from './fixtures/one-modster-forest'
 import { sceneForest } from './fixtures/scene-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
-import { CATCH } from '../hooks/constants'
+import { CATCH, DESKTOP } from '../hooks/constants'
 import { throwingMs } from '../hooks/game'
 
 // The game runs only while autoStart is on (decision 0038); these tests play it
@@ -115,14 +115,16 @@ describe('register: encounter pane', () => {
     await pane.unmount()
   })
 
-  test('a Modster with desktop art only shows in the pane as text, on the terminal and desktop, and Throw works (0045 point 10)', HUNTING, async ($, on) => {
+  test('a Modster with desktop art only shows as text on the terminal and as its sheet on desktop, and Throw works (0045 points 9–10)', HUNTING, async ($, on) => {
     const clock = await start($, on, () => [], desktopOnlyForest())
     const pane = await mountPane($)
     const desktop = await $.ui.mount({ plugin: 'modster-hunter', surface: 'desktop', component: 'Pane', requestId: 'modster-hunt', props: PANE_PROPS as any })
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await clock.advance(4_250)
     expect(await pane.find({ type: 'Raster' })).toBeUndefined()
-    expect(await desktop.find({ type: 'Svg' })).toBeUndefined()
+    const svg = await desktop.find({ type: 'Svg' })
+    expect(svg?.props.source).toContain('<image href="data:image/png;base64,')
+    expect([svg?.props.width, svg?.props.height]).toEqual([32 * DESKTOP.sheetPaneScale, 32 * DESKTOP.sheetPaneScale])
     expect(await pane.find({ type: 'Text', text: /Sproutling/ })).toBeDefined()
     await pane.press({ key: 'throw' })
     await clock.advance(250 + CATCH_THROW_MS)

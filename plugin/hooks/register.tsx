@@ -9,9 +9,11 @@ import {
   toggleDisabled,
   type ContentReader,
   type ContentRegistry,
+  type DesktopSheet,
   type LoadedBiome,
   type LoadedCatcher,
   type LoadedModster,
+  type Modster,
   type Sprite,
   type MergedContent,
   type SheetFiles,
@@ -65,6 +67,7 @@ import {
   sceneCells,
   settingsLines,
   pixelsToSvg,
+  desktopSheetSvg,
   spriteCells,
   spriteRgba,
   statsLines,
@@ -251,6 +254,8 @@ let isBlittingPreview = false
 const silhouettes = new Map<string, string>()
 // Desktop's Svg versions of the collection's silhouettes and the Catchers tab's preview (P5-38)
 const silhouetteSvgs = new Map<string, { sprite: Sprite; svg: string }>()
+// Desktop sheets' Svgs by Modster, scale and look (0045 point 9)
+const sheetSvgs = new Map<string, { sheet: DesktopSheet; svg: string }>()
 const catcherPreviewSvgs = new Map<string, { catcher: LoadedCatcher; frames: Sprite['frames']; svg: string | undefined }>()
 let collectionSite: string | undefined
 let collectionSpriteModster: DrawnModster | undefined
@@ -458,19 +463,13 @@ export const register: Register = (on, options) => {
       const lines = <Box flexDirection="column">{view.lines.map(line)}</Box>
       // P5-06: the Desktop Code tab draws the Modster as an Svg beside the text, scaled
       // down when needed so it stays within the band's maxRows (rowPx is an estimate)
-      // A Modster with desktop art only stays text until P5-46 draws it (0045 point 10)
-      if (e.surface !== 'desktop' || !modster || !hasSprite(modster) || !band || currentPlan().band === 'one-row') return lines
+      if (e.surface !== 'desktop' || !modster || !band || currentPlan().band === 'one-row') return lines
+      const art = desktopArt($, modster, { scale: DESKTOP.bandScale, sheetScale: DESKTOP.sheetBandScale, maxHeight: e.props.maxRows * DESKTOP.rowPx })
+      if (!art) return lines
       const { Svg } = $.ui.resolve(e)
-      const scale = Math.min(DESKTOP.bandScale, (e.props.maxRows * DESKTOP.rowPx) / modster.sprite.height)
       return (
         <Box flexDirection="row" columnGap={BAND.gapColumns}>
-          <Svg
-            source={desktopSprite($, modster)}
-            alt={modster.modster.name}
-            width={Math.round(modster.sprite.width * scale)}
-            height={Math.round(modster.sprite.height * scale)}
-            isInteractive
-          />
+          <Svg source={art.source} alt={modster.modster.name} width={art.width} height={art.height} {...(art.isInteractive ? { isInteractive: true } : {})} />
           {lines}
         </Box>
       )
@@ -608,18 +607,11 @@ export const register: Register = (on, options) => {
       removeSite(e.requestId)
       const { Svg } = $.ui.resolve(e)
       const lines = view.kind === 'compact' ? view.lines : []
+      const art = desktopArt($, modster, { scale: DESKTOP.paneScale, sheetScale: DESKTOP.sheetPaneScale })
       return (
         <Box flexDirection="column">
           {header}
-          {hasSprite(modster) ? (
-            <Svg
-              source={desktopSprite($, modster)}
-              alt={modster.modster.name}
-              width={modster.sprite.width * DESKTOP.paneScale}
-              height={modster.sprite.height * DESKTOP.paneScale}
-              isInteractive
-            />
-          ) : null}
+          {art ? <Svg source={art.source} alt={modster.modster.name} width={art.width} height={art.height} {...(art.isInteractive ? { isInteractive: true } : {})} /> : null}
           {lines.map(line)}
         </Box>
       )
@@ -1144,21 +1136,29 @@ export const register: Register = (on, options) => {
             {text}
           </Box>
         )
-      } else if (loaded && hasSprite(loaded) && e.surface === 'desktop') {
-        // P5-38: an Svg above the text (0042); a caught Modster loops its idle frames, the silhouette holds still
+      } else if (loaded && e.surface === 'desktop' && (loaded.desktop || hasSprite(loaded))) {
+        // P5-38: an Svg above the text (0042); a caught Modster loops its idle frames, the silhouette holds still.
+        // A desktop sheet wins (0045 point 9), its silhouette the same sheet through a gray filter
         dropCollectionSite(e.requestId)
         const { Svg } = $.ui.resolve(e)
-        detail = (
+        const caught = selected.record !== undefined
+        const art = loaded.desktop
+          ? sheetArt(loaded.modster, loaded.desktop, DESKTOP.sheetCollectionScale, caught ? undefined : COLLECTION.silhouetteColor)
+          : hasSprite(loaded)
+            ? {
+                source: caught ? svgFor(loaded) : silhouetteSvgFor(loaded),
+                width: loaded.sprite.width * DESKTOP.collectionScale,
+                height: loaded.sprite.height * DESKTOP.collectionScale,
+                isInteractive: true,
+              }
+            : undefined
+        detail = art ? (
           <Box key="detail" flexDirection="column">
-            <Svg
-              source={selected.record ? svgFor(loaded) : silhouetteSvgFor(loaded)}
-              alt={selected.record ? loaded.modster.name : 'An uncaught Modster'}
-              width={loaded.sprite.width * DESKTOP.collectionScale}
-              height={loaded.sprite.height * DESKTOP.collectionScale}
-              isInteractive
-            />
+            <Svg source={art.source} alt={caught ? loaded.modster.name : 'An uncaught Modster'} width={art.width} height={art.height} {...(art.isInteractive ? { isInteractive: true } : {})} />
             {text}
           </Box>
+        ) : (
+          text
         )
       } else {
         dropCollectionSite(e.requestId)
@@ -1337,6 +1337,40 @@ function svgFor(loaded: DrawnModster): string {
   const svg = pixelsToSvg(frames, { scale: 1, fps: loaded.modster.sprite?.fps ?? CONTENT.modster.defaultFps })
   svgByModster.set(loaded.modster.id, { sprite: loaded.sprite, svg })
   return svg
+}
+
+/** An Svg the desktop draws, sized in CSS pixels; interactive for SMIL over paths, not over an embedded PNG (0045 point 9). */
+interface DesktopArt {
+  source: string
+  width: number
+  height: number
+  isInteractive: boolean
+}
+
+/**
+ * The Modster as the desktop draws it at `scale` per terminal pixel, or `sheetScale` per
+ * desktop sheet pixel, made smaller to fit `maxHeight`. A desktop sheet wins over the
+ * terminal sprite (0045 point 2); with neither, undefined, and the text stands alone.
+ * The sheet holds still in its idle loop during a throw until P5-47 draws desktop throws.
+ */
+function desktopArt($: EngineInterface, loaded: LoadedModster, size: { scale: number; sheetScale: number; maxHeight?: number }): DesktopArt | undefined {
+  const fit = (scale: number, height: number) => Math.min(scale, (size.maxHeight ?? Infinity) / height)
+  if (loaded.desktop) return sheetArt(loaded.modster, loaded.desktop, fit(size.sheetScale, loaded.desktop.height))
+  if (!hasSprite(loaded)) return undefined
+  const scale = fit(size.scale, loaded.sprite.height)
+  return { source: desktopSprite($, loaded), width: Math.round(loaded.sprite.width * scale), height: Math.round(loaded.sprite.height * scale), isInteractive: true }
+}
+
+/** A desktop sheet's Svg, made once per Modster, scale and look; `silhouette` paints an uncaught one. */
+function sheetArt(modster: Modster, sheet: DesktopSheet, scale: number, silhouette?: string): DesktopArt {
+  const key = `${modster.id}/${scale}/${silhouette ?? ''}`
+  let cached = sheetSvgs.get(key)
+  if (cached?.sheet !== sheet) {
+    const fps = modster.desktopSprite?.fps ?? CONTENT.modster.defaultFps
+    cached = { sheet, svg: desktopSheetSvg(sheet, { scale, fps, ...(silhouette ? { silhouette } : {}) }) }
+    sheetSvgs.set(key, cached)
+  }
+  return { source: cached.svg, width: Math.round(sheet.width * scale), height: Math.round(sheet.height * scale), isInteractive: false }
 }
 
 /**

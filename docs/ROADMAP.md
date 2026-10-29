@@ -815,15 +815,15 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] A desktop-only biome shows the idle line alone, and a desktop-only catcher falls back to the default catcher.
   - [x] Tests cover each case.
 
-#### [ ] P5-46 — Draw desktop Modster sheets
+#### [x] P5-46 — Draw desktop Modster sheets
 - **Depends on:** P5-44
 - **Size:** M
 - **Goal:** on the desktop surface, a Modster with a desktop sheet shows it in the band, the encounter pane and the Collection tab. (The Catchers tab preview, a looping catch, moved to P5-47 on 2026-10-28.)
 - **Done when:**
-  - [ ] A pure renderer makes the image-mode Svg: the sheet stepped by SMIL at its `fps`, pixelated, at 0045's scales. Render tests check its frames, timing and size.
-  - [ ] The Collection tab's silhouette is the same sheet through a gray filter.
-  - [ ] One built-in Modster ships a desktop sheet, ahead of P5-51 (asked by @danielpg95, 2026-10-28): original art, approved by @danielpg95, credited, passing `node tools/check-content.mjs`.
-  - [ ] Checked in the Code tab with that Modster and one without a desktop sheet.
+  - [x] A pure renderer makes the image-mode Svg: the sheet stepped by SMIL at its `fps`, pixelated, at 0045's scales. Render tests check its frames, timing and size.
+  - [x] The Collection tab's silhouette is the same sheet through a gray filter.
+  - [x] One built-in Modster ships a desktop sheet, ahead of P5-51 (asked by @danielpg95, 2026-10-28): original art, approved by @danielpg95, credited, passing `node tools/check-content.mjs`.
+  - [x] Checked in the Code tab with that Modster and one without a desktop sheet.
 
 #### [ ] P5-47 — Catch animation with desktop art
 - **Depends on:** P5-46

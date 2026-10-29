@@ -221,11 +221,18 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('on desktop a Modster with desktop art only shows its text, with no Svg until desktop sheets draw', HUNTING, async ($, on) => {
+  test('on desktop the band draws a desktop sheet beside the text: an image, not interactive, within maxRows (0045 point 9)', HUNTING, async ($, on) => {
     const { ui, clock } = await startBand($, on, desktopOnlyForest(), 'desktop')
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await clock.advance(4_000 + BAND_TICK)
-    expect(await ui.find({ type: 'Svg' })).toBeUndefined()
+    const svg = await ui.find({ type: 'Svg' })
+    expect(svg?.props.alt).toBe('Sproutling')
+    expect(svg?.props.source).toContain('<image href="data:image/png;base64,')
+    expect(svg?.props.isInteractive).toBeUndefined()
+    // The fixture sheet is 32×32 at the band's 0.5
+    expect([svg?.props.width, svg?.props.height]).toEqual([32 * DESKTOP.sheetBandScale, 32 * DESKTOP.sheetBandScale])
+    await ui.redraw({ ...BAND_PROPS, maxRows: 2 } as any)
+    expect((await ui.find({ type: 'Svg' }))?.props.height).toBeLessThanOrEqual(2 * DESKTOP.rowPx)
     expect(await ui.find({ type: 'Button', key: 'throw' })).toBeDefined()
     await ui.unmount()
   })
