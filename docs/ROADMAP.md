@@ -843,7 +843,8 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Goal:** the idle scene tiles a biome's `desktopBackground` on desktop (decision 0044).
 - **Done when:**
   - [ ] `sceneSvg` tiles it within the band's `maxRows`, and the Biomes tab shows it. Tests cover it.
-  - [ ] Checked in the Code tab.
+  - [ ] Whispering Forest ships a `desktopBackground`, ahead of P5-51 (asked by @danielpg95, 2026-10-28): original art from a reference, approved by @danielpg95, credited, passing `node tools/check-content.mjs`.
+  - [ ] Checked in the Code tab with Whispering Forest and a biome without a desktop background.
 
 #### [x] P5-49 — Contributor skills: desktop, terminal or both
 - **Depends on:** P5-44
