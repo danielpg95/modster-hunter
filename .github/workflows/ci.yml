@@ -6,6 +6,29 @@ on:
     branches: [main]
 
 jobs:
+  # A PR that only touches docs/ (claims, roadmap, handoffs, decisions) needs
+  # only the tracking check. The other jobs are skipped, not left out, so a
+  # required check still reports: GitHub counts a skipped job as passed.
+  changes:
+    name: Changed files
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.diff.outputs.code }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: diff
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          # Pushes to main always run everything
+          if [ "$EVENT" != pull_request ]; then echo code=true >> "$GITHUB_OUTPUT"; exit 0; fi
+          changed=$(git diff --name-only "$BASE" HEAD)
+          echo "$changed"
+          if echo "$changed" | grep -qv '^docs/'; then echo code=true >> "$GITHUB_OUTPUT"; else echo code=false >> "$GITHUB_OUTPUT"; fi
+
   tracking:
     name: Tracking and content checks
     runs-on: ubuntu-latest
@@ -23,6 +46,8 @@ jobs:
 
   plugin:
     name: Plugin validate and tests
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     env:
       # Pinned so a CLI release can't change results under a PR; bump with the
@@ -50,6 +75,8 @@ jobs:
 
   tools:
     name: Tools tests
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
