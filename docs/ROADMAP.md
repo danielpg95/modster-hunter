@@ -883,6 +883,15 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] It checks whether a pane can lay out a grid of animated Svg thumbnails and switch to a detail view on a press, within the Svg limit.
   - [ ] Digit hotkeys and the terminal layout still work the same with the spike mod loaded.
   - [ ] A decision picks which ideas to build on desktop, keeps the terminal as the simple path (keys and text), and keeps rules 6 and 7. If any are picked, roadmap tasks build them.
+
+#### [ ] P5-53 — Desktop reference prompts for Modsters and catchers
+- **Depends on:** P5-49
+- **Size:** S
+- **Goal:** the `add-modster` and `add-catcher` skills give a dedicated reference prompt for desktop art, so image generators produce the detail desktop sheets keep, instead of the terminal prompt's chunky blocks (asked by @danielpg95, 2026-10-28; P5-48 does the biome background prompt).
+- **Done when:**
+  - [ ] `add-modster`'s desktop path has a prompt template: detailed pixel art about 120 px tall, 2–3 shading tones per colour, a clear dark outline, big readable eyes, a plain background with margin, filled from every design field. It can ask for 2–3 poses for a livelier idle.
+  - [ ] `add-catcher` has one: the object alone on a plain background, three-quarter view, opening or moving parts clearly separated.
+  - [ ] Each template is tried once with a generator, and what worked or failed is noted in the skill, as the terminal prompt's P5-19 examples are.
 ---
 
 ## Phase 6 — Beyond the terminal
