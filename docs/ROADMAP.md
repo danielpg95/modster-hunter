@@ -834,6 +834,8 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] The throw uses both desktop sheets, and falls back to today's art for content without them. Render tests cover it.
   - [ ] The Catchers tab's preview uses them too (moved from P5-46).
   - [ ] A throw with the largest allowed Modster and catcher stays under the 131072-character limit.
+  - [ ] The puzzle cube catcher (decision 0036) ships a desktop sheet, ahead of P5-51 (asked by @danielpg95, 2026-10-28): original art, approved by @danielpg95, credited, passing `node tools/check-content.mjs`.
+  - [ ] Checked in the Code tab: a throw and the Catchers tab preview with Shellsprout and the puzzle cube, and with content that has no desktop sheet.
 
 #### [ ] P5-48 — Desktop biome backgrounds
 - **Depends on:** P5-44
@@ -863,7 +865,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 #### [ ] P5-51 — First desktop art set
 - **Depends on:** P5-21, P5-47, P5-48, P5-49
 - **Size:** M
-- **Goal:** the first built-in desktop art, made with the new skills: Tidecrown (#036), Saltbreeze Bay's background and one catcher.
+- **Goal:** the first built-in desktop art, made with the new skills: Tidecrown (#036), Saltbreeze Bay's background and one catcher (not the puzzle cube, which got its sheet in P5-47).
 - **Done when:**
   - [ ] Tidecrown's desktop sheet (from @victor-aguilars's detailed design), Saltbreeze Bay's `desktopBackground` and one catcher's `desktopSprite` are original, credited and pass the validator.
   - [ ] A preview of each in the PR description, every frame, dark and light.
