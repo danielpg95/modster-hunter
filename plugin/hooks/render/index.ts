@@ -3,7 +3,7 @@ export { displayPlan, type DisplayPlan, type DisplayState } from './display-plan
 export { readDisplaySettings, type DisplaySettings, type EncounterPaneMode } from './display-settings'
 export { catchDots } from './catch-dots'
 export { resolveBeats, type ResolvedBeat, type ResolvedBeats } from './catch-beats'
-export { catchFrame, prepareCatch, type CatchArt } from './catch-frame'
+export { catchFrame, prepareCatch, prepareDesktopCatch, type CatchArt, type ThrowArt } from './catch-frame'
 export { catchLengthMs, catchSvg, type CatchSvgOptions } from './catch-svg'
 export { sceneSvg, sceneSvgSize, type SceneSvgOptions } from './scene-svg'
 export { DEFAULT_COLOR, pixelsToCells, type Frame } from './pixels-to-cells'

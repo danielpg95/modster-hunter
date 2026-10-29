@@ -4,6 +4,7 @@ import { CATCH, COLLECTION, DESKTOP } from '../hooks/constants'
 import { catchLengthMs } from '../hooks/render'
 import { base64FromBytes } from './fixtures/base64-from-bytes'
 import { catcherFiles } from './fixtures/catcher-files'
+import { desktopOnlyForest } from './fixtures/desktop-only-forest'
 import { desktopPng } from './fixtures/desktop-png'
 import { oneModsterForest } from './fixtures/one-modster-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
@@ -163,6 +164,23 @@ describe('register: Catchers tab', () => {
     await clock.advance(1_000)
     expect(blits.some(([key, cells]) => key === 'sprite' && colorsIn(cells).has(BLUE))).toBe(true)
     await band.unmount()
+  })
+
+  test('on desktop the preview draws a desktop sheet Modster as an image, a gray silhouette before any catch (0045)', HUNTING, async ($, on) => {
+    // As user content, without the dex number only built-ins may have (0017)
+    const forest = desktopOnlyForest()
+    const modster = JSON.parse(forest['modsters/sproutling/modster.json'] ?? '{}')
+    delete modster.dex.number
+    forest['modsters/sproutling/modster.json'] = JSON.stringify(modster)
+    const user = Object.fromEntries(Object.entries(forest).map(([path, text]) => [`content/${path}`, text]))
+    await start($, on, {}, user)
+    const pane = await mountPane($, 'desktop')
+    await pane.press({ key: 'catchers' })
+    const svg = await pane.find({ type: 'Svg' })
+    expect(svg?.props.source).toContain('<image id="ms" ')
+    expect(svg?.props.source).toContain('filter="url(#sil)"')
+    expect(svg?.props.isInteractive).toBeUndefined()
+    await pane.unmount()
   })
 
   test("the player's own catcher is marked yours, with the delete hint (0032 point 7)", HUNTING, async ($, on) => {

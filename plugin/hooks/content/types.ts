@@ -81,6 +81,10 @@ export interface DesktopSheet {
   frames: number
   /** Its opaque colours as `#rrggbb`, at most 64 */
   colors: string[]
+  /** Opaque pixels across all frames, inclusive, in one frame's coordinates: where a throw aims (0043) */
+  bounds: { x0: number; y0: number; x1: number; y1: number }
+  /** Frame 0's most common colour bright enough to glow, else its most common one, as `#rrggbb` */
+  mainColor: string
 }
 
 export interface Sprite {

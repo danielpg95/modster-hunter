@@ -9,5 +9,6 @@
     "rock": { "frames": [1, 2, 3] },
     "caught": { "frames": [4] }
   },
-  "lidRows": 9
+  "lidRows": 9,
+  "desktopSprite": { "file": "desktop.png", "frames": 5, "lidRows": 36 }
 }

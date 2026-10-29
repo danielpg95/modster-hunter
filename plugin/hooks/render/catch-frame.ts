@@ -1,5 +1,5 @@
 import { CATCH } from '../constants'
-import type { Catcher, Sprite } from '../content'
+import type { Catcher, DesktopSheet, Sprite } from '../content'
 import { resolveBeats, type ResolvedBeat, type ResolvedBeats } from './catch-beats'
 import { catchBeatAt, type CatchBeatAt, type CatchOutcome } from '../game'
 import type { Frame } from './pixels-to-cells'
@@ -13,8 +13,12 @@ import { rgbaOf, spriteRgba } from './sprite-cells'
 interface Art {
   width: number
   height: number
-  /** RGBA, row-major, one array per frame */
+  /** RGBA, row-major, one array per frame; empty for a desktop sheet */
   frames: Uint8Array[]
+  /** Desktop art (decision 0045), drawn by `catchSvg` only, a quarter of its pixels per terminal pixel */
+  sheet?: DesktopSheet
+  /** A desktop sheet's lit copy: this colour painted in the Modster's (0045 point 5) */
+  glow?: { from: string; to: string }
 }
 
 /** Everything a throw draws from, decoded once per catcher and Modster. */
@@ -60,6 +64,67 @@ export function prepareCatch(catcher: Catcher, catcherSprite: Sprite, modsterSpr
     bounds: opaqueBounds(modster),
     fits: !anchored || (art.width <= modster.width && art.height <= modster.height),
   }
+}
+
+/** A Modster's or catcher's art for a desktop throw: its desktop sheet, else its terminal sprite. */
+export interface ThrowArt {
+  sprite?: Sprite
+  desktop?: DesktopSheet
+}
+
+/**
+ * The art for a throw on desktop (decision 0045 point 5). A desktop sheet takes
+ * the place of the terminal sprite, drawn at a quarter of its pixels so the
+ * throw keeps the terminal's geometry and plays at today's size; its bounds and
+ * main colour were measured when it loaded. Only `catchSvg` draws it; the
+ * terminal's `catchFrame` takes `prepareCatch`'s art. Undefined when either
+ * side has no art.
+ */
+export function prepareDesktopCatch(catcher: Catcher, catcherArt: ThrowArt, modsterArt: ThrowArt, modsterFps: number): CatchArt | undefined {
+  if (!catcherArt.desktop && !modsterArt.desktop) {
+    return catcherArt.sprite && modsterArt.sprite ? prepareCatch(catcher, catcherArt.sprite, modsterArt.sprite, modsterFps) : undefined
+  }
+  const modster = artOf(modsterArt)
+  const art = artOf(catcherArt)
+  if (!modster || !art) return undefined
+  const main = modsterArt.desktop ? `${modsterArt.desktop.mainColor}ff` : mainColor(modster)
+  const desktop = catcherArt.desktop ? catcher.desktopSprite : undefined
+  let lit = art
+  if (desktop?.glowColor) lit = { ...art, glow: { from: desktop.glowColor.toLowerCase(), to: main.slice(0, 7) } }
+  else if (!desktop && catcherArt.sprite && catcher.glowIndex !== undefined) {
+    const palette = [...catcherArt.sprite.palette]
+    palette[catcher.glowIndex] = main
+    lit = { ...art, frames: spriteRgba(catcherArt.sprite, palette) }
+  }
+  const rimColor = desktop ? desktop.rimColor : catcher.rimIndex === undefined ? undefined : catcherArt.sprite?.palette[catcher.rimIndex]
+  const beats = resolveBeats(catcher)
+  const anchored = Object.values(beats).some((beat) => beat.place !== 'stretch')
+  const bounds = modsterArt.desktop ? quarterBounds(modsterArt.desktop.bounds) : opaqueBounds(modster)
+  return {
+    width: modster.width,
+    height: modster.height,
+    modster,
+    modsterFps,
+    catcher: art,
+    lit,
+    beats,
+    lidRows: desktop ? (desktop.lidRows ?? 0) / CATCH.desktopPixels : (catcher.lidRows ?? 0),
+    ...(rimColor ? { rim: rgbaOf(rimColor.length === 7 ? `${rimColor}ff` : rimColor).slice(0, 3) } : {}),
+    bounds,
+    fits: !anchored || (art.width <= modster.width && art.height <= modster.height),
+  }
+}
+
+/** The sheet at a quarter of its pixels, or the sprite decoded. */
+function artOf({ sprite, desktop }: ThrowArt): Art | undefined {
+  if (desktop) return { width: desktop.width / CATCH.desktopPixels, height: desktop.height / CATCH.desktopPixels, frames: [], sheet: desktop }
+  return sprite ? { width: sprite.width, height: sprite.height, frames: spriteRgba(sprite) } : undefined
+}
+
+/** A sheet's bounds in terminal pixels: the box its opaque pixels cover, inclusive. */
+function quarterBounds({ x0, y0, x1, y1 }: DesktopSheet['bounds']): CatchArt['bounds'] {
+  const q = CATCH.desktopPixels
+  return { x0: x0 / q, y0: y0 / q, x1: (x1 + 1) / q - 1, y1: (y1 + 1) / q - 1 }
 }
 
 /** The throw `ms` after it was made, for a catch or a miss after `rocks` rocks. */

@@ -47,6 +47,7 @@ import {
   previewModsterId,
   pixelsToCells,
   prepareCatch,
+  prepareDesktopCatch,
   oddsRow,
   tierRow,
   tierSections,
@@ -78,6 +79,7 @@ import {
   type BandLine,
   type BiomeEntry,
   type CatchArt,
+  type ThrowArt,
   type CatcherEntry,
   type CollectionEntry,
   type CollectionTab,
@@ -174,10 +176,15 @@ let isBlitting = false
 let pickedCatcherId: string | undefined
 // Keyed by catcher and Modster id, checked against what they were made from: a reload may change either
 const catchArts = new Map<string, { catcher: LoadedCatcher; modster: LoadedModster; art: CatchArt }>()
+const desktopCatchArts = new Map<string, { catcher: LoadedCatcher; modster: LoadedModster; art: CatchArt }>()
 // The throw as a dot count for the text (point 7), kept current by the tick
 let shownDots: string | undefined
 // `svg` is the desktop's vector throw (0043), made on first draw; null when it's over the Svg limit
-let catchPlay: { art: CatchArt; outcome: CatchOutcome; rocks: number; throwAt: number; endsAt: number; svg?: string | null } | undefined
+/**
+ * The throw playing. `art` is the terminal's (blitted), `desktop` the desktop's (one Svg), each
+ * only when it fits (0035 point 8); `at` is the clock at the last tick, where a redraw resumes it.
+ */
+let catchPlay: { art?: CatchArt; desktop?: CatchArt; outcome: CatchOutcome; rocks: number; throwAt: number; endsAt: number; svg?: string | null; at?: number; resumed?: { fromMs: number; svg: string } } | undefined
 let catchCells: string | undefined
 let catchTimer: Timer | undefined
 let isBlittingCatch = false
@@ -256,7 +263,7 @@ const silhouettes = new Map<string, string>()
 const silhouetteSvgs = new Map<string, { sprite: Sprite; svg: string }>()
 // Desktop sheets' Svgs by Modster, scale and look (0045 point 9)
 const sheetSvgs = new Map<string, { sheet: DesktopSheet; svg: string }>()
-const catcherPreviewSvgs = new Map<string, { catcher: LoadedCatcher; frames: Sprite['frames']; svg: string | undefined }>()
+const catcherPreviewSvgs = new Map<string, { catcher: LoadedCatcher; modster: LoadedModster; preview: CatcherPreview | undefined }>()
 let collectionSite: string | undefined
 let collectionSpriteModster: DrawnModster | undefined
 let collectionFrame = 0
@@ -776,12 +783,15 @@ export const register: Register = (on, options) => {
       }
       // The preview plays on the Modster caught last, or a silhouette when none is caught yet
       const all = content ? [...content.modsters.values(), ...content.off.modsters.values()] : []
-      // Only terminal art can be previewed until desktop throws draw desktop art (0045 point 10)
+      // The terminal previews terminal art on both sides; the desktop takes desktop sheets too (0045 points 5 and 10)
       const drawable = all.filter(hasSprite)
       const caughtId = previewModsterId(collectionRecords, new Set(drawable.map((loaded) => loaded.modster.id)))
       const shown = drawable.find((loaded) => loaded.modster.id === caughtId) ?? drawable[0]
       const previewCatcher = hasCatcherSprite(loadedCatcher) ? loadedCatcher : undefined
       const modster = previewCatcher && shown
+      const desktopDrawable = all.filter((loaded) => loaded.desktop !== undefined || hasSprite(loaded))
+      const desktopCaughtId = previewModsterId(collectionRecords, new Set(desktopDrawable.map((loaded) => loaded.modster.id)))
+      const desktopModster = desktopDrawable.find((loaded) => loaded.modster.id === desktopCaughtId) ?? desktopDrawable[0]
       const lines: BandLine[] = [
         [{ text: selected.name, bold: true }],
         ...(selected.description ? [[{ text: selected.description, dim: true }] as BandLine] : []),
@@ -828,21 +838,21 @@ export const register: Register = (on, options) => {
             {text}
           </Box>
         )
-      } else if (modster && previewCatcher && e.surface === 'desktop') {
-        // P5-38: the same looped catch as one vector Svg above the text (0043); the surface plays it
+      } else if (desktopModster && e.surface === 'desktop') {
+        // P5-38: the same looped catch as one Svg above the text (0043); the surface plays it.
+        // With a desktop sheet in it, it's drawn as an image (0045 point 9)
         dropCatcherPreview(e.requestId)
         const { Svg } = $.ui.resolve(e)
-        const sprite = caughtId === undefined ? silhouetteSprite(modster.sprite) : modster.sprite
-        const source = catcherPreviewSvg(previewCatcher, modster, sprite)
-        if (source) {
+        const preview = catcherPreviewSvg(loadedCatcher, desktopModster, desktopCaughtId !== undefined)
+        if (preview) {
           detail = (
             <Box key="detail" flexDirection="column">
               <Svg
-                source={source}
+                source={preview.svg}
                 alt={`${selected.name} catching a Modster`}
-                width={sprite.width * DESKTOP.collectionScale}
-                height={sprite.height * DESKTOP.collectionScale}
-                isInteractive
+                width={Math.round(preview.art.width * DESKTOP.collectionScale)}
+                height={Math.round(preview.art.height * DESKTOP.collectionScale)}
+                {...(preview.image ? {} : { isInteractive: true })}
               />
               {text}
             </Box>
@@ -1355,10 +1365,17 @@ interface DesktopArt {
  */
 function desktopArt($: EngineInterface, loaded: LoadedModster, size: { scale: number; sheetScale: number; maxHeight?: number }): DesktopArt | undefined {
   const fit = (scale: number, height: number) => Math.min(scale, (size.maxHeight ?? Infinity) / height)
+  // A throw plays as one Svg in terminal pixels at the terminal scale (0043); desktop sheets in it are quarter size (0045 point 5)
+  const play = catchPlay
+  const thrown = play?.desktop && throwSvg($, loaded, play)
+  if (play?.desktop && thrown) {
+    const scale = fit(size.scale, play.desktop.height)
+    return { source: thrown.svg, width: Math.round(play.desktop.width * scale), height: Math.round(play.desktop.height * scale), isInteractive: !thrown.image }
+  }
   if (loaded.desktop) return sheetArt(loaded.modster, loaded.desktop, fit(size.sheetScale, loaded.desktop.height))
   if (!hasSprite(loaded)) return undefined
   const scale = fit(size.scale, loaded.sprite.height)
-  return { source: desktopSprite($, loaded), width: Math.round(loaded.sprite.width * scale), height: Math.round(loaded.sprite.height * scale), isInteractive: true }
+  return { source: svgFor(loaded), width: Math.round(loaded.sprite.width * scale), height: Math.round(loaded.sprite.height * scale), isInteractive: true }
 }
 
 /** A desktop sheet's Svg, made once per Modster, scale and look; `silhouette` paints an uncaught one. */
@@ -1374,20 +1391,29 @@ function sheetArt(modster: Modster, sheet: DesktopSheet, scale: number, silhouet
 }
 
 /**
- * What the desktop's Svg shows: a throw as one vector Svg while it plays (0043), else the
- * idle loop (0042). Svg has no key, so the source carries the throw: a new source is a new
- * box, and its SMIL starts at 0 even when the last throw drew the same art.
+ * The throw as the desktop draws it (0043): one Svg, made once per throw, or undefined over the
+ * Svg limit (the idle art and dots stay). Svg has no key, so the source carries the throw: a new
+ * source is a new box, and its SMIL starts at 0 even when the last throw drew the same art.
+ * With a desktop sheet in it, it must be drawn as an image (0045 point 9), which restarts its SMIL
+ * on every redraw and shows its plain values for a moment; so a redraw gets a new Svg that starts
+ * where the throw is now (checked in the Code tab, P5-47).
  */
-function desktopSprite($: EngineInterface, loaded: DrawnModster): string {
-  const play = catchPlay
-  if (play) {
-    if (play.svg === undefined) {
-      play.svg = catchSvg(play.art, play.outcome, play.rocks, { scale: 1 }) ?? null
-      if (play.svg === null) $.ui.log(`catch: no Svg for ${loaded.modster.id}, over ${DESKTOP.svgMaxChars} characters; showing the idle sprite`, { to: 'debug' })
-    }
-    if (play.svg) return play.svg.replace('<svg ', `<svg data-throw="${play.throwAt}" `)
+function throwSvg($: EngineInterface, loaded: LoadedModster, play: NonNullable<typeof catchPlay>): { svg: string; image: boolean } | undefined {
+  if (!play.desktop) return undefined
+  if (play.svg === undefined) {
+    play.svg = catchSvg(play.desktop, play.outcome, play.rocks, { scale: 1 }) ?? null
+    if (play.svg === null) $.ui.log(`catch: no Svg for ${loaded.modster.id}, over ${DESKTOP.svgMaxChars} characters; showing the idle art`, { to: 'debug' })
   }
-  return svgFor(loaded)
+  if (!play.svg) return undefined
+  const image = play.desktop.modster.sheet !== undefined || play.desktop.catcher.sheet !== undefined
+  if (!image) return { svg: play.svg.replace('<svg ', `<svg data-throw="${play.throwAt}" `), image }
+  // Drawn as an image it restarts on every redraw: a new Svg starts where the throw is now, on the sample grid
+  const fromMs = Math.floor(((play.at ?? play.throwAt) - play.throwAt) / DESKTOP.catchSampleMs) * DESKTOP.catchSampleMs
+  if (play.resumed?.fromMs !== fromMs) {
+    const svg = fromMs === 0 ? play.svg : catchSvg(play.desktop, play.outcome, play.rocks, { scale: 1, fromMs })
+    play.resumed = { fromMs, svg: (svg ?? play.svg).replace('<svg ', `<svg data-throw="${play.throwAt}/${fromMs}" `) }
+  }
+  return { svg: play.resumed.svg, image }
 }
 
 function currentModster(): LoadedModster | undefined {
@@ -1617,16 +1643,20 @@ function updateCatch($: EngineInterface, now: number): void {
   }
   if (catchPlay?.throwAt === throwAt) return
   const modster = currentModster()
-  const catcher = content && catcherInUse(content.catchers, pickedCatcherId, CATCH.defaultCatcher, hasCatcherSprite)
-  // Without terminal art on both sides the throw plays as the dot count (0035 point 8, 0045 point 10)
-  if (!modster || !hasSprite(modster) || !catcher || !hasCatcherSprite(catcher)) return
-  const art = catchArtFor(catcher, modster)
+  if (!modster || !content) return
+  // The terminal needs terminal art on both sides; the desktop takes desktop sheets too (0045 points 5 and 10)
+  const terminalCatcher = catcherInUse(content.catchers, pickedCatcherId, CATCH.defaultCatcher, hasCatcherSprite)
+  const desktopCatcher = catcherInUse(content.catchers, pickedCatcherId, CATCH.defaultCatcher)
+  const terminal = terminalCatcher && hasCatcherSprite(terminalCatcher) && hasSprite(modster) ? catchArtFor(terminalCatcher, modster) : undefined
+  const desktop = desktopCatcher ? desktopCatchArtFor(desktopCatcher, modster) : undefined
   // A catcher that doesn't fit the sprite area isn't drawn (0035 point 8; P5-33 shows the dot count)
-  if (!art.fits) return
+  const art = terminal?.fits ? terminal : undefined
+  const vector = desktop?.fits ? desktop : undefined
+  if (!art && !vector) return
   const outcome: CatchOutcome = encounter.throwLands || encounter.outcome === 'caught' ? 'caught' : 'missed'
   const endsAt = throwAt + catchLengthMs(outcome, rocks)
-  catchPlay = { art, outcome, rocks, throwAt, endsAt }
-  catchCells = pixelsToCells(catchFrame(art, outcome, rocks, now - throwAt))
+  catchPlay = { ...(art ? { art } : {}), ...(vector ? { desktop: vector } : {}), outcome, rocks, throwAt, endsAt, at: now }
+  catchCells = art ? pixelsToCells(catchFrame(art, outcome, rocks, now - throwAt)) : undefined
   catchTimer?.cancel()
   catchTimer = $.clock.every(Math.round(1000 / CATCH.fps), () => {
     // Skip a tick while the last blits are in flight (P1-03)
@@ -1643,10 +1673,13 @@ async function blitCatchFrame($: EngineInterface): Promise<void> {
   const at = await $.clock.now()
   const play = catchPlay
   if (!play) return
+  play.at = at
   if (at >= play.endsAt) {
     endCatch($)
     return
   }
+  // Only the desktop draws this throw: the tick just keeps its time
+  if (!play.art) return
   const cells = pixelsToCells(catchFrame(play.art, play.outcome, play.rocks, at - play.throwAt))
   catchCells = cells
   await Promise.all([...spriteSites].map((site) => $.ui.blit({ requestId: site, key: SPRITE_KEY, cells }).catch(() => undefined)))
@@ -1676,6 +1709,21 @@ type DrawnCatcher = LoadedCatcher & { sprite: Sprite }
 
 function hasCatcherSprite(loaded: LoadedCatcher): loaded is DrawnCatcher {
   return loaded.sprite !== undefined
+}
+
+/** The art for a throw on desktop, desktop sheets included (0045 point 5); made once per catcher and Modster. */
+function desktopCatchArtFor(catcher: LoadedCatcher, modster: LoadedModster): CatchArt | undefined {
+  const key = `${catcher.catcher.id}/${modster.modster.id}/desktop`
+  const cached = desktopCatchArts.get(key)
+  if (cached && cached.catcher === catcher && cached.modster === modster) return cached.art
+  const fps = (modster.desktop ? modster.modster.desktopSprite?.fps : modster.modster.sprite?.fps) ?? CONTENT.modster.defaultFps
+  const art = prepareDesktopCatch(catcher.catcher, throwArt(catcher), throwArt(modster), fps)
+  if (art) desktopCatchArts.set(key, { catcher, modster, art })
+  return art
+}
+
+function throwArt(loaded: { sprite?: Sprite; desktop?: DesktopSheet }): ThrowArt {
+  return { ...(loaded.sprite ? { sprite: loaded.sprite } : {}), ...(loaded.desktop ? { desktop: loaded.desktop } : {}) }
 }
 
 function catchArtFor(catcher: DrawnCatcher, modster: DrawnModster): CatchArt {
@@ -2060,14 +2108,26 @@ function silhouetteSvgFor(loaded: DrawnModster): string {
  * The Catchers tab's preview on desktop (P5-38): a catch by `catcher` on `sprite`, looped with
  * the terminal's pause, as one vector Svg (0043). Undefined when it's over the Svg limit.
  */
-function catcherPreviewSvg(catcher: DrawnCatcher, modster: DrawnModster, sprite: Sprite): string | undefined {
-  const key = `${catcher.catcher.id}/${modster.modster.id}/${sprite === modster.sprite ? 'caught' : 'silhouette'}`
+function catcherPreviewSvg(catcher: LoadedCatcher, modster: LoadedModster, caught: boolean): CatcherPreview | undefined {
+  const key = `${catcher.catcher.id}/${modster.modster.id}/${caught ? 'caught' : 'silhouette'}`
   const cached = catcherPreviewSvgs.get(key)
-  if (cached && cached.catcher === catcher && cached.frames === sprite.frames) return cached.svg
-  const art = prepareCatch(catcher.catcher, catcher.sprite, sprite, modster.modster.sprite?.fps ?? CONTENT.modster.defaultFps)
-  const svg = catchSvg(art, 'caught', CATCH.rocksToCatch, { scale: 1, loopPauseMs: CATCH.previewPauseMs })
-  catcherPreviewSvgs.set(key, { catcher, frames: sprite.frames, svg })
-  return svg
+  if (cached && cached.catcher === catcher && cached.modster === modster) return cached.preview
+  // Before any catch it plays on a silhouette: the terminal sprite in gray, or the desktop sheet through a gray filter
+  const gray = !caught && !modster.desktop && modster.sprite ? silhouetteSprite(modster.sprite) : undefined
+  const fps = (modster.desktop ? modster.modster.desktopSprite?.fps : modster.modster.sprite?.fps) ?? CONTENT.modster.defaultFps
+  const art = prepareDesktopCatch(catcher.catcher, throwArt(catcher), gray ? { sprite: gray } : throwArt(modster), fps)
+  const silhouette = !caught && modster.desktop ? { silhouette: COLLECTION.silhouetteColor } : {}
+  const svg = art && catchSvg(art, 'caught', CATCH.rocksToCatch, { scale: 1, loopPauseMs: CATCH.previewPauseMs, ...silhouette })
+  const preview = art && svg ? { svg, art, image: art.modster.sheet !== undefined || art.catcher.sheet !== undefined } : undefined
+  catcherPreviewSvgs.set(key, { catcher, modster, preview })
+  return preview
+}
+
+/** The Catchers tab's looping catch on desktop, sized from its art; `image` when a desktop sheet is in it. */
+interface CatcherPreview {
+  svg: string
+  art: CatchArt
+  image: boolean
 }
 
 /** A sprite in the silhouette's one gray, for a preview before anything is caught. */
@@ -2168,6 +2228,7 @@ async function reloadContent($: EngineInterface, includeBuiltins: boolean, idleT
   // Sprites and backgrounds may have changed, and Modsters and catchers come or go
   cellsByModster.clear()
   catchArts.clear()
+  desktopCatchArts.clear()
   stopCatcherPreview()
   silhouettes.clear()
   biomeScenes.clear()

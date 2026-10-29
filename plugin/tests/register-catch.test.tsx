@@ -5,6 +5,7 @@ import type { Catcher, Sprite } from '../hooks/content'
 import { throwingMs } from '../hooks/game'
 import { catchFrame, catchSvg, pixelsToCells, prepareCatch, spriteCells } from '../hooks/render'
 import { catcherFiles } from './fixtures/catcher-files'
+import { desktopOnlyForest } from './fixtures/desktop-only-forest'
 import { oneModsterForest } from './fixtures/one-modster-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
 import { validSprite } from './fixtures/valid-sprite'
@@ -183,6 +184,30 @@ describe('register: catch animation', () => {
 
     await clock.advance(CATCH_THROW_MS + CATCH.beatMs.caught)
     expect((await pane.find({ type: 'Svg' }))?.props.source).toBe(idle)
+    await pane.unmount()
+  })
+
+  test('on desktop a throw at a Modster with a desktop sheet is drawn as an image, and a redraw starts a new Svg where the throw is (0045 point 9)', HUNTING, async ($, on) => {
+    const { clock } = await start($, on, { ...desktopOnlyForest(), ...catcherFiles() }, {}, () => SHOWN)
+    await $.command.run({ command: 'modsters', args: 'pane' } as any)
+    const pane = await mountPane($, 'desktop')
+    await untilWaiting($, clock)
+    const throwAt = clock.now()
+    await pane.press({ key: 'throw' })
+    const thrown = await pane.find({ type: 'Svg' })
+    expect(thrown?.props.source).toContain('<image id="ms" ')
+    expect(thrown?.props.source).toContain(`data-throw="${throwAt}/0"`)
+    expect(thrown?.props.isInteractive).toBeUndefined()
+    // The fixture's 32×32 sheet is 8×8 terminal pixels, at the pane's 4
+    expect([thrown?.props.width, thrown?.props.height]).toEqual([32, 32])
+    expect(thrown?.props.source).toContain('<g data-part="modster" display="inline">')
+    // A second in, the Modster is inside the jar: a redraw's new Svg starts with it hidden, so it never flashes back
+    await clock.advance(1_000)
+    await pane.redraw(PANE_PROPS as any)
+    const resumed = (await pane.find({ type: 'Svg' }))?.props.source
+    expect(resumed).toMatch(new RegExp(`data-throw="${throwAt}/(9|10)\\d\\d(\\.\\d+)?"`))
+    expect(resumed).toContain('<g data-part="modster" display="none">')
+    expect(resumed).not.toContain('begin="-')
     await pane.unmount()
   })
 

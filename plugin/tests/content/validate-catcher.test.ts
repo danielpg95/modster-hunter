@@ -105,7 +105,7 @@ describe('validateCatcher', () => {
   })
 
   test('checkCatcherDesktop: a sheet that fits the catcher has no issues; frames, colours and lidRows past it are errors', () => {
-    const sheet: DesktopSheet = { png: '', width: 24, height: 24, frames: 2, colors: ['#ffd54f', '#202020'] }
+    const sheet: DesktopSheet = { png: '', width: 24, height: 24, frames: 2, colors: ['#ffd54f', '#202020'], bounds: { x0: 0, y0: 0, x1: 23, y1: 23 }, mainColor: '#ffd54f' }
     const fits = { ...validCatcher(), desktopSprite: { file: 'desktop.png', frames: 2, glowColor: '#FFD54F', lidRows: 8 } } as unknown as Catcher
     expect(checkCatcherDesktop(fits, sheet, where.file)).toEqual([])
 

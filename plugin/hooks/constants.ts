@@ -57,6 +57,8 @@ export const CATCH = {
   defaultCatcher: 'jar',
   /** `glowIndex` takes the Modster's most common color with summed RGB over this (half of full brightness) */
   glowMinBrightness: 384,
+  /** Desktop sheet pixels per terminal pixel in a throw (decision 0045 point 9) */
+  desktopPixels: 4,
 } as const
 
 /**
