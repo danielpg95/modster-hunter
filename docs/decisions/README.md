@@ -46,8 +46,8 @@ settled questions and avoid making assumptions about open ones.
 | [0030](0030-tier-first-encounters.md) | An encounter picks a tier first, then a Modster from that tier | Accepted |
 | [0031](0031-content-reload.md) | `/modsters reload` keeps the encounter and moves on from a dropped biome | Accepted |
 | [0032](0032-in-pane-enable-disable.md) | The pane turns content on and off; deleting is the content skill's job | Accepted |
-| [0033](0033-standard-sprite-size.md) | Every Modster's sprite is at most 32 px tall and 48 px wide | Accepted |
-| [0034](0034-color-limit.md) | A Modster's sprite uses at most 24 colors | Accepted |
+| [0033](0033-standard-sprite-size.md) | Every Modster's sprite is at most 32 px tall and 48 px wide | Accepted (terminal sprites only since 0045) |
+| [0034](0034-color-limit.md) | A Modster's sprite uses at most 24 colors | Accepted (terminal sprites only since 0045) |
 | [0035](0035-catchers.md) | Throws play a catcher animation, and players can make their own catchers | Accepted (P5-27 added `rimIndex`; P5-30: `u: Use`, tab `4: Catchers`; amended by 0036) |
 | [0036](0036-puzzle-cube-catcher.md) | A fifth built-in catcher, the Puzzle Cube | Accepted |
 | [0037](0037-portable-core-and-hosts.md) | Claude Code users first, then a portable core shared by other hosts | Proposed |
@@ -58,4 +58,4 @@ settled questions and avoid making assumptions about open ones.
 | [0042](0042-desktop-svg-sprites.md) | On the desktop app, sprites are one animated Svg each | Proposed (point 4: the catch animation in 0043, the biome scenes in 0044) |
 | [0043](0043-desktop-vector-catch.md) | On the desktop app, a throw plays as one vector Svg | Proposed |
 | [0044](0044-desktop-vector-scenes.md) | On the desktop app, a biome's idle scene is one vector Svg | Proposed |
-| [0045](0045-desktop-sprites.md) | A Modster may have a desktop sprite: a 2× or 3× PNG sheet | Proposed |
+| [0045](0045-desktop-sprites.md) | Desktop first: new built-in art is hi-res pixel art for the Desktop app | Accepted |

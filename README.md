@@ -18,7 +18,8 @@
 </table>
 
 Modster Hunter is a [Claude Code mod](https://code.claude.com/docs/en/plugins/mods):
-a tiny collecting game that lives in your terminal, right above the prompt.
+a tiny collecting game that lives right above the prompt, in the Desktop app's
+Code tab or in your terminal.
 
 You ask Claude for something. While it works, a wild Modster wanders into view.
 Press `1` to throw. You get a few tries before it gets bored and leaves. When
@@ -52,7 +53,7 @@ Every throw plays a catcher. Pick yours in `/modsters`, on the Catchers tab:
 
 ## Install
 
-You need Claude Code **v2.1.292 or later** (`claude --version`), in a terminal.
+You need Claude Code **v2.1.292 or later** (`claude --version`), in the Desktop app's Code tab or a terminal.
 
 ```bash
 claude plugin install modster-hunter --marketplace danielpg95/modster-hunter

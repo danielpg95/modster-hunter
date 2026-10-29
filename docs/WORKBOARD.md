@@ -19,16 +19,17 @@ this file lists only tasks someone has claimed.
 | P5-21 | @victor-aguilars | in-progress | p5-21-inkspector | 2026-10-14 | 2026-10-27 | Merge the Inkspector (#034) PR; then pick a Tidecrown (#036) design (axolotl king on hold, needs a higher-contrast reference) |
 | P5-34 | @victor-aguilars | in-progress | p5-34-readme-install | 2026-10-22 | 2026-10-22 | Hand check on a second computer: fresh install of 0.1.0 from the marketplace, then tick the items (README merged in #149) |
 | P5-36 | @victor-aguilars | in-review | p5-36-in-game-settings | 2026-10-22 | 2026-10-22 | Merge #155, #156, then the P5-36 PR; then close the task |
-| P5-43 | @danielpg95 | in-progress | p5-43-desktop-first | 2026-10-28 | 2026-10-28 | Draft the rework of decision 0045: the cut, the Modster bar, and defaults for colours, backgrounds, catchers and display scales |
 
 ## Up next
 
 Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
+- **P5-01** — Shiny variants
 - **P5-02** — Sounds
 - **P5-03** — Extended stats and milestones
 - **P5-05** — Light skill catch experiment
 - **P5-09** — Sprite miniatures (spike)
 - **P5-17** — Player-defined tiers (spike)
 - **P5-18** — Live Stats tab
+- **P5-44** — Desktop art: format, loader and validator
