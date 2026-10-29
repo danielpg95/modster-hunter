@@ -1,4 +1,5 @@
-import { DESKTOP, SCENE } from '../constants'
+import { DESKTOP, IDLE_TAG, SCENE } from '../constants'
+import { idleTagMarkup, idleTagSize, type IdleTag } from './idle-tag'
 import type { DesktopSheet } from '../content'
 import type { IdleScene, Particle } from './idle-scene'
 import { particlePixel } from './idle-scene'
@@ -20,6 +21,8 @@ export interface SceneSvgOptions {
   maxChars?: number
   /** Keeps the strip's size and crops it at the right when the box is narrower, instead of shrinking it */
   crop?: boolean
+  /** The idle tag at the bottom-left, in CSS pixels whatever the strip's scale (0047) */
+  tag?: IdleTag
 }
 
 /**
@@ -27,16 +30,16 @@ export interface SceneSvgOptions {
  * `columnPx` per sprite pixel, smaller so that with `maxRows` the strip and one line fit in
  * `maxRows × rowPx`. Undefined when even 1 CSS pixel per sprite pixel doesn't fit.
  */
-export function sceneSvgSize(scene: IdleScene, bodyColumns: number, maxRows?: number): { width: number; scale: number } | undefined {
+export function sceneSvgSize(scene: IdleScene, bodyColumns: number, maxRows?: number, lineRows = 1): { width: number; scale: number } | undefined {
   const height = scene.rows * 2
-  const room = maxRows === undefined ? Infinity : (maxRows - 1) * DESKTOP.rowPx
+  const room = maxRows === undefined ? Infinity : (maxRows - lineRows) * DESKTOP.rowPx
   const scale = Math.min(DESKTOP.columnPx, Math.floor(room / height))
   if (scale < 1 || bodyColumns <= 0) return undefined
   return { width: Math.ceil((bodyColumns * DESKTOP.columnPx) / scale), scale }
 }
 
 /** The strip as SVG, or undefined when it comes out over `maxChars`. */
-export function sceneSvg(scene: IdleScene, particles: readonly Particle[], { width, scale, moving, maxChars = DESKTOP.svgMaxChars, crop }: SceneSvgOptions): string | undefined {
+export function sceneSvg(scene: IdleScene, particles: readonly Particle[], { width, scale, moving, maxChars = DESKTOP.svgMaxChars, crop, tag }: SceneSvgOptions): string | undefined {
   const height = scene.rows * 2
   const defs: string[] = []
   let body = ''
@@ -74,6 +77,12 @@ export function sceneSvg(scene: IdleScene, particles: readonly Particle[], { wid
     if (art) defs.push(`<image id="pt" href="data:image/png;base64,${art.png}" width="${art.width * art.frames}" height="${art.height}" image-rendering="pixelated" style="image-rendering:pixelated"/>`)
     const mark = (particle: Particle) => (x: number, y: number) => (art ? particleArt(art, particle, x, y, moving) : `<rect fill="${color}" x="${x}" y="${y}" width="1" height="1"/>`)
     body += particles.map((particle) => (moving ? movingParticle(particle, look.style, mark(particle), width, height) : stillParticle(particle, look.style, mark(particle), width, height))).join('')
+  }
+
+  if (tag) {
+    const { height: th } = idleTagSize(tag)
+    const at = (px: number) => num(px / scale)
+    body += `<g transform="translate(${at(IDLE_TAG.margin)} ${num(height - (IDLE_TAG.margin + th) / scale)}) scale(${num(1 / scale)})">${idleTagMarkup(tag)}</g>`
   }
 
   const fit = crop ? ' preserveAspectRatio="xMinYMin slice"' : ''

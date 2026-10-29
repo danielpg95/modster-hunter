@@ -1,5 +1,5 @@
 import type { EngineInterface, Register, Timer } from 'claude-code'
-import { BAND, CATCH, COLLECTION, CONTENT, DESKTOP, USER_CONTENT, WELCOME_TOAST_MS } from './constants'
+import { BAND, CATCH, COLLECTION, CONTENT, DESKTOP, IDLE_TAG, USER_CONTENT, WELCOME_TOAST_MS } from './constants'
 import {
   cachedSheetLoader,
   formatIssue,
@@ -8,6 +8,7 @@ import {
   noBiomesMessage,
   toggleDisabled,
   type ContentReader,
+  type Biome,
   type ContentRegistry,
   type DesktopSheet,
   type LoadedBiome,
@@ -41,6 +42,9 @@ import {
   catchLengthMs,
   catchSvg,
   sceneSvg,
+  idleTagSize,
+  idleTagSvg,
+  type IdleTag,
   sceneSvgSize,
   catcherEntries,
   catcherRow,
@@ -194,6 +198,11 @@ let isBlittingCatch = false
 // site; it moves only while Claude works and holds still otherwise (point 5).
 const SCENE_KEY = 'scene'
 let scene: IdleScene | undefined
+// The desktop's idle tag (0047): shown as the biome comes into view, then fading, then gone
+let idleTagPhase: 'shown' | 'fading' | 'gone' = 'gone'
+let idleTagTimer: Timer | undefined
+// A biome without an accent colour gets a light grey tag
+const IDLE_TAG_COLOR = '#d0d0d0'
 // The desktop's scene: the biome's desktop background when it has one (0045 point 4), else `scene`
 let sheetScene: IdleScene | undefined
 const particlesByColumns = new Map<number, Particle[]>()
@@ -408,7 +417,8 @@ export const register: Register = (on, options) => {
     if (view.kind !== 'full') removeSite(e.requestId)
     if (view.kind !== 'scene') removeSceneSite(e.requestId)
     // P5-38: the desktop draws the idle scene as one vector Svg above the idle line (0044)
-    const desktopScene = e.surface === 'desktop' && view.kind === 'idle' && sheetScene && showIdleScene ? desktopSceneSvg($, sheetScene, e.props.bodyColumns, e.props.maxRows, sceneMoves()) : undefined
+    const tag = e.surface === 'desktop' && view.kind === 'idle' ? currentIdleTag(biome) : undefined
+    const desktopScene = e.surface === 'desktop' && view.kind === 'idle' && sheetScene && showIdleScene ? desktopSceneSvg($, sheetScene, e.props.bodyColumns, e.props.maxRows, sceneMoves(), tag) : undefined
     if (scene && showIdleScene && view.kind === 'idle' && !desktopScene) {
       const skip = `idle scene: not drawn (surface ${e.surface}, band ${e.props.maxRows} rows, scene needs ${scene.rows + 1})`
       if (skip !== loggedSceneSkip) {
@@ -449,14 +459,15 @@ export const register: Register = (on, options) => {
 
     if (view.kind === 'idle') {
       // The surface check narrows the table so Svg resolves
-      if (!desktopScene || e.surface !== 'desktop') return line(view.line, 0)
+      if (e.surface !== 'desktop') return line(view.line, 0)
       const { Svg } = $.ui.resolve(e)
-      return (
-        <Box flexDirection="column">
-          <Svg source={desktopScene.source} alt={`${biome?.name ?? 'Biome'} scene`} height={desktopScene.height} {...(desktopScene.image ? {} : { isInteractive: true })} />
-          {line(view.line, 0)}
-        </Box>
-      )
+      // On desktop the idle line is a tag in the scene that fades once the biome is shown (0047)
+      if (desktopScene) {
+        return <Svg source={desktopScene.source} alt={`${biome?.name ?? 'Biome'} scene`} height={desktopScene.height} {...(desktopScene.image ? {} : { isInteractive: true })} />
+      }
+      if (!tag) return next(e)
+      const size = idleTagSize(tag)
+      return <Svg source={idleTagSvg(tag)} alt={tag.name} width={size.width} height={size.height} />
     }
     if (view.kind === 'scene') {
       // Chosen only on the terminal (canDrawSprite); the check narrows the surface so Raster resolves
@@ -1511,9 +1522,35 @@ function startMachine($: EngineInterface, idleTimeoutSec: number): void {
   })
 }
 
+/** The desktop's idle tag now (0047), or undefined once it has faded. */
+function currentIdleTag(biome: Biome | undefined): IdleTag | undefined {
+  if (!biome || idleTagPhase === 'gone') return undefined
+  return { name: biome.name, color: biome.accentColor ?? IDLE_TAG_COLOR, pulse: sceneMoves(), fading: idleTagPhase === 'fading' }
+}
+
+/**
+ * Shows the idle tag as the biome comes into view (0047 point 2): for `IDLE_TAG.showMs`, then a
+ * redraw that fades it and one that drops it. The mod times it, since an image restarts its
+ * animation on every redraw and turns redraw the band.
+ */
+function showIdleTag($: EngineInterface): void {
+  idleTagTimer?.cancel()
+  idleTagPhase = 'shown'
+  idleTagTimer = $.clock.after(IDLE_TAG.showMs, () => {
+    idleTagPhase = 'fading'
+    $.ui.invalidate('ui.render')
+    idleTagTimer = $.clock.after(IDLE_TAG.fadeMs, () => {
+      idleTagPhase = 'gone'
+      idleTagTimer = undefined
+      $.ui.invalidate('ui.render')
+    })
+  })
+}
+
 /** Shows `loaded`'s idle scene in the band, from its first frame. */
 function setScene($: EngineInterface, loaded: LoadedBiome | undefined): void {
   stopScene()
+  if (loaded) showIdleTag($)
   scene = loaded && idleScene(loaded.biome, loaded.background)
   sheetScene = loaded && withDesktopArt(loaded, scene)
   loggedSceneSkip = undefined
@@ -1546,6 +1583,7 @@ type MachineAction = EncounterInput extends infer I ? (I extends { now: number }
 async function advanceMachine($: EngineInterface, action: MachineAction): Promise<void> {
   if (!machine || !machineContext) return
   const now = await $.clock.now()
+  const hadEncounter = machine.encounter !== undefined
   const step = stepEncounter(machine, { ...action, now } as EncounterInput, machineContext)
   if (step.state === machine) {
     // The dots move on while the state holds still
@@ -1556,6 +1594,8 @@ async function advanceMachine($: EngineInterface, action: MachineAction): Promis
     return
   }
   machine = step.state
+  // The biome comes back into view: its tag shows again (0047 point 2)
+  if (hadEncounter && !machine.encounter) showIdleTag($)
   if (pendingIdleTimeoutMs !== undefined && !machine.encounter) {
     machineContext = { ...machineContext, idleTimeoutMs: pendingIdleTimeoutMs }
     pendingIdleTimeoutMs = undefined
@@ -1916,6 +1956,8 @@ function stopFrames(): void {
 function stopTimers(): void {
   tickTimer?.cancel()
   tickTimer = undefined
+  idleTagTimer?.cancel()
+  idleTagTimer = undefined
   stopCatch()
   stopCatcherPreview()
   stopFrames()
@@ -1957,12 +1999,13 @@ function sceneMoves(): boolean {
  * in the band, its `maxRows`; undefined when it doesn't fit. Particles are made once per width.
  */
 /** The scene as the desktop draws it; `image` when a desktop background is embedded (0045 point 9), so not interactive. */
-function desktopSceneSvg($: EngineInterface, current: IdleScene, bodyColumns: number, maxRows: number | undefined, moving: boolean): { source: string; width: number; height: number; image: boolean } | undefined {
-  const estimate = sceneSvgSize(current, bodyColumns, maxRows)
+function desktopSceneSvg($: EngineInterface, current: IdleScene, bodyColumns: number, maxRows: number | undefined, moving: boolean, tag?: IdleTag): { source: string; width: number; height: number; image: boolean } | undefined {
+  // On desktop the idle line is a tag inside the scene (0047), so the strip may take every row
+  const estimate = sceneSvgSize(current, bodyColumns, maxRows, 0)
   if (!estimate) return undefined
   // Wider than the band, cropped at the slot's edge: `columnPx` is only an estimate
   const size = { ...estimate, width: Math.ceil(estimate.width * DESKTOP.sceneOvershoot) }
-  const key = `${size.width}/${size.scale}/${moving}`
+  const key = `${size.width}/${size.scale}/${moving}/${tag ? `${tag.pulse}/${tag.fading}` : 'none'}`
   const cached = sceneSvgs.get(key)
   if (cached && cached.scene === current) return cached.drawn
   let particles = particlesByColumns.get(size.width)
@@ -1970,9 +2013,10 @@ function desktopSceneSvg($: EngineInterface, current: IdleScene, bodyColumns: nu
     particles = makeParticles(current, size.width, Math.random)
     particlesByColumns.set(size.width, particles)
   }
-  const source = sceneSvg(current, particles, { ...size, moving, crop: true })
+  const source = sceneSvg(current, particles, { ...size, moving, crop: true, ...(tag ? { tag } : {}) })
   if (!source) $.ui.log(`idle scene: no Svg, over ${DESKTOP.svgMaxChars} characters; showing the idle line`, { to: 'debug' })
-  const drawn = source ? { source, width: size.width * size.scale, height: current.rows * 2 * size.scale, image: current.sheet !== undefined || current.particleSheet !== undefined } : undefined
+  // Text in an image-mode Svg draws (0047); SMIL runs there too, so the tag never needs interactive mode
+  const drawn = source ? { source, width: size.width * size.scale, height: current.rows * 2 * size.scale, image: current.sheet !== undefined || current.particleSheet !== undefined || tag !== undefined } : undefined
   sceneSvgs.set(key, { scene: current, drawn })
   return drawn
 }

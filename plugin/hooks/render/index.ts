@@ -6,6 +6,7 @@ export { resolveBeats, type ResolvedBeat, type ResolvedBeats } from './catch-bea
 export { catchFrame, prepareCatch, prepareDesktopCatch, type CatchArt, type ThrowArt } from './catch-frame'
 export { catchLengthMs, catchSvg, type CatchSvgOptions } from './catch-svg'
 export { sceneSvg, sceneSvgSize, type SceneSvgOptions } from './scene-svg'
+export { idleTagMarkup, idleTagSize, idleTagSvg, type IdleTag } from './idle-tag'
 export { DEFAULT_COLOR, pixelsToCells, type Frame } from './pixels-to-cells'
 export { pixelsToSvg, type SvgOptions } from './pixels-to-svg'
 export { desktopSheetSvg, type DesktopSheetSvgOptions } from './desktop-sheet-svg'

@@ -154,7 +154,8 @@ describe('register: encounter pane', () => {
   test('on the desktop surface the band draws the Modster as an Svg beside its text, within maxRows (P5-06)', HUNTING, async ($, on) => {
     const clock = await start($, on)
     const band = await $.ui.mount({ plugin: 'modster-hunter', surface: 'desktop', component: 'AbovePrompt', props: BAND_PROPS })
-    expect(await band.find({ type: 'Svg' })).toBeUndefined()
+    // Between encounters, with no scene, the band shows the biome's name tag (0047)
+    expect((await band.find({ type: 'Svg' }))?.props.alt).toBe('Whispering Forest')
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await clock.advance(3_250)
     const svg = await band.find({ type: 'Svg' })
