@@ -11,6 +11,7 @@ import {
   fieldPath,
   isObject,
 } from './fields'
+import { checkDesktopRef } from './check-desktop-ref'
 import { IssueList } from './issue-list'
 import type { Biome, Validation } from './types'
 
@@ -22,6 +23,7 @@ const KEYS = [
   'accentColor',
   'background',
   'backgroundFps',
+  'desktopBackground',
   'particles',
   'encounterEverySec',
   'modsters',
@@ -30,6 +32,7 @@ const REQUIRED = ['schemaVersion', 'id', 'name', 'modsters']
 const ENTRY_KEYS = ['id', 'rarity', 'maxAttempts', 'catchRate']
 const ENTRY_REQUIRED = ['id']
 const PARTICLE_KEYS = ['style', 'color', 'density']
+const DESKTOP_BACKGROUND_KEYS = ['file', 'frames']
 
 /**
  * Checks a parsed `biome.json` against CONTENT_FORMAT.md. `folder` is the name
@@ -52,6 +55,9 @@ export function validateBiome(input: unknown, where: { file: string; folder: str
   checkPattern(input, 'background', CONTENT.spriteFilePattern, 'a .sprite.json file in this folder', issues)
   const { backgroundFpsMin, backgroundFpsMax } = CONTENT.biome
   checkNumber(input, 'backgroundFps', { min: backgroundFpsMin, max: backgroundFpsMax, integer: true }, issues)
+  // Hi-res idle scene for the Desktop app (decision 0045 point 4); its PNG is checked when it loads
+  const { framesMin, framesMax } = CONTENT.desktop.background
+  checkDesktopRef(input.desktopBackground, { field: 'desktopBackground', keys: DESKTOP_BACKGROUND_KEYS, framesMin, framesMax }, issues)
   checkParticles(input.particles, issues)
   checkEncounterEverySec(input.encounterEverySec, issues)
   checkEntries(input.modsters, issues)

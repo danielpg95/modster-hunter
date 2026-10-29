@@ -189,3 +189,25 @@ test('other file types and unreadable files fail clearly', () => {
   writeFileSync(bad, 'not a png')
   assert.match(run(bad, '--frames', '1').stderr, /not a PNG pngjs can read/)
 })
+
+test('--desktop checks a PNG against decision 0045 and writes nothing', () => {
+  const path = writePng('desktop.png', 48, 24, (x) => (x % 24 === 0 ? [255, 0, 0, 255] : undefined))
+  const { code, stdout } = run(path, '--frames', '2', '--desktop', 'modster')
+  assert.equal(code, 0)
+  assert.match(stdout, /2 frames of 24×24, 1 colours, .* KiB: fits modster desktop art \(0045\)/)
+})
+
+test('--desktop lists every rule a sheet breaks', () => {
+  const path = writePng('soft.png', 200, 50, (x, y) => (y === 0 ? [0, 0, 0, 100] : undefined))
+  const { code, stderr } = run(path, '--frames', '1', '--desktop', 'background')
+  assert.equal(code, 1)
+  assert.match(stderr, /points to 200×50 frames; at most 192×48/)
+  const half = writePng('half.png', 16, 8, (x, y) => (y === 0 ? [0, 0, 0, 100] : undefined))
+  assert.match(run(half, '--frames', '2', '--desktop', 'modster').stderr, /has 16 half-transparent pixels/)
+})
+
+test('--desktop needs a known kind and frames in its range', () => {
+  const path = writePng('kind.png', 16, 8, () => [0, 0, 0, 255])
+  assert.match(run(path, '--frames', '2', '--desktop', 'sprite').stderr, /--desktop must be modster, background or catcher/)
+  assert.match(run(path, '--frames', '1', '--desktop', 'modster').stderr, /--frames must be 2–8 for modster desktop art/)
+})

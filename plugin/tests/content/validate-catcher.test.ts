@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { checkCatcherSprite, formatIssue, validateCatcher, type Catcher, type Sprite } from '../../hooks/content'
+import { checkCatcherDesktop, checkCatcherSprite, formatIssue, validateCatcher, type Catcher, type DesktopSheet, type Sprite } from '../../hooks/content'
 import { encodeFrame } from '../fixtures/encode-frame'
 import { issuesAt } from '../fixtures/issues-at'
 import { validCatcher } from '../fixtures/valid-catcher'
@@ -45,6 +45,13 @@ const INVALID: [string, (catcher: Json) => void, string][] = [
   ['a fractional rimIndex is an error', (c) => (c.rimIndex = 1.5), 'rimIndex'],
   ['lidRows of 0 is an error', (c) => (c.lidRows = 0), 'lidRows'],
   ['lidRows over 31 is an error', (c) => (c.lidRows = 32), 'lidRows'],
+  ['a desktopSprite without frames is an error (0045)', (c) => (c.desktopSprite = { file: 'desktop.png' }), 'desktopSprite.frames'],
+  ['17 desktopSprite frames is an error', (c) => (c.desktopSprite = { file: 'desktop.png', frames: 17 }), 'desktopSprite.frames'],
+  ['a desktop glowColor that is not #rrggbb is an error', (c) => (c.desktopSprite = { file: 'desktop.png', frames: 2, glowColor: 'gold' }), 'desktopSprite.glowColor'],
+  ['a desktop rimColor with alpha is an error', (c) => (c.desktopSprite = { file: 'desktop.png', frames: 2, rimColor: '#ffd54fff' }), 'desktopSprite.rimColor'],
+  ['desktop lidRows of 0 is an error', (c) => (c.desktopSprite = { file: 'desktop.png', frames: 2, lidRows: 0 }), 'desktopSprite.lidRows'],
+  ['desktop lidRows over 95 is an error', (c) => (c.desktopSprite = { file: 'desktop.png', frames: 2, lidRows: 96 }), 'desktopSprite.lidRows'],
+  ['a desktop glowIndex is an error: PNGs have no palette (0045 point 5)', (c) => (c.desktopSprite = { file: 'desktop.png', frames: 2, glowIndex: 2 }), 'desktopSprite.glowIndex'],
 ]
 
 describe('validateCatcher', () => {
@@ -88,6 +95,30 @@ describe('validateCatcher', () => {
     const missingAction = validCustomCatcher()
     delete beat(missingAction, 'caught').modster
     expect(issuesAt(validateCatcher(missingAction, where), 'beats.caught.modster')[0]?.problem).toBe('is required')
+  })
+
+  test('a desktopSprite with colours and lidRows is valid, built-in or user (decision 0045)', () => {
+    const desktopSprite = { file: 'desktop.png', frames: 16, glowColor: '#FFD54F', rimColor: '#000000', lidRows: 95 }
+    for (const userContent of [false, true]) {
+      expect(validateCatcher({ ...validCatcher(), desktopSprite }, { ...where, userContent }).issues).toEqual([])
+    }
+  })
+
+  test('checkCatcherDesktop: a sheet that fits the catcher has no issues; frames, colours and lidRows past it are errors', () => {
+    const sheet: DesktopSheet = { png: '', width: 24, height: 24, frames: 2, colors: ['#ffd54f', '#202020'] }
+    const fits = { ...validCatcher(), desktopSprite: { file: 'desktop.png', frames: 2, glowColor: '#FFD54F', lidRows: 8 } } as unknown as Catcher
+    expect(checkCatcherDesktop(fits, sheet, where.file)).toEqual([])
+
+    const broken = {
+      ...validCatcher(),
+      beats: { rock: { frames: [1, 2] } },
+      desktopSprite: { file: 'desktop.png', frames: 2, glowColor: '#00ff00', rimColor: '#202020', lidRows: 24 },
+    } as unknown as Catcher
+    expect(checkCatcherDesktop(broken, sheet, where.file).map(formatIssue)).toEqual([
+      `${where.file}: beats.rock.frames[1] is frame 2, but the desktop sheet has 2 (0–1)`,
+      `${where.file}: desktopSprite.glowColor is #00ff00, which isn't a colour in the desktop sheet`,
+      `${where.file}: desktopSprite.lidRows must be less than the desktop sheet's height, 24 (it is 24)`,
+    ])
   })
 
   test('user content may name a PNG sheet with up to 16 frames', () => {

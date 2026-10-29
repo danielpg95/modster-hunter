@@ -2305,5 +2305,11 @@ function fsReader($: EngineInterface): ContentReader {
       // Without `{ as: 'bytes' }` a read is always text
       return typeof text === 'string' ? text : undefined
     },
+    async readBase64(path) {
+      if (!(await $.fs.exists(path))) return undefined
+      const read = await $.fs.read(path, { as: 'bytes' })
+      if (typeof read === 'string') throw new Error('was read as text')
+      return read.base64
+    },
   }
 }

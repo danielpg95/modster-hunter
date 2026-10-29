@@ -9,7 +9,8 @@
 // across all biomes, and every sprite has 2–4 frames. Every built-in Modster
 // also needs a complete dex with a unique number (decision 0017 point 4).
 // Every built-in catcher fits every built-in Modster's sprite area and has a
-// credits row, and the default catcher ships (decision 0035).
+// credits row, and the default catcher ships (decision 0035). Desktop art is
+// checked by the loader, and each sheet needs a credits row (decision 0045).
 import './ts-resolve.mjs'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -27,6 +28,9 @@ const reader = {
   },
   async readText(path) {
     return existsSync(path) ? readFileSync(path, 'utf8') : undefined
+  },
+  async readBase64(path) {
+    return existsSync(path) ? readFileSync(path).toString('base64') : undefined
   },
 }
 
@@ -71,6 +75,15 @@ for (const [id, { catcher, sprite }] of content.catchers) {
   )
   if (tooSmall.length > 0) problems.push(`catchers/${id}: doesn't fit ${tooSmall.map((loaded) => loaded.modster.id).join(', ')}; built-in catchers fit every built-in Modster (P5-29)`)
   if (!credits.includes(`\`catchers/${id}/sprite.png\``)) problems.push(`catchers/${id}: no row in plugin/content/CREDITS.md`)
+}
+
+const desktopArt = [
+  ...[...content.modsters.values()].map(({ modster }) => modster.desktopSprite && `modsters/${modster.id}/${modster.desktopSprite.file}`),
+  ...[...content.biomes.values()].map(({ biome }) => biome.desktopBackground && `biomes/${biome.id}/${biome.desktopBackground.file}`),
+  ...[...content.catchers.values()].map(({ catcher }) => catcher.desktopSprite && `catchers/${catcher.id}/${catcher.desktopSprite.file}`),
+].filter(Boolean)
+for (const path of desktopArt) {
+  if (!credits.includes(`\`${path}\``)) problems.push(`${path}: no row in plugin/content/CREDITS.md (0045)`)
 }
 
 console.log(`\n${content.biomes.size} biomes, ${content.modsters.size} Modsters, ${content.catchers.size} catchers`)

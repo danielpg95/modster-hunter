@@ -1,12 +1,14 @@
 import { CONTENT, MODSTER_TYPES } from '../constants'
+import { checkDesktopRef } from './check-desktop-ref'
 import { checkSpriteRef } from './check-sprite-ref'
 import { checkKeys, checkNumber, checkPattern, checkRarity, checkSchemaVersion, checkString, describe, fieldPath, isObject, type JsonObject } from './fields'
 import { IssueList } from './issue-list'
 import type { Modster, Validation } from './types'
 
-const KEYS = ['schemaVersion', 'id', 'name', 'description', 'rarity', 'maxAttempts', 'catchRate', 'shinyChance', 'dex', 'sprite']
+const KEYS = ['schemaVersion', 'id', 'name', 'description', 'rarity', 'maxAttempts', 'catchRate', 'shinyChance', 'dex', 'sprite', 'desktopSprite']
 const REQUIRED = ['schemaVersion', 'id', 'name', 'rarity', 'sprite']
 const SPRITE_KEYS = ['file', 'frames', 'fps']
+const DESKTOP_KEYS = ['file', 'frames', 'fps']
 // `type` is listed only so its rename error isn't doubled by "not a known field" (decision 0022)
 const DEX_KEYS = ['number', 'types', 'type', 'category', 'heightM', 'weightKg', 'entry']
 const TYPES = Object.keys(MODSTER_TYPES)
@@ -36,8 +38,16 @@ export function validateModster(input: unknown, where: { file: string; folder: s
   checkNumber(input, 'shinyChance', { min: 0, max: 1, nullable: true }, issues)
   checkDex(input.dex, where.userContent === true, issues)
   checkSprite(input.sprite, where.userContent === true, issues)
+  checkDesktopSprite(input.desktopSprite, issues)
 
   return issues.result(input as unknown as Modster)
+}
+
+/** Hi-res desktop art, built-in or user (decision 0045 point 3); its PNG is checked when it loads. */
+function checkDesktopSprite(value: unknown, issues: IssueList): void {
+  const { framesMin, framesMax } = CONTENT.desktop.modster
+  const sprite = checkDesktopRef(value, { field: 'desktopSprite', keys: DESKTOP_KEYS, framesMin, framesMax }, issues)
+  if (sprite) checkNumber(sprite, 'fps', { min: CONTENT.modster.fpsMin, max: CONTENT.modster.fpsMax }, issues, 'desktopSprite')
 }
 
 function checkDex(value: unknown, userContent: boolean, issues: IssueList): void {

@@ -40,17 +40,20 @@ content/
 ├── biomes/
 │   └── <biome-id>/
 │       ├── biome.json
-│       └── background.sprite.json # optional: the idle scene (decision 0026)
+│       ├── background.sprite.json # optional: the idle scene (decision 0026)
+│       └── desktop.png            # optional: the idle scene for the Desktop app (decision 0045)
 ├── modsters/
 │   └── <modster-id>/
 │       ├── modster.json
 │       ├── sprite.png              # source sheet (built-in: required; user: optional)
-│       └── sprite.sprite.json      # runtime sprite (user: optional when sprite.file is the PNG)
+│       ├── sprite.sprite.json      # runtime sprite (user: optional when sprite.file is the PNG)
+│       └── desktop.png             # optional: hi-res art for the Desktop app (decision 0045)
 └── catchers/                       # throw animations (decision 0035)
     └── <catcher-id>/
         ├── catcher.json
         ├── sprite.png              # as for a Modster
-        └── sprite.sprite.json
+        ├── sprite.sprite.json
+        └── desktop.png             # optional, as for a Modster
 ```
 
 ## IDs
@@ -93,6 +96,7 @@ content/
 | `accentColor` | no | `#rrggbb`; tints the band's idle line |
 | `background` | no | A `.sprite.json` in this folder, 1–4 frames. The idle scene: tiled left to right above the idle line, so its left and right edges should line up. Keep it about 12 px tall (6 rows); it stays on screen all session (decision 0026) |
 | `backgroundFps` | no | 1–12 frames per second for the scene. Default 2 |
+| `desktopBackground` | no | `{ "file": "desktop.png", "frames": 2 }`: the idle scene for the Desktop app, a PNG sheet of 1–4 frames played at `backgroundFps`. See [Desktop art](#desktop-art) |
 | `particles` | no | Single pixels drifting over the scene, or a 3-row strip of them without one: `{ "style", "color", "density" }` |
 | `particles.style` | yes | `sparkle` (twinkles in place), `leaf` (falls and drifts right), `sand` (blows right), `bubble` (rises) or `snow` (falls) |
 | `particles.color` | no | `#rrggbb`. Default: `accentColor`, else white |
@@ -168,6 +172,9 @@ default (decision 0004).
 | `sprite.file` | yes | A `.sprite.json` in this folder. User content may name a `.png` sheet instead (decision 0016) |
 | `sprite.frames` | with a `.png` | Integer 1–8: how many frames sit side by side in the sheet. Required with a `.png`, an error with a `.sprite.json` |
 | `sprite.fps` | no | 1–12. Default 6 |
+| `desktopSprite.file` | no | A `.png` sheet in this folder: hi-res art for the Desktop app, built-in or user content. See [Desktop art](#desktop-art) |
+| `desktopSprite.frames` | with `desktopSprite` | Integer 2–8: how many frames sit side by side in the sheet |
+| `desktopSprite.fps` | no | 1–12. Default 6. Its own, so it can differ from `sprite.fps` |
 
 ### `dex`
 
@@ -222,6 +229,11 @@ picks one in `/modsters`; it only changes how a throw looks.
 | `glowIndex` | no | Integer 1–63: a palette index painted in the Modster's most common bright color while the Modster is inside, in beats where its `modster` is `hidden`. Otherwise it shows its own color, so draw it as the empty catcher. Must be inside the sprite's palette |
 | `rimIndex` | no | Integer 1–63: a palette index for the edge of a `stretch` shape. Must be inside the sprite's palette. Without it, a `stretch` shape has no edge |
 | `lidRows` | no | Integer 1–31: the closed frame's top rows that lift to open and fly off on a break, when those beats have no frames of their own. Must be less than the sprite's height |
+| `desktopSprite.file` | no | A `.png` sheet in this folder: hi-res art for the Desktop app. See [Desktop art](#desktop-art) |
+| `desktopSprite.frames` | with `desktopSprite` | Integer 1–16. Every beat's frames must be inside it too |
+| `desktopSprite.glowColor` | no | A colour like `"#ffd54f"` from the sheet: `glowIndex` for the desktop, since a PNG has no palette |
+| `desktopSprite.rimColor` | no | A colour from the sheet: `rimIndex` for the desktop |
+| `desktopSprite.lidRows` | no | Integer 1–95: `lidRows` for the desktop, in rows of the sheet. Must be less than its height |
 
 The sprite follows the [`.sprite.json`](#spritejson) rules, but a catcher's is
 at most 32×32 px and may have up to 16 frames. **Frame 0 is the closed
@@ -287,6 +299,30 @@ flying off for `broken` (no lid moves without `lidRows`).
 
 Alpha is either `00` (transparent) or `ff` (opaque); anything in between is
 rounded at conversion time, because terminal cells can't blend.
+
+## Desktop art
+
+Modsters, catchers and biomes may also carry hi-res pixel art for the Desktop
+app (decision [0045](decisions/0045-desktop-sprites.md)): a PNG sheet in the
+same folder, its frames side by side, embedded as-is and drawn pixelated. It's
+allowed in built-in and user content.
+
+| Art | Field | Each frame | Frames | File size |
+| --- | --- | --- | --- | --- |
+| Modster | `desktopSprite` | up to 128×128 px | 2–8 | at most 48 KiB |
+| Biome idle scene | `desktopBackground` | up to 192 px wide, 48 tall; edges that tile | 1–4 | at most 24 KiB |
+| Catcher | `desktopSprite` | up to 96×96 px | 1–16 | at most 24 KiB |
+
+- The sheet's width must split into exactly `frames` equal frames.
+- At most 64 opaque colours across all frames.
+- Every pixel is fully opaque or fully clear: the desktop draws the file as it
+  is, so a half-transparent pixel would blend.
+- Desktop art that breaks a rule is left out with a content issue. What names it
+  still loads with its terminal art.
+- With both, the terminal and desktop art are the same design, but each has its
+  own size, frames and fps.
+- For now the terminal `sprite` is still required. P5-45 makes it optional for
+  content with desktop art.
 
 ## User PNG sheets
 

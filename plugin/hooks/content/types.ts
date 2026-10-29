@@ -48,6 +48,8 @@ export interface Biome {
   /** 1–4 frames; tiled across the band between encounters (decision 0026) */
   background?: string
   backgroundFps?: number
+  /** Hi-res idle scene for the Desktop app, played at `backgroundFps` (decision 0045 point 4) */
+  desktopBackground?: { file: string; frames: number }
   particles?: BiomeParticles
   encounterEverySec?: [number, number]
   modsters: BiomeModsterEntry[]
@@ -65,6 +67,20 @@ export interface Modster {
   dex?: ModsterDex
   /** `file` is a `.png` only in user content, and then `frames` is set (decision 0016) */
   sprite: { file: string; frames?: number; fps?: number }
+  /** Hi-res art for the Desktop app (decision 0045 point 3) */
+  desktopSprite?: { file: string; frames: number; fps?: number }
+}
+
+/** Desktop art that passed decision 0045's checks, kept as-is for embedding (point 9). */
+export interface DesktopSheet {
+  /** The PNG file, base64 */
+  png: string
+  /** One frame's size in pixels; the sheet is `width × frames` wide */
+  width: number
+  height: number
+  frames: number
+  /** Its opaque colours as `#rrggbb`, at most 64 */
+  colors: string[]
 }
 
 export interface Sprite {
@@ -107,6 +123,8 @@ export interface Catcher {
   glowIndex?: number
   rimIndex?: number
   lidRows?: number
+  /** Hi-res art for the Desktop app; colours stand in for palette indexes (decision 0045 point 5) */
+  desktopSprite?: { file: string; frames: number; glowColor?: string; rimColor?: string; lidRows?: number }
 }
 
 /** User `settings.json` (user folder only). */

@@ -1,12 +1,14 @@
 import { CONTENT } from '../constants'
+import { checkDesktopRef } from './check-desktop-ref'
 import { checkSpriteRef } from './check-sprite-ref'
 import { checkKeys, checkNumber, checkPattern, checkSchemaVersion, checkString, describe, fieldPath, isObject, type JsonObject } from './fields'
 import { IssueList } from './issue-list'
-import type { Catcher, ContentIssue, Sprite, Validation } from './types'
+import type { Catcher, ContentIssue, DesktopSheet, Sprite, Validation } from './types'
 
-const KEYS = ['schemaVersion', 'id', 'name', 'description', 'style', 'sprite', 'beats', 'glowIndex', 'rimIndex', 'lidRows']
+const KEYS = ['schemaVersion', 'id', 'name', 'description', 'style', 'sprite', 'beats', 'glowIndex', 'rimIndex', 'lidRows', 'desktopSprite']
 const REQUIRED = ['schemaVersion', 'id', 'name', 'style', 'sprite']
 const SPRITE_KEYS = ['file', 'frames']
+const DESKTOP_KEYS = ['file', 'frames', 'glowColor', 'rimColor', 'lidRows']
 const BEAT_KEYS = ['frames', 'place', 'modster', 'path']
 const RULES = CONTENT.catcher
 
@@ -35,8 +37,45 @@ export function validateCatcher(input: unknown, where: { file: string; folder: s
   checkNumber(input, 'glowIndex', paletteIndex, issues)
   checkNumber(input, 'rimIndex', paletteIndex, issues)
   checkNumber(input, 'lidRows', { min: RULES.lidRowsMin, max: RULES.lidRowsMax, integer: true }, issues)
+  checkDesktopSprite(input.desktopSprite, issues)
 
   return issues.result(input as unknown as Catcher)
+}
+
+/** Hi-res desktop art (decision 0045 point 5); what depends on its PNG is checked by `checkCatcherDesktop`. */
+function checkDesktopSprite(value: unknown, issues: IssueList): void {
+  const { framesMin, framesMax, lidRowsMax } = CONTENT.desktop.catcher
+  const sprite = checkDesktopRef(value, { field: 'desktopSprite', keys: DESKTOP_KEYS, framesMin, framesMax }, issues)
+  if (!sprite) return
+  checkPattern(sprite, 'glowColor', CONTENT.rgbColorPattern, 'a colour from the sheet like "#ffd54f"', issues, 'desktopSprite')
+  checkPattern(sprite, 'rimColor', CONTENT.rgbColorPattern, 'a colour from the sheet like "#ffd54f"', issues, 'desktopSprite')
+  checkNumber(sprite, 'lidRows', { min: RULES.lidRowsMin, max: lidRowsMax, integer: true }, issues, 'desktopSprite')
+}
+
+/**
+ * What a valid catcher asks of its loaded desktop sheet (decision 0045 point
+ * 5): every beat's frame inside it, `glowColor` and `rimColor` among its
+ * colours, and `lidRows` shorter than it. Each problem drops the desktop art
+ * only; the catcher keeps its terminal sprite.
+ */
+export function checkCatcherDesktop(catcher: Catcher, sheet: DesktopSheet, file: string): ContentIssue[] {
+  const issues = new IssueList(file)
+  const desktop = catcher.desktopSprite
+  if (!desktop) return []
+  for (const beat of RULES.beats) {
+    catcher.beats?.[beat]?.frames?.forEach((frame, index) => {
+      if (frame >= sheet.frames) issues.error(fieldPath(`beats.${beat}.frames`, index), `is frame ${frame}, but the desktop sheet has ${sheet.frames} (0–${sheet.frames - 1})`)
+    })
+  }
+  const colors = new Set(sheet.colors)
+  for (const key of ['glowColor', 'rimColor'] as const) {
+    const color = desktop[key]
+    if (color !== undefined && !colors.has(color.toLowerCase())) issues.error(`desktopSprite.${key}`, `is ${color}, which isn't a colour in the desktop sheet`)
+  }
+  if (desktop.lidRows !== undefined && desktop.lidRows >= sheet.height) {
+    issues.error('desktopSprite.lidRows', `must be less than the desktop sheet's height, ${sheet.height} (it is ${desktop.lidRows})`)
+  }
+  return issues.items
 }
 
 /**
