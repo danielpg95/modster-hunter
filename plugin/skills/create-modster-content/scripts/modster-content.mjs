@@ -11,6 +11,13 @@
 //   node modster-content.mjs preview <sprite.png --frames N | anim.gif | x.sprite.json> --out preview.png [--scale S] [--catcher]
 //   node modster-content.mjs preview-catcher <catcher-folder> --out preview.html [--on id,id] [--scale S]
 //   node modster-content.mjs check [content-folder] [--without-builtins]
+//   node modster-content.mjs reduce <ref.png> --crop X,Y,W,H --size WxH --out base.png [--desktop] [--colors N]
+//                            [--dark 70] [--edges top,left,right,bottom|none] [--clear "#rrggbb,…"] [--tolerance 48] [--trim-edges 190]
+//   node modster-content.mjs check-desktop <sheet.png> --frames N --kind modster|background|catcher|particles
+//                            [--fps F] [--preview page.html] [--catcher catcher.json]
+//
+// `reduce` turns a reference image into a base to finish (desktop art with --desktop,
+// decision 0045); `check-desktop` checks desktop art and can write a browser preview.
 //
 // `--catcher` allows up to 16 frames, as a catcher's sprite may have (decision 0035).
 import './ts-resolve.mjs'
@@ -24,7 +31,11 @@ const { CONTENT, USER_CONTENT } = await import('../../../hooks/constants.ts')
 const { checkCatcherSprite, formatIssue, loadAllContent, spriteFromGif, spriteFromPng, spriteFromSheet, validateCatcher, validateSprite } = await import(
   '../../../hooks/content/index.ts'
 )
-const { catchPreview, catchPreviewPage, checkReport, encodeRgbaPng, previewImage, sheetFromGrid } = await import('./lib/index.ts')
+const { catchPreview, catchPreviewPage, checkReport, clearReaching, desktopPreviewPage, encodeRgbaPng, indexedRgba, keepLargest, parseRgb, previewImage, refImage, sheetFromGrid, trimEdges } = await import(
+  './lib/index.ts'
+)
+const { desktopSheet, loadContent } = await import('../../../hooks/content/index.ts')
+const { decodePng } = await import('../../../hooks/vendor/png.ts')
 
 const BUILT_IN_ROOT = new URL('../../../content', import.meta.url).pathname
 const PREVIEW_SCALE = { default: 8, min: 1, max: 32 }
@@ -38,6 +49,8 @@ const USAGE = [
   '       node modster-content.mjs preview <sprite.png --frames N | anim.gif | x.sprite.json> --out preview.png [--scale S] [--catcher]',
   '       node modster-content.mjs preview-catcher <catcher-folder> --out preview.html [--on id,id] [--scale S]',
   '       node modster-content.mjs check [content-folder] [--without-builtins]',
+  '       node modster-content.mjs reduce <ref.png> --crop X,Y,W,H --size WxH --out base.png [--desktop] [--colors N] [--dark 70] [--edges …|none] [--clear "#rrggbb,…"] [--tolerance 48] [--trim-edges 190]',
+  '       node modster-content.mjs check-desktop <sheet.png> --frames N --kind modster|background|catcher|particles [--fps F] [--preview page.html] [--catcher catcher.json]',
 ].join('\n')
 
 function fail(message) {
@@ -45,7 +58,9 @@ function fail(message) {
   process.exit(1)
 }
 
-const COMMANDS = { convert, draw, preview, 'preview-catcher': previewCatcher, check }
+const COMMANDS = { convert, draw, preview, 'preview-catcher': previewCatcher, check, reduce, 'check-desktop': checkDesktop }
+// Desktop art kinds and their bounds (decisions 0045 and 0046)
+const DESKTOP_KINDS = { modster: CONTENT.desktop.modster, background: CONTENT.desktop.background, catcher: CONTENT.desktop.catcher, particles: CONTENT.desktop.particles }
 
 const [command, ...rest] = process.argv.slice(2)
 if (!command || command === '--help' || command === '-h') fail(USAGE)
@@ -271,3 +286,117 @@ async function check(argv) {
   for (const line of lines) console.log(line)
   if (errors > 0) process.exit(1)
 }
+
+/**
+ * Turns a reference image into a base to finish by hand (P5-22): cut out along the
+ * outline, a palette, a shrink to --size. With --desktop it's desktop art's base
+ * (decision 0045): up to 64 colors (default 48). --clear and --trim-edges clean up
+ * what a busy background leaves. A PNG reference only (convert others first).
+ */
+function reduce(argv) {
+  const args = parse(argv, {
+    crop: { type: 'string' },
+    size: { type: 'string' },
+    out: { type: 'string' },
+    desktop: { type: 'boolean' },
+    colors: { type: 'string' },
+    dark: { type: 'string' },
+    edges: { type: 'string' },
+    clear: { type: 'string' },
+    tolerance: { type: 'string' },
+    'trim-edges': { type: 'string' },
+  })
+  const [input] = args.positionals
+  const { crop, size, out } = args.values
+  if (!input || !crop || !size || !out) fail(`reduce needs a reference, --crop, --size and --out\n${USAGE}`)
+  if (extname(out).toLowerCase() !== '.png') fail(`--out must name a .png file (got "${out}")`)
+  const [x, y, w, h] = crop.split(',').map(Number)
+  const [sw, sh] = size.toLowerCase().split('x').map(Number)
+  if ([x, y, w, h, sw, sh].some((n) => !Number.isInteger(n) || n < 0) || !w || !h || !sw || !sh) fail(`--crop is X,Y,W,H and --size is WxH, in whole pixels\n${USAGE}`)
+  const desktop = args.values.desktop === true
+  const colors = args.values.colors === undefined ? (desktop ? 48 : 24) : Number(args.values.colors)
+  const most = desktop ? CONTENT.desktop.colorsMax : 24
+  if (!(Number.isInteger(colors) && colors >= 1 && colors <= most)) fail(`--colors must be 1–${most}${desktop ? ' for desktop art (decision 0045)' : ' (decision 0034)'}`)
+  let image
+  try {
+    // A reference is big; the sheet it becomes is checked later
+    image = decodePng(readBytes(input), { maxWidth: 8192, maxHeight: 8192 })
+  } catch (error) {
+    fail(`${input}: can't be read as a PNG (${error.message}); convert it first, e.g. sips -s format png ref.jpg --out ref.png`)
+  }
+  if (x + w > image.width || y + h > image.height) fail(`--crop goes past the ${image.width}×${image.height} image`)
+  let clear = []
+  try {
+    clear = args.values.clear ? args.values.clear.split(',').map(parseRgb) : []
+  } catch (error) {
+    fail(`--clear: ${error.message}`)
+  }
+  const result = refImage(image, {
+    crop: { x, y, w, h },
+    size: { w: sw, h: sh },
+    colors,
+    dark: args.values.dark === undefined ? 70 : Number(args.values.dark),
+    ...(args.values.edges === undefined ? {} : { edges: args.values.edges.split(',') }),
+  })
+  if (clear.length) clearReaching(result.image, result.palette, clear, args.values.tolerance === undefined ? 48 : Number(args.values.tolerance))
+  if (args.values['trim-edges'] !== undefined) trimEdges(result.image, result.palette, Number(args.values['trim-edges']))
+  if (clear.length || args.values['trim-edges'] !== undefined) keepLargest(result.image)
+  writeFileSync(out, encodeRgbaPng(indexedRgba(result), (raw) => new Uint8Array(deflateSync(raw, { level: 9 }))))
+  const used = new Set([...result.image.pixels].filter((p) => p >= 0)).size
+  console.log(`${out}: ${sw}×${sh}, ${used} colors`)
+}
+
+/**
+ * Checks desktop art (decisions 0045 and 0046) the way the mod will when it loads it,
+ * and with --preview writes a browser page drawn by the mod's own renderers.
+ */
+async function checkDesktop(argv) {
+  const args = parse(argv, { frames: { type: 'string' }, kind: { type: 'string' }, fps: { type: 'string' }, preview: { type: 'string' }, catcher: { type: 'string' } })
+  const [input] = args.positionals
+  const kind = args.values.kind
+  if (!input || !kind) fail(`check-desktop needs a sheet and --kind\n${USAGE}`)
+  if (!Object.hasOwn(DESKTOP_KINDS, kind)) fail(`--kind must be modster, background, catcher or particles (it is "${kind}")`)
+  const rules = DESKTOP_KINDS[kind]
+  const frames = Number(args.values.frames)
+  if (!(Number.isInteger(frames) && frames >= rules.framesMin && frames <= rules.framesMax)) {
+    fail(`--frames must be ${rules.framesMin}–${rules.framesMax} for ${kind} desktop art (it is ${args.values.frames ?? 'missing'})`)
+  }
+  const bytes = readBytes(input)
+  const result = desktopSheet(Buffer.from(bytes).toString('base64'), { frames, field: 'desktop art', file: basename(input) }, rules)
+  for (const issue of result.issues) console.error(formatIssue(issue))
+  if (!result.ok) process.exit(1)
+  const sheet = result.value
+  const decision = kind === 'particles' ? '0046' : '0045'
+  console.log(`${input}: ${frames} frames of ${sheet.width}×${sheet.height}, ${sheet.colors.length} colours, ${(bytes.length / 1024).toFixed(1)} KiB: fits ${kind} desktop art (${decision})`)
+  if (args.values.preview === undefined) return
+  const fps = args.values.fps === undefined ? CONTENT.modster.defaultFps : Number(args.values.fps)
+  if (!(fps >= 1 && fps <= 12)) fail(`--fps must be 1–12 (it is ${args.values.fps})`)
+  let catcher
+  if (args.values.catcher !== undefined) {
+    try {
+      catcher = JSON.parse(readFileSync(args.values.catcher, 'utf8'))
+    } catch (error) {
+      fail(`${args.values.catcher}: ${error.message}`)
+    }
+  }
+  const targets = kind === 'catcher' ? await throwTargets() : []
+  writeFileSync(args.values.preview, desktopPreviewPage({ kind, sheet, bytes: bytes.length, fps, title: basename(input), ...(catcher ? { catcher } : {}), targets }))
+  console.log(`${args.values.preview}: preview page`)
+}
+
+/** Built-in Modsters a catcher's preview throws at: Shellsprout (desktop art) and Mossmaul (terminal art). */
+async function throwTargets() {
+  const reader = {
+    listFolders: async (path) => (existsSync(path) ? readdirSync(path, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name) : []),
+    readText: async (path) => (existsSync(path) ? readFileSync(path, 'utf8') : undefined),
+    readBase64: async (path) => (existsSync(path) ? readFileSync(path).toString('base64') : undefined),
+  }
+  const content = await loadContent(reader, BUILT_IN_ROOT)
+  return ['sproutling', 'mossbeast'].flatMap((id) => {
+    const loaded = content.modsters.get(id)
+    if (!loaded) return []
+    const fps = (loaded.desktop ? loaded.modster.desktopSprite?.fps : loaded.modster.sprite?.fps) ?? CONTENT.modster.defaultFps
+    return [{ name: loaded.modster.name, art: { ...(loaded.sprite ? { sprite: loaded.sprite } : {}), ...(loaded.desktop ? { desktop: loaded.desktop } : {}) }, fps }]
+  })
+}
+

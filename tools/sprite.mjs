@@ -10,7 +10,7 @@
 //
 // With --desktop it converts nothing: it checks desktop art against decision
 // 0045 with the mod's own `desktopSheet`, since the desktop embeds the PNG as-is.
-// --preview also writes a browser page of it (tools/desktop-preview.mjs); for a
+// --preview also writes a browser page of it (the player helper's lib, so both draw it the same); for a
 // catcher, --catcher names its catcher.json so the throws use its beats and lid.
 //
 // Needs Node 22.18+ (type stripping) and `npm install` (pngjs, omggif).
@@ -105,7 +105,7 @@ async function checkDesktop(art) {
   const { width, height, colors } = result.value
   console.log(`${input}: ${count} frames of ${width}×${height}, ${colors.length} colours, ${(bytes.length / 1024).toFixed(1)} KiB: fits ${art} desktop art (${art === 'particles' ? '0046' : '0045'})`)
   if (args.values.preview !== undefined) {
-    const { desktopPreviewPage } = await import('./desktop-preview.mjs')
+    const { desktopPreviewPage } = await import('../plugin/skills/create-modster-content/scripts/lib/index.ts')
     const fps = args.values.fps === undefined ? CONTENT.modster.defaultFps : Number(args.values.fps)
     if (!(fps >= 1 && fps <= 12)) fail(`--fps must be 1–12 (it is ${args.values.fps})`)
     let catcher
@@ -116,11 +116,30 @@ async function checkDesktop(art) {
         fail(`${args.values.catcher}: ${error.message}`)
       }
     }
-    const page = await desktopPreviewPage({ kind: art, bytes, sheet: result.value, fps, title: basename(input), catcher })
+    const targets = art === 'catcher' ? await throwTargets() : []
+    const page = desktopPreviewPage({ kind: art, bytes: bytes.length, sheet: result.value, fps, title: basename(input), ...(catcher ? { catcher } : {}), targets })
     writeFileSync(args.values.preview, page)
     console.log(`${args.values.preview}: preview page`)
   }
   process.exit(0)
+}
+
+/** Shellsprout (desktop art) and Mossmaul (terminal art) from the built-in content: a catcher's preview throws at both. */
+async function throwTargets() {
+  const { loadContent } = await import('../plugin/hooks/content/index.ts')
+  const { existsSync, readdirSync } = await import('node:fs')
+  const reader = {
+    listFolders: async (path) => (existsSync(path) ? readdirSync(path, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name) : []),
+    readText: async (path) => (existsSync(path) ? readFileSync(path, 'utf8') : undefined),
+    readBase64: async (path) => (existsSync(path) ? readFileSync(path).toString('base64') : undefined),
+  }
+  const content = await loadContent(reader, new URL('../plugin/content', import.meta.url).pathname)
+  return ['sproutling', 'mossbeast'].flatMap((id) => {
+    const loaded = content.modsters.get(id)
+    if (!loaded) return []
+    const fps = (loaded.desktop ? loaded.modster.desktopSprite?.fps : loaded.modster.sprite?.fps) ?? CONTENT.modster.defaultFps
+    return [{ name: loaded.modster.name, art: { ...(loaded.sprite ? { sprite: loaded.sprite } : {}), ...(loaded.desktop ? { desktop: loaded.desktop } : {}) }, fps }]
+  })
 }
 
 /**

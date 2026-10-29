@@ -218,10 +218,10 @@ test('--desktop --preview writes a browser page: the GIF and the mod\'s own Svg 
   const { code, stderr } = run(path, '--frames', '2', '--fps', '4', '--desktop', 'modster', '--preview', page)
   assert.equal(code, 0, stderr)
   const html = readFileSync(page, 'utf8')
-  assert.match(html, /data:image\/gif;base64,/)
+  assert.match(html, /data:image\/svg\+xml;utf8,/)
   assert.match(html, /pane, 1×/)
   assert.match(html, /uncaught silhouette/)
-  assert.match(html, /<image href="data:image\/png;base64,/)
+  assert.match(html, /data%3Aimage%2Fpng%3Bbase64%2C/)
 })
 
 test('a catcher\'s preview plays throws on Shellsprout and Mossmaul, with its catcher.json', () => {
@@ -234,5 +234,5 @@ test('a catcher\'s preview plays throws on Shellsprout and Mossmaul, with its ca
   const html = readFileSync(page, 'utf8')
   assert.match(html, /catches Shellsprout \(desktop art\)/)
   assert.match(html, /misses Mossmaul \(terminal art\)/)
-  assert.match(html, /data:image\/svg\+xml;base64,/)
+  assert.match(html, /data:image\/svg\+xml;utf8,/)
 })

@@ -231,3 +231,26 @@ Precedence, highest first: biome entry → Modster file → tier default.
 
 Turning all built-ins off is the **Include built-in content** option in
 `/config`, not this file.
+
+## Desktop art
+
+Optional hi-res art for the Desktop app (decisions 0045 and 0046). Each is a
+PNG sheet in the item's folder, frames side by side, every pixel fully opaque
+or fully clear, at most 64 colours. Art that breaks a rule is left out with a
+content issue, and the item still loads with its terminal art.
+
+| Field | In | Each frame | Frames | File size |
+| --- | --- | --- | --- | --- |
+| `desktopSprite: { file, frames, fps? }` | `modster.json` | up to 128×128 | 2–8 | at most 48 KiB |
+| `desktopBackground: { file, frames }` | `biome.json` | up to 192×48, edges that tile | 1–4, at `backgroundFps` | at most 24 KiB |
+| `desktopParticles: { file, frames }` | `biome.json`, with `particles` | up to 16×16 | 1–8 | at most 4 KiB |
+| `desktopSprite: { file, frames, glowColor?, rimColor?, lidRows? }` | `catcher.json` | up to 96×96 | 1–16 | at most 24 KiB |
+
+- A Modster or catcher needs `sprite`, `desktopSprite`, or both. With
+  `desktopSprite` only, the terminal shows a Modster as text, and plays the
+  glass jar for a catcher.
+- A catcher's `glowColor` and `rimColor` are `#rrggbb` colours from its sheet;
+  its `lidRows` counts the sheet's rows; every frame its beats name must be in
+  the sheet.
+- With both, they're the same design, but each has its own frames and fps.
+

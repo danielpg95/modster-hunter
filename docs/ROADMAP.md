@@ -858,14 +858,14 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] The tooling the desktop path needs (added by @danielpg95, 2026-10-28): `tools/ref-sprite.mjs --desktop` with `--clear` and `--trim-edges` and fully compressed PNGs; `tools/sprite.mjs --desktop … --preview` writing a browser page (the mod's own Svg at every size, tiled backgrounds, real throws for catchers); tools tests for both.
   - [x] `.claude/rules/content.md` covers desktop sheets, and its 24-colour and size rules apply to terminal sprites only.
 
-#### [ ] P5-50 — Player skill: desktop, terminal or both
+#### [x] P5-50 — Player skill: desktop, terminal or both
 - **Depends on:** P5-44, P5-45
 - **Size:** M
 - **Goal:** players' own Modsters, biomes and catchers can be desktop art, terminal art or both.
 - **Done when:**
-  - [ ] `create-modster-content` offers the three, recommends desktop for detailed art and terminal for terminal players, and explains the terminal fallback.
-  - [ ] Its helper `modster-content.mjs`, which ships with the mod, gets desktop modes, so players can follow the desktop path without the repo's tools (asked by @danielpg95, 2026-10-28): reduce a reference image, check a desktop sheet against 0045 and 0046, and write the preview page (Modsters, backgrounds, particles, catcher throws). It stays offline, with no installs. Tests cover them.
-  - [ ] `plugin.json`'s version goes up.
+  - [x] `create-modster-content` offers the three, recommends desktop for detailed art and terminal for terminal players, and explains the terminal fallback.
+  - [x] Its helper `modster-content.mjs`, which ships with the mod, gets desktop modes, so players can follow the desktop path without the repo's tools (asked by @danielpg95, 2026-10-28): reduce a reference image, check a desktop sheet against 0045 and 0046, and write the preview page (Modsters, backgrounds, particles, catcher throws). It stays offline, with no installs. Tests cover them.
+  - [x] `plugin.json`'s version goes up.
 
 #### [ ] P5-51 — First desktop art set
 - **Depends on:** P5-21, P5-47, P5-48, P5-49
