@@ -1,5 +1,5 @@
 import { CATCH } from '../constants'
-import type { Catcher, DesktopSheet, Sprite } from '../content'
+import { glowPaths, type Catcher, type DesktopSheet, type Sprite } from '../content'
 import { resolveBeats, type ResolvedBeat, type ResolvedBeats } from './catch-beats'
 import { catchBeatAt, type CatchBeatAt, type CatchOutcome } from '../game'
 import type { Frame } from './pixels-to-cells'
@@ -17,8 +17,8 @@ interface Art {
   frames: Uint8Array[]
   /** Desktop art (decision 0045), drawn by `catchSvg` only, a quarter of its pixels per terminal pixel */
   sheet?: DesktopSheet
-  /** A desktop sheet's lit copy: this colour painted in the Modster's (0045 point 5) */
-  glow?: { from: string; to: string }
+  /** A desktop sheet's lit copy: these shapes (its `glowColor` pixels, per frame) painted in the Modster's colour (0045 point 5) */
+  glow?: { paths: string[]; to: string }
 }
 
 /** Everything a throw draws from, decoded once per catcher and Modster. */
@@ -90,7 +90,7 @@ export function prepareDesktopCatch(catcher: Catcher, catcherArt: ThrowArt, mods
   const main = modsterArt.desktop ? `${modsterArt.desktop.mainColor}ff` : mainColor(modster)
   const desktop = catcherArt.desktop ? catcher.desktopSprite : undefined
   let lit = art
-  if (desktop?.glowColor) lit = { ...art, glow: { from: desktop.glowColor.toLowerCase(), to: main.slice(0, 7) } }
+  if (desktop?.glowColor && catcherArt.desktop) lit = { ...art, glow: { paths: glowPaths(catcherArt.desktop, desktop.glowColor), to: main.slice(0, 7) } }
   else if (!desktop && catcherArt.sprite && catcher.glowIndex !== undefined) {
     const palette = [...catcherArt.sprite.palette]
     palette[catcher.glowIndex] = main

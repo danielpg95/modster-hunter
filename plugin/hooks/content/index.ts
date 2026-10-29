@@ -1,6 +1,6 @@
 export { cachedSheetLoader, type SheetFiles } from './cached-sheet-loader'
 export { checkBiomeReferences } from './check-biome-references'
-export { desktopSheet, type DesktopSheetRules } from './desktop-sheet'
+export { desktopSheet, glowPaths, type DesktopSheetRules } from './desktop-sheet'
 export { checkTierBalance } from './check-tier-balance'
 export { formatIssue } from './issue-list'
 export { leavesNoBiome } from './leaves-no-biome'

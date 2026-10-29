@@ -107,3 +107,44 @@ function hex(data: Uint8Array, at: number): string {
 function kib(bytes: number): string {
   return `${Math.ceil(bytes / 102.4) / 10} KiB`
 }
+
+/**
+ * Where a catcher's `glowColor` is in each frame of its sheet, as SVG path data in sheet
+ * pixels (frame f's x from f × width): one box per run along a row, as `framePaths` draws.
+ * A throw paints these in the Modster's colour (decision 0045 point 5). Found exactly here,
+ * from the decoded PNG, because matching a colour in the browser fails: it shifts an image's
+ * colours a little (seen in P5-53, where a filter lit nothing). Empty strings when the sheet
+ * can't be read again.
+ */
+export function glowPaths(sheet: DesktopSheet, color: string): string[] {
+  const bytes = Uint8Array.from(atob(sheet.png), (char) => char.charCodeAt(0))
+  let image
+  try {
+    image = decodePng(bytes, { maxWidth: sheet.width * sheet.frames, maxHeight: sheet.height })
+  } catch {
+    return Array.from({ length: sheet.frames }, () => '')
+  }
+  const target = color.toLowerCase()
+  return Array.from({ length: sheet.frames }, (_, f) => {
+    let d = ''
+    for (let y = 0; y < sheet.height; y++) {
+      let x = 0
+      while (x < sheet.width) {
+        const at = f * sheet.width + x
+        if (!isColor(image.data, (y * image.width + at) * 4, target)) {
+          x++
+          continue
+        }
+        let end = x + 1
+        while (end < sheet.width && isColor(image.data, (y * image.width + f * sheet.width + end) * 4, target)) end++
+        d += `M${at} ${y}h${end - x}v1h-${end - x}z`
+        x = end
+      }
+    }
+    return d
+  })
+}
+
+function isColor(data: Uint8Array, at: number, target: string): boolean {
+  return data[at + 3] === 255 && hex(data, at) === target
+}

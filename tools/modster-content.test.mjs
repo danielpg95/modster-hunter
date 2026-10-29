@@ -291,12 +291,12 @@ test('check-desktop: checks a sheet like the mod, and --preview writes the page 
   assert.match(run('check-desktop', sheet, '--frames', '2', '--kind', 'sprite').stderr, /--kind must be modster, background, catcher or particles/)
 })
 
-test('check-desktop: a catcher\'s preview throws at Shellsprout and Mossmaul', () => {
+test('check-desktop: a catcher\'s preview throws at Shellsprout and Dunebun', () => {
   const sheet = writePng('catch.png', 32, 16, () => [60, 60, 200, 255])
   const page = join(dir, 'catch.html')
   const ok = run('check-desktop', sheet, '--frames', '2', '--kind', 'catcher', '--preview', page)
   assert.equal(ok.code, 0, ok.stderr)
   const html = readFileSync(page, 'utf8')
   assert.match(html, /catches Shellsprout \(desktop art\)/)
-  assert.match(html, /misses Mossmaul \(terminal art\)/)
+  assert.match(html, /misses Dunebun \(terminal art\)/)
 })

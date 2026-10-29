@@ -124,7 +124,7 @@ async function checkDesktop(art) {
   process.exit(0)
 }
 
-/** Shellsprout (desktop art) and Mossmaul (terminal art) from the built-in content: a catcher's preview throws at both. */
+/** Shellsprout (desktop art) and Dunebun (terminal art, the smallest) from the built-in content: a catcher's preview throws at both. */
 async function throwTargets() {
   const { loadContent } = await import('../plugin/hooks/content/index.ts')
   const { existsSync, readdirSync } = await import('node:fs')
@@ -134,7 +134,7 @@ async function throwTargets() {
     readBase64: async (path) => (existsSync(path) ? readFileSync(path).toString('base64') : undefined),
   }
   const content = await loadContent(reader, new URL('../plugin/content', import.meta.url).pathname)
-  return ['sproutling', 'mossbeast'].flatMap((id) => {
+  return ['sproutling', 'dunebun'].flatMap((id) => {
     const loaded = content.modsters.get(id)
     if (!loaded) return []
     const fps = (loaded.desktop ? loaded.modster.desktopSprite?.fps : loaded.modster.sprite?.fps) ?? CONTENT.modster.defaultFps
