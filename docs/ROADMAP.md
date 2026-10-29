@@ -845,14 +845,16 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] `sceneSvg` tiles it within the band's `maxRows`, and the Biomes tab shows it. Tests cover it.
   - [ ] Checked in the Code tab.
 
-#### [ ] P5-49 — Contributor skills: desktop, terminal or both
+#### [x] P5-49 — Contributor skills: desktop, terminal or both
 - **Depends on:** P5-44
-- **Size:** M
+- **Size:** L
 - **Goal:** contributors can make built-in desktop art, terminal art or both for Modsters, biomes and catchers.
 - **Done when:**
-  - [ ] `add-modster` and `add-biome` ask for desktop, terminal or both, and a new `add-catcher` contributor skill exists.
-  - [ ] The desktop path aims for detail: hi-res pixel art up to 128×128 with full shading, worked from a reference image, previewed at pane and band scale before approval.
-  - [ ] For "both", the terminal sprite is reduced from the desktop design, not the other way round.
+  - [x] `add-modster` and `add-biome` ask for desktop, terminal or both, and a new `add-catcher` contributor skill exists.
+  - [x] The desktop path aims for detail: hi-res pixel art up to 128×128 with full shading, worked from a reference image, previewed at pane and band scale before approval.
+  - [x] For "both", the terminal sprite is reduced from the desktop design, not the other way round.
+  - [x] The tooling the desktop path needs (added by @danielpg95, 2026-10-28): `tools/ref-sprite.mjs --desktop` with `--clear` and `--trim-edges` and fully compressed PNGs; `tools/sprite.mjs --desktop … --preview` writing a browser page (the mod's own Svg at every size, tiled backgrounds, real throws for catchers); tools tests for both.
+  - [x] `.claude/rules/content.md` covers desktop sheets, and its 24-colour and size rules apply to terminal sprites only.
 
 #### [ ] P5-50 — Player skill: desktop, terminal or both
 - **Depends on:** P5-44, P5-45

@@ -6,9 +6,12 @@
 //   node tools/sprite.mjs <sheet.png> --frames N [--out file.sprite.json]
 //   node tools/sprite.mjs <animation.gif> [--out file.sprite.json]
 //   node tools/sprite.mjs <desktop.png> --frames N --desktop modster|background|catcher
+//                         [--fps F] [--preview page.html] [--catcher catcher.json]
 //
 // With --desktop it converts nothing: it checks desktop art against decision
 // 0045 with the mod's own `desktopSheet`, since the desktop embeds the PNG as-is.
+// --preview also writes a browser page of it (tools/desktop-preview.mjs); for a
+// catcher, --catcher names its catcher.json so the throws use its beats and lid.
 //
 // Needs Node 22.18+ (type stripping) and `npm install` (pngjs, omggif).
 import './ts-resolve.mjs'
@@ -23,7 +26,7 @@ const { CONTENT } = await import('../plugin/hooks/constants.ts')
 
 const USAGE = 'usage: node tools/sprite.mjs <sheet.png> --frames N [--out file.sprite.json]\n' +
   '       node tools/sprite.mjs <animation.gif> [--out file.sprite.json]\n' +
-  '       node tools/sprite.mjs <desktop.png> --frames N --desktop modster|background|catcher'
+  '       node tools/sprite.mjs <desktop.png> --frames N --desktop modster|background|catcher [--fps F] [--preview page.html] [--catcher catcher.json]'
 
 function fail(message) {
   console.error(message)
@@ -32,7 +35,10 @@ function fail(message) {
 
 let args
 try {
-  args = parseArgs({ allowPositionals: true, options: { frames: { type: 'string' }, out: { type: 'string' }, desktop: { type: 'string' } } })
+  args = parseArgs({
+    allowPositionals: true,
+    options: { frames: { type: 'string' }, out: { type: 'string' }, desktop: { type: 'string' }, fps: { type: 'string' }, preview: { type: 'string' }, catcher: { type: 'string' } },
+  })
 } catch (error) {
   fail(`${error.message}\n${USAGE}`)
 }
@@ -47,7 +53,7 @@ try {
   fail(`${input}: ${error.message}`)
 }
 
-if (args.values.desktop !== undefined) checkDesktop(args.values.desktop)
+if (args.values.desktop !== undefined) await checkDesktop(args.values.desktop)
 
 let sheet
 let frames
@@ -84,7 +90,7 @@ writeFileSync(out, `${JSON.stringify(sprite, null, 2)}\n`)
 console.log(`${out}: ${sprite.width}×${sprite.height}, ${sprite.frames.length} frames, ${sprite.palette.length - 1} colors`)
 
 /** Checks desktop art (decision 0045) and exits: 0 when it fits, 1 with every problem. */
-function checkDesktop(art) {
+async function checkDesktop(art) {
   if (!['modster', 'background', 'catcher'].includes(art)) fail(`--desktop must be modster, background or catcher (it is "${art}")\n${USAGE}`)
   const rules = CONTENT.desktop[art]
   if (kind !== '.png') fail(`${input}: desktop art is a .png sheet`)
@@ -98,6 +104,22 @@ function checkDesktop(art) {
   if (!result.ok) process.exit(1)
   const { width, height, colors } = result.value
   console.log(`${input}: ${count} frames of ${width}×${height}, ${colors.length} colours, ${(bytes.length / 1024).toFixed(1)} KiB: fits ${art} desktop art (0045)`)
+  if (args.values.preview !== undefined) {
+    const { desktopPreviewPage } = await import('./desktop-preview.mjs')
+    const fps = args.values.fps === undefined ? CONTENT.modster.defaultFps : Number(args.values.fps)
+    if (!(fps >= 1 && fps <= 12)) fail(`--fps must be 1–12 (it is ${args.values.fps})`)
+    let catcher
+    if (args.values.catcher !== undefined) {
+      try {
+        catcher = JSON.parse(readFileSync(args.values.catcher, 'utf8'))
+      } catch (error) {
+        fail(`${args.values.catcher}: ${error.message}`)
+      }
+    }
+    const page = await desktopPreviewPage({ kind: art, bytes, sheet: result.value, fps, title: basename(input), catcher })
+    writeFileSync(args.values.preview, page)
+    console.log(`${args.values.preview}: preview page`)
+  }
   process.exit(0)
 }
 
