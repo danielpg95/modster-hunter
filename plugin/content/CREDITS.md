@@ -6,6 +6,7 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | Asset | Author | License | Notes |
 | --- | --- | --- | --- |
 | `modsters/sproutling/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Shellsprout, redrawn as a seed snail in P5-19; replaces @victor-aguilars' provisional design |
+| `modsters/sproutling/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Shellsprout's desktop sheet (P5-46, decision 0045), reduced from @danielpg95's reference |
 | `modsters/mossbeast/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Mossmaul, redrawn as a moss bear cub in P5-19; replaces @victor-aguilars' provisional design |
 | `modsters/acornsprite/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Acornsprite, redrawn as an acorn fairy in P5-19; replaces @victor-aguilars' provisional design |
 | `modsters/elderbark/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Elderbark, redrawn in P5-19 from @danielpg95's reference; replaces @victor-aguilars' design |

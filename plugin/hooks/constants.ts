@@ -102,6 +102,10 @@ export const DESKTOP = {
   catchSampleMs: 1000 / 24,
   /** The most an `Svg` source may hold; a bigger throw keeps the idle Svg and dots (0043 point 8) */
   svgMaxChars: 131072,
+  // Desktop sheets (0045 point 9) are 4× finer than terminal sprites, so a quarter of the scales above
+  sheetPaneScale: 1,
+  sheetCollectionScale: 0.75,
+  sheetBandScale: 0.5,
 } as const
 
 /**

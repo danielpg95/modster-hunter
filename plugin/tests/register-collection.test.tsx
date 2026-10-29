@@ -6,7 +6,7 @@ import { desktopOnlyForest } from './fixtures/desktop-only-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
 import { sceneForest } from './fixtures/scene-forest'
 import { twoBiomes } from './fixtures/two-biomes'
-import { CATCH, DESKTOP } from '../hooks/constants'
+import { CATCH, COLLECTION, DESKTOP } from '../hooks/constants'
 import { throwingMs } from '../hooks/game'
 
 // The game runs only while autoStart is on (decision 0038); these tests play it
@@ -277,15 +277,28 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
-  test('a Modster with desktop art only shows its entry as text, with no sprite on the terminal or desktop (0045 point 10)', HUNTING, async ($, on) => {
+  test('a Modster with desktop art only is text on the terminal, and its sheet on desktop (0045 points 9–10)', HUNTING, async ($, on) => {
     await start($, on, () => [], desktopOnlyForest(), { 'caught:sproutling': record() })
     const pane = await mountPane($, DOCK)
     expect(await pane.find({ type: 'Raster', key: 'collection-sprite' })).toBeUndefined()
     expect(await pane.find({ type: 'Text', text: /Sproutling/ })).toBeDefined()
     const desktop = await mountPane($, DOCK, 'desktop')
-    expect(await desktop.find({ type: 'Svg' })).toBeUndefined()
+    const svg = await desktop.find({ type: 'Svg' })
+    expect(svg?.props.alt).toBe('Sproutling')
+    expect(svg?.props.source).toContain('<animate attributeName="x"')
+    expect(svg?.props.width).toBe(32 * DESKTOP.sheetCollectionScale)
     await desktop.unmount()
     await pane.unmount()
+  })
+
+  test("on desktop an uncaught Modster's sheet is its silhouette: the same sheet through a gray filter, holding still", HUNTING, async ($, on) => {
+    await start($, on, () => [], desktopOnlyForest())
+    const desktop = await mountPane($, DOCK, 'desktop')
+    const svg = await desktop.find({ type: 'Svg' })
+    expect(svg?.props.alt).toBe('An uncaught Modster')
+    expect(svg?.props.source).toContain(`flood-color="${COLLECTION.silhouetteColor}"`)
+    expect(svg?.props.source).not.toContain('<animate')
+    await desktop.unmount()
   })
 
   test('an uncaught Modster shows a still silhouette; a caught one animates', HUNTING, async ($, on) => {
