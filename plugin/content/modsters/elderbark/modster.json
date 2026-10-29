@@ -18,5 +18,10 @@
   "sprite": {
     "file": "sprite.sprite.json",
     "fps": 3
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
   }
 }

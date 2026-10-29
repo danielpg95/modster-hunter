@@ -61,7 +61,8 @@ art**, or **both**. Ask which before drawing anything:
 - **Desktop:** detailed pixel art for the Desktop app's Code tab. A Modster can be
   up to 128×128 pixels with up to 64 colours, so there's room for shading,
   texture and a real face. Recommend it to players who use the Desktop app, and
-  for anything detailed.
+  for anything detailed. Make a Modster at least 76×80: a catcher bigger than
+  the Modster isn't thrown, and the largest built-in catcher is 76×80.
 - **Terminal:** today's small sprites (at most 48×32 and 24 colours), drawn in
   the terminal's text cells. Recommend it to players who play in a terminal.
 - **Both:** make the desktop art first, then a terminal sprite reduced from it,
@@ -110,7 +111,11 @@ the Code tab will draw it.
      (sky, ground) goes with `--clear "#rrggbb,…"` (colours sampled from the
      picture), and pale specks on the edge with `--trim-edges 190`.
    - Animate it in a scratch script: 2–8 frames side by side, small moves (a
-     1-pixel sway, a blink). Save it as `modsters/<id>/desktop.png`.
+     1-pixel body bob with the feet planted, a blink). A part that swings (a
+     tail, ears) needs in-between frames, or it snaps between two positions.
+     Bend it rather than rotate it (rotating swings it open like a lid):
+     shift each row sideways more the further it is from the base, the tip
+     going 0, 2, 4, 6, 4, 2 px, drawn under the body, at about 6 fps. Save it as `modsters/<id>/desktop.png`.
    - Check it: `check-desktop modsters/<id>/desktop.png --frames N --fps F
      --kind modster --preview <tmp>/preview.html`. Open the page, post its
      path in chat, and wait for the player.

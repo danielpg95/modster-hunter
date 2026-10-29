@@ -55,7 +55,10 @@ image](#desktop-art-from-a-reference-image) is the desktop path;
        its own fps. It shows at 1 CSS px per pixel in the pane, 0.75 in the
        Collection and 0.5 in the band, so a 128 px Modster is as big on screen
        as a 32 px terminal one is today. Use the room for detail: shading,
-       texture, a readable face.
+       texture, a readable face. Make it at least 76×80, whatever the tier: a
+       throw plays only when the catcher fits in the Modster's frame (0035
+       point 8), and the largest built-in catcher, the puzzle cube, is 76×80
+       (P5-55: a 62×53 Pinekin lost every catcher but the net).
      - **Terminal:** ≤ 24 colors (decision 0034) and a 2–4 frame idle. Every
        Modster, any tier, is at most 32 px tall (even) and 48 px wide (decision
        0033). Pick the size the design needs within that. Tell the user where
@@ -351,7 +354,16 @@ wait for their approval before it goes in.
      the moss rising alone looked like it levitated, and the moss swaying
      looked odd. A body bob worked: everything above the paws 1 px up for two
      frames, paws planted. Mossmaul's idle is rest, up, up, rest, rest, blink
-     at 4 fps. A busy scene still works if the
+     at 4 fps.
+   - **A swinging part needs in-between frames** (P5-55). Swapping a part
+     between two poses (Hollowmask's tail from the rest pose to the swished
+     one) snaps and reads as static. Rotating the whole part about its base
+     was smoother but swung it open like a lid. Bend it instead: take the part
+     from the rest pose and shift each row sideways more the further it is
+     from the base (the tip moves most, the base stays), through small steps.
+     Hollowmask's tail tip goes 0, 2, 4, 6, 4, 2 px, drawn behind the body so
+     the base stays hidden, at 6 fps. A swinging pose from the generator is
+     only a guide for how far the tip goes. A busy scene still works if the
    creature has a clear outline (Shellsprout's reference was a whole forest
    scene), since `ref-sprite` cuts it out, but a plain background saves the
    cleanup.
@@ -379,8 +391,12 @@ wait for their approval before it goes in.
    size: a body bob (everything above the feet 1 px up, the feet planted), a
    blink (closed eyes from a blink pose, or the eyes painted in the face
    colour with a closed-eye curve), a sway of a loose part that isn't fixed
-   to the body (Shellsprout's sprout). Keep every pixel fully opaque or fully
-   clear. Write the sheet with pngjs at `{ deflateLevel: 9, deflateStrategy: 1 }`;
+   to the body (Shellsprout's sprout). Anything that swings (a tail, a
+   sprout, ears) moves through in-between frames, bent rather than rotated:
+   cut the part from the rest pose, shift each row sideways by
+   `tip × (distance from the base / length)^1.6`, draw it under the body,
+   and go out and back (tip 0, 2, 4, 6, 4, 2 px). 6 fps keeps it smooth
+   within 8 frames; the bob and blink fill the rest. Keep every pixel fully opaque or fully clear. Write the sheet with pngjs at `{ deflateLevel: 9, deflateStrategy: 1 }`;
    default compression made Shellsprout's 4 frames 49 KiB, maximum made them 12.
 5. **Check and preview:**
 

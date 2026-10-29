@@ -21,7 +21,7 @@
   },
   "desktopSprite": {
     "file": "desktop.png",
-    "frames": 4,
-    "fps": 4
+    "frames": 8,
+    "fps": 6
   }
 }
