@@ -837,14 +837,15 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] The puzzle cube catcher (decision 0036) ships a desktop sheet, ahead of P5-51 (asked by @danielpg95, 2026-10-28): original art, approved by @danielpg95, credited, passing `node tools/check-content.mjs`.
   - [x] Checked in the Code tab: a throw and the Catchers tab preview with Shellsprout and the puzzle cube, and with content that has no desktop sheet.
 
-#### [ ] P5-48 — Desktop biome backgrounds
+#### [x] P5-48 — Desktop biome backgrounds
 - **Depends on:** P5-44
-- **Size:** S
+- **Size:** M
 - **Goal:** the idle scene tiles a biome's `desktopBackground` on desktop (decision 0044).
 - **Done when:**
-  - [ ] `sceneSvg` tiles it within the band's `maxRows`, and the Biomes tab shows it. Tests cover it.
-  - [ ] Whispering Forest ships a `desktopBackground`, ahead of P5-51 (asked by @danielpg95, 2026-10-28): original art from a reference, approved by @danielpg95, credited, passing `node tools/check-content.mjs`.
-  - [ ] Checked in the Code tab with Whispering Forest and a biome without a desktop background.
+  - [x] `sceneSvg` tiles it within the band's `maxRows`, and the Biomes tab shows it. Tests cover it.
+  - [x] Whispering Forest ships a `desktopBackground`, ahead of P5-51 (asked by @danielpg95, 2026-10-28): original art from a reference, approved by @danielpg95, credited, passing `node tools/check-content.mjs`.
+  - [x] Checked in the Code tab with Whispering Forest and a biome without a desktop background.
+  - [x] Added on the way (asked by @danielpg95): per-biome particle art on desktop (decision 0046, `desktopParticles`), with Whispering Forest's falling leaf; the scene fills the band's width (drawn wider, cropped at the slot); `add-biome` covers the background prompt, animating a background and particle art; a resumed desktop throw starts a tick ahead, so the Modster never flashes back in.
 
 #### [x] P5-49 — Contributor skills: desktop, terminal or both
 - **Depends on:** P5-44
@@ -893,6 +894,15 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] `add-modster`'s desktop path has a prompt template: detailed pixel art about 120 px tall, 2–3 shading tones per colour, a clear dark outline, big readable eyes, a plain background with margin, filled from every design field. It can ask for 2–3 poses for a livelier idle.
   - [ ] `add-catcher` has one: the object alone on a plain background, three-quarter view, opening or moving parts clearly separated.
   - [ ] Each template is tried once with a generator, and what worked or failed is noted in the skill, as the terminal prompt's P5-19 examples are.
+
+#### [ ] P5-54 — Desktop idle label in the scene
+- **Depends on:** P5-48
+- **Size:** S
+- **Goal:** on desktop, the band's idle line ("Whispering Forest · listening for Modsters") becomes part of the scene, which reads less like a terminal (asked by @danielpg95, 2026-10-28).
+- **Done when:**
+  - [ ] A decision amends 0026's idle line for desktop: the biome's name in a small tag in the strip's corner, in its accent colour on a translucent backing, with a dot that pulses while Claude works; whether the tag fades after a while; and what stays for `showIdleLine` and the terminal.
+  - [ ] `sceneSvg` draws the tag (SVG text in the image), and the text row under the scene goes away on desktop, so the band is a row shorter. Render and register tests cover it.
+  - [ ] Checked in the Code tab, light and dark.
 ---
 
 ## Phase 6 — Beyond the terminal

@@ -41,7 +41,8 @@ content/
 │   └── <biome-id>/
 │       ├── biome.json
 │       ├── background.sprite.json # optional: the idle scene (decision 0026)
-│       └── desktop.png            # optional: the idle scene for the Desktop app (decision 0045)
+│       ├── desktop.png            # optional: the idle scene for the Desktop app (decision 0045)
+│       └── particles.png          # optional: the particles' look on the Desktop app (decision 0046)
 ├── modsters/
 │   └── <modster-id>/
 │       ├── modster.json
@@ -101,6 +102,7 @@ content/
 | `particles.style` | yes | `sparkle` (twinkles in place), `leaf` (falls and drifts right), `sand` (blows right), `bubble` (rises) or `snow` (falls) |
 | `particles.color` | no | `#rrggbb`. Default: `accentColor`, else white |
 | `particles.density` | no | Integer 1–5. Default 2 |
+| `desktopParticles` | no | `{ "file": "particles.png", "frames": 4 }`: what the particles look like on the Desktop app, a PNG sheet of 1–8 frames of at most 16×16, at most 4 KiB. Needs `particles`, whose style still moves them. See [Desktop art](#desktop-art) and decision [0046](decisions/0046-desktop-particle-art.md) |
 | `encounterEverySec` | no | `[min, max]` seconds between encounters while a turn runs; 3 ≤ min ≤ max ≤ 600. Default `[10, 30]` |
 | `modsters` | yes | 1–50 entries, ids unique within the biome |
 | `modsters[].id` | yes | A Modster that exists after merging. A missing id is an error for that entry only |
@@ -312,6 +314,7 @@ allowed in built-in and user content.
 | Modster | `desktopSprite` | up to 128×128 px | 2–8 | at most 48 KiB |
 | Biome idle scene | `desktopBackground` | up to 192 px wide, 48 tall; edges that tile | 1–4 | at most 24 KiB |
 | Catcher | `desktopSprite` | up to 96×96 px | 1–16 | at most 24 KiB |
+| Biome particles | `desktopParticles` | up to 16×16 px | 1–8 | at most 4 KiB |
 
 - The sheet's width must split into exactly `frames` equal frames.
 - At most 64 opaque colours across all frames.

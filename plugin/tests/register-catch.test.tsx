@@ -205,7 +205,8 @@ describe('register: catch animation', () => {
     await clock.advance(1_000)
     await pane.redraw(PANE_PROPS as any)
     const resumed = (await pane.find({ type: 'Svg' }))?.props.source
-    expect(resumed).toMatch(new RegExp(`data-throw="${throwAt}/(9|10)\\d\\d(\\.\\d+)?"`))
+    // It starts a tick ahead of the last tick, so never at an earlier moment
+    expect(resumed).toMatch(new RegExp(`data-throw="${throwAt}/1(0|1)\\d\\d(\\.\\d+)?"`))
     expect(resumed).toContain('<g data-part="modster" display="none">')
     expect(resumed).not.toContain('begin="-')
     await pane.unmount()

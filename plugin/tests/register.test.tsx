@@ -237,6 +237,16 @@ describe('register', () => {
     await ui.unmount()
   })
 
+  test('on desktop the band draws a biome\'s desktop background as its scene, an image above the idle line (0045 point 4)', HUNTING, async ($, on) => {
+    const { ui } = await startBand($, on, desktopOnlyForest(), 'desktop')
+    const svg = await ui.find({ type: 'Svg' })
+    expect(svg?.props.alt).toBe('Whispering Forest scene')
+    expect(svg?.props.source).toContain('<image href="data:image/png;base64,')
+    expect(svg?.props.isInteractive).toBeUndefined()
+    expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeDefined()
+    await ui.unmount()
+  })
+
   test('a biome with a desktop background only shows the idle line alone on the terminal', HUNTING, async ($, on) => {
     const { ui } = await startBand($, on, desktopOnlyForest())
     expect(await ui.find({ type: 'Raster' })).toBeUndefined()
@@ -332,7 +342,10 @@ describe('register', () => {
     expect(still?.props.alt).toBe('Whispering Forest scene')
     expect(still?.props.source).not.toContain('<animate')
     // 120 columns at DESKTOP.columnPx; 4 rows (8 px) at the full scale fit the 7-row band
-    expect([still?.props.width, still?.props.height]).toEqual([120 * DESKTOP.columnPx, 8 * DESKTOP.columnPx])
+    // No width: the box stops at the band's edge, and the markup, drawn wider, is cropped there (P5-48)
+    expect([still?.props.width, still?.props.height]).toEqual([undefined, 8 * DESKTOP.columnPx])
+    expect(still?.props.source).toContain(`width="${Math.ceil(120 * DESKTOP.sceneOvershoot) * DESKTOP.columnPx}"`)
+    expect(still?.props.source).toContain('preserveAspectRatio="xMinYMin slice"')
     expect(await ui.find({ type: 'Text', text: /Whispering Forest/ })).toBeDefined()
 
     await $.turn.start({ text: 'go', turnId: 't1' } as any)

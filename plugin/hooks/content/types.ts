@@ -50,6 +50,8 @@ export interface Biome {
   backgroundFps?: number
   /** Hi-res idle scene for the Desktop app, played at `backgroundFps` (decision 0045 point 4) */
   desktopBackground?: { file: string; frames: number }
+  /** What its particles look like on desktop; needs `particles`, whose style still moves them (decision 0046) */
+  desktopParticles?: { file: string; frames: number }
   particles?: BiomeParticles
   encounterEverySec?: [number, number]
   modsters: BiomeModsterEntry[]

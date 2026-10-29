@@ -57,7 +57,7 @@ export const CATCH = {
   defaultCatcher: 'jar',
   /** `glowIndex` takes the Modster's most common color with summed RGB over this (half of full brightness) */
   glowMinBrightness: 384,
-  /** Desktop sheet pixels per terminal pixel in a throw (decision 0045 point 9) */
+  /** Desktop sheet pixels per terminal pixel in a throw (decision 0045 point 9); as DESKTOP.sheetPixels */
   desktopPixels: 4,
 } as const
 
@@ -96,6 +96,11 @@ export const DESKTOP = {
   rowPx: 20,
   /** An estimate of one desktop column, for the idle scene's width (0044 point 2); measured in P5-38 */
   columnPx: 8,
+  /**
+   * The idle scene is drawn this much wider than `columnPx` says the band is, and cropped at the slot's
+   * right edge: an Svg without a width stops at the slot, so the strip always fills it (P5-48, Code tab)
+   */
+  sceneOvershoot: 1.5,
   /** A particle's sway is drawn from this many samples of one period of its sine (0044 point 4) */
   swaySamples: 16,
   /** The collection's Modster and the Catchers tab's preview (P5-38): a little under the pane's 4, to fit a narrow dock */
@@ -108,6 +113,8 @@ export const DESKTOP = {
   sheetPaneScale: 1,
   sheetCollectionScale: 0.75,
   sheetBandScale: 0.5,
+  /** Desktop sheet pixels per terminal pixel where a sheet joins terminal geometry: throws, idle scenes (0045 point 9) */
+  sheetPixels: 4,
 } as const
 
 /**
@@ -270,6 +277,8 @@ export const CONTENT = {
     // 0045 sets no width: 192 is the terminal's 48 at the desktop's 4× finer pixels (point 9)
     background: { widthMax: 192, heightMax: 48, framesMin: 1, framesMax: 4, bytesMax: 24 * 1024 },
     catcher: { widthMax: 96, heightMax: 96, framesMin: 1, framesMax: 16, bytesMax: 24 * 1024, lidRowsMax: 95 },
+    // Decision 0046: a biome's particle art, at most 4×4 strip pixels
+    particles: { widthMax: 16, heightMax: 16, framesMin: 1, framesMax: 8, bytesMax: 4 * 1024 },
   },
 } as const
 

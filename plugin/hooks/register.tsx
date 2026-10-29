@@ -61,6 +61,7 @@ import {
   silhouettePalette,
   displayPlan,
   idleScene,
+  desktopIdleScene,
   isAnimated,
   makeParticles,
   paneHint,
@@ -193,9 +194,11 @@ let isBlittingCatch = false
 // site; it moves only while Claude works and holds still otherwise (point 5).
 const SCENE_KEY = 'scene'
 let scene: IdleScene | undefined
+// The desktop's scene: the biome's desktop background when it has one (0045 point 4), else `scene`
+let sheetScene: IdleScene | undefined
 const particlesByColumns = new Map<number, Particle[]>()
 // The desktop's scene Svgs by size and motion (0044); checked against the scene they were made from
-const sceneSvgs = new Map<string, { scene: IdleScene; drawn: { source: string; width: number; height: number } | undefined }>()
+const sceneSvgs = new Map<string, { scene: IdleScene; drawn: { source: string; width: number; height: number; image: boolean } | undefined }>()
 const sceneSites = new Map<string, number>() // requestId → columns
 let sceneTimer: Timer | undefined
 let sceneTick = 0
@@ -273,6 +276,7 @@ let isBlittingCollection = false
 // runs whenever the tab draws it, apart from the band's (0026 point 5)
 const BIOMES_SCENE_KEY = 'biomes-scene'
 const biomeScenes = new Map<string, IdleScene | undefined>()
+const biomeSheetScenes = new Map<string, IdleScene | undefined>()
 let biomesSceneSite: { requestId: string; biomeId: string; scene: IdleScene; columns: number; particles: Particle[] } | undefined
 let biomesSceneTimer: Timer | undefined
 let biomesSceneTick = 0
@@ -292,6 +296,7 @@ export const register: Register = (on, options) => {
   on('session.start', async ($, e, next) => {
     content = await loadGameContent($, includeBuiltins)
     biomeScenes.clear()
+    biomeSheetScenes.clear()
     if (content.biomes.size === 0) $.ui.toast(`Modster Hunter: ${noBiomesMessage(includeBuiltins, USER_FOLDER_LABEL)}`)
     sessionId = await $.session.id().catch(() => 'unknown')
     // A reload (a /config change, 0040) drops module variables; $.state keeps the session's view
@@ -403,7 +408,7 @@ export const register: Register = (on, options) => {
     if (view.kind !== 'full') removeSite(e.requestId)
     if (view.kind !== 'scene') removeSceneSite(e.requestId)
     // P5-38: the desktop draws the idle scene as one vector Svg above the idle line (0044)
-    const desktopScene = e.surface === 'desktop' && view.kind === 'idle' && scene && showIdleScene ? desktopSceneSvg($, scene, e.props.bodyColumns, e.props.maxRows, sceneMoves()) : undefined
+    const desktopScene = e.surface === 'desktop' && view.kind === 'idle' && sheetScene && showIdleScene ? desktopSceneSvg($, sheetScene, e.props.bodyColumns, e.props.maxRows, sceneMoves()) : undefined
     if (scene && showIdleScene && view.kind === 'idle' && !desktopScene) {
       const skip = `idle scene: not drawn (surface ${e.surface}, band ${e.props.maxRows} rows, scene needs ${scene.rows + 1})`
       if (skip !== loggedSceneSkip) {
@@ -448,7 +453,7 @@ export const register: Register = (on, options) => {
       const { Svg } = $.ui.resolve(e)
       return (
         <Box flexDirection="column">
-          <Svg source={desktopScene.source} alt={`${biome?.name ?? 'Biome'} scene`} width={desktopScene.width} height={desktopScene.height} isInteractive />
+          <Svg source={desktopScene.source} alt={`${biome?.name ?? 'Biome'} scene`} height={desktopScene.height} {...(desktopScene.image ? {} : { isInteractive: true })} />
           {line(view.line, 0)}
         </Box>
       )
@@ -986,11 +991,11 @@ export const register: Register = (on, options) => {
       } else {
         dropBiomesSceneSite(e.requestId)
         // P5-38: on desktop the selected biome's scene is one vector Svg that always moves while the tab shows (0044 point 5)
-        const desktop = e.surface === 'desktop' && showIdleScene && loadedBiome ? biomeScene(loadedBiome) : undefined
+        const desktop = e.surface === 'desktop' && showIdleScene && loadedBiome ? biomeDesktopScene(loadedBiome) : undefined
         const drawn = desktop ? desktopSceneSvg($, desktop, e.props.bodyColumns, undefined, true) : undefined
         if (drawn && e.surface === 'desktop') {
           const { Svg } = $.ui.resolve(e)
-          sceneView = <Svg source={drawn.source} alt={`${selected.name} scene`} width={drawn.width} height={drawn.height} isInteractive />
+          sceneView = <Svg source={drawn.source} alt={`${selected.name} scene`} height={drawn.height} {...(drawn.image ? {} : { isInteractive: true })} />
         }
       }
       const window = listWindow(entries.length, index, plan.listRows)
@@ -1407,8 +1412,13 @@ function throwSvg($: EngineInterface, loaded: LoadedModster, play: NonNullable<t
   if (!play.svg) return undefined
   const image = play.desktop.modster.sheet !== undefined || play.desktop.catcher.sheet !== undefined
   if (!image) return { svg: play.svg.replace('<svg ', `<svg data-throw="${play.throwAt}" `), image }
-  // Drawn as an image it restarts on every redraw: a new Svg starts where the throw is now, on the sample grid
-  const fromMs = Math.floor(((play.at ?? play.throwAt) - play.throwAt) / DESKTOP.catchSampleMs) * DESKTOP.catchSampleMs
+  // Drawn as an image it restarts on every redraw: a new Svg starts where the throw is now, on the sample grid.
+  // Its first draw starts with the throw. Later, `at` is the last tick's, up to one tick behind, so a redraw
+  // starts a tick ahead and rounds up: never at an earlier moment, which would show the Modster again for
+  // an instant after it went inside (seen in the Code tab, P5-48)
+  const lead = play.resumed === undefined ? 0 : 1000 / CATCH.fps
+  const ahead = (play.at ?? play.throwAt) - play.throwAt + lead
+  const fromMs = Math.ceil(ahead / DESKTOP.catchSampleMs) * DESKTOP.catchSampleMs
   if (play.resumed?.fromMs !== fromMs) {
     const svg = fromMs === 0 ? play.svg : catchSvg(play.desktop, play.outcome, play.rocks, { scale: 1, fromMs })
     play.resumed = { fromMs, svg: (svg ?? play.svg).replace('<svg ', `<svg data-throw="${play.throwAt}/${fromMs}" `) }
@@ -1505,6 +1515,7 @@ function startMachine($: EngineInterface, idleTimeoutSec: number): void {
 function setScene($: EngineInterface, loaded: LoadedBiome | undefined): void {
   stopScene()
   scene = loaded && idleScene(loaded.biome, loaded.background)
+  sheetScene = loaded && withDesktopArt(loaded, scene)
   loggedSceneSkip = undefined
   if (loaded) $.ui.log(scene ? `idle scene: ${loaded.biome.id}, ${scene.rows} rows, timer ${scene.timerFps} fps` : `idle scene: ${loaded.biome.id} has none`, { to: 'debug' })
   particlesByColumns.clear()
@@ -1945,9 +1956,12 @@ function sceneMoves(): boolean {
  * The desktop's idle scene as one vector Svg (0044), sized from the band or pane's columns and,
  * in the band, its `maxRows`; undefined when it doesn't fit. Particles are made once per width.
  */
-function desktopSceneSvg($: EngineInterface, current: IdleScene, bodyColumns: number, maxRows: number | undefined, moving: boolean): { source: string; width: number; height: number } | undefined {
-  const size = sceneSvgSize(current, bodyColumns, maxRows)
-  if (!size) return undefined
+/** The scene as the desktop draws it; `image` when a desktop background is embedded (0045 point 9), so not interactive. */
+function desktopSceneSvg($: EngineInterface, current: IdleScene, bodyColumns: number, maxRows: number | undefined, moving: boolean): { source: string; width: number; height: number; image: boolean } | undefined {
+  const estimate = sceneSvgSize(current, bodyColumns, maxRows)
+  if (!estimate) return undefined
+  // Wider than the band, cropped at the slot's edge: `columnPx` is only an estimate
+  const size = { ...estimate, width: Math.ceil(estimate.width * DESKTOP.sceneOvershoot) }
   const key = `${size.width}/${size.scale}/${moving}`
   const cached = sceneSvgs.get(key)
   if (cached && cached.scene === current) return cached.drawn
@@ -1956,9 +1970,9 @@ function desktopSceneSvg($: EngineInterface, current: IdleScene, bodyColumns: nu
     particles = makeParticles(current, size.width, Math.random)
     particlesByColumns.set(size.width, particles)
   }
-  const source = sceneSvg(current, particles, { ...size, moving })
+  const source = sceneSvg(current, particles, { ...size, moving, crop: true })
   if (!source) $.ui.log(`idle scene: no Svg, over ${DESKTOP.svgMaxChars} characters; showing the idle line`, { to: 'debug' })
-  const drawn = source ? { source, width: size.width * size.scale, height: current.rows * 2 * size.scale } : undefined
+  const drawn = source ? { source, width: size.width * size.scale, height: current.rows * 2 * size.scale, image: current.sheet !== undefined || current.particleSheet !== undefined } : undefined
   sceneSvgs.set(key, { scene: current, drawn })
   return drawn
 }
@@ -2176,6 +2190,22 @@ function stopCatcherPreview(): void {
 }
 
 /** A biome's idle scene, made once per content load (0028 point 1). */
+/** The Biomes tab's scene on desktop, with the biome's desktop art (0045 point 4, 0046). */
+function biomeDesktopScene(loaded: LoadedBiome): IdleScene | undefined {
+  if (!loaded.desktopBackground && !loaded.desktopParticles) return biomeScene(loaded)
+  if (!biomeSheetScenes.has(loaded.biome.id)) biomeSheetScenes.set(loaded.biome.id, withDesktopArt(loaded, biomeScene(loaded)))
+  return biomeSheetScenes.get(loaded.biome.id)
+}
+
+/**
+ * The scene the desktop draws for `loaded`: its desktop background in place of the terminal one
+ * (0045 point 4), and its particle art on the particles (0046); else the terminal's `scene`.
+ */
+function withDesktopArt(loaded: LoadedBiome, terminal: IdleScene | undefined): IdleScene | undefined {
+  const base = loaded.desktopBackground ? desktopIdleScene(loaded.biome, loaded.desktopBackground) : terminal
+  return base && loaded.desktopParticles && base.particles ? { ...base, particleSheet: loaded.desktopParticles } : base
+}
+
 function biomeScene(loaded: LoadedBiome): IdleScene | undefined {
   if (!biomeScenes.has(loaded.biome.id)) biomeScenes.set(loaded.biome.id, idleScene(loaded.biome, loaded.background))
   return biomeScenes.get(loaded.biome.id)
@@ -2232,6 +2262,7 @@ async function reloadContent($: EngineInterface, includeBuiltins: boolean, idleT
   stopCatcherPreview()
   silhouettes.clear()
   biomeScenes.clear()
+  biomeSheetScenes.clear()
   dropCollectionSite(COLLECTION_PANE_ID)
   dropBiomesSceneSite(COLLECTION_PANE_ID)
   loadCollectionRecords($)

@@ -491,9 +491,22 @@ describe('register: collection pane', () => {
     expect(svg?.props.alt).toBe('Whispering Forest scene')
     // No turn is running: the tab's scene moves anyway (0028 point 4)
     expect(svg?.props.source).toContain('repeatCount="indefinite"')
-    expect(svg?.props.width).toBe(120 * DESKTOP.columnPx)
+    // No width: the markup, drawn wider than the pane, is cropped at its edge (P5-48)
+    expect(svg?.props.width).toBeUndefined()
+    expect(svg?.props.source).toContain(`width="${Math.ceil(120 * DESKTOP.sceneOvershoot) * DESKTOP.columnPx}"`)
     await clock.advance(1_000)
     expect(blits).toHaveLength(0)
+    await pane.unmount()
+  })
+
+  test('on desktop the Biomes tab shows a biome\'s desktop background as an image scene (0045 point 4)', HUNTING, async ($, on) => {
+    await start($, on, () => [], desktopOnlyForest())
+    const pane = await mountPane($, DOCK, 'desktop')
+    await pane.press({ key: 'biomes' })
+    const svg = await pane.find({ type: 'Svg' })
+    expect(svg?.props.alt).toBe('Whispering Forest scene')
+    expect(svg?.props.source).toContain('<image href="data:image/png;base64,')
+    expect(svg?.props.isInteractive).toBeUndefined()
     await pane.unmount()
   })
 

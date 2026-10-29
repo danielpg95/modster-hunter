@@ -24,6 +24,7 @@ const KEYS = [
   'background',
   'backgroundFps',
   'desktopBackground',
+  'desktopParticles',
   'particles',
   'encounterEverySec',
   'modsters',
@@ -58,6 +59,10 @@ export function validateBiome(input: unknown, where: { file: string; folder: str
   // Hi-res idle scene for the Desktop app (decision 0045 point 4); its PNG is checked when it loads
   const { framesMin, framesMax } = CONTENT.desktop.background
   checkDesktopRef(input.desktopBackground, { field: 'desktopBackground', keys: DESKTOP_BACKGROUND_KEYS, framesMin, framesMax }, issues)
+  // Particle art (decision 0046): the style still moves them, so it needs `particles`
+  const particleArt = CONTENT.desktop.particles
+  const particles = checkDesktopRef(input.desktopParticles, { field: 'desktopParticles', keys: DESKTOP_BACKGROUND_KEYS, framesMin: particleArt.framesMin, framesMax: particleArt.framesMax }, issues)
+  if (particles && !Object.hasOwn(input, 'particles')) issues.error('desktopParticles', 'needs "particles": its style moves them and its density sets how many (decision 0046)')
   checkParticles(input.particles, issues)
   checkEncounterEverySec(input.encounterEverySec, issues)
   checkEntries(input.modsters, issues)

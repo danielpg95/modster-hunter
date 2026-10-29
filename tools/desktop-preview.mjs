@@ -5,6 +5,7 @@
 //   modster     the Svg at pane, Collection and band size, and the uncaught silhouette
 //   background  three tiles side by side, so a seam that doesn't line up shows
 //   catcher     throws on Shellsprout (desktop art) and Mossmaul (terminal art), as images
+//   particles   the frames only, enlarged 8×: one particle tumbling (decision 0046)
 import './ts-resolve.mjs'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -22,7 +23,7 @@ const LIGHT = [245, 245, 245]
 export async function desktopPreviewPage({ kind, bytes, sheet, fps, title, catcher }) {
   const png = pngjs.PNG.sync.read(bytes)
   const tiles = kind === 'background' ? 3 : 1
-  const scale = kind === 'background' ? 2 : 4
+  const scale = kind === 'background' ? 2 : kind === 'particles' ? 8 : 4
   const gif = sheetGif(png, sheet, fps, scale, tiles)
   const head = `<h2>${title}: ${sheet.frames} frame${sheet.frames === 1 ? '' : 's'} of ${sheet.width}×${sheet.height}, ${sheet.colors.length} colours, ${(bytes.length / 1024).toFixed(1)} KiB, ${fps} fps</h2>`
   const enlarged = `<p>Enlarged ${scale}×${tiles > 1 ? `, ${tiles} tiles side by side` : ''}, dark and light:</p><img src="data:image/gif;base64,${gif}" style="image-rendering:pixelated">`
