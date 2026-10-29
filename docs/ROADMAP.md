@@ -807,7 +807,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 
 #### [ ] P5-45 — Terminal fallbacks for desktop-only content
 - **Depends on:** P5-44
-- **Size:** S
+- **Size:** M
 - **Goal:** content with only desktop art still plays on the terminal (decision 0045).
 - **Done when:**
   - [ ] The terminal `sprite` is optional for a Modster or catcher with a `desktopSprite` (decision 0045 point 2): the validator, `CONTENT_FORMAT.md` and the loaded types allow it, and every place that reads a loaded sprite handles its absence (moved from P5-44).
