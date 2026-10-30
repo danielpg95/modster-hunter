@@ -65,9 +65,10 @@ const EncounterControls: ClientModule<ControlsProps & Record<string, never>, { s
   })
   // Blank rows give the region its height: an empty Box collapses to its border on desktop
   const blank = (n: number, prefix: string) => Array.from({ length: Math.max(1, n) }, (_, i) => <Text key={`${prefix}${i}`}>{' '}</Text>)
-  // Centred in the panel: Throw and Run as filled buttons of one width, a row apart so a click meant for Throw
-  // never lands on Run, the throws left as pips. A Button in a Client draws as plain text on desktop, so each
-  // sits in a filled Box. Short of room the pips go first (the status line has them)
+  // Throw and Run as filled buttons of one width, a row apart so a click meant for Throw never lands on Run,
+  // the throws left as pips. A Button in a Client draws as plain text on desktop, so each sits in a filled Box.
+  // The stack sits a row below centre (P5-59); short of room the pips go first (the status line has them)
+  const place = panelPlace(props.rows, props.buttons, props.triesLeft !== null)
   const pill = (key: string, fill: string, button: RenderElement) => (
     <Box key={key} width={Math.max(1, props.panelColumns - 2)} justifyContent="center" backgroundColor={fill}>
       {button}
@@ -75,14 +76,14 @@ const EncounterControls: ClientModule<ControlsProps & Record<string, never>, { s
   )
   const panel =
     shown && (props.buttons || props.triesLeft !== null) ? (
-      <Box flexDirection="column" height={props.rows} justifyContent="center" alignItems="center">
+      <Box flexDirection="column" height={props.rows} paddingTop={place.top} alignItems="center">
         {props.buttons ? pill('throw-fill', props.fills.throw, <Button key="throw" label="Throw" hotkey="1" variant="primary" onPress={act('throw')} />) : null}
         {props.buttons ? (
           <Box key="run-gap" marginTop={1}>
             {pill('run-fill', props.fills.run, <Button key="run" label="Run" hotkey="2" variant="secondary" onPress={act('run')} />)}
           </Box>
         ) : null}
-        {props.triesLeft !== null && props.rows >= 4 ? (
+        {place.pips && props.triesLeft !== null ? (
           <Text key="tries" dimColor>
             {pips(props.triesLeft, props.maxTries)}
           </Text>
@@ -101,6 +102,19 @@ const EncounterControls: ClientModule<ControlsProps & Record<string, never>, { s
       </Box>
     </Box>
   )
+}
+
+/**
+ * Where the panel's stack starts, in rows from the top, and whether the pips fit: a row below centre
+ * (P5-59), never past the panel's bottom. The pips give way before the stack moves less; the gap
+ * between Throw and Run never does.
+ */
+export function panelPlace(rows: number, buttons: boolean, pipsWanted: boolean): { top: number; pips: boolean } {
+  const height = (withPips: boolean) => (buttons ? 3 : 0) + (withPips ? 1 : 0)
+  const at = (stack: number) => Math.floor((rows - stack) / 2) + 1
+  const pips = pipsWanted && at(height(true)) + height(true) <= rows
+  const stack = height(pips)
+  return { top: Math.max(0, Math.min(at(stack), rows - stack)), pips }
 }
 
 /** `● ● ○`: a filled pip per throw left, an empty one per throw used. */
