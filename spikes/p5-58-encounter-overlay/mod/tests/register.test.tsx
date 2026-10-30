@@ -8,7 +8,6 @@ describe('overlay spike', () => {
     const pane = await $.ui.mount({ plugin: 'modster-overlay-spike', surface: 'desktop', component: 'Pane', requestId: 'overlay-spike', props: PROPS as any })
     expect((await pane.find({ type: 'Svg' }))?.props.alt).toBe('pane scene')
     expect(await pane.find({ type: 'Client' })).toBeDefined()
-    expect(await pane.find({ type: 'Button', key: 'spike-pane-throw' })).toBeUndefined()
     await pane.press({ key: 'spike-start' })
     // Draws while it runs play the slide; a redraw after it shows it ended, without replaying it
     const sliding = String((await pane.find({ type: 'Svg' }))?.props.source)
@@ -24,10 +23,8 @@ describe('overlay spike', () => {
     const svg = String((await pane.find({ type: 'Svg' }))?.props.source)
     expect(svg).not.toContain('<animateTransform')
     expect(svg).toContain('<g transform="translate(120 0)">')
-    expect(await pane.find({ type: 'Button', key: 'spike-pane-throw' })).toBeDefined()
-    expect(await pane.find({ type: 'Text', text: '3 left' })).toBeDefined()
-    await pane.press({ key: 'spike-pane-throw' })
-    expect(await pane.find({ type: 'Text', text: '2 left' })).toBeDefined()
+    // The buttons are drawn by the Client, which shows them on its own timer
+    expect((await pane.find({ type: 'Client' }))?.props.props).toMatchObject({ tries: 3, buttonsAfterMs: 850 })
     // The departure: the cue where the Modster stood, then the slide back, in one Svg
     await pane.press({ key: 'spike-caught' })
     const leaving = String((await pane.find({ type: 'Svg' }))?.props.source)

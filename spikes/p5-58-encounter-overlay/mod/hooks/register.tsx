@@ -132,7 +132,8 @@ function sceneSvg(stage: Stage, caught: boolean, at: number): string {
 
 interface Probe {
   site: string
-  kind: 'down' | 'key'
+  kind: 'down' | 'key' | 'press'
+  button?: string
   x?: number
   y?: number
   columns: number
@@ -141,6 +142,10 @@ interface Probe {
 }
 
 async function onProbe($: EngineInterface, p: Probe): Promise<string> {
+  if (p.kind === 'press') {
+    if (p.button === 'throw') await update($, tries, (n) => Math.max(0, n - 1))
+    return `${p.site}: ${p.button === 'throw' ? 'Throw' : 'Run'} button (in the Client)`
+  }
   if (p.kind === 'key') return `${p.site}: key "${p.key}" reached the Client`
   const cw = W / Math.max(1, p.columns)
   const ch = H / Math.max(1, p.rows)
@@ -172,15 +177,8 @@ async function scene($: EngineInterface, e: Parameters<EngineInterface['ui']['re
     <Box key={`spike-${site}`} position="relative">
       <Svg source={sceneSvg(stage, state.caught === true, state.at)} alt={`${site} scene`} width={W} height={H} />
       <Box position="absolute" top={0} left={0}>
-        <Client key={`spike-${site}-overlay`} module="./overlay-probe.tsx" props={{ site, outline: show, rows: CELLS.rows }} width={CELLS.columns} height={CELLS.rows} />
+        <Client key={`spike-${site}-overlay`} module="./overlay-probe.tsx" props={{ site, outline: show, rows: CELLS.rows, encounter: state.phase === 'up' ? state.at : null, buttonsAfterMs: Math.round(SILHOUETTE_AT * 1000), panelColumns: Math.floor(SLIDE / COLUMN_PX), tries: left }} width={CELLS.columns} height={CELLS.rows} />
       </Box>
-      {state.phase === 'up' ? (
-        <Box position="absolute" top={0} left={1} flexDirection="column" gap={1}>
-          <Button key={`spike-${site}-throw`} label="Throw" hotkey="1" plain onPress={() => throwOnce($, `${site}: Throw button`)} />
-          <Button key={`spike-${site}-run`} label="Run" hotkey="2" plain onPress={() => note($, `${site}: Run button`)} />
-          <Text dimColor>{`${left} left`}</Text>
-        </Box>
-      ) : null}
     </Box>
   )
 }
