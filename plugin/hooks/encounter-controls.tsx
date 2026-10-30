@@ -13,8 +13,10 @@ export interface ControlsProps {
   showAfterMs: number
   /** Throw and Run take presses: the Modster is appearing or waiting */
   buttons: boolean
-  /** The throws left, shown under the buttons; null hides it */
+  /** The throws left, shown as pips under the buttons; null hides them */
   triesLeft: number | null
+  /** The encounter's throws in all: the pips' count */
+  maxTries: number
   /** The backdrop's width in columns */
   panelColumns: number
   /** The scene's height in rows */
@@ -61,15 +63,15 @@ const EncounterControls: ClientModule<ControlsProps & Record<string, never>, { s
   })
   // Blank rows give the region its height: an empty Box collapses to its border on desktop
   const blank = (n: number, prefix: string) => Array.from({ length: Math.max(1, n) }, (_, i) => <Text key={`${prefix}${i}`}>{' '}</Text>)
-  const gap = props.rows >= 5 ? 1 : 0
+  // Centred in the panel: Throw the one main action, Run quiet under it, the throws left as pips
   const panel =
     shown && (props.buttons || props.triesLeft !== null) ? (
-      <Box flexDirection="column" gap={gap} paddingLeft={1}>
-        {props.buttons ? <Button key="throw" label="Throw" hotkey="1" plain onPress={act('throw')} /> : null}
-        {props.buttons ? <Button key="run" label="Run" hotkey="2" plain onPress={act('run')} /> : null}
+      <Box flexDirection="column" height={props.rows} justifyContent="center" alignItems="center">
+        {props.buttons ? <Button key="throw" label="Throw" hotkey="1" variant="primary" onPress={act('throw')} /> : null}
+        {props.buttons ? <Button key="run" label="Run" hotkey="2" plain dimColor onPress={act('run')} /> : null}
         {props.triesLeft !== null && props.rows >= 3 ? (
           <Text key="tries" dimColor>
-            {`${props.triesLeft} left`}
+            {pips(props.triesLeft, props.maxTries)}
           </Text>
         ) : null}
       </Box>
@@ -86,6 +88,12 @@ const EncounterControls: ClientModule<ControlsProps & Record<string, never>, { s
       </Box>
     </Box>
   )
+}
+
+/** `● ● ○`: a filled pip per throw left, an empty one per throw used. */
+export function pips(left: number, max: number): string {
+  const all = Math.max(max, left, 0)
+  return Array.from({ length: all }, (_, i) => (i < left ? '●' : '○')).join(' ')
 }
 
 export default EncounterControls

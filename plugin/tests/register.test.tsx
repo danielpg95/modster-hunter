@@ -455,7 +455,10 @@ describe('register', () => {
     await ui.advance(BUTTONS_AFTER_MS)
     expect(await ui.find({ type: 'Button', key: 'throw', in: 'encounter-controls' })).toBeDefined()
     expect(await ui.find({ type: 'Button', key: 'run', in: 'encounter-controls' })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: '3 left', in: 'encounter-controls' })).toBeDefined()
+    // Throw is the main action, Run quiet under it, the throws left as pips
+    expect((await ui.find({ type: 'Button', key: 'throw', in: 'encounter-controls' }))?.props.variant).toBe('primary')
+    expect((await ui.find({ type: 'Button', key: 'run', in: 'encounter-controls' }))?.props.dimColor).toBe(true)
+    expect(await ui.find({ type: 'Text', text: '● ● ●', in: 'encounter-controls' })).toBeDefined()
     // The same arrival Svg until it's over
     await clock.advance(1_000)
     expect((await ui.find({ type: 'Svg' }))?.props.source).toBe(scene?.props.source)
