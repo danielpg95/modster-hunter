@@ -946,8 +946,8 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Checked first in the Code tab with a throwaway spike: a `Client` laid over the scene `Svg` leaves it visible and hears clicks with their cell; it doesn't hear the 1 and 2 keys (decision 0050).
   - [x] A decision records the layout and the press path from those findings (0050, superseding 0049).
   - [x] The spike checks the motion in the Code tab: the arrival and the departure as one stamped `Svg` each, the buttons drawn by the `Client` after the slide, no blink or replay (decision 0051, superseding 0050). The hotkeys inside the `Client` are assumed (0051 point 3).
-  - [ ] Pure functions, with tests: the encounter scene at the idle scene's size, the Modster (or its throw) scaled to the strip's height; the arrival (flash, slide, silhouette, sprite, tag) and the departure (caught or fled cue, slide back) as stamped `Svg`s with the timings in `constants.ts`; the still scene; the Modster's hit box in cells.
-  - [ ] A surface module draws Throw, Run and the tries left after the slide, and hears a click on the Modster; the desktop band and pane draw the scene with it laid over. Tests press Throw, Run and the Modster. The terminal, the one-row band and `showIdleScene` off are unchanged.
+  - [x] Pure functions, with tests: the encounter scene at the idle scene's size, the Modster (or its throw) scaled to the strip's height; the arrival (flash, slide, silhouette, sprite, tag) and the departure (caught or fled cue, slide back) as stamped `Svg`s with the timings in `constants.ts`; the still scene; the Modster's hit box in cells.
+  - [x] A surface module draws Throw, Run and the tries left after the slide, and hears a click on the Modster; the desktop band and pane draw the scene with it laid over. Tests press Throw, Run and the Modster. The terminal, the one-row band and `showIdleScene` off are unchanged.
   - [ ] Checked in the Code tab, in the band and the pane: the scene doesn't change size, the arrival and departure play once with no blink, clicks and the 1 and 2 keys work.
   - [ ] `spikes/p5-58-encounter-overlay/` is deleted.
 ---

@@ -3,7 +3,7 @@ import type { On, UiPane } from 'claude-code'
 import { CATCH, DESKTOP } from '../hooks/constants'
 import type { Catcher, Sprite } from '../hooks/content'
 import { throwingMs } from '../hooks/game'
-import { catchFrame, catchSvg, pixelsToCells, prepareCatch, spriteCells } from '../hooks/render'
+import { BUTTONS_AFTER_MS, catchFrame, catchSvg, pixelsToCells, prepareCatch, spriteCells } from '../hooks/render'
 import { catcherFiles } from './fixtures/catcher-files'
 import { desktopOnlyForest } from './fixtures/desktop-only-forest'
 import { oneModsterForest } from './fixtures/one-modster-forest'
@@ -191,15 +191,17 @@ describe('register: catch animation', () => {
     const { clock } = await start($, on, { ...desktopOnlyForest(), ...catcherFiles() }, {}, () => SHOWN)
     await $.command.run({ command: 'modsters', args: 'pane' } as any)
     const pane = await mountPane($, 'desktop')
+    const idle = await pane.find({ type: 'Svg' })
     await untilWaiting($, clock)
+    await pane.advance(BUTTONS_AFTER_MS)
     const throwAt = clock.now()
     await pane.press({ key: 'throw' })
     const thrown = await pane.find({ type: 'Svg' })
     expect(thrown?.props.source).toContain('<image id="ms" ')
     expect(thrown?.props.source).toContain(`data-throw="${throwAt}/0"`)
     expect(thrown?.props.isInteractive).toBeUndefined()
-    // It plays over the biome's scene (0048): the 40 px tall background is 10 strip pixels, at the pane's 4
-    expect([thrown?.props.width, thrown?.props.height]).toEqual([undefined, 10 * DESKTOP.paneScale])
+    // It plays in the biome's scene, at the idle scene's size (0051 point 1)
+    expect([thrown?.props.width, thrown?.props.height]).toEqual([undefined, idle?.props.height])
     expect(thrown?.props.source).toContain('fill="url(#bg)"')
     expect(thrown?.props.source).toContain('<g data-part="modster" display="inline">')
     // A second in, the Modster is inside the jar: a redraw's new Svg starts with it hidden, so it never flashes back

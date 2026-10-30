@@ -1,5 +1,6 @@
 import { describe, expect, mock, test } from 'claude-code/testing'
 import type { On, UiPane } from 'claude-code'
+import { catcherFiles } from './fixtures/catcher-files'
 import { encodePng } from './fixtures/encode-png'
 import { desktopOnlyForest } from './fixtures/desktop-only-forest'
 import { oneModsterForest } from './fixtures/one-modster-forest'
@@ -9,7 +10,8 @@ import { validBiome } from './fixtures/valid-biome'
 import { validModster } from './fixtures/valid-modster'
 import { validUserModster } from './fixtures/valid-user-modster'
 import { validSprite } from './fixtures/valid-sprite'
-import { CATCH, DESKTOP, IDLE_TAG } from '../hooks/constants'
+import { CATCH, DESKTOP, IDLE_TAG, MOTION } from '../hooks/constants'
+import { BUTTONS_AFTER_MS } from '../hooks/render'
 import { throwingMs } from '../hooks/game'
 
 // The game runs only while autoStart is on (decision 0038); these tests play it
@@ -433,25 +435,86 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('on desktop an encounter keeps the scene, with the Modster in front, its lines beside it and within maxRows (0049)', HUNTING, async ($, on) => {
-    const { ui, clock } = await startBand($, on, sceneForest(), 'desktop')
+  test('on desktop an encounter plays in the idle scene at its size: the arrival, then Throw and Run in the Client (0051)', HUNTING, async ($, on) => {
+    const { ui, clock } = await startBand($, on, { ...sceneForest(), ...catcherFiles() }, 'desktop')
+    const idle = await ui.find({ type: 'Svg' })
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await clock.advance(3_000 + BAND_TICK)
     const svgs = await ui.findAll({ type: 'Svg' })
     expect(svgs).toHaveLength(1)
     const scene = svgs[0]
     expect(scene?.props.alt).toBe('Sproutling in Whispering Forest')
-    // The strip and the Modster nested in one document, the strip drawn first
+    expect(scene?.props.source).toContain('data-motion="arrive/')
     expect(scene?.props.source).toContain('fill="url(#bg)"')
-    expect(String(scene?.props.source).split('<svg ').length - 1).toBe(3)
-    // The 8 px strip and sprite at bandScale
-    expect(scene?.props.height).toBe(8 * DESKTOP.bandScale)
-    expect(await ui.find({ type: 'Text', text: /A wild Sproutling appeared!/ })).toBeDefined()
-    await ui.redraw({ ...BAND_PROPS, maxRows: 1 } as any)
-    expect((await ui.find({ type: 'Svg' }))?.props.height).toBeLessThanOrEqual(DESKTOP.rowPx)
-    await ui.redraw(BAND_PROPS as any)
+    expect(scene?.props.source).toContain('>Sproutling · common</text>')
+    // The scene keeps its idle size, and the band has no lines (0051 points 1 and 6)
+    expect(scene?.props.height).toBe(idle?.props.height)
+    expect(await ui.find({ type: 'Text', text: /A wild Sproutling/ })).toBeUndefined()
+    // The buttons show on the Client's own timer, once the slide has uncovered their backdrop
+    expect(await ui.find({ type: 'Button', key: 'throw', in: 'encounter-controls' })).toBeUndefined()
+    await ui.advance(BUTTONS_AFTER_MS)
+    expect(await ui.find({ type: 'Button', key: 'throw', in: 'encounter-controls' })).toBeDefined()
+    expect(await ui.find({ type: 'Button', key: 'run', in: 'encounter-controls' })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: '3 left', in: 'encounter-controls' })).toBeDefined()
+    // The same arrival Svg until it's over
     await clock.advance(1_000)
-    expect(await ui.find({ type: 'Button', key: 'throw' })).toBeDefined()
+    expect((await ui.find({ type: 'Svg' }))?.props.source).toBe(scene?.props.source)
+    const throwAt = clock.now()
+    await ui.press({ key: 'throw' })
+    const thrown = (await ui.find({ type: 'Svg' }))?.props.source
+    expect(thrown).toContain('data-motion="up/')
+    expect(thrown).toContain(`data-throw="${throwAt}"`)
+    await ui.unmount()
+  })
+
+  test('on desktop a click on the Modster throws, and a click on the scene elsewhere does not (0051 point 3)', HUNTING, async ($, on) => {
+    const { ui, clock } = await startBand($, on, { ...sceneForest(), ...catcherFiles() }, 'desktop')
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(3_000 + BAND_TICK + 1_000)
+    await ui.advance(BUTTONS_AFTER_MS)
+    const hit = (await ui.find({ type: 'Client' }))?.props.props.hit
+    expect(hit).toBeDefined()
+    // What a Client posts is input: anything but a known action does nothing
+    await ui.post({ action: 'catch-everything' })
+    await ui.post('throw')
+    await ui.pointer({ type: 'down', x: hit.right + 2, y: hit.top, button: 'left' })
+    expect((await ui.find({ type: 'Svg' }))?.props.source).not.toContain('data-throw')
+    await ui.pointer({ type: 'down', x: hit.left + 1, y: hit.top + 1, button: 'left' })
+    expect((await ui.find({ type: 'Svg' }))?.props.source).toContain('data-throw')
+    await ui.unmount()
+  })
+
+  test('on desktop a catch plays whole, then the departure with the result, then the still scene (0051 point 4)', HUNTING, async ($, on) => {
+    const { ui, clock } = await startBand($, on, { ...sceneForest(), ...catcherFiles() }, 'desktop')
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(3_000 + BAND_TICK + 1_000)
+    await ui.advance(BUTTONS_AFTER_MS)
+    await ui.press({ key: 'throw' })
+    await clock.advance(CATCH_THROW_MS)
+    // The caught beat still plays the throw
+    expect((await ui.find({ type: 'Svg' }))?.props.source).toContain('data-throw')
+    // The catch's last tick ends it and redraws
+    await clock.advance(CATCH.beatMs.caught + 100)
+    const leaving = (await ui.find({ type: 'Svg' }))?.props.source
+    expect(leaving).toContain('data-motion="leave/')
+    expect(leaving).toContain('>Caught Sproutling!</text>')
+    expect(leaving).toContain(`fill="${MOTION.caughtCue}"`)
+    expect(await ui.find({ type: 'Button', key: 'throw', in: 'encounter-controls' })).toBeUndefined()
+    await clock.advance(1_000)
+    await ui.redraw(BAND_PROPS as any)
+    expect((await ui.find({ type: 'Svg' }))?.props.source).not.toContain('data-motion')
+    await ui.unmount()
+  })
+
+  test('on desktop running plays the grey departure (0051 point 4)', HUNTING, async ($, on) => {
+    const { ui, clock } = await startBand($, on, { ...sceneForest(), ...catcherFiles() }, 'desktop')
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(3_000 + BAND_TICK + 1_000)
+    await ui.advance(BUTTONS_AFTER_MS)
+    await ui.press({ key: 'run' })
+    const leaving = (await ui.find({ type: 'Svg' }))?.props.source
+    expect(leaving).toContain('>You ran from Sproutling.</text>')
+    expect(leaving).toContain(`fill="${MOTION.fledCue}"`)
     await ui.unmount()
   })
 

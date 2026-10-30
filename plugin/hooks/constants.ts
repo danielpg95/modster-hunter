@@ -117,6 +117,31 @@ export const DESKTOP = {
   sheetPixels: 4,
 } as const
 
+/**
+ * The desktop encounter's motion (decision 0051): times in seconds, sizes in CSS pixels. The arrival
+ * plays flash, slide, silhouette (fade in, hold), sprite, tag; the departure plays the cue, then the slide back.
+ */
+export const MOTION = {
+  flashS: 0.4,
+  slideS: 0.45,
+  fadeS: 0.25,
+  silhouetteHoldS: 0.5,
+  cueS: 0.4,
+  /** How far the scene slides right, uncovering the backdrop Throw and Run sit on */
+  slidePx: 120,
+  flashOpacity: 0.45,
+  backdrop: '#1b1b1b',
+  silhouette: '#0d0d0d',
+  caughtCue: '#ffd54f',
+  fledCue: '#cfd8dc',
+  /** The Modster stands at most this share of the scene's height */
+  modsterFill: 0.85,
+  /** A desktop column as a Client's cells measure it, for clicks on the Modster (measured in the P5-58 spike) */
+  columnPx: 8.8,
+  /** Cells around the Modster that still count as a click on it */
+  hitMarginCells: 1,
+} as const
+
 /** The desktop's idle tag (decision 0047): sizes in CSS pixels, times in ms. */
 export const IDLE_TAG = {
   showMs: 5000,
