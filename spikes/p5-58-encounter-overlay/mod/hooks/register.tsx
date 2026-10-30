@@ -18,7 +18,7 @@ const redraws = atom({ plugin: 'modster-overlay-spike', key: 'redraws' } as cons
 const W = 480
 const H = 120
 const SLIDE = 120
-const SLIDE_S = 0.35
+const SLIDE_S = 0.45
 const FLASH_S = 0.4
 const COLUMN_PX = 8.8
 const ROW_PX = 20
@@ -27,16 +27,19 @@ const CELLS = { columns: Math.round(W / COLUMN_PX), rows: Math.ceil(H / ROW_PX) 
 const MODSTER = { x: SLIDE + (W - SLIDE) / 2 - 30, y: 40, w: 60, h: 70 }
 
 function sceneSvg(state: Encounter, now: number): string {
-  const elapsed = Math.max(0, (now - state.at) / 1000).toFixed(3)
-  // The slide starts at the time already elapsed, so a redraw doesn't replay it (0050 point 7)
-  const slide =
-    state.phase === 'idle'
-      ? ''
-      : `<animateTransform attributeName="transform" type="translate" from="${state.phase === 'up' ? '0 0' : `${SLIDE} 0`}" to="${state.phase === 'up' ? `${SLIDE} 0` : '0 0'}" dur="${SLIDE_S}s" begin="-${elapsed}s" fill="freeze"/>`
+  // While the slide runs, every draw plays it from its start, at its own speed; after that a draw shows
+  // where it ended. Resuming it at the elapsed time made it jump: the press-to-paint delay varies (0050 point 7)
+  const first = now - state.at < SLIDE_S * 1000
   const up = state.phase === 'up'
-  const flash = up
-    ? `<rect width="${W}" height="${H}" fill="#fff" opacity="0"><animate attributeName="opacity" values="0;0.45;0" dur="${FLASH_S}s" begin="-${elapsed}s" fill="freeze"/></rect>`
-    : ''
+  const offset = up ? SLIDE : 0
+  const slide =
+    state.phase !== 'idle' && first
+      ? `<animateTransform attributeName="transform" type="translate" from="${up ? '0 0' : `${SLIDE} 0`}" to="${up ? `${SLIDE} 0` : '0 0'}" dur="${SLIDE_S}s" calcMode="spline" keyTimes="0;1" keySplines="0.2 0.8 0.2 1" fill="freeze"/>`
+      : ''
+  const flash =
+    up && first
+      ? `<rect width="${W}" height="${H}" fill="#fff" opacity="0"><animate attributeName="opacity" values="0;0.45;0" dur="${FLASH_S}s" fill="freeze"/></rect>`
+      : ''
   const modster = up
     ? `<rect x="${MODSTER.x - SLIDE}" y="${MODSTER.y}" width="${MODSTER.w}" height="${MODSTER.h}" rx="18" fill="#7cb342"/>` +
       `<circle cx="${MODSTER.x - SLIDE + 20}" cy="${MODSTER.y + 28}" r="5" fill="#111"/><circle cx="${MODSTER.x - SLIDE + 40}" cy="${MODSTER.y + 28}" r="5" fill="#111"/>` +
@@ -46,7 +49,7 @@ function sceneSvg(state: Encounter, now: number): string {
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">` +
     `<rect width="${W}" height="${H}" fill="#1b1b1b"/>` +
-    `<g>${slide}<rect width="${W}" height="${H}" fill="#2e4a3a"/><rect y="96" width="${W}" height="24" fill="#4e6b3a"/>` +
+    `<g transform="translate(${offset} 0)">${slide}<rect width="${W}" height="${H}" fill="#2e4a3a"/><rect y="96" width="${W}" height="24" fill="#4e6b3a"/>` +
     `<circle cx="40" cy="20" r="3" fill="#9ccc65"><animate attributeName="cy" values="10;100" dur="3s" repeatCount="indefinite"/></circle>` +
     `${modster}</g>${flash}</svg>`
   )
@@ -85,7 +88,7 @@ async function scene($: EngineInterface, e: Parameters<EngineInterface['ui']['re
   const show = await read($, outline)
   return (
     <Box key={`spike-${site}`} position="relative">
-      <Svg source={sceneSvg(state, now)} alt={`${site} scene`} width={W} height={H} />
+      <Svg source={sceneSvg(state, await $.clock.now())} alt={`${site} scene`} width={W} height={H} />
       <Box position="absolute" top={0} left={0}>
         <Client key={`spike-${site}-overlay`} module="./overlay-probe.tsx" props={{ site, outline: show, rows: CELLS.rows }} width={CELLS.columns} height={CELLS.rows} />
       </Box>
