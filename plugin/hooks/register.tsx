@@ -42,6 +42,7 @@ import {
   catchLengthMs,
   catchSvg,
   sceneSvg,
+  encounterSceneSvg,
   idleTagSize,
   idleTagSvg,
   type IdleTag,
@@ -208,6 +209,8 @@ let sheetScene: IdleScene | undefined
 const particlesByColumns = new Map<number, Particle[]>()
 // The desktop's scene Svgs by size and motion (0044); checked against the scene they were made from
 const sceneSvgs = new Map<string, { scene: IdleScene; drawn: { source: string; width: number; height: number; image: boolean } | undefined }>()
+// The encounter's last scene (0049), made again when the scene, the art, the scale or the width changes
+let encounterSceneCache: { scene: IdleScene; actor: string; scale: number; width: number; drawn: { source: string; height: number; image: boolean } | undefined } | undefined
 const sceneSites = new Map<string, number>() // requestId → columns
 let sceneTimer: Timer | undefined
 let sceneTick = 0
@@ -488,9 +491,26 @@ export const register: Register = (on, options) => {
       // P5-06: the Desktop Code tab draws the Modster as an Svg beside the text, scaled
       // down when needed so it stays within the band's maxRows (rowPx is an estimate)
       if (e.surface !== 'desktop' || !modster || !band || currentPlan().band === 'one-row') return lines
+      const { Svg } = $.ui.resolve(e)
+      // 0049: the lines on the left, the biome's strip filling the rest with the Modster in front
+      const staged =
+        sheetScene && showIdleScene
+          ? encounterScene($, modster, sheetScene, {
+              shownPx: (e.props.bodyColumns - BAND.textColumns - BAND.gapColumns) * DESKTOP.columnPx,
+              scale: DESKTOP.bandScale,
+              maxHeightPx: e.props.maxRows * DESKTOP.rowPx,
+            })
+          : undefined
+      if (staged) {
+        return (
+          <Box flexDirection="row" columnGap={BAND.gapColumns}>
+            {lines}
+            <Svg source={staged.source} alt={`${modster.modster.name} in ${biome?.name ?? 'its biome'}`} height={staged.height} {...(staged.image ? {} : { isInteractive: true })} />
+          </Box>
+        )
+      }
       const art = desktopArt($, modster, { scale: DESKTOP.bandScale, sheetScale: DESKTOP.sheetBandScale, maxHeight: e.props.maxRows * DESKTOP.rowPx })
       if (!art) return lines
-      const { Svg } = $.ui.resolve(e)
       return (
         <Box flexDirection="row" columnGap={BAND.gapColumns}>
           <Svg source={art.source} alt={modster.modster.name} width={art.width} height={art.height} {...(art.isInteractive ? { isInteractive: true } : {})} />
@@ -571,6 +591,15 @@ export const register: Register = (on, options) => {
         )
       }
       removeSceneSite(e.requestId)
+      // On desktop the pane draws the band's vector scene (0044, 0045) with the biome's name tag in
+      // it and no header or idle text, as the band does (0047); the text stays when there's no scene
+      const tag = e.surface === 'desktop' ? currentIdleTag(biome) : undefined
+      const desktopScene = e.surface === 'desktop' && sheetScene && showIdleScene ? desktopSceneSvg($, sheetScene, columns, e.props.scroll.bodyRows, sceneMoves(), tag) : undefined
+      if (desktopScene && e.surface === 'desktop') {
+        const { Svg } = $.ui.resolve(e)
+        if (tag) startIdleTag($)
+        return <Svg source={desktopScene.source} alt={`${biomeName} scene`} height={desktopScene.height} {...(desktopScene.image ? {} : { isInteractive: true })} />
+      }
       if (scene && showIdleScene) {
         const skip = `idle scene: not drawn in the pane (surface ${e.surface}, ${rows} rows, scene needs ${scene.rows + 1})`
         if (skip !== loggedSceneSkip) {
@@ -631,10 +660,14 @@ export const register: Register = (on, options) => {
       removeSite(e.requestId)
       const { Svg } = $.ui.resolve(e)
       const lines = view.kind === 'compact' ? view.lines : []
-      const art = desktopArt($, modster, { scale: DESKTOP.paneScale, sheetScale: DESKTOP.sheetPaneScale })
+      // 0048: the Modster stands in front of its biome; without a scene, or over the limit, it stands alone
+      const staged = sheetScene && showIdleScene ? encounterScene($, modster, sheetScene, { shownPx: columns * DESKTOP.columnPx, scale: DESKTOP.paneScale }) : undefined
+      const art = staged ? undefined : desktopArt($, modster, { scale: DESKTOP.paneScale, sheetScale: DESKTOP.sheetPaneScale })
       return (
         <Box flexDirection="column">
-          {header}
+          {/* The scene shows the biome, so it takes the header's place */}
+          {staged ? null : header}
+          {staged ? <Svg source={staged.source} alt={`${modster.modster.name} in ${biomeName}`} height={staged.height} {...(staged.image ? {} : { isInteractive: true })} /> : null}
           {art ? <Svg source={art.source} alt={modster.modster.name} width={art.width} height={art.height} {...(art.isInteractive ? { isInteractive: true } : {})} /> : null}
           {lines.map(line)}
         </Box>
@@ -2030,6 +2063,40 @@ function desktopSceneSvg($: EngineInterface, current: IdleScene, bodyColumns: nu
   // Text in an image-mode Svg draws (0047); SMIL runs there too, so the tag never needs interactive mode
   const drawn = source ? { source, width: size.width * size.scale, height: current.rows * 2 * size.scale, image: current.sheet !== undefined || current.particleSheet !== undefined || tag !== undefined } : undefined
   sceneSvgs.set(key, { scene: current, drawn })
+  return drawn
+}
+
+/**
+ * The desktop encounter's scene (0048, 0049): the biome's strip, moving, with the Modster or its
+ * throw standing in front, drawn wider than the `shownPx` the slot shows and cropped at its edge,
+ * as the band's idle strip is. `scale` is CSS pixels per strip pixel, lowered to a whole number
+ * that fits `maxHeightPx`. Undefined without desktop or terminal art for the Modster, below a
+ * scale of 1, or over the Svg limit.
+ */
+function encounterScene($: EngineInterface, loaded: LoadedModster, current: IdleScene, size: { shownPx: number; scale: number; maxHeightPx?: number }): { source: string; height: number; image: boolean } | undefined {
+  // In strip pixels: terminal sprites and throws at 1, desktop sheets at a quarter of their pixels (0045 point 9)
+  const actor = desktopArt($, loaded, { scale: 1, sheetScale: 1 / DESKTOP.sheetPixels })
+  if (!actor) return undefined
+  const stripPx = Math.max(current.rows * 2, actor.height)
+  const scale = size.maxHeightPx === undefined ? size.scale : Math.min(size.scale, Math.floor(size.maxHeightPx / stripPx))
+  if (scale < 1 || size.shownPx <= 0) return undefined
+  const shown = size.shownPx / scale
+  const width = Math.ceil(shown * DESKTOP.sceneOvershoot)
+  const cached = encounterSceneCache
+  if (cached && cached.scene === current && cached.actor === actor.source && cached.scale === scale && cached.width === width) return cached.drawn
+  const particlesFor = (stripWidth: number): Particle[] => {
+    let particles = particlesByColumns.get(stripWidth)
+    if (!particles) {
+      particles = makeParticles(current, stripWidth, Math.random)
+      particlesByColumns.set(stripWidth, particles)
+    }
+    return particles
+  }
+  const source = encounterSceneSvg(current, particlesFor, actor, { width, center: shown / 2, scale })
+  if (!source) $.ui.log(`encounter scene: no Svg for ${loaded.modster.id}, over ${DESKTOP.svgMaxChars} characters; showing the Modster alone`, { to: 'debug' })
+  const image = current.sheet !== undefined || current.particleSheet !== undefined || !actor.isInteractive
+  const drawn = source ? { source, height: stripPx * scale, image } : undefined
+  encounterSceneCache = { scene: current, actor: actor.source, scale, width, drawn }
   return drawn
 }
 

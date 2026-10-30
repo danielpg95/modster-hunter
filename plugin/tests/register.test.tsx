@@ -221,7 +221,8 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('on desktop the band draws a desktop sheet beside the text: an image, not interactive, within maxRows (0045 point 9)', HUNTING, async ($, on) => {
+  // With the scene off, so the Modster stands alone (0049 draws it in front of the scene otherwise)
+  test('on desktop the band draws a desktop sheet beside the text: an image, not interactive, within maxRows (0045 point 9)', { options: { autoStart: true, showIdleScene: false } }, async ($, on) => {
     const { ui, clock } = await startBand($, on, desktopOnlyForest(), 'desktop')
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await clock.advance(4_000 + BAND_TICK)
@@ -432,11 +433,35 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('on desktop an encounter replaces the scene with the Modster', HUNTING, async ($, on) => {
+  test('on desktop an encounter keeps the scene, with the Modster in front, its lines beside it and within maxRows (0049)', HUNTING, async ($, on) => {
     const { ui, clock } = await startBand($, on, sceneForest(), 'desktop')
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await clock.advance(3_000 + BAND_TICK)
-    expect((await ui.find({ type: 'Svg' }))?.props.alt).toBe('Sproutling')
+    const svgs = await ui.findAll({ type: 'Svg' })
+    expect(svgs).toHaveLength(1)
+    const scene = svgs[0]
+    expect(scene?.props.alt).toBe('Sproutling in Whispering Forest')
+    // The strip and the Modster nested in one document, the strip drawn first
+    expect(scene?.props.source).toContain('fill="url(#bg)"')
+    expect(String(scene?.props.source).split('<svg ').length - 1).toBe(3)
+    // The 8 px strip and sprite at bandScale
+    expect(scene?.props.height).toBe(8 * DESKTOP.bandScale)
+    expect(await ui.find({ type: 'Text', text: /A wild Sproutling appeared!/ })).toBeDefined()
+    await ui.redraw({ ...BAND_PROPS, maxRows: 1 } as any)
+    expect((await ui.find({ type: 'Svg' }))?.props.height).toBeLessThanOrEqual(DESKTOP.rowPx)
+    await ui.redraw(BAND_PROPS as any)
+    await clock.advance(1_000)
+    expect(await ui.find({ type: 'Button', key: 'throw' })).toBeDefined()
+    await ui.unmount()
+  })
+
+  test('on desktop with showIdleScene off an encounter shows the Modster alone (0049)', { options: { autoStart: true, showIdleScene: false } }, async ($, on) => {
+    const { ui, clock } = await startBand($, on, sceneForest(), 'desktop')
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(3_000 + BAND_TICK)
+    const svg = await ui.find({ type: 'Svg' })
+    expect(svg?.props.alt).toBe('Sproutling')
+    expect(svg?.props.source).not.toContain('url(#bg)')
     await ui.unmount()
   })
 

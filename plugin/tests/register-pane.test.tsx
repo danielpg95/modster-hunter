@@ -1,10 +1,11 @@
 import { describe, expect, mock, test } from 'claude-code/testing'
 import type { On, UiPane } from 'claude-code'
+import { catcherFiles } from './fixtures/catcher-files'
 import { desktopOnlyForest } from './fixtures/desktop-only-forest'
 import { oneModsterForest } from './fixtures/one-modster-forest'
 import { sceneForest } from './fixtures/scene-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
-import { CATCH, DESKTOP } from '../hooks/constants'
+import { CATCH, DESKTOP, IDLE_TAG } from '../hooks/constants'
 import { throwingMs } from '../hooks/game'
 
 // The game runs only while autoStart is on (decision 0038); these tests play it
@@ -115,16 +116,18 @@ describe('register: encounter pane', () => {
     await pane.unmount()
   })
 
-  test('a Modster with desktop art only shows as text on the terminal and as its sheet on desktop, and Throw works (0045 points 9–10)', HUNTING, async ($, on) => {
+  test('a Modster with desktop art only shows as text on the terminal and as its sheet in front of the biome on desktop, and Throw works (0045 points 9–10, 0048)', HUNTING, async ($, on) => {
     const clock = await start($, on, () => [], desktopOnlyForest())
     const pane = await mountPane($)
     const desktop = await $.ui.mount({ plugin: 'modster-hunter', surface: 'desktop', component: 'Pane', requestId: 'modster-hunt', props: PANE_PROPS as any })
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await clock.advance(4_250)
     expect(await pane.find({ type: 'Raster' })).toBeUndefined()
+    // It stands in front of the desktop background (0048): both sheets embedded in one Svg, as tall as the 40 px background
     const svg = await desktop.find({ type: 'Svg' })
-    expect(svg?.props.source).toContain('<image href="data:image/png;base64,')
-    expect([svg?.props.width, svg?.props.height]).toEqual([32 * DESKTOP.sheetPaneScale, 32 * DESKTOP.sheetPaneScale])
+    expect(String(svg?.props.source).split('<image href="data:image/png;base64,').length - 1).toBe(2)
+    expect([svg?.props.width, svg?.props.height]).toEqual([undefined, 10 * DESKTOP.paneScale])
+    expect(svg?.props.isInteractive).toBeUndefined()
     expect(await pane.find({ type: 'Text', text: /Sproutling/ })).toBeDefined()
     await pane.press({ key: 'throw' })
     await clock.advance(250 + CATCH_THROW_MS)
@@ -148,6 +151,60 @@ describe('register: encounter pane', () => {
     await pane.press({ key: 'throw' })
     await clock.advance(250 + CATCH_THROW_MS)
     expect(await pane.find({ type: 'Text', text: 'Caught Sproutling!' })).toBeDefined()
+    await pane.unmount()
+  })
+
+  test('on desktop the Modster stands in front of its biome as one Svg, the throw plays over the scene, and Throw works (0048)', HUNTING, async ($, on) => {
+    const clock = await start($, on, () => [], { ...sceneForest(), ...catcherFiles() })
+    const pane = await $.ui.mount({ plugin: 'modster-hunter', surface: 'desktop', component: 'Pane', requestId: 'modster-hunt', props: PANE_PROPS as any })
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(3_250)
+    const svgs = await pane.findAll({ type: 'Svg' })
+    expect(svgs).toHaveLength(1)
+    const scene = svgs[0]
+    expect(scene?.props.alt).toBe('Sproutling in Whispering Forest')
+    // The strip (its background tiled by a pattern) and the Modster, nested in one document
+    expect(scene?.props.source).toContain('fill="url(#bg)"')
+    expect(scene?.props.source).toContain('#8d6e63')
+    expect(String(scene?.props.source).split('<svg ').length - 1).toBe(3)
+    expect(scene?.props.width).toBeUndefined()
+    expect(scene?.props.height).toBe(8 * DESKTOP.paneScale)
+    // The scene shows the biome, so there's no header
+    expect(await pane.find({ type: 'Text', text: 'Whispering Forest' })).toBeUndefined()
+
+    await clock.advance(1_000)
+    await pane.press({ key: 'throw' })
+    await clock.advance(250)
+    const thrown = await pane.find({ type: 'Svg' })
+    expect(thrown?.props.alt).toBe('Sproutling in Whispering Forest')
+    expect(thrown?.props.source).toContain('fill="url(#bg)"')
+    // The vector throw (0043) stands where the Modster stood
+    expect(thrown?.props.source).toContain('data-throw=')
+    await clock.advance(CATCH_THROW_MS)
+    expect(await pane.find({ type: 'Text', text: 'Caught Sproutling!' })).toBeDefined()
+    await pane.unmount()
+  })
+
+  test('with showIdleScene off the desktop pane draws the Modster alone (0048)', { options: { autoStart: true, showIdleScene: false } }, async ($, on) => {
+    const clock = await start($, on, () => [], sceneForest())
+    const pane = await $.ui.mount({ plugin: 'modster-hunter', surface: 'desktop', component: 'Pane', requestId: 'modster-hunt', props: PANE_PROPS as any })
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(3_250)
+    const svg = await pane.find({ type: 'Svg' })
+    expect(svg?.props.alt).toBe('Sproutling')
+    expect(svg?.props.source).not.toContain('url(#bg)')
+    // With no scene the header names the biome
+    expect(await pane.find({ type: 'Text', text: 'Whispering Forest' })).toBeDefined()
+    await pane.unmount()
+  })
+
+  test('the terminal pane is unchanged with a scene: the sprite as a Raster, no Svg (0048)', HUNTING, async ($, on) => {
+    const clock = await start($, on, () => [], sceneForest())
+    const pane = await mountPane($)
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(3_250)
+    expect(await pane.find({ type: 'Raster', key: 'sprite' })).toBeDefined()
+    expect(await pane.find({ type: 'Svg' })).toBeUndefined()
     await pane.unmount()
   })
 
@@ -350,6 +407,42 @@ describe('register: encounter pane', () => {
     await start($, on, () => SHOWN, sceneForest())
     const pane = await mountPane($)
     expect(await pane.find({ type: 'Raster', key: 'scene' })).toBeDefined()
+    expect(await pane.find({ type: 'Text', text: /Listening for Modsters/ })).toBeDefined()
+    await pane.unmount()
+  })
+
+  test('on desktop the idle pane shows the band\'s vector scene with no header or idle text: still between turns, moving while Claude works (0027, 0044)', HUNTING, async ($, on) => {
+    const clock = await start($, on, () => SHOWN, sceneForest())
+    const pane = await $.ui.mount({ plugin: 'modster-hunter', surface: 'desktop', component: 'Pane', requestId: 'modster-hunt', props: PANE_PROPS as any })
+    const still = await pane.find({ type: 'Svg' })
+    expect(still?.props.alt).toBe('Whispering Forest scene')
+    expect(still?.props.source).toContain('fill="url(#bg)"')
+    expect(still?.props.source).not.toContain('<animate')
+    // The tag in the scene takes the header's and the idle text's place (0047)
+    expect(await pane.find({ type: 'Text', text: /Listening for Modsters/ })).toBeUndefined()
+    expect(await pane.find({ type: 'Text', text: 'Whispering Forest' })).toBeUndefined()
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(250)
+    expect((await pane.find({ type: 'Svg' }))?.props.source).toContain('repeatCount="indefinite"')
+    await pane.unmount()
+  })
+
+  test('on desktop the idle pane shows the biome\'s name tag in its scene, which fades as in the band (0047)', HUNTING, async ($, on) => {
+    const clock = await start($, on, () => SHOWN, sceneForest())
+    const pane = await $.ui.mount({ plugin: 'modster-hunter', surface: 'desktop', component: 'Pane', requestId: 'modster-hunt', props: PANE_PROPS as any })
+    expect((await pane.find({ type: 'Svg' }))?.props.source).toContain('>Whispering Forest</text>')
+    await clock.advance(IDLE_TAG.showMs + IDLE_TAG.fadeMs)
+    await pane.redraw(PANE_PROPS as any)
+    const faded = await pane.find({ type: 'Svg' })
+    expect(faded?.props.source).toContain('fill="url(#bg)"')
+    expect(faded?.props.source).not.toContain('<text')
+    await pane.unmount()
+  })
+
+  test('on desktop with showIdleScene off the idle pane keeps its text alone', { options: { autoStart: true, showIdleScene: false } }, async ($, on) => {
+    await start($, on, () => SHOWN, sceneForest())
+    const pane = await $.ui.mount({ plugin: 'modster-hunter', surface: 'desktop', component: 'Pane', requestId: 'modster-hunt', props: PANE_PROPS as any })
+    expect(await pane.find({ type: 'Svg' })).toBeUndefined()
     expect(await pane.find({ type: 'Text', text: /Listening for Modsters/ })).toBeDefined()
     await pane.unmount()
   })

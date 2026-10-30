@@ -86,7 +86,7 @@ export function sceneSvg(scene: IdleScene, particles: readonly Particle[], { wid
   }
 
   const fit = crop ? ' preserveAspectRatio="xMinYMin slice"' : ''
-  const head = `<svg xmlns="http://www.w3.org/2000/svg" width="${width * scale}" height="${height * scale}" viewBox="0 0 ${width} ${height}"${fit} shape-rendering="crispEdges">`
+  const head = `<svg xmlns="http://www.w3.org/2000/svg" width="${num(width * scale)}" height="${num(height * scale)}" viewBox="0 0 ${width} ${height}"${fit} shape-rendering="crispEdges">`
   const svg = `${head}${defs.length > 0 ? `<defs>${defs.join('')}</defs>` : ''}${body}</svg>`
   return svg.length > maxChars ? undefined : svg
 }

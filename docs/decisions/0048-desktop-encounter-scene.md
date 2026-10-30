@@ -1,6 +1,6 @@
 # 0048 — On desktop, the encounter pane shows the Modster in front of its biome
 
-- **Status:** Accepted
+- **Status:** Superseded by 0049
 - **Date:** 2026-10-29
 - **Decided by:** @danielpg95
 

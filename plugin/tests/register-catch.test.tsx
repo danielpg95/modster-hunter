@@ -1,6 +1,6 @@
 import { describe, expect, mock, test } from 'claude-code/testing'
 import type { On, UiPane } from 'claude-code'
-import { CATCH } from '../hooks/constants'
+import { CATCH, DESKTOP } from '../hooks/constants'
 import type { Catcher, Sprite } from '../hooks/content'
 import { throwingMs } from '../hooks/game'
 import { catchFrame, catchSvg, pixelsToCells, prepareCatch, spriteCells } from '../hooks/render'
@@ -198,8 +198,9 @@ describe('register: catch animation', () => {
     expect(thrown?.props.source).toContain('<image id="ms" ')
     expect(thrown?.props.source).toContain(`data-throw="${throwAt}/0"`)
     expect(thrown?.props.isInteractive).toBeUndefined()
-    // The fixture's 32×32 sheet is 8×8 terminal pixels, at the pane's 4
-    expect([thrown?.props.width, thrown?.props.height]).toEqual([32, 32])
+    // It plays over the biome's scene (0048): the 40 px tall background is 10 strip pixels, at the pane's 4
+    expect([thrown?.props.width, thrown?.props.height]).toEqual([undefined, 10 * DESKTOP.paneScale])
+    expect(thrown?.props.source).toContain('fill="url(#bg)"')
     expect(thrown?.props.source).toContain('<g data-part="modster" display="inline">')
     // A second in, the Modster is inside the jar: a redraw's new Svg starts with it hidden, so it never flashes back
     await clock.advance(1_000)

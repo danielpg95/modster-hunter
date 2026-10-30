@@ -926,15 +926,27 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Register tests cover a band first drawn after `IDLE_TAG.showMs`, a band held aside by the encounter pane, and the existing timing.
   - [x] Checked in the Code tab: the tag shows on a session's first load.
 
-#### [ ] P5-57 — Desktop encounter scene
+#### [x] P5-57 — Desktop encounter scene
 - **Depends on:** P5-52, P5-38
 - **Size:** M
-- **Goal:** on desktop the encounter pane shows the Modster in front of its biome as one scene `Svg` (decision 0048, asked by @danielpg95, 2026-10-29).
+- **Goal:** on desktop the encounter pane and the band show the Modster in front of its biome as one scene `Svg` (decisions 0048 and 0049, asked by @danielpg95, 2026-10-29).
 - **Done when:**
-  - [ ] A pure function builds the scene: the biome's desktop idle scene behind, the Modster's desktop sheet (or terminal sprite) in front, as one image-mode `Svg` under `DESKTOP.svgMaxChars`; tests cover a desktop sheet, a terminal sprite, a biome with and without desktop art, and the over-limit fallback.
-  - [ ] The encounter pane draws it on desktop, with Throw and Run as `Button`s below it and their digit hotkeys unchanged; the band and the terminal are unchanged.
-  - [ ] Checked in the Code tab, inline: the scene animates, the Modster stands in front, and Throw and Run work.
-  - [ ] `spikes/p5-52-desktop-interaction/` is deleted.
+  - [x] A pure function builds the scene: the biome's desktop idle scene behind, the Modster's desktop sheet (or terminal sprite) in front, as one image-mode `Svg` under `DESKTOP.svgMaxChars`; tests cover a desktop sheet, a terminal sprite, a biome with and without desktop art, and the over-limit fallback.
+  - [x] The encounter pane draws it on desktop, with Throw and Run as `Button`s below it and their digit hotkeys unchanged; the terminal is unchanged.
+  - [x] The desktop band draws it too (0049): the encounter's lines on the left, the strip filling the rest with the Modster in front, inside `maxRows`; the Modster alone with the scene off or over the limit; the one-row band and the terminal are unchanged.
+  - [x] Added on the way (asked by @danielpg95, for parity with the band): between encounters the desktop pane draws the band's vector scene (0027, 0044), still between turns and moving while Claude works, with the biome's name tag in it that fades as in the band, and no header or idle text (0047). In the encounter the scene takes the header's place too. In the encounter the strip grows to the Modster's height.
+  - [x] Checked in the Code tab, in the band and the pane: the idle and encounter scenes animate, the Modster stands in front, and Throw and Run work.
+  - [x] `spikes/p5-52-desktop-interaction/` is deleted.
+
+#### [ ] P5-58 — Desktop click to throw
+- **Depends on:** P5-57
+- **Size:** M
+- **Goal:** on desktop a press on the Modster in the scene throws, in the band and the pane, and Run gets a home that keeps the scene clean (decision 0048 point 5, asked by @danielpg95, 2026-10-30).
+- **Done when:**
+  - [ ] A decision settles, from the P5-52 spike's findings: how a press on the Modster reaches the mod with nothing drawn over the scene (an `Svg` can't be pressed; a `Button` laid over one with `position: absolute` can), where Run goes, whether the Throw and Run buttons stay beside the scene, and that the digit hotkeys and the terminal stay as they are.
+  - [ ] On desktop a press on the Modster throws, in the band and the pane, and the throw plays where the Modster stood; tests press it.
+  - [ ] Run works as the decision says, and nothing is drawn over the scene but the Modster and its throw.
+  - [ ] Checked in the Code tab, in the band and the pane: pressing the Modster throws, Run works, and the keys still work.
 ---
 
 ## Phase 6 — Beyond the terminal
