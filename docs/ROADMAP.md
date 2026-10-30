@@ -934,7 +934,8 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] A pure function builds the scene: the biome's desktop idle scene behind, the Modster's desktop sheet (or terminal sprite) in front, as one image-mode `Svg` under `DESKTOP.svgMaxChars`; tests cover a desktop sheet, a terminal sprite, a biome with and without desktop art, and the over-limit fallback.
   - [x] The encounter pane draws it on desktop, with Throw and Run as `Button`s below it and their digit hotkeys unchanged; the terminal is unchanged.
   - [x] The desktop band draws it too (0049): the encounter's lines on the left, the strip filling the rest with the Modster in front, inside `maxRows`; the Modster alone with the scene off or over the limit; the one-row band and the terminal are unchanged.
-  - [ ] Checked in the Code tab, in the band and the pane: the scene animates, the Modster stands in front, and Throw and Run work.
+  - [x] Added on the way (asked by @danielpg95, for parity with the band): between encounters the desktop pane draws the band's vector scene above its idle text (0027, 0044), still between turns and moving while Claude works; the header names the biome, so no tag. In the encounter the strip grows to the Modster's height.
+  - [ ] Checked in the Code tab, in the band and the pane: the idle and encounter scenes animate, the Modster stands in front, and Throw and Run work.
   - [x] `spikes/p5-52-desktop-interaction/` is deleted.
 ---
 

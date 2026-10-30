@@ -591,6 +591,20 @@ export const register: Register = (on, options) => {
         )
       }
       removeSceneSite(e.requestId)
+      // On desktop the pane draws the band's vector scene (0044, 0045) above its idle text (0027);
+      // the header names the biome, so no tag (0047)
+      const desktopScene = e.surface === 'desktop' && sheetScene && showIdleScene ? desktopSceneSvg($, sheetScene, columns, rows - 1, sceneMoves()) : undefined
+      if (desktopScene && e.surface === 'desktop') {
+        const { Svg } = $.ui.resolve(e)
+        return (
+          <Box flexDirection="column">
+            {header}
+            <Text key="gap"> </Text>
+            <Svg source={desktopScene.source} alt={`${biomeName} scene`} height={desktopScene.height} {...(desktopScene.image ? {} : { isInteractive: true })} />
+            {idleText}
+          </Box>
+        )
+      }
       if (scene && showIdleScene) {
         const skip = `idle scene: not drawn in the pane (surface ${e.surface}, ${rows} rows, scene needs ${scene.rows + 1})`
         if (skip !== loggedSceneSkip) {
