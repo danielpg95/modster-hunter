@@ -169,6 +169,8 @@ describe('register: encounter pane', () => {
     expect(String(scene?.props.source).split('<svg ').length - 1).toBe(3)
     expect(scene?.props.width).toBeUndefined()
     expect(scene?.props.height).toBe(8 * DESKTOP.paneScale)
+    // The scene shows the biome, so there's no header
+    expect(await pane.find({ type: 'Text', text: 'Whispering Forest' })).toBeUndefined()
 
     await clock.advance(1_000)
     await pane.press({ key: 'throw' })
@@ -191,6 +193,8 @@ describe('register: encounter pane', () => {
     const svg = await pane.find({ type: 'Svg' })
     expect(svg?.props.alt).toBe('Sproutling')
     expect(svg?.props.source).not.toContain('url(#bg)')
+    // With no scene the header names the biome
+    expect(await pane.find({ type: 'Text', text: 'Whispering Forest' })).toBeDefined()
     await pane.unmount()
   })
 
@@ -407,15 +411,16 @@ describe('register: encounter pane', () => {
     await pane.unmount()
   })
 
-  test('on desktop the idle pane shows the band\'s vector scene with no idle text: still between turns, moving while Claude works (0027, 0044)', HUNTING, async ($, on) => {
+  test('on desktop the idle pane shows the band\'s vector scene with no header or idle text: still between turns, moving while Claude works (0027, 0044)', HUNTING, async ($, on) => {
     const clock = await start($, on, () => SHOWN, sceneForest())
     const pane = await $.ui.mount({ plugin: 'modster-hunter', surface: 'desktop', component: 'Pane', requestId: 'modster-hunt', props: PANE_PROPS as any })
     const still = await pane.find({ type: 'Svg' })
     expect(still?.props.alt).toBe('Whispering Forest scene')
     expect(still?.props.source).toContain('fill="url(#bg)"')
     expect(still?.props.source).not.toContain('<animate')
-    // The tag in the scene takes the idle text's place (0047)
+    // The tag in the scene takes the header's and the idle text's place (0047)
     expect(await pane.find({ type: 'Text', text: /Listening for Modsters/ })).toBeUndefined()
+    expect(await pane.find({ type: 'Text', text: 'Whispering Forest' })).toBeUndefined()
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await clock.advance(250)
     expect((await pane.find({ type: 'Svg' }))?.props.source).toContain('repeatCount="indefinite"')

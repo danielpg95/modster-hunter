@@ -592,19 +592,13 @@ export const register: Register = (on, options) => {
       }
       removeSceneSite(e.requestId)
       // On desktop the pane draws the band's vector scene (0044, 0045) with the biome's name tag in
-      // it and no idle text under it, as the band does (0047); the text stays when there's no scene
+      // it and no header or idle text, as the band does (0047); the text stays when there's no scene
       const tag = e.surface === 'desktop' ? currentIdleTag(biome) : undefined
-      const desktopScene = e.surface === 'desktop' && sheetScene && showIdleScene ? desktopSceneSvg($, sheetScene, columns, rows, sceneMoves(), tag) : undefined
+      const desktopScene = e.surface === 'desktop' && sheetScene && showIdleScene ? desktopSceneSvg($, sheetScene, columns, e.props.scroll.bodyRows, sceneMoves(), tag) : undefined
       if (desktopScene && e.surface === 'desktop') {
         const { Svg } = $.ui.resolve(e)
         if (tag) startIdleTag($)
-        return (
-          <Box flexDirection="column">
-            {header}
-            <Text key="gap"> </Text>
-            <Svg source={desktopScene.source} alt={`${biomeName} scene`} height={desktopScene.height} {...(desktopScene.image ? {} : { isInteractive: true })} />
-          </Box>
-        )
+        return <Svg source={desktopScene.source} alt={`${biomeName} scene`} height={desktopScene.height} {...(desktopScene.image ? {} : { isInteractive: true })} />
       }
       if (scene && showIdleScene) {
         const skip = `idle scene: not drawn in the pane (surface ${e.surface}, ${rows} rows, scene needs ${scene.rows + 1})`
@@ -671,7 +665,8 @@ export const register: Register = (on, options) => {
       const art = staged ? undefined : desktopArt($, modster, { scale: DESKTOP.paneScale, sheetScale: DESKTOP.sheetPaneScale })
       return (
         <Box flexDirection="column">
-          {header}
+          {/* The scene shows the biome, so it takes the header's place */}
+          {staged ? null : header}
           {staged ? <Svg source={staged.source} alt={`${modster.modster.name} in ${biomeName}`} height={staged.height} {...(staged.image ? {} : { isInteractive: true })} /> : null}
           {art ? <Svg source={art.source} alt={modster.modster.name} width={art.width} height={art.height} {...(art.isInteractive ? { isInteractive: true } : {})} /> : null}
           {lines.map(line)}
