@@ -29,6 +29,9 @@ const FADE_S = 0.25
 const SPRITE_AT = SILHOUETTE_AT + FADE_S + 0.5
 const TAG_AT = SPRITE_AT + FADE_S
 const ARRIVAL_S = TAG_AT + FADE_S
+// The departure: a cue where the Modster stood (a gold burst when caught, a grey puff when it fled), then the slide back
+const CUE_S = 0.4
+const DEPARTURE_S = CUE_S + SLIDE_S
 const COLUMN_PX = 8.8
 const ROW_PX = 20
 const CELLS = { columns: Math.round(W / COLUMN_PX), rows: Math.ceil(H / ROW_PX) }
@@ -60,16 +63,16 @@ type Stage = 'idle' | 'arrive' | 'up' | 'leave'
 function stageOf(state: Encounter, now: number): Stage {
   const t = (now - state.at) / 1000
   if (state.phase === 'up') return t < ARRIVAL_S ? 'arrive' : 'up'
-  if (state.phase === 'leaving') return t < SLIDE_S ? 'leave' : 'idle'
+  if (state.phase === 'leaving') return t < DEPARTURE_S ? 'leave' : 'idle'
   return 'idle'
 }
 
-function sceneSvg(stage: Stage): string {
+function sceneSvg(stage: Stage, caught: boolean): string {
   const arrive = stage === 'arrive'
   const slid = stage === 'up' || stage === 'leave'
   const slide =
     arrive || stage === 'leave'
-      ? `<animateTransform attributeName="transform" type="translate" from="${arrive ? '0 0' : `${SLIDE} 0`}" to="${arrive ? `${SLIDE} 0` : '0 0'}" dur="${SLIDE_S}s" begin="${arrive ? SLIDE_AT : 0}s" calcMode="spline" keyTimes="0;1" keySplines="0.2 0.8 0.2 1" fill="freeze"/>`
+      ? `<animateTransform attributeName="transform" type="translate" from="${arrive ? '0 0' : `${SLIDE} 0`}" to="${arrive ? `${SLIDE} 0` : '0 0'}" dur="${SLIDE_S}s" begin="${sec(arrive ? SLIDE_AT : CUE_S)}" calcMode="spline" keyTimes="0;1" keySplines="0.2 0.8 0.2 1" fill="freeze"/>`
       : ''
   const flash = arrive
     ? `<rect width="${W}" height="${H}" fill="#fff" opacity="0"><animate attributeName="opacity" values="0;0.45;0" dur="${FLASH_S}s" fill="freeze"/></rect>`
@@ -86,12 +89,28 @@ function sceneSvg(stage: Stage): string {
         `<g opacity="${arrive ? 0 : 1}">${fadeIn(TAG_AT, arrive)}<rect x="10" y="88" width="150" height="22" rx="11" fill="#000" fill-opacity="0.45"/>` +
         `<text x="22" y="103" font-size="12" font-family="system-ui" fill="#fff">Sproutling ● common</text></g>`
       : ''
+  // On the way out the Modster and its tag fade under the cue, then the scene slides back
+  const cx = x + MODSTER.w / 2
+  const cy = MODSTER.y + MODSTER.h / 2
+  const cueColor = caught ? '#ffd54f' : '#cfd8dc'
+  const rays = Array.from({ length: 8 }, (_, i) => {
+    const a = (i / 8) * Math.PI * 2
+    const dx = +(Math.cos(a) * 46).toFixed(1)
+    const dy = +(Math.sin(a) * 46).toFixed(1)
+    return `<circle cx="${cx}" cy="${cy}" r="4" fill="${cueColor}"><animate attributeName="cx" from="${cx}" to="${cx + dx}" dur="${sec(CUE_S)}" fill="freeze"/><animate attributeName="cy" from="${cy}" to="${cy + dy}" dur="${sec(CUE_S)}" fill="freeze"/><animate attributeName="r" from="4" to="0" dur="${sec(CUE_S)}" fill="freeze"/></circle>`
+  }).join('')
+  const departing =
+    stage === 'leave'
+      ? `<g opacity="1"><animate attributeName="opacity" from="1" to="0" dur="${sec(CUE_S * 0.6)}" fill="freeze"/>${modsterShape(x, '#7cb342', '#111')}` +
+        `<rect x="10" y="88" width="150" height="22" rx="11" fill="#000" fill-opacity="0.45"/><text x="22" y="103" font-size="12" font-family="system-ui" fill="#fff">${caught ? 'Caught Sproutling!' : 'Sproutling fled'}</text></g>` +
+        `<circle cx="${cx}" cy="${cy}" r="0" fill="${cueColor}" opacity="0.7"><animate attributeName="r" from="0" to="44" dur="${sec(CUE_S)}" fill="freeze"/><animate attributeName="opacity" from="0.7" to="0" dur="${sec(CUE_S)}" fill="freeze"/></circle>${rays}`
+      : ''
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">` +
     `<rect width="${W}" height="${H}" fill="#1b1b1b"/>` +
     `<g transform="translate(${slid ? SLIDE : 0} 0)">${slide}<rect width="${W}" height="${H}" fill="#2e4a3a"/><rect y="96" width="${W}" height="24" fill="#4e6b3a"/>` +
     `<circle cx="40" cy="20" r="3" fill="#9ccc65"><animate attributeName="cy" values="10;100" dur="3s" repeatCount="indefinite"/></circle>` +
-    `${modster}</g>${flash}</svg>`
+    `${modster}${departing}</g>${flash}</svg>`
   )
 }
 
@@ -135,7 +154,7 @@ async function scene($: EngineInterface, e: Parameters<EngineInterface['ui']['re
   const left = await read($, tries)
   return (
     <Box key={`spike-${site}`} position="relative">
-      <Svg source={sceneSvg(stage)} alt={`${site} scene`} width={W} height={H} />
+      <Svg source={sceneSvg(stage, state.caught === true)} alt={`${site} scene`} width={W} height={H} />
       <Box position="absolute" top={0} left={0}>
         <Client key={`spike-${site}-overlay`} module="./overlay-probe.tsx" props={{ site, outline: show, rows: CELLS.rows }} width={CELLS.columns} height={CELLS.rows} />
       </Box>
@@ -184,9 +203,9 @@ export const register: Register = (on) => {
     const lines = await read($, log)
     const state = await read($, encounter)
     const count = await read($, redraws)
-    const setPhase = async (phase: Encounter['phase']) => {
+    const setPhase = async (phase: Encounter['phase'], caught = false) => {
       const at = await $.clock.now()
-      await update($, encounter, () => ({ phase, at }))
+      await update($, encounter, () => ({ phase, at, ...(caught ? { caught } : {}) }))
       if (phase === 'up') await update($, tries, () => 3)
     }
     return (
@@ -195,7 +214,14 @@ export const register: Register = (on) => {
         <Text dimColor>Start: does it flash, then slide right, with Throw and Run in the strip? Click the Modster, the buttons, and press 1 and 2. Redraw mid-encounter: does the slide replay? End: does it slide back?</Text>
         {await scene($, e, 'pane')}
         <Box flexDirection="row" gap={1}>
-          <Button key="spike-start" label={state.phase === 'up' ? 'End encounter' : 'Start encounter'} onPress={() => setPhase(state.phase === 'up' ? 'leaving' : 'up')} />
+          {state.phase === 'up' ? (
+            <>
+              <Button key="spike-caught" label="End: caught" onPress={() => setPhase('leaving', true)} />
+              <Button key="spike-fled" label="End: fled" onPress={() => setPhase('leaving')} />
+            </>
+          ) : (
+            <Button key="spike-start" label="Start encounter" onPress={() => setPhase('up')} />
+          )}
           <Button key="spike-redraw" label={`Redraw (${count})`} onPress={() => update($, redraws, (n) => n + 1)} />
           <Button key="spike-outline" label={(await read($, outline)) ? 'Hide the Client outline' : 'Outline the Client'} onPress={() => update($, outline, (now) => !now)} />
           <Button key="spike-band-toggle" label={(await read($, band)) ? 'Hide the band test' : 'Show the band test'} onPress={() => update($, band, (now) => !now)} />
