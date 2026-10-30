@@ -14,6 +14,7 @@ const hits = atom({ plugin: 'modster-interaction-spike', key: 'hits' } as const,
 const selected = atom({ plugin: 'modster-interaction-spike', key: 'selected' } as const, null)
 const showAll = atom({ plugin: 'modster-interaction-spike', key: 'showAll' } as const, false)
 const band = atom({ plugin: 'modster-interaction-spike', key: 'band' } as const, false)
+const client = atom({ plugin: 'modster-interaction-spike', key: 'client' } as const, false)
 
 // Click the green square: SMIL starts the throw inside the frame, no script
 const CLICK_SVG =
@@ -107,7 +108,7 @@ export const register: Register = (on) => {
 
     return (
       <Box flexDirection="column" gap={1}>
-        <Text dimColor>Round 1. Try each letter, then note what happened next to it.</Text>
+        <Text dimColor>Round 4: F is now last, G still off until pressed. Try each letter, then note what happened next to it.</Text>
         <Text bold>Part 1: clicks</Text>
 
         <Text bold>A. A pane Button</Text>
@@ -138,15 +139,6 @@ export const register: Register = (on) => {
         </Box>
         {reached('E')}
 
-        <Text bold>F. A Markdown link the mod answers</Text>
-        <Markdown key="spike-f" text={`Throw at [${sample.name}](https://modster.invalid/throw).`} onLinkPress={() => update($, hits, bump('F'))} />
-        {reached('F')}
-        <Text dimColor>If a browser opens instead, the press didn't reach the mod.</Text>
-
-        <Text bold>G. A Client (surface module) that counts pointer events</Text>
-        <Client key="spike-g" module="./pointer-probe.tsx" props={null} />
-        {reached('G')}
-
         <Text bold>H. A band Button</Text>
         <Button key="spike-h" label={(await read($, band)) ? 'Hide the band test' : 'Show the band test'} onPress={() => update($, band, (now) => !now)} />
         <Text dimColor>Shows a row with a Poke button above the prompt, over the game's band.</Text>
@@ -154,6 +146,18 @@ export const register: Register = (on) => {
         <Text bold>Part 2: a dex grid</Text>
         <Text dimColor>Press a name to open its detail; Back returns. Try Show all to test the Svg budget.</Text>
         {grid}
+
+        <Text bold>G. A Client (surface module) that counts pointer events</Text>
+        <Text dimColor>Off until pressed (round 3): with it drawn, the Buttons after it lost their handlers (round 1) and the pane went blank (round 2).</Text>
+        <Button key="spike-g-toggle" label={(await read($, client)) ? 'Remove the Client' : 'Draw the Client'} onPress={() => update($, client, (now) => !now)} />
+        {(await read($, client)) ? <Client key="spike-g" module="./pointer-probe.tsx" props={null} /> : null}
+        {reached('G')}
+
+        <Text bold>F. A Markdown link the mod answers</Text>
+        <Markdown key="spike-f" text={`Throw at [${sample.name}](https://modster.invalid/throw).`} onLinkPress={() => update($, hits, bump('F'))} />
+        {reached('F')}
+        <Text dimColor>If a browser opens instead, the press didn't reach the mod. Moved last in round 4: Buttons after it lost their handlers.</Text>
+
       </Box>
     )
   })

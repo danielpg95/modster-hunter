@@ -9,6 +9,7 @@ declare module 'claude-code' {
       selected: string | null
       showAll: boolean
       band: boolean
+      client: boolean
     }
   }
 }

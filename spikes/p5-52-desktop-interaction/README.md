@@ -55,6 +55,33 @@ claude plugin marketplace remove modster-interaction-spike
   `Markdown` links and a `Client` can take a click, so "click a Modster" means
   D, F or G working, or a Button beside the picture (E).
 
-## Findings (Desktop Code tab)
+## Findings (Desktop Code tab, 2026-10-29)
 
-_Not checked yet._
+Rounds 1–4 (0.0.1–0.0.4), checked by @danielpg95. Presses that don't reach
+the mod show in the app's log (`~/Library/Logs/Claude/claude.ai-web.log`) as
+`engine surface: ui_press not handled`, with the Button's key.
+
+- **A pane Button (A), a Button over an Svg (D) and one beside it (E) all
+  reach the mod.** A Button laid over the picture with `position: absolute`
+  works, so "click a Modster" can be a Button drawn on top of it.
+- **An isInteractive Svg runs a SMIL `begin="click"` animation, CSS `:hover`
+  and a `<title>` tooltip (C)**, but the mod never hears the click.
+- **A Markdown link with `onLinkPress` (F) reaches the mod, but every Button
+  drawn after it in the same tree loses its handler** (rounds 1–3: H, the G
+  toggle and the whole dex grid). With F moved last (round 4) they all work.
+  Keep a pressable Markdown last in a tree, or don't use one.
+- **A Client (G) gets pointer events on desktop.** It isn't what broke the
+  Buttons (round 3 had it off and they still failed).
+- **The dex grid works with 12 thumbnails** (desktop sheets and terminal-sprite
+  paths, 209,750 characters of Svg in one pane): a name opens the detail, Back returns.
+- **All 35 thumbnails (678,175 characters of Svg) break the pane.** The
+  first press is handled, then every Button in the pane is dead: the redraw is
+  refused, the old drawing stays on screen, and its handlers are gone. Nothing
+  says so in the log beyond the dead presses. The limit is somewhere between
+  209,750 and 678,175 characters; a grid must page.
+- **`/reload-plugins` with the pane open leaves it blank** ("nothing to show
+  yet"), even after running the command again. A new session draws it. Test
+  each round in a new session.
+- **The band test (H) never showed.** The press reaches the mod, but the
+  game's own band hook answers without `next(e)` while hunting, so a band hook
+  beneath it never runs. _To check with `/modsters stop`._
