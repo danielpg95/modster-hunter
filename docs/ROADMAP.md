@@ -877,7 +877,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] Checked in the Code tab: band, pane, Collection, Biomes tab and a throw.
 
 
-#### [ ] P5-52 — Desktop interaction (spike)
+#### [x] P5-52 — Desktop interaction (spike)
 - **Depends on:** P5-38
 - **Size:** S
 - **Goal:** know what input and layout the Desktop Code tab allows, so the game can feel made for desktop and not only drawn for it (asked by @danielpg95, 2026-10-28). Ideas to test: click a Modster to throw, one encounter scene with the Modster in front of its biome, a dex grid with a detail card in the Collection tab, and a catch card.
@@ -885,7 +885,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] A throwaway spike checks in the Code tab, inline and not fullscreen, whether a click reaches a band `Button`, a pane `Button` and an `Svg` (image mode and `isInteractive`). The findings and screenshots are in its README.
   - [x] It checks whether a pane can lay out a grid of animated Svg thumbnails and switch to a detail view on a press, within the Svg limit.
   - [x] Digit hotkeys and the terminal layout still work the same with the spike mod loaded.
-  - [ ] A decision picks which ideas to build on desktop, keeps the terminal as the simple path (keys and text), and keeps rules 6 and 7. If any are picked, roadmap tasks build them.
+  - [x] A decision picks which ideas to build on desktop, keeps the terminal as the simple path (keys and text), and keeps rules 6 and 7. If any are picked, roadmap tasks build them. (decision 0048: the encounter scene, P5-57)
 
 #### [x] P5-53 — Desktop reference prompts for Modsters and catchers
 - **Depends on:** P5-49
@@ -925,6 +925,16 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] The tag's show and fade start the first time the band draws the desktop scene (or the tag alone) after the biome comes into view: at session start, and when an encounter ends.
   - [x] Register tests cover a band first drawn after `IDLE_TAG.showMs`, a band held aside by the encounter pane, and the existing timing.
   - [x] Checked in the Code tab: the tag shows on a session's first load.
+
+#### [ ] P5-57 — Desktop encounter scene
+- **Depends on:** P5-52, P5-38
+- **Size:** M
+- **Goal:** on desktop the encounter pane shows the Modster in front of its biome as one scene `Svg` (decision 0048, asked by @danielpg95, 2026-10-29).
+- **Done when:**
+  - [ ] A pure function builds the scene: the biome's desktop idle scene behind, the Modster's desktop sheet (or terminal sprite) in front, as one image-mode `Svg` under `DESKTOP.svgMaxChars`; tests cover a desktop sheet, a terminal sprite, a biome with and without desktop art, and the over-limit fallback.
+  - [ ] The encounter pane draws it on desktop, with Throw and Run as `Button`s below it and their digit hotkeys unchanged; the band and the terminal are unchanged.
+  - [ ] Checked in the Code tab, inline: the scene animates, the Modster stands in front, and Throw and Run work.
+  - [ ] `spikes/p5-52-desktop-interaction/` is deleted.
 ---
 
 ## Phase 6 — Beyond the terminal
