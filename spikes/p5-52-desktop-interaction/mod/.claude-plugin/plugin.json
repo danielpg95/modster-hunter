@@ -1,9 +1,0 @@
-{
-  "name": "modster-interaction-spike",
-  "displayName": "Modster interaction spike (P5-52)",
-  "version": "0.0.4",
-  "description": "Throwaway P5-52 spike: what clicks and layouts the Desktop Code tab allows.",
-  "author": { "name": "danielpg95" },
-  "license": "MIT",
-  "types": "./types/index.d.ts"
-}

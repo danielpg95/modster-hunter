@@ -42,6 +42,7 @@ import {
   catchLengthMs,
   catchSvg,
   sceneSvg,
+  encounterSceneSvg,
   idleTagSize,
   idleTagSvg,
   type IdleTag,
@@ -208,6 +209,8 @@ let sheetScene: IdleScene | undefined
 const particlesByColumns = new Map<number, Particle[]>()
 // The desktop's scene Svgs by size and motion (0044); checked against the scene they were made from
 const sceneSvgs = new Map<string, { scene: IdleScene; drawn: { source: string; width: number; height: number; image: boolean } | undefined }>()
+// The encounter pane's last scene (0048), made again when the scene, the art or the width changes
+let encounterSceneCache: { scene: IdleScene; actor: string; width: number; drawn: { source: string; height: number; image: boolean } | undefined } | undefined
 const sceneSites = new Map<string, number>() // requestId → columns
 let sceneTimer: Timer | undefined
 let sceneTick = 0
@@ -631,10 +634,13 @@ export const register: Register = (on, options) => {
       removeSite(e.requestId)
       const { Svg } = $.ui.resolve(e)
       const lines = view.kind === 'compact' ? view.lines : []
-      const art = desktopArt($, modster, { scale: DESKTOP.paneScale, sheetScale: DESKTOP.sheetPaneScale })
+      // 0048: the Modster stands in front of its biome; without a scene, or over the limit, it stands alone
+      const staged = sheetScene && showIdleScene ? encounterScene($, modster, sheetScene, columns) : undefined
+      const art = staged ? undefined : desktopArt($, modster, { scale: DESKTOP.paneScale, sheetScale: DESKTOP.sheetPaneScale })
       return (
         <Box flexDirection="column">
           {header}
+          {staged ? <Svg source={staged.source} alt={`${modster.modster.name} in ${biomeName}`} height={staged.height} {...(staged.image ? {} : { isInteractive: true })} /> : null}
           {art ? <Svg source={art.source} alt={modster.modster.name} width={art.width} height={art.height} {...(art.isInteractive ? { isInteractive: true } : {})} /> : null}
           {lines.map(line)}
         </Box>
@@ -2030,6 +2036,34 @@ function desktopSceneSvg($: EngineInterface, current: IdleScene, bodyColumns: nu
   // Text in an image-mode Svg draws (0047); SMIL runs there too, so the tag never needs interactive mode
   const drawn = source ? { source, width: size.width * size.scale, height: current.rows * 2 * size.scale, image: current.sheet !== undefined || current.particleSheet !== undefined || tag !== undefined } : undefined
   sceneSvgs.set(key, { scene: current, drawn })
+  return drawn
+}
+
+/**
+ * The desktop encounter pane's scene (0048): the biome's strip, moving, with the Modster or its
+ * throw standing in front, sized like the pane's art (`paneScale` per strip pixel) and drawn wider
+ * than the pane, cropped at its edge, as the band's strip is. Undefined without desktop or
+ * terminal art for the Modster, or over the Svg limit.
+ */
+function encounterScene($: EngineInterface, loaded: LoadedModster, current: IdleScene, bodyColumns: number): { source: string; height: number; image: boolean } | undefined {
+  // In strip pixels: terminal sprites and throws at 1, desktop sheets at a quarter of their pixels (0045 point 9)
+  const actor = desktopArt($, loaded, { scale: 1, sheetScale: 1 / DESKTOP.sheetPixels })
+  if (!actor) return undefined
+  const scale = DESKTOP.paneScale
+  const shown = (bodyColumns * DESKTOP.columnPx) / scale
+  const width = Math.ceil(shown * DESKTOP.sceneOvershoot)
+  const cached = encounterSceneCache
+  if (cached && cached.scene === current && cached.actor === actor.source && cached.width === width) return cached.drawn
+  let particles = particlesByColumns.get(width)
+  if (!particles) {
+    particles = makeParticles(current, width, Math.random)
+    particlesByColumns.set(width, particles)
+  }
+  const source = encounterSceneSvg(current, particles, actor, { width, center: shown / 2, scale })
+  if (!source) $.ui.log(`encounter scene: no Svg for ${loaded.modster.id}, over ${DESKTOP.svgMaxChars} characters; showing the Modster alone`, { to: 'debug' })
+  const image = current.sheet !== undefined || current.particleSheet !== undefined || !actor.isInteractive
+  const drawn = source ? { source, height: Math.max(current.rows * 2, actor.height) * scale, image } : undefined
+  encounterSceneCache = { scene: current, actor: actor.source, width, drawn }
   return drawn
 }
 
