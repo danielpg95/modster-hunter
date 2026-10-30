@@ -929,11 +929,12 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 #### [ ] P5-57 — Desktop encounter scene
 - **Depends on:** P5-52, P5-38
 - **Size:** M
-- **Goal:** on desktop the encounter pane shows the Modster in front of its biome as one scene `Svg` (decision 0048, asked by @danielpg95, 2026-10-29).
+- **Goal:** on desktop the encounter pane and the band show the Modster in front of its biome as one scene `Svg` (decisions 0048 and 0049, asked by @danielpg95, 2026-10-29).
 - **Done when:**
   - [x] A pure function builds the scene: the biome's desktop idle scene behind, the Modster's desktop sheet (or terminal sprite) in front, as one image-mode `Svg` under `DESKTOP.svgMaxChars`; tests cover a desktop sheet, a terminal sprite, a biome with and without desktop art, and the over-limit fallback.
-  - [x] The encounter pane draws it on desktop, with Throw and Run as `Button`s below it and their digit hotkeys unchanged; the band and the terminal are unchanged.
-  - [ ] Checked in the Code tab, inline: the scene animates, the Modster stands in front, and Throw and Run work.
+  - [x] The encounter pane draws it on desktop, with Throw and Run as `Button`s below it and their digit hotkeys unchanged; the terminal is unchanged.
+  - [x] The desktop band draws it too (0049): the encounter's lines on the left, the strip filling the rest with the Modster in front, inside `maxRows`; the Modster alone with the scene off or over the limit; the one-row band and the terminal are unchanged.
+  - [ ] Checked in the Code tab, in the band and the pane: the scene animates, the Modster stands in front, and Throw and Run work.
   - [x] `spikes/p5-52-desktop-interaction/` is deleted.
 ---
 

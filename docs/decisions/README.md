@@ -61,4 +61,5 @@ settled questions and avoid making assumptions about open ones.
 | [0045](0045-desktop-sprites.md) | Desktop first: new built-in art is hi-res pixel art for the Desktop app | Accepted |
 | [0046](0046-desktop-particle-art.md) | On desktop, a biome may draw its particles with its own art | Accepted |
 | [0047](0047-desktop-idle-tag.md) | On desktop, the idle line is a name tag in the scene that fades | Accepted |
-| [0048](0048-desktop-encounter-scene.md) | On desktop, the encounter pane shows the Modster in front of its biome | Accepted |
+| [0048](0048-desktop-encounter-scene.md) | On desktop, the encounter pane shows the Modster in front of its biome | Superseded by 0049 |
+| [0049](0049-desktop-encounter-scene-in-band.md) | On desktop, the band and the encounter pane show the Modster in front of its biome | Accepted |
