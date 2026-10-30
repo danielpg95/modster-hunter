@@ -1,6 +1,6 @@
 # 0050 — On desktop, the scene slides aside for the encounter's buttons
 
-- **Status:** Accepted
+- **Status:** Superseded by 0051
 - **Date:** 2026-10-30
 - **Decided by:** @danielpg95
 - **Supersedes:** 0049
