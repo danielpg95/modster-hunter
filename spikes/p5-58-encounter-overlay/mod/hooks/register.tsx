@@ -13,8 +13,8 @@ const outline = atom({ plugin: 'modster-overlay-spike', key: 'outline' } as cons
 // The scene, in CSS pixels: a strip, a Modster in the middle and a Run tag at the right
 const W = 480
 const H = 120
-// The Client's size in cells: an estimate of 8×20 px per cell on desktop (DESKTOP.columnPx, rowPx)
-const CELLS = { columns: Math.ceil(W / 8), rows: Math.ceil(H / 20) }
+// The Client's size in cells: about 8.8 px per column (measured with 0.0.3) and an estimated 20 px per row
+const CELLS = { columns: Math.round(W / 8.8), rows: Math.ceil(H / 20) }
 const MODSTER = { x: 210, y: 40, w: 60, h: 70 }
 const RUN = { x: 404, y: 88, w: 64, h: 22 }
 
@@ -75,7 +75,7 @@ export const register: Register = (on) => {
       <Box key="spike-band" position="relative">
         <Svg source={SCENE} alt="Band scene" width={W} height={H} />
         <Box position="absolute" top={0} left={0} right={0} bottom={0}>
-          <Client key="spike-band-overlay" module="./overlay-probe.tsx" props={{ site: 'band', outline: await read($, outline) }} width={CELLS.columns} height={CELLS.rows} />
+          <Client key="spike-band-overlay" module="./overlay-probe.tsx" props={{ site: 'band', outline: await read($, outline), rows: CELLS.rows }} width={CELLS.columns} height={CELLS.rows} />
         </Box>
       </Box>
     )
@@ -96,7 +96,7 @@ export const register: Register = (on) => {
         <Box key="spike-pane" position="relative">
           <Svg source={SCENE} alt="Pane scene" width={W} height={H} />
           <Box position="absolute" top={0} left={0} right={0} bottom={0}>
-            <Client key="spike-pane-overlay" module="./overlay-probe.tsx" props={{ site: 'pane', outline: await read($, outline) }} width={CELLS.columns} height={CELLS.rows} />
+            <Client key="spike-pane-overlay" module="./overlay-probe.tsx" props={{ site: 'pane', outline: await read($, outline), rows: CELLS.rows }} width={CELLS.columns} height={CELLS.rows} />
           </Box>
         </Box>
         <Button key="spike-outline" label={(await read($, outline)) ? 'Hide the Client outline' : 'Outline the Client'} onPress={() => update($, outline, (now) => !now)} />
