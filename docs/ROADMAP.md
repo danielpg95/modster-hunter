@@ -552,7 +552,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] No extra `$.store` reads while another tab is shown or the pane is closed.
 - **Why:** found during P3-04 (2026-10-13), recorded in the phase 3 review.
 
-#### [ ] P5-19 — Fill Whispering Forest
+#### [x] P5-19 — Fill Whispering Forest
 - **Depends on:** P2-09, P2-16, P5-16
 - **Size:** M
 - **Goal:** give Whispering Forest a full roster of 3 common, 3 uncommon, 3 rare and its legendary Elderbark (asked by @danielpg95, 2026-10-14). The unused placeholders Sproutling, Mossbeast and Acornsprite are redesigned and join it, and 3 new Modsters fill the rest.
