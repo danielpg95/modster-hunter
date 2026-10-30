@@ -957,7 +957,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Size:** S
 - **Goal:** on desktop the encounter panel's stack (Throw, the gap, Run, the pips) sits one row lower, clear of the panel's top edge, with its spacing unchanged (asked by @danielpg95, 2026-10-30).
 - **Done when:**
-  - [ ] The `Client` draws the stack one row lower in the band and the pane; the gap between Throw and Run stays; short of room the pips give way first, never the gap; a test covers it.
+  - [x] The `Client` draws the stack one row lower in the band and the pane; the gap between Throw and Run stays; short of room the pips give way first, never the gap; a test covers it.
   - [ ] Checked in the Code tab, in the band and the pane.
 ---
 
