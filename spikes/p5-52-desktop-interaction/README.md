@@ -85,5 +85,5 @@ the mod show in the app's log (`~/Library/Logs/Claude/claude.ai-web.log`) as
 - **A band row with an Svg and a Button draws on desktop (H)**, once the game
   isn't hunting. While it hunts, the game's own band hook answers without
   `next(e)`, so a band hook beneath it never runs: two mods can't share the
-  band unless the upper one passes it on. No press from the band showed up as
-  `not handled` in the log.
+  band unless the upper one passes it on. A press on the band's Poke reaches
+  the mod (its count went up).
