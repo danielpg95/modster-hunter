@@ -938,15 +938,16 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Checked in the Code tab, in the band and the pane: the idle and encounter scenes animate, the Modster stands in front, and Throw and Run work.
   - [x] `spikes/p5-52-desktop-interaction/` is deleted.
 
-#### [ ] P5-58 — Desktop click to throw
+#### [ ] P5-58 — Desktop encounter inside the scene
 - **Depends on:** P5-57
-- **Size:** M
-- **Goal:** on desktop a press on the Modster in the scene throws, in the band and the pane, and Run gets a home that keeps the scene clean (decision 0048 point 5, asked by @danielpg95, 2026-10-30).
+- **Size:** L
+- **Goal:** on desktop the encounter happens inside the biome's scene, in the band and the pane: the scene keeps its idle size, the Modster shrinks to stand in it, a slight cue marks its arrival, its details and Run are subtle tags in the scene, a click on the Modster throws, and the 1 and 2 keys still work (decision 0048 point 5; asked by @danielpg95, 2026-10-30).
 - **Done when:**
-  - [ ] A decision settles, from the P5-52 spike's findings: how a press on the Modster reaches the mod with nothing drawn over the scene (an `Svg` can't be pressed; a `Button` laid over one with `position: absolute` can), where Run goes, whether the Throw and Run buttons stay beside the scene, and that the digit hotkeys and the terminal stay as they are.
-  - [ ] On desktop a press on the Modster throws, in the band and the pane, and the throw plays where the Modster stood; tests press it.
-  - [ ] Run works as the decision says, and nothing is drawn over the scene but the Modster and its throw.
-  - [ ] Checked in the Code tab, in the band and the pane: pressing the Modster throws, Run works, and the keys still work.
+  - [ ] Checked first in the Code tab with a throwaway spike: a `Client` laid over the scene `Svg` (`position: absolute`, drawing nothing) leaves the scene visible, hears a click and the cell it landed in well enough to tell the Modster from a Run tag, and whether it takes 1 and 2 while its site has the focus (a `Client` can't draw an `Svg`, so the scene can't live inside one).
+  - [ ] A decision, superseding 0049 for the desktop encounter, records the layout and the press path from those findings, with a fallback if the keys can't reach the `Client`.
+  - [ ] Pure functions, with tests: the encounter scene keeps the idle scene's size; the Modster (or its throw) is scaled to the strip's height, feet on the ground; a slight cue on arrival; tags in the scene for the name, the caught mark, the tier, the results (caught, broke free, wandered off) and Run; hit boxes for the Modster and the Run tag.
+  - [ ] The desktop band and pane draw it: a click on the Modster throws, a click on Run runs, and 1 and 2 still work; tests press them. The terminal and the one-row band are unchanged.
+  - [ ] Checked in the Code tab, in the band and the pane: the scene doesn't change size when a Modster appears, the cue shows, the tags read well, clicks and keys work.
 ---
 
 ## Phase 6 — Beyond the terminal
