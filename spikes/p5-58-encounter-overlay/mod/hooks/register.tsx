@@ -29,12 +29,15 @@ const MODSTER = { x: SLIDE + (W - SLIDE) / 2 - 30, y: 40, w: 60, h: 70 }
 function sceneSvg(state: Encounter, now: number): string {
   // While the slide runs, every draw plays it from its start, at its own speed; after that a draw shows
   // where it ended. Resuming it at the elapsed time made it jump: the press-to-paint delay varies (0050 point 7)
-  const first = now - state.at < SLIDE_S * 1000
+  // On arrival the flash plays first and the slide starts as it ends (0050 point 2)
+  const delay = state.phase === 'up' ? FLASH_S : 0
+  const first = now - state.at < (delay + SLIDE_S) * 1000
   const up = state.phase === 'up'
-  const offset = up ? SLIDE : 0
+  // Until the slide starts, the scene stands where it was; after, where it ends
+  const offset = first ? (up ? 0 : SLIDE) : up ? SLIDE : 0
   const slide =
     state.phase !== 'idle' && first
-      ? `<animateTransform attributeName="transform" type="translate" from="${up ? '0 0' : `${SLIDE} 0`}" to="${up ? `${SLIDE} 0` : '0 0'}" dur="${SLIDE_S}s" calcMode="spline" keyTimes="0;1" keySplines="0.2 0.8 0.2 1" fill="freeze"/>`
+      ? `<animateTransform attributeName="transform" type="translate" from="${up ? '0 0' : `${SLIDE} 0`}" to="${up ? `${SLIDE} 0` : '0 0'}" dur="${SLIDE_S}s" begin="${delay}s" calcMode="spline" keyTimes="0;1" keySplines="0.2 0.8 0.2 1" fill="freeze"/>`
       : ''
   const flash =
     up && first

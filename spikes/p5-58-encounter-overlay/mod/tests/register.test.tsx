@@ -11,7 +11,11 @@ describe('overlay spike', () => {
     expect(await pane.find({ type: 'Button', key: 'spike-pane-throw' })).toBeUndefined()
     await pane.press({ key: 'spike-start' })
     // Draws while it runs play the slide; a redraw after it shows it ended, without replaying it
-    expect(String((await pane.find({ type: 'Svg' }))?.props.source)).toContain('type="translate"')
+    const sliding = String((await pane.find({ type: 'Svg' }))?.props.source)
+    expect(sliding).toContain('type="translate"')
+    // The flash first, then the slide from where the scene stood
+    expect(sliding).toContain('begin="0.4s"')
+    expect(sliding).toContain('<g transform="translate(0 0)">')
     await clock.advance(1_000)
     await pane.redraw(PROPS as any)
     const svg = String((await pane.find({ type: 'Svg' }))?.props.source)
