@@ -1,4 +1,4 @@
-import type { ClientModule } from 'claude-code'
+import type { ClientModule, RenderElement } from 'claude-code'
 
 // The desktop encounter's controls (decision 0051 point 3): a surface module laid over the scene.
 // It draws Throw, Run and the throws left in the backdrop the slide uncovers, on its own timer, and
@@ -19,6 +19,8 @@ export interface ControlsProps {
   maxTries: number
   /** The backdrop's width in columns */
   panelColumns: number
+  /** The buttons' fills, at rest and hovered (MOTION.buttonFills) */
+  fills: { throw: string; throwHover: string; run: string; runHover: string }
   /** The scene's height in rows */
   rows: number
   /** The cells a click on the Modster lands in, right and bottom exclusive; null while it can't be thrown at */
@@ -63,15 +65,21 @@ const EncounterControls: ClientModule<ControlsProps & Record<string, never>, { s
   })
   // Blank rows give the region its height: an empty Box collapses to its border on desktop
   const blank = (n: number, prefix: string) => Array.from({ length: Math.max(1, n) }, (_, i) => <Text key={`${prefix}${i}`}>{' '}</Text>)
-  // Centred in the panel: Throw the primary button, Run a secondary one a row under it so a click meant for Throw
-  // never lands on Run, the throws left as pips. Short of room the pips go first (the status line has them)
+  // Centred in the panel: Throw and Run as filled buttons of one width, a row apart so a click meant for Throw
+  // never lands on Run, the throws left as pips. A Button in a Client draws as plain text on desktop, so each
+  // sits in a filled Box. Short of room the pips go first (the status line has them)
+  const pill = (key: string, fill: string, hover: string, button: RenderElement) => (
+    <Box key={key} width={Math.max(1, props.panelColumns - 2)} justifyContent="center" backgroundColor={fill} hover={{ backgroundColor: hover }}>
+      {button}
+    </Box>
+  )
   const panel =
     shown && (props.buttons || props.triesLeft !== null) ? (
       <Box flexDirection="column" height={props.rows} justifyContent="center" alignItems="center">
-        {props.buttons ? <Button key="throw" label="Throw" hotkey="1" variant="primary" onPress={act('throw')} /> : null}
+        {props.buttons ? pill('throw-fill', props.fills.throw, props.fills.throwHover, <Button key="throw" label="Throw" hotkey="1" variant="primary" onPress={act('throw')} />) : null}
         {props.buttons ? (
           <Box key="run-gap" marginTop={1}>
-            <Button key="run" label="Run" hotkey="2" variant="secondary" onPress={act('run')} />
+            {pill('run-fill', props.fills.run, props.fills.runHover, <Button key="run" label="Run" hotkey="2" variant="secondary" onPress={act('run')} />)}
           </Box>
         ) : null}
         {props.triesLeft !== null && props.rows >= 4 ? (

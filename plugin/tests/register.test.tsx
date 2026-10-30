@@ -10,7 +10,7 @@ import { validBiome } from './fixtures/valid-biome'
 import { validModster } from './fixtures/valid-modster'
 import { validUserModster } from './fixtures/valid-user-modster'
 import { validSprite } from './fixtures/valid-sprite'
-import { CATCH, DESKTOP, IDLE_TAG } from '../hooks/constants'
+import { CATCH, DESKTOP, IDLE_TAG, MOTION } from '../hooks/constants'
 import { BUTTONS_AFTER_MS } from '../hooks/render'
 import { throwingMs } from '../hooks/game'
 
@@ -458,6 +458,11 @@ describe('register', () => {
     // Both are buttons, Throw the primary one, Run a row under it; in this 3-row band the pips give way to that gap
     expect((await ui.find({ type: 'Button', key: 'throw', in: 'encounter-controls' }))?.props.variant).toBe('primary')
     expect((await ui.find({ type: 'Button', key: 'run', in: 'encounter-controls' }))?.props.variant).toBe('secondary')
+    // A Button in a Client draws as plain text on desktop, so each sits in a filled Box
+    const throwFill = await ui.find({ type: 'Box', key: 'throw-fill', in: 'encounter-controls' })
+    expect(throwFill?.props.backgroundColor).toBe(MOTION.buttonFills.throw)
+    expect(throwFill?.props.hover).toEqual({ backgroundColor: MOTION.buttonFills.throwHover })
+    expect((await ui.find({ type: 'Box', key: 'run-fill', in: 'encounter-controls' }))?.props.backgroundColor).toBe(MOTION.buttonFills.run)
     expect((await ui.find({ type: 'Client' }))?.props.props.rows).toBe(3)
     expect(await ui.find({ type: 'Text', text: '● ● ●', in: 'encounter-controls' })).toBeUndefined()
     // The same arrival Svg until it's over

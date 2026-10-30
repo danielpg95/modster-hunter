@@ -2166,7 +2166,8 @@ function desktopMotion($: EngineInterface, loaded: LoadedModster, encounter: Ban
   const rows = Math.max(1, Math.floor(strip.height / DESKTOP.rowPx))
   const panelColumns = Math.floor(MOTION.slidePx / MOTION.columnPx)
   const maxTries = machine?.encounter?.maxAttempts ?? encounter.attemptsLeft
-  const off: ControlsProps = { encounter: null, showAfterMs: 0, buttons: false, triesLeft: null, maxTries, panelColumns, rows, hit: null }
+  const fills = { ...MOTION.buttonFills }
+  const off: ControlsProps = { encounter: null, showAfterMs: 0, buttons: false, triesLeft: null, maxTries, fills, panelColumns, rows, hit: null }
   // After the departure: the still strip until the encounter ends
   if (stage === 'gone') return { source: strip.source, height: strip.height, controls: off }
   // A caught Modster leaves as its catcher's last frame, sized as the throw was (0053)
@@ -2202,6 +2203,7 @@ function desktopMotion($: EngineInterface, loaded: LoadedModster, encounter: Ban
       buttons,
       triesLeft: encounter.phase === 'result' ? null : encounter.attemptsLeft,
       maxTries,
+      fills,
       panelColumns,
       rows,
       hit: buttons ? hitCells(layout.modster) : null,

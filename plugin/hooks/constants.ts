@@ -132,6 +132,8 @@ export const MOTION = {
   flashOpacity: 0.45,
   backdrop: '#1b1b1b',
   silhouette: '#0d0d0d',
+  /** The buttons' fills, at rest and hovered: a Button inside a Client draws as plain text on desktop, so a Box fills it */
+  buttonFills: { throw: '#2e7d4f', throwHover: '#3a9a62', run: '#3a3a3a', runHover: '#4d4d4d' },
   /** The Modster stands at most this share of the scene's height */
   modsterFill: 0.85,
   /** A desktop column as a Client's cells measure it, for clicks on the Modster (measured in the P5-58 spike) */
