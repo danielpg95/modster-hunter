@@ -67,7 +67,7 @@ function stageOf(state: Encounter, now: number): Stage {
   return 'idle'
 }
 
-function sceneSvg(stage: Stage, caught: boolean): string {
+function sceneSvg(stage: Stage, caught: boolean, at: number): string {
   const arrive = stage === 'arrive'
   const slid = stage === 'up' || stage === 'leave'
   const slide =
@@ -105,8 +105,11 @@ function sceneSvg(stage: Stage, caught: boolean): string {
         `<rect x="10" y="88" width="150" height="22" rx="11" fill="#000" fill-opacity="0.45"/><text x="22" y="103" font-size="12" font-family="system-ui" fill="#fff">${caught ? 'Caught Sproutling!' : 'Sproutling fled'}</text></g>` +
         `<circle cx="${cx}" cy="${cy}" r="0" fill="${cueColor}" opacity="0.7"><animate attributeName="r" from="0" to="44" dur="${sec(CUE_S)}" fill="freeze"/><animate attributeName="opacity" from="0.7" to="0" dur="${sec(CUE_S)}" fill="freeze"/></circle>${rays}`
       : ''
+  // Each arrival and departure is a new source, stamped with its encounter's time: the surface reuses an
+  // image it has drawn before, with its animation already over, so the same markup twice showed the end first
+  const stamp = stage === 'arrive' || stage === 'leave' ? ` data-motion="${stage}/${at}"` : ''
   return (
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">` +
+    `<svg xmlns="http://www.w3.org/2000/svg"${stamp} width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">` +
     `<rect width="${W}" height="${H}" fill="#1b1b1b"/>` +
     `<g transform="translate(${slid ? SLIDE : 0} 0)">${slide}<rect width="${W}" height="${H}" fill="#2e4a3a"/><rect y="96" width="${W}" height="24" fill="#4e6b3a"/>` +
     `<circle cx="40" cy="20" r="3" fill="#9ccc65"><animate attributeName="cy" values="10;100" dur="3s" repeatCount="indefinite"/></circle>` +
@@ -154,7 +157,7 @@ async function scene($: EngineInterface, e: Parameters<EngineInterface['ui']['re
   const left = await read($, tries)
   return (
     <Box key={`spike-${site}`} position="relative">
-      <Svg source={sceneSvg(stage, state.caught === true)} alt={`${site} scene`} width={W} height={H} />
+      <Svg source={sceneSvg(stage, state.caught === true, state.at)} alt={`${site} scene`} width={W} height={H} />
       <Box position="absolute" top={0} left={0}>
         <Client key={`spike-${site}-overlay`} module="./overlay-probe.tsx" props={{ site, outline: show, rows: CELLS.rows }} width={CELLS.columns} height={CELLS.rows} />
       </Box>

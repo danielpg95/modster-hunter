@@ -13,6 +13,7 @@ describe('overlay spike', () => {
     // Draws while it runs play the slide; a redraw after it shows it ended, without replaying it
     const sliding = String((await pane.find({ type: 'Svg' }))?.props.source)
     expect(sliding).toContain('type="translate"')
+    expect(sliding).toContain('data-motion="arrive/')
     // The flash first, then the slide from where the scene stood
     expect(sliding).toContain('begin="0.4s"')
     expect(sliding).toContain('<g transform="translate(0 0)">')
