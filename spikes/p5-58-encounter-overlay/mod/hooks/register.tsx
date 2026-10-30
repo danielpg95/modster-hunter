@@ -13,6 +13,7 @@ const band = atom({ plugin: 'modster-overlay-spike', key: 'band' } as const, fal
 const outline = atom({ plugin: 'modster-overlay-spike', key: 'outline' } as const, false)
 const encounter = atom({ plugin: 'modster-overlay-spike', key: 'encounter' } as const, { phase: 'idle', at: 0 })
 const redraws = atom({ plugin: 'modster-overlay-spike', key: 'redraws' } as const, 0)
+const tries = atom({ plugin: 'modster-overlay-spike', key: 'tries' } as const, 3)
 
 // The scene, in CSS pixels; SLIDE is the strip the slide uncovers at the left
 const W = 480
@@ -48,36 +49,47 @@ function modsterShape(x: number, body: string, eyes: string): string {
   )
 }
 
-function sceneSvg(state: Encounter, now: number): string {
-  // While the arrival or the departure runs, every draw plays it from its start, at its own speed; after
-  // that a draw shows where it ended. Resuming at the elapsed time made it jump: the press-to-paint delay varies
-  const up = state.phase === 'up'
-  const playing = state.phase !== 'idle' && now - state.at < (up ? ARRIVAL_S : SLIDE_S) * 1000
-  const slideAt = up ? SLIDE_AT : 0
-  // Until the slide starts, the scene stands where it was; after, where it ends
-  const offset = playing ? (up ? 0 : SLIDE) : up ? SLIDE : 0
-  const slide = playing
-    ? `<animateTransform attributeName="transform" type="translate" from="${up ? '0 0' : `${SLIDE} 0`}" to="${up ? `${SLIDE} 0` : '0 0'}" dur="${SLIDE_S}s" begin="${slideAt}s" calcMode="spline" keyTimes="0;1" keySplines="0.2 0.8 0.2 1" fill="freeze"/>`
-    : ''
+/**
+ * Where an encounter's motion stands: the arrival is split at the redraw that shows the buttons, since a
+ * redraw restarts an image Svg's animation even with the same source. Each stage starts its own motion
+ * at 0, so a planned redraw never replays the last stage (0050 point 7).
+ */
+type Stage = 'idle' | 'arrive' | 'reveal' | 'up' | 'leave'
+
+function stageOf(state: Encounter, now: number): Stage {
+  const t = (now - state.at) / 1000
+  if (state.phase === 'up') return t < SILHOUETTE_AT ? 'arrive' : t < ARRIVAL_S ? 'reveal' : 'up'
+  if (state.phase === 'leaving') return t < SLIDE_S ? 'leave' : 'idle'
+  return 'idle'
+}
+
+function sceneSvg(stage: Stage): string {
+  const slid = stage === 'reveal' || stage === 'up' || stage === 'leave'
+  const slide =
+    stage === 'arrive' || stage === 'leave'
+      ? `<animateTransform attributeName="transform" type="translate" from="${stage === 'arrive' ? '0 0' : `${SLIDE} 0`}" to="${stage === 'arrive' ? `${SLIDE} 0` : '0 0'}" dur="${SLIDE_S}s" begin="${stage === 'arrive' ? SLIDE_AT : 0}s" calcMode="spline" keyTimes="0;1" keySplines="0.2 0.8 0.2 1" fill="freeze"/>`
+      : ''
   const flash =
-    up && playing
+    stage === 'arrive'
       ? `<rect width="${W}" height="${H}" fill="#fff" opacity="0"><animate attributeName="opacity" values="0;0.45;0" dur="${FLASH_S}s" fill="freeze"/></rect>`
       : ''
   const x = MODSTER.x - SLIDE
-  // The silhouette fades in, holds, then gives way to the sprite; after the arrival only the sprite is drawn
+  // In the reveal the silhouette fades in, holds, then gives way to the sprite, and the tag fades in last
   const span = SPRITE_AT + FADE_S - SILHOUETTE_AT
-  const silhouette = playing
-    ? `<g opacity="0"><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;${(FADE_S / span).toFixed(3)};${((SPRITE_AT - SILHOUETTE_AT) / span).toFixed(3)};1" begin="${SILHOUETTE_AT}s" dur="${span}s" fill="freeze"/>${modsterShape(x, '#0d0d0d', '#0d0d0d')}</g>`
+  const reveal = stage === 'reveal'
+  const silhouette = reveal
+    ? `<g opacity="0"><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;${(FADE_S / span).toFixed(3)};${((SPRITE_AT - SILHOUETTE_AT) / span).toFixed(3)};1" dur="${span}s" fill="freeze"/>${modsterShape(x, '#0d0d0d', '#0d0d0d')}</g>`
     : ''
-  const modster = up
-    ? `${silhouette}<g opacity="${playing ? 0 : 1}">${fadeIn(SPRITE_AT, playing)}${modsterShape(x, '#7cb342', '#111')}</g>` +
-      `<g opacity="${playing ? 0 : 1}">${fadeIn(TAG_AT, playing)}<rect x="10" y="88" width="150" height="22" rx="11" fill="#000" fill-opacity="0.45"/>` +
-      `<text x="22" y="103" font-size="12" font-family="system-ui" fill="#fff">Sproutling ● common</text></g>`
-    : ''
+  const modster =
+    reveal || stage === 'up'
+      ? `${silhouette}<g opacity="${reveal ? 0 : 1}">${fadeIn(SPRITE_AT - SILHOUETTE_AT, reveal)}${modsterShape(x, '#7cb342', '#111')}</g>` +
+        `<g opacity="${reveal ? 0 : 1}">${fadeIn(TAG_AT - SILHOUETTE_AT, reveal)}<rect x="10" y="88" width="150" height="22" rx="11" fill="#000" fill-opacity="0.45"/>` +
+        `<text x="22" y="103" font-size="12" font-family="system-ui" fill="#fff">Sproutling ● common</text></g>`
+      : ''
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">` +
     `<rect width="${W}" height="${H}" fill="#1b1b1b"/>` +
-    `<g transform="translate(${offset} 0)">${slide}<rect width="${W}" height="${H}" fill="#2e4a3a"/><rect y="96" width="${W}" height="24" fill="#4e6b3a"/>` +
+    `<g transform="translate(${slid ? SLIDE : 0} 0)">${slide}<rect width="${W}" height="${H}" fill="#2e4a3a"/><rect y="96" width="${W}" height="24" fill="#4e6b3a"/>` +
     `<circle cx="40" cy="20" r="3" fill="#9ccc65"><animate attributeName="cy" values="10;100" dur="3s" repeatCount="indefinite"/></circle>` +
     `${modster}</g>${flash}</svg>`
   )
@@ -105,25 +117,33 @@ async function onProbe($: EngineInterface, p: Probe): Promise<string> {
 }
 
 function note($: EngineInterface, line: string) {
-return update($, log, (now) => [line, ...now].slice(0, 8))
+  return update($, log, (now) => [line, ...now].slice(0, 8))
+}
+
+async function throwOnce($: EngineInterface, line: string) {
+  await update($, tries, (n) => Math.max(0, n - 1))
+  return note($, line)
 }
 
 // The scene with the strip's buttons and the Client laid over it, for the band or the pane
 async function scene($: EngineInterface, e: Parameters<EngineInterface['ui']['resolve']>[0], site: string) {
-  const { Box, Button, Svg, Client } = $.ui.resolve(e) as any
+  const { Box, Button, Svg, Client, Text } = $.ui.resolve(e) as any
   const state = await read($, encounter)
   const now = await $.clock.now()
   const show = await read($, outline)
+  const stage = stageOf(state, now)
+  const left = await read($, tries)
   return (
     <Box key={`spike-${site}`} position="relative">
-      <Svg source={sceneSvg(state, now)} alt={`${site} scene`} width={W} height={H} />
+      <Svg source={sceneSvg(stage)} alt={`${site} scene`} width={W} height={H} />
       <Box position="absolute" top={0} left={0}>
         <Client key={`spike-${site}-overlay`} module="./overlay-probe.tsx" props={{ site, outline: show, rows: CELLS.rows }} width={CELLS.columns} height={CELLS.rows} />
       </Box>
-      {state.phase === 'up' && now - state.at >= BUTTONS_AT_MS ? (
+      {stage === 'reveal' || stage === 'up' ? (
         <Box position="absolute" top={0} left={1} flexDirection="column" gap={1}>
-          <Button key={`spike-${site}-throw`} label="Throw" hotkey="1" plain onPress={() => note($, `${site}: Throw button`)} />
+          <Button key={`spike-${site}-throw`} label="Throw" hotkey="1" plain onPress={() => throwOnce($, `${site}: Throw button`)} />
           <Button key={`spike-${site}-run`} label="Run" hotkey="2" plain onPress={() => note($, `${site}: Run button`)} />
+          <Text dimColor>{`${left} left`}</Text>
         </Box>
       ) : null}
     </Box>
@@ -144,6 +164,7 @@ export const register: Register = (on) => {
 
   on('ui.message', async ($, e, next) => {
     const line = await onProbe($, e.data as unknown as Probe)
+    if (line.includes('THROW')) await update($, tries, (n) => Math.max(0, n - 1))
     await update($, log, (now) => [line, ...now].slice(0, 8))
     return next(e)
   })
@@ -166,10 +187,13 @@ export const register: Register = (on) => {
     const setPhase = async (phase: Encounter['phase']) => {
       const at = await $.clock.now()
       await update($, encounter, () => ({ phase, at }))
+      if (phase === 'up') await update($, tries, () => 3)
       // The buttons show once the strip is uncovered, and the scene drops its motion once it's over
       if (phase === 'up') {
         $.clock.after(BUTTONS_AT_MS, () => $.ui.invalidate('ui.render'))
         $.clock.after(ARRIVAL_S * 1000 + 50, () => $.ui.invalidate('ui.render'))
+      } else {
+        $.clock.after(SLIDE_S * 1000 + 50, () => $.ui.invalidate('ui.render'))
       }
     }
     return (

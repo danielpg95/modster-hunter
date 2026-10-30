@@ -1,7 +1,7 @@
 {
   "name": "modster-overlay-spike",
   "displayName": "Modster overlay spike (P5-58)",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Throwaway P5-58 spike: can a Client laid over a scene Svg hear clicks and keys in the Desktop Code tab.",
   "author": { "name": "danielpg95" },
   "license": "MIT",

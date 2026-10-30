@@ -12,6 +12,7 @@ declare module 'claude-code' {
       outline: boolean
       encounter: Encounter
       redraws: number
+      tries: number
     }
   }
 }
