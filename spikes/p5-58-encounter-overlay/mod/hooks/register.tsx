@@ -214,14 +214,10 @@ export const register: Register = (on) => {
         <Text dimColor>Start: does it flash, then slide right, with Throw and Run in the strip? Click the Modster, the buttons, and press 1 and 2. Redraw mid-encounter: does the slide replay? End: does it slide back?</Text>
         {await scene($, e, 'pane')}
         <Box flexDirection="row" gap={1}>
-          {state.phase === 'up' ? (
-            <>
-              <Button key="spike-caught" label="End: caught" onPress={() => setPhase('leaving', true)} />
-              <Button key="spike-fled" label="End: fled" onPress={() => setPhase('leaving')} />
-            </>
-          ) : (
-            <Button key="spike-start" label="Start encounter" onPress={() => setPhase('up')} />
-          )}
+          {/* Always the same three, so a press never changes the pane's layout (that redraw replayed the arrival) */}
+          <Button key="spike-start" label="Start encounter" onPress={() => (state.phase === 'up' ? undefined : setPhase('up'))} />
+          <Button key="spike-caught" label="End: caught" onPress={() => (state.phase === 'up' ? setPhase('leaving', true) : undefined)} />
+          <Button key="spike-fled" label="End: fled" onPress={() => (state.phase === 'up' ? setPhase('leaving') : undefined)} />
           <Button key="spike-redraw" label={`Redraw (${count})`} onPress={() => update($, redraws, (n) => n + 1)} />
           <Button key="spike-outline" label={(await read($, outline)) ? 'Hide the Client outline' : 'Outline the Client'} onPress={() => update($, outline, (now) => !now)} />
           <Button key="spike-band-toggle" label={(await read($, band)) ? 'Hide the band test' : 'Show the band test'} onPress={() => update($, band, (now) => !now)} />
