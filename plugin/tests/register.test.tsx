@@ -506,7 +506,7 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('on desktop running plays the grey departure (0051 point 4)', HUNTING, async ($, on) => {
+  test('on desktop running reverses the arrival: the Modster turns into its silhouette and vanishes (0052)', HUNTING, async ($, on) => {
     const { ui, clock } = await startBand($, on, { ...sceneForest(), ...catcherFiles() }, 'desktop')
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await clock.advance(3_000 + BAND_TICK + 1_000)
@@ -514,7 +514,8 @@ describe('register', () => {
     await ui.press({ key: 'run' })
     const leaving = (await ui.find({ type: 'Svg' }))?.props.source
     expect(leaving).toContain('>You ran from Sproutling.</text>')
-    expect(leaving).toContain(`fill="${MOTION.fledCue}"`)
+    expect(leaving).toContain('filter="url(#mm-dark)"')
+    expect(leaving).not.toContain(MOTION.caughtCue)
     await ui.unmount()
   })
 

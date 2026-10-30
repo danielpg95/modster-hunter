@@ -118,8 +118,9 @@ export const DESKTOP = {
 } as const
 
 /**
- * The desktop encounter's motion (decision 0051): times in seconds, sizes in CSS pixels. The arrival
- * plays flash, slide, silhouette (fade in, hold), sprite, tag; the departure plays the cue, then the slide back.
+ * The desktop encounter's motion (decisions 0051, 0052): times in seconds, sizes in CSS pixels. The arrival
+ * plays flash, slide, silhouette (fade in, hold), sprite, tag; a catch leaves with a burst, any other
+ * departure plays the arrival reversed (sprite to silhouette, hold, vanish); then the slide back.
  */
 export const MOTION = {
   flashS: 0.4,
@@ -133,7 +134,6 @@ export const MOTION = {
   backdrop: '#1b1b1b',
   silhouette: '#0d0d0d',
   caughtCue: '#ffd54f',
-  fledCue: '#cfd8dc',
   /** The Modster stands at most this share of the scene's height */
   modsterFill: 0.85,
   /** A desktop column as a Client's cells measure it, for clicks on the Modster (measured in the P5-58 spike) */

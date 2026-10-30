@@ -1,6 +1,6 @@
 import { MOTION } from '../constants'
 
-// Where the desktop encounter's motion stands (decision 0051). A redraw that changes an image Svg's
+// Where the desktop encounter's motion stands (decisions 0051 and 0052). A redraw that changes an image Svg's
 // source blinks and one that keeps it restarts its animation, so each motion is one source played
 // whole; this says which one a redraw draws at `now`.
 
@@ -11,6 +11,8 @@ export interface MotionTimes {
   appearedAt?: number
   /** When the departure starts: the result card, after a catch's animation */
   departAt?: number
+  /** The departure is a catch's: the burst, not the vanishing */
+  caught?: boolean
 }
 
 /** Rounded to the millisecond, so 0.4 + 0.45 is 0.85 */
@@ -27,14 +29,21 @@ export const ARRIVAL = (() => {
   return { slideAt, silhouetteAt, spriteAt, tagAt, endS: ms(tagAt + MOTION.fadeS) }
 })()
 
-/** Seconds the departure takes: the cue, then the slide back (0051 point 4) */
-export const DEPARTURE_S = ms(MOTION.cueS + MOTION.slideS)
+/**
+ * Seconds, as the departure's slide back starts and as it ends (0052): a catch's burst, then the
+ * slide; any other departure is the arrival reversed (the sprite turns into its silhouette, which
+ * holds, then vanishes), then the slide.
+ */
+export function departure(caught: boolean): { slideAt: number; endS: number } {
+  const slideAt = caught ? MOTION.cueS : ms(MOTION.fadeS * 2 + MOTION.silhouetteHoldS)
+  return { slideAt, endS: ms(slideAt + MOTION.slideS) }
+}
 
 /** The buttons show once the slide has uncovered their backdrop (0051 point 3) */
 export const BUTTONS_AFTER_MS = Math.round(ARRIVAL.silhouetteAt * 1000)
 
-export function motionStage({ appearedAt, departAt }: MotionTimes, now: number): MotionStage {
-  if (departAt !== undefined && now >= departAt) return now - departAt < DEPARTURE_S * 1000 ? 'leave' : 'gone'
+export function motionStage({ appearedAt, departAt, caught = false }: MotionTimes, now: number): MotionStage {
+  if (departAt !== undefined && now >= departAt) return now - departAt < departure(caught).endS * 1000 ? 'leave' : 'gone'
   if (appearedAt !== undefined && now - appearedAt < ARRIVAL.endS * 1000) return 'arrive'
   return 'up'
 }

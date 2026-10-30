@@ -13,7 +13,7 @@ const input = (over: Partial<MotionSvgInput> = {}): MotionSvgInput => ({ strip, 
 describe('encounterMotionSvg', () => {
   test('the arrival keeps the strip size, stamped with its start, over the dark backdrop', () => {
     const svg = encounterMotionSvg(input()) ?? ''
-    expect(svg.startsWith('<svg xmlns="http://www.w3.org/2000/svg" data-motion="arrive/1234" width="600" height="120" viewBox="0 0 600 120">')).toBe(true)
+    expect(svg.startsWith('<svg xmlns="http://www.w3.org/2000/svg" data-motion="arrive/1234" width="600" height="120" viewBox="0 0 600 120" preserveAspectRatio="xMinYMin slice">')).toBe(true)
     expect(svg).toContain(`fill="${MOTION.backdrop}"`)
     // The strip, nested at its own size, slides with the Modster
     expect(svg).toContain('<svg x="0" y="0" xmlns="http://www.w3.org/2000/svg" width="600" height="120" viewBox="0 0 150 30">')
@@ -43,19 +43,24 @@ describe('encounterMotionSvg', () => {
     expect(svg).toContain('>Sproutling ● · common</text>')
   })
 
-  test('leaving, a grey puff where the Modster stood as it fades with its tag, then the slide back', () => {
+  test('fleeing reverses the arrival: the sprite turns into its silhouette, which holds and vanishes with the tag, then the slide back (0052)', () => {
     const svg = encounterMotionSvg(input({ stage: 'leave', stamp: 9000, tag: 'Sproutling fled!' })) ?? ''
     expect(svg).toContain('data-motion="leave/9000"')
-    expect(svg).toContain(`fill="${MOTION.fledCue}"`)
     expect(svg).toContain('>Sproutling fled!</text>')
-    expect(svg).toContain('from="120 0" to="0 0" begin="0.4s" dur="0.45s"')
     expect(svg).toContain('<svg x="170"')
+    // The sprite fades as the silhouette fades in, holds, then goes, the tag with it
+    expect(svg).toContain('from="1" to="0" dur="0.25s" fill="freeze"/><use href="#mm-actor"/>')
+    expect(svg).toContain('values="0;1;1;0" keyTimes="0;0.25;0.75;1" dur="1s" fill="freeze"/><use href="#mm-actor" filter="url(#mm-dark)"/>')
+    expect(svg).toContain('from="1" to="0" begin="0.75s" dur="0.25s"')
+    expect(svg).toContain('from="120 0" to="0 0" begin="1s" dur="0.45s"')
+    expect(svg).not.toContain(MOTION.caughtCue)
   })
 
   test('a caught Modster leaves as a gold burst, already inside its catcher', () => {
     const svg = encounterMotionSvg(input({ stage: 'leave', actor: undefined, caught: true, tag: 'Caught Sproutling!' })) ?? ''
     expect(svg).toContain(`fill="${MOTION.caughtCue}"`)
     expect(svg).not.toContain('id="modster"')
+    expect(svg).toContain('from="120 0" to="0 0" begin="0.4s" dur="0.45s"')
   })
 
   test('tag text is escaped', () => {

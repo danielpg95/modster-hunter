@@ -217,7 +217,7 @@ const particlesByColumns = new Map<number, Particle[]>()
 const sceneSvgs = new Map<string, { scene: IdleScene; drawn: { source: string; width: number; height: number; image: boolean } | undefined }>()
 // The desktop encounter's motion (0051): an id for the encounter, when it appeared (none when it was
 // up before this load) and when it leaves; cleared when it ends
-let motion: { id: number; appearedAt?: number; departAt?: number } | undefined
+let motion: { id: number; appearedAt?: number; departAt?: number; caught?: boolean } | undefined
 // The last motion Svg, made again when anything in it changes
 let motionCache: { key: string; strip: string; actor: string | undefined; source: string | undefined } | undefined
 // The Client over the desktop encounter's scene (0051 point 3), by its key in the band and the pane
@@ -1708,6 +1708,7 @@ function updateMotion(now: number, appeared: boolean): void {
   motion ??= { id: now }
   if (encounter.phase === 'result' && motion.departAt === undefined) {
     motion.departAt = catchPlay?.outcome === 'caught' ? Math.max(now, catchPlay.endsAt) : now
+    if (encounter.outcome === 'caught') motion.caught = true
   }
 }
 

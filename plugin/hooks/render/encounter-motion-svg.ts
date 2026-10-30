@@ -1,6 +1,6 @@
 import { DESKTOP, IDLE_TAG, MOTION } from '../constants'
 import type { MotionLayout } from './motion-layout'
-import { ARRIVAL, type MotionStage } from './motion-stage'
+import { ARRIVAL, departure, type MotionStage } from './motion-stage'
 
 // The desktop encounter in the scene (decision 0051), one Svg per motion. The strip keeps its idle
 // size; during an encounter it sits slid right over a dark backdrop, where the Client draws Throw and
@@ -18,7 +18,7 @@ export interface MotionSvgInput {
   actor?: string
   /** The name tag: name, caught mark and tier; the result while leaving */
   tag: string
-  /** Leaving: a gold burst for a catch, else a grey puff */
+  /** Leaving: a gold burst for a catch, else the arrival reversed (0052) */
   caught?: boolean
   maxChars?: number
 }
@@ -30,12 +30,13 @@ export function encounterMotionSvg({ strip, layout, stage, stamp, actor, tag, ca
   const box = { ...modster, x: modster.x - slide }
   const drawn = actor ? nested(actor, box) : ''
   const label = tagMarkup(tag, height)
+  const silhouetteDefs = `<defs><filter id="mm-dark"><feFlood flood-color="${MOTION.silhouette}"/><feComposite in2="SourceAlpha" operator="in"/></filter><g id="mm-actor">${drawn}</g></defs>`
   let defs = ''
   let content: string
   let motion = ''
   let flash = ''
   if (stage === 'arrive') {
-    defs = `<defs><filter id="mm-dark"><feFlood flood-color="${MOTION.silhouette}"/><feComposite in2="SourceAlpha" operator="in"/></filter><g id="mm-actor">${drawn}</g></defs>`
+    defs = silhouetteDefs
     const span = ARRIVAL.spriteAt + MOTION.fadeS - ARRIVAL.silhouetteAt
     const keys = `0;${num(MOTION.fadeS / span)};${num((ARRIVAL.spriteAt - ARRIVAL.silhouetteAt) / span)};1`
     const silhouette = `<g opacity="0"><animate attributeName="opacity" values="0;1;1;0" keyTimes="${keys}" begin="${sec(ARRIVAL.silhouetteAt)}" dur="${sec(span)}" fill="freeze"/><use href="#mm-actor" filter="url(#mm-dark)"/></g>`
@@ -44,15 +45,27 @@ export function encounterMotionSvg({ strip, layout, stage, stamp, actor, tag, ca
     flash = `<rect width="${num(width)}" height="${num(height)}" fill="#fff" opacity="0"><animate attributeName="opacity" values="0;${MOTION.flashOpacity};0" dur="${sec(MOTION.flashS)}" fill="freeze"/></rect>`
   } else if (stage === 'up') {
     content = `${drawn}${label}`
-  } else {
-    // The Modster and its tag fade under the cue, then the scene slides back (0051 point 4)
+  } else if (caught) {
+    // The Modster and its tag fade under a gold burst, then the scene slides back (0051 point 4)
     const fade = `<animate attributeName="opacity" from="1" to="0" dur="${sec(MOTION.cueS * 0.6)}" fill="freeze"/>`
-    content = `<g>${fade}${drawn}${label}</g>${cue(box, caught)}`
-    motion = slideBy(slide, 0, MOTION.cueS)
+    content = `<g>${fade}${drawn}${label}</g>${burst(box)}`
+    motion = slideBy(slide, 0, departure(true).slideAt)
+  } else {
+    // The arrival reversed (0052): the sprite turns into its silhouette, which holds and vanishes with the tag
+    defs = silhouetteDefs
+    const { fadeS, silhouetteHoldS } = MOTION
+    const span = fadeS * 2 + silhouetteHoldS
+    const keys = `0;${num(fadeS / span)};${num((fadeS + silhouetteHoldS) / span)};1`
+    const silhouette = `<g opacity="0"><animate attributeName="opacity" values="0;1;1;0" keyTimes="${keys}" dur="${sec(span)}" fill="freeze"/><use href="#mm-actor" filter="url(#mm-dark)"/></g>`
+    const sprite = `<g><animate attributeName="opacity" from="1" to="0" dur="${sec(fadeS)}" fill="freeze"/><use href="#mm-actor"/></g>`
+    const tagOut = `<g><animate attributeName="opacity" from="1" to="0" begin="${sec(fadeS + silhouetteHoldS)}" dur="${sec(fadeS)}" fill="freeze"/>${label}</g>`
+    content = `${sprite}${silhouette}${tagOut}`
+    motion = slideBy(slide, 0, departure(false).slideAt)
   }
   const at = stage === 'arrive' ? 0 : slide
   const svg =
-    `<svg xmlns="http://www.w3.org/2000/svg" data-motion="${stage}/${stamp}" width="${num(width)}" height="${num(height)}" viewBox="0 0 ${num(width)} ${num(height)}">` +
+    // Cropped at the slot's right edge like the idle scene, never shrunk to fit it, so it keeps its size
+    `<svg xmlns="http://www.w3.org/2000/svg" data-motion="${stage}/${stamp}" width="${num(width)}" height="${num(height)}" viewBox="0 0 ${num(width)} ${num(height)}" preserveAspectRatio="xMinYMin slice">` +
     `${defs}<rect width="${num(width)}" height="${num(height)}" fill="${MOTION.backdrop}"/>` +
     `<g transform="translate(${num(at)} 0)">${motion}${placed(strip.source, 0, 0)}${content}</g>${flash}</svg>`
   return svg.length > maxChars ? undefined : svg
@@ -69,12 +82,12 @@ function tagMarkup(text: string, sceneHeight: number): string {
   )
 }
 
-/** A gold burst for a catch, a grey puff otherwise, where the Modster stood. */
-function cue(box: { x: number; y: number; width: number; height: number }, caught: boolean): string {
+/** A gold burst where a caught Modster stood. */
+function burst(box: { x: number; y: number; width: number; height: number }): string {
   const cx = num(box.x + box.width / 2)
   const cy = num(box.y + box.height / 2)
   const r = Math.max(box.width, box.height) * 0.6
-  const color = caught ? MOTION.caughtCue : MOTION.fledCue
+  const color = MOTION.caughtCue
   const dur = sec(MOTION.cueS)
   const rays = Array.from({ length: 8 }, (_, i) => {
     const a = (i / 8) * Math.PI * 2

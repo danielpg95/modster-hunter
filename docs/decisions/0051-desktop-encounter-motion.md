@@ -1,6 +1,6 @@
 # 0051 — On desktop, the encounter plays in the scene, one Svg per motion
 
-- **Status:** Accepted
+- **Status:** Superseded by 0052
 - **Date:** 2026-10-30
 - **Decided by:** @danielpg95
 - **Supersedes:** 0050
