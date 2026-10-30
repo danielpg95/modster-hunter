@@ -82,6 +82,8 @@ the mod show in the app's log (`~/Library/Logs/Claude/claude.ai-web.log`) as
 - **`/reload-plugins` with the pane open leaves it blank** ("nothing to show
   yet"), even after running the command again. A new session draws it. Test
   each round in a new session.
-- **The band test (H) never showed.** The press reaches the mod, but the
-  game's own band hook answers without `next(e)` while hunting, so a band hook
-  beneath it never runs. _To check with `/modsters stop`._
+- **A band row with an Svg and a Button draws on desktop (H)**, once the game
+  isn't hunting. While it hunts, the game's own band hook answers without
+  `next(e)`, so a band hook beneath it never runs: two mods can't share the
+  band unless the upper one passes it on. No press from the band showed up as
+  `not handled` in the log.
