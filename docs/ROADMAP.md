@@ -966,7 +966,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Size:** S
 - **Goal:** on desktop a biome with only terminal pixel art draws its scene across the whole slot, as one with a desktop background does. Today its scene `Svg` is interactive with no width, so it stops at 300 px in the Biomes tab, and in the idle band and pane once the name tag fades (found by @danielpg95, 2026-10-30).
 - **Done when:**
-  - [ ] The desktop idle scene (band and pane) and the Biomes tab's scene are drawn in image mode whatever the biome's art, so they take their own width; tests cover a terminal-art biome in each.
+  - [x] The desktop idle scene (band and pane) and the Biomes tab's scene are drawn in image mode whatever the biome's art, so they take their own width; tests cover a terminal-art biome in each.
   - [ ] Checked in the Code tab with a biome without desktop art: the scene fills the slot in the band, the pane and the Biomes tab, and still animates.
 ---
 

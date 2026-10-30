@@ -439,6 +439,8 @@ describe('register: encounter pane', () => {
     const faded = await pane.find({ type: 'Svg' })
     expect(faded?.props.source).toContain('fill="url(#bg)"')
     expect(faded?.props.source).not.toContain('<text')
+    // Without the tag the pixel-art strip stays an image, which takes its own width (P5-60)
+    expect(faded?.props.isInteractive).toBeUndefined()
     await pane.unmount()
   })
 
