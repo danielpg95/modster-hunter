@@ -63,13 +63,18 @@ const EncounterControls: ClientModule<ControlsProps & Record<string, never>, { s
   })
   // Blank rows give the region its height: an empty Box collapses to its border on desktop
   const blank = (n: number, prefix: string) => Array.from({ length: Math.max(1, n) }, (_, i) => <Text key={`${prefix}${i}`}>{' '}</Text>)
-  // Centred in the panel: Throw the one main action, Run quiet under it, the throws left as pips
+  // Centred in the panel: Throw the primary button, Run a secondary one a row under it so a click meant for Throw
+  // never lands on Run, the throws left as pips. Short of room the pips go first (the status line has them)
   const panel =
     shown && (props.buttons || props.triesLeft !== null) ? (
       <Box flexDirection="column" height={props.rows} justifyContent="center" alignItems="center">
         {props.buttons ? <Button key="throw" label="Throw" hotkey="1" variant="primary" onPress={act('throw')} /> : null}
-        {props.buttons ? <Button key="run" label="Run" hotkey="2" plain dimColor onPress={act('run')} /> : null}
-        {props.triesLeft !== null && props.rows >= 3 ? (
+        {props.buttons ? (
+          <Box key="run-gap" marginTop={1}>
+            <Button key="run" label="Run" hotkey="2" variant="secondary" onPress={act('run')} />
+          </Box>
+        ) : null}
+        {props.triesLeft !== null && props.rows >= 4 ? (
           <Text key="tries" dimColor>
             {pips(props.triesLeft, props.maxTries)}
           </Text>
