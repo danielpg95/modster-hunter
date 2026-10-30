@@ -29,17 +29,18 @@ const FADE_S = 0.25
 const SPRITE_AT = SILHOUETTE_AT + FADE_S + 0.5
 const TAG_AT = SPRITE_AT + FADE_S
 const ARRIVAL_S = TAG_AT + FADE_S
-/** When the strip is uncovered, so the buttons can show */
-const BUTTONS_AT_MS = SILHOUETTE_AT * 1000
 const COLUMN_PX = 8.8
 const ROW_PX = 20
 const CELLS = { columns: Math.round(W / COLUMN_PX), rows: Math.ceil(H / ROW_PX) }
 // The Modster stands in the middle of the part the scene shows once slid
 const MODSTER = { x: SLIDE + (W - SLIDE) / 2 - 30, y: 40, w: 60, h: 70 }
 
+/** Seconds for SMIL, rounded so sums like 0.4 + 0.45 read 0.85s */
+const sec = (n: number): string => `${+n.toFixed(3)}s`
+
 /** Fades from 0 to 1 at `at`, held after; nothing outside the arrival */
 function fadeIn(at: number, playing: boolean): string {
-  return playing ? `<animate attributeName="opacity" from="0" to="1" begin="${at}s" dur="${FADE_S}s" fill="freeze"/>` : ''
+  return playing ? `<animate attributeName="opacity" from="0" to="1" begin="${sec(at)}" dur="${sec(FADE_S)}" fill="freeze"/>` : ''
 }
 
 function modsterShape(x: number, body: string, eyes: string): string {
@@ -50,40 +51,39 @@ function modsterShape(x: number, body: string, eyes: string): string {
 }
 
 /**
- * Where an encounter's motion stands: the arrival is split at the redraw that shows the buttons, since a
- * redraw restarts an image Svg's animation even with the same source. Each stage starts its own motion
- * at 0, so a planned redraw never replays the last stage (0050 point 7).
+ * Where an encounter's motion stands. A redraw that changes an image Svg's source blinks, and one that keeps
+ * it restarts its animation, so the whole arrival is one source with no planned redraw in it; the next redraw
+ * after it ends, for whatever reason, swaps in the still scene (0050 point 7).
  */
-type Stage = 'idle' | 'arrive' | 'reveal' | 'up' | 'leave'
+type Stage = 'idle' | 'arrive' | 'up' | 'leave'
 
 function stageOf(state: Encounter, now: number): Stage {
   const t = (now - state.at) / 1000
-  if (state.phase === 'up') return t < SILHOUETTE_AT ? 'arrive' : t < ARRIVAL_S ? 'reveal' : 'up'
+  if (state.phase === 'up') return t < ARRIVAL_S ? 'arrive' : 'up'
   if (state.phase === 'leaving') return t < SLIDE_S ? 'leave' : 'idle'
   return 'idle'
 }
 
 function sceneSvg(stage: Stage): string {
-  const slid = stage === 'reveal' || stage === 'up' || stage === 'leave'
+  const arrive = stage === 'arrive'
+  const slid = stage === 'up' || stage === 'leave'
   const slide =
-    stage === 'arrive' || stage === 'leave'
-      ? `<animateTransform attributeName="transform" type="translate" from="${stage === 'arrive' ? '0 0' : `${SLIDE} 0`}" to="${stage === 'arrive' ? `${SLIDE} 0` : '0 0'}" dur="${SLIDE_S}s" begin="${stage === 'arrive' ? SLIDE_AT : 0}s" calcMode="spline" keyTimes="0;1" keySplines="0.2 0.8 0.2 1" fill="freeze"/>`
+    arrive || stage === 'leave'
+      ? `<animateTransform attributeName="transform" type="translate" from="${arrive ? '0 0' : `${SLIDE} 0`}" to="${arrive ? `${SLIDE} 0` : '0 0'}" dur="${SLIDE_S}s" begin="${arrive ? SLIDE_AT : 0}s" calcMode="spline" keyTimes="0;1" keySplines="0.2 0.8 0.2 1" fill="freeze"/>`
       : ''
-  const flash =
-    stage === 'arrive'
-      ? `<rect width="${W}" height="${H}" fill="#fff" opacity="0"><animate attributeName="opacity" values="0;0.45;0" dur="${FLASH_S}s" fill="freeze"/></rect>`
-      : ''
+  const flash = arrive
+    ? `<rect width="${W}" height="${H}" fill="#fff" opacity="0"><animate attributeName="opacity" values="0;0.45;0" dur="${FLASH_S}s" fill="freeze"/></rect>`
+    : ''
   const x = MODSTER.x - SLIDE
-  // In the reveal the silhouette fades in, holds, then gives way to the sprite, and the tag fades in last
+  // The silhouette fades in after the slide, holds, then gives way to the sprite, and the tag fades in last
   const span = SPRITE_AT + FADE_S - SILHOUETTE_AT
-  const reveal = stage === 'reveal'
-  const silhouette = reveal
-    ? `<g opacity="0"><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;${(FADE_S / span).toFixed(3)};${((SPRITE_AT - SILHOUETTE_AT) / span).toFixed(3)};1" dur="${span}s" fill="freeze"/>${modsterShape(x, '#0d0d0d', '#0d0d0d')}</g>`
+  const silhouette = arrive
+    ? `<g opacity="0"><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;${(FADE_S / span).toFixed(3)};${((SPRITE_AT - SILHOUETTE_AT) / span).toFixed(3)};1" begin="${sec(SILHOUETTE_AT)}" dur="${sec(span)}" fill="freeze"/>${modsterShape(x, '#0d0d0d', '#0d0d0d')}</g>`
     : ''
   const modster =
-    reveal || stage === 'up'
-      ? `${silhouette}<g opacity="${reveal ? 0 : 1}">${fadeIn(SPRITE_AT - SILHOUETTE_AT, reveal)}${modsterShape(x, '#7cb342', '#111')}</g>` +
-        `<g opacity="${reveal ? 0 : 1}">${fadeIn(TAG_AT - SILHOUETTE_AT, reveal)}<rect x="10" y="88" width="150" height="22" rx="11" fill="#000" fill-opacity="0.45"/>` +
+    arrive || stage === 'up'
+      ? `${silhouette}<g opacity="${arrive ? 0 : 1}">${fadeIn(SPRITE_AT, arrive)}${modsterShape(x, '#7cb342', '#111')}</g>` +
+        `<g opacity="${arrive ? 0 : 1}">${fadeIn(TAG_AT, arrive)}<rect x="10" y="88" width="150" height="22" rx="11" fill="#000" fill-opacity="0.45"/>` +
         `<text x="22" y="103" font-size="12" font-family="system-ui" fill="#fff">Sproutling ● common</text></g>`
       : ''
   return (
@@ -139,7 +139,7 @@ async function scene($: EngineInterface, e: Parameters<EngineInterface['ui']['re
       <Box position="absolute" top={0} left={0}>
         <Client key={`spike-${site}-overlay`} module="./overlay-probe.tsx" props={{ site, outline: show, rows: CELLS.rows }} width={CELLS.columns} height={CELLS.rows} />
       </Box>
-      {stage === 'reveal' || stage === 'up' ? (
+      {state.phase === 'up' ? (
         <Box position="absolute" top={0} left={1} flexDirection="column" gap={1}>
           <Button key={`spike-${site}-throw`} label="Throw" hotkey="1" plain onPress={() => throwOnce($, `${site}: Throw button`)} />
           <Button key={`spike-${site}-run`} label="Run" hotkey="2" plain onPress={() => note($, `${site}: Run button`)} />
@@ -188,13 +188,6 @@ export const register: Register = (on) => {
       const at = await $.clock.now()
       await update($, encounter, () => ({ phase, at }))
       if (phase === 'up') await update($, tries, () => 3)
-      // The buttons show once the strip is uncovered, and the scene drops its motion once it's over
-      if (phase === 'up') {
-        $.clock.after(BUTTONS_AT_MS, () => $.ui.invalidate('ui.render'))
-        $.clock.after(ARRIVAL_S * 1000 + 50, () => $.ui.invalidate('ui.render'))
-      } else {
-        $.clock.after(SLIDE_S * 1000 + 50, () => $.ui.invalidate('ui.render'))
-      }
     }
     return (
       <Box flexDirection="column" gap={1}>

@@ -16,8 +16,8 @@ describe('overlay spike', () => {
     // The flash first, then the slide from where the scene stood
     expect(sliding).toContain('begin="0.4s"')
     expect(sliding).toContain('<g transform="translate(0 0)">')
-    // The buttons wait for the strip to be uncovered
-    expect(await pane.find({ type: 'Button', key: 'spike-pane-throw' })).toBeUndefined()
+    // One source for the whole arrival: the silhouette waits for the slide, in the same Svg
+    expect(sliding).toContain('begin="0.85s"')
     await clock.advance(3_000)
     await pane.redraw(PROPS as any)
     const svg = String((await pane.find({ type: 'Svg' }))?.props.source)
