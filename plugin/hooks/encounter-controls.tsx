@@ -19,8 +19,8 @@ export interface ControlsProps {
   maxTries: number
   /** The backdrop's width in columns */
   panelColumns: number
-  /** The buttons' fills, at rest and hovered (MOTION.buttonFills) */
-  fills: { throw: string; throwHover: string; run: string; runHover: string }
+  /** The buttons' fills (MOTION.buttonFills) */
+  fills: { throw: string; run: string }
   /** The scene's height in rows */
   rows: number
   /** The cells a click on the Modster lands in, right and bottom exclusive; null while it can't be thrown at */
@@ -68,18 +68,18 @@ const EncounterControls: ClientModule<ControlsProps & Record<string, never>, { s
   // Centred in the panel: Throw and Run as filled buttons of one width, a row apart so a click meant for Throw
   // never lands on Run, the throws left as pips. A Button in a Client draws as plain text on desktop, so each
   // sits in a filled Box. Short of room the pips go first (the status line has them)
-  const pill = (key: string, fill: string, hover: string, button: RenderElement) => (
-    <Box key={key} width={Math.max(1, props.panelColumns - 2)} justifyContent="center" backgroundColor={fill} hover={{ backgroundColor: hover }}>
+  const pill = (key: string, fill: string, button: RenderElement) => (
+    <Box key={key} width={Math.max(1, props.panelColumns - 2)} justifyContent="center" backgroundColor={fill}>
       {button}
     </Box>
   )
   const panel =
     shown && (props.buttons || props.triesLeft !== null) ? (
       <Box flexDirection="column" height={props.rows} justifyContent="center" alignItems="center">
-        {props.buttons ? pill('throw-fill', props.fills.throw, props.fills.throwHover, <Button key="throw" label="Throw" hotkey="1" variant="primary" onPress={act('throw')} />) : null}
+        {props.buttons ? pill('throw-fill', props.fills.throw, <Button key="throw" label="Throw" hotkey="1" variant="primary" onPress={act('throw')} />) : null}
         {props.buttons ? (
           <Box key="run-gap" marginTop={1}>
-            {pill('run-fill', props.fills.run, props.fills.runHover, <Button key="run" label="Run" hotkey="2" variant="secondary" onPress={act('run')} />)}
+            {pill('run-fill', props.fills.run, <Button key="run" label="Run" hotkey="2" variant="secondary" onPress={act('run')} />)}
           </Box>
         ) : null}
         {props.triesLeft !== null && props.rows >= 4 ? (

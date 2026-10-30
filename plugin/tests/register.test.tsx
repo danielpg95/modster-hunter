@@ -461,7 +461,6 @@ describe('register', () => {
     // A Button in a Client draws as plain text on desktop, so each sits in a filled Box
     const throwFill = await ui.find({ type: 'Box', key: 'throw-fill', in: 'encounter-controls' })
     expect(throwFill?.props.backgroundColor).toBe(MOTION.buttonFills.throw)
-    expect(throwFill?.props.hover).toEqual({ backgroundColor: MOTION.buttonFills.throwHover })
     expect((await ui.find({ type: 'Box', key: 'run-fill', in: 'encounter-controls' }))?.props.backgroundColor).toBe(MOTION.buttonFills.run)
     expect((await ui.find({ type: 'Client' }))?.props.props.rows).toBe(3)
     expect(await ui.find({ type: 'Text', text: '● ● ●', in: 'encounter-controls' })).toBeUndefined()
