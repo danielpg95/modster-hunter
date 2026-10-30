@@ -221,6 +221,9 @@ const sceneSvgs = new Map<string, { scene: IdleScene; drawn: { source: string; w
 let motion: { id: number; appearedAt?: number; departAt?: number; caught?: boolean; lastFrame?: { svg: string; width: number; height: number } } | undefined
 // The last motion Svg, made again when anything in it changes
 let motionCache: { key: string; strip: string; actor: string | undefined; source: string | undefined } | undefined
+// Where the encounter is drawn, by surface and requestId: true where it's the desktop motion. A redraw there restarts
+// the Svg's animation, so steps only the other sites show skip it when every site is a motion (0051 point 5)
+const encounterSites = new Map<string, boolean>()
 // The Client over the desktop encounter's scene (0051 point 3), by its key in the band and the pane
 const CONTROLS_KEY = 'encounter-controls'
 const sceneSites = new Map<string, number>() // requestId → columns
@@ -412,6 +415,7 @@ export const register: Register = (on, options) => {
     if (!hunting) {
       removeSite(e.requestId)
       removeSceneSite(e.requestId)
+      encounterSites.delete(`${e.surface}/${e.requestId}`)
       return next(e)
     }
     // While the encounter pane is on screen the band steps aside, so the same
@@ -419,6 +423,7 @@ export const register: Register = (on, options) => {
     if (await isPaneShown($)) {
       removeSite(e.requestId)
       removeSceneSite(e.requestId)
+      encounterSites.delete(`${e.surface}/${e.requestId}`)
       return next(e)
     }
     const modster = currentModster()
@@ -440,6 +445,8 @@ export const register: Register = (on, options) => {
 
     if (view.kind !== 'full') removeSite(e.requestId)
     if (view.kind !== 'scene') removeSceneSite(e.requestId)
+    if (band) encounterSites.set(`${e.surface}/${e.requestId}`, false)
+    else encounterSites.delete(`${e.surface}/${e.requestId}`)
     // P5-38: the desktop draws the idle scene as one vector Svg above the idle line (0044)
     const tag = e.surface === 'desktop' && view.kind === 'idle' ? currentIdleTag(biome) : undefined
     const desktopScene = e.surface === 'desktop' && view.kind === 'idle' && sheetScene && showIdleScene ? desktopSceneSvg($, sheetScene, e.props.bodyColumns, e.props.maxRows, sceneMoves(), tag) : undefined
@@ -516,6 +523,7 @@ export const register: Register = (on, options) => {
       // 0051: the encounter plays in the idle scene, at its size, with the controls in a Client over it
       const slot = { columns: e.props.bodyColumns, maxRows: e.props.maxRows }
       const staged = sheetScene && showIdleScene ? desktopMotion($, modster, band, sheetScene, slot, { scale: DESKTOP.bandScale, sheetScale: DESKTOP.sheetBandScale }, await $.clock.now()) : undefined
+      encounterSites.set(`${e.surface}/${e.requestId}`, staged !== undefined)
       if (staged) {
         return (
           <Box position="relative">
@@ -581,6 +589,7 @@ export const register: Register = (on, options) => {
     )
     if (!encounter || !modster) {
       removeSite(e.requestId)
+      encounterSites.delete(`${e.surface}/${e.requestId}`)
       const idleText = (
         <Text key="idle" dimColor>
           Listening for Modsters… they appear while Claude works.
@@ -634,6 +643,7 @@ export const register: Register = (on, options) => {
     }
 
     removeSceneSite(e.requestId)
+    encounterSites.set(`${e.surface}/${e.requestId}`, false)
     // The sprite's normal size, as in the band: 2x looked far too big in a real terminal (0015)
     const sprite = modster.sprite
     // No terminal sprite means the compact text (0045 point 10)
@@ -681,6 +691,7 @@ export const register: Register = (on, options) => {
       // the scene shows the biome, so there's no header. Without a scene, or over the limit, the Modster stands alone
       const slot = { columns, maxRows: e.props.scroll.bodyRows }
       const staged = sheetScene && showIdleScene ? desktopMotion($, modster, encounter, sheetScene, slot, { scale: DESKTOP.paneScale, sheetScale: DESKTOP.sheetPaneScale }, await $.clock.now()) : undefined
+      encounterSites.set(`${e.surface}/${e.requestId}`, staged !== undefined)
       if (staged) {
         return (
           <Box position="relative">
@@ -1656,6 +1667,7 @@ async function advanceMachine($: EngineInterface, action: MachineAction): Promis
   if (!machine || !machineContext) return
   const now = await $.clock.now()
   const hadEncounter = machine.encounter !== undefined
+  const phaseBefore = machine.encounter?.phase
   const step = stepEncounter(machine, { ...action, now } as EncounterInput, machineContext)
   if (step.state === machine) {
     // The dots move on while the state holds still
@@ -1679,7 +1691,10 @@ async function advanceMachine($: EngineInterface, action: MachineAction): Promis
   updateMotion(now, step.events.some((event) => event.type === 'appeared'))
   // Before the redraw, so a scene that stops is drawn still
   updateSceneTimer($)
-  $.ui.invalidate('ui.render')
+  // Appearing to waiting changes nothing the desktop draws (the Client times its buttons), and the
+  // redraw would restart the arrival a second in
+  const unseen = motionOnly() && step.events.length === 0 && phaseBefore === 'appearing' && machine.encounter?.phase === 'waiting'
+  if (!unseen) $.ui.invalidate('ui.render')
   updateStatus($)
   const where = { sessionId, biomeId: machineContext.biome.id }
   if (step.events.length > 0) queueWrite($, (store) => recordEncounterEvents(store, where, step.events, now))
@@ -1695,6 +1710,11 @@ async function advanceMachine($: EngineInterface, action: MachineAction): Promis
   }
 }
 
+/** Every site drawing the encounter draws it as the desktop motion. */
+function motionOnly(): boolean {
+  return encounterSites.size > 0 && [...encounterSites.values()].every(Boolean)
+}
+
 /**
  * Times the desktop encounter's motion (0051): the arrival from the appearance, the departure from
  * the result card, or after a catch's animation when one plays, so the catch is seen whole.
@@ -1703,6 +1723,7 @@ function updateMotion(now: number, appeared: boolean): void {
   const encounter = machine?.encounter
   if (!encounter) {
     motion = undefined
+    encounterSites.clear()
     return
   }
   if (appeared) motion = { id: now, appearedAt: now }
@@ -1731,6 +1752,8 @@ function checkAlreadyCaught($: EngineInterface, modsterId: string): void {
     const caught = await isCaught(store, modsterId)
     if (!caught || check !== caughtCheck) return
     alreadyCaught = true
+    // Not during the desktop arrival, which a redraw restarts: the mark shows from the next one
+    if (motionOnly() && motion && motionStage(motion, await $.clock.now()) === 'arrive') return
     $.ui.invalidate('ui.render')
   })
 }
@@ -2156,7 +2179,8 @@ function desktopMotion($: EngineInterface, loaded: LoadedModster, encounter: Ban
   const actor = stage === 'leave' && times.caught && !last ? undefined : art.source
   const tag = stage === 'leave' ? resultText(encounter) : `${encounter.name}${encounter.alreadyCaught ? ` ${BAND.caughtMark}` : ''} · ${encounter.tier}`
   const stamp = stage === 'leave' ? (times.departAt ?? now) : (times.appearedAt ?? times.id)
-  const key = `${stage}/${stamp}/${tag}/${strip.width}/${strip.height}/${slot.columns}/${art.width}/${art.height}`
+  // The arrival keeps its first source: a caught mark read mid-arrival waits for the next motion
+  const key = `${stage}/${stamp}/${stage === 'arrive' ? '' : tag}/${strip.width}/${strip.height}/${slot.columns}/${art.width}/${art.height}`
   let cached = motionCache
   if (!cached || cached.key !== key || cached.strip !== strip.source || cached.actor !== actor) {
     const source = encounterMotionSvg({ strip, layout, stage, stamp, ...(actor ? { actor } : {}), tag, caught: times.caught === true })

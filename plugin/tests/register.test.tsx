@@ -467,6 +467,22 @@ describe('register', () => {
     await ui.unmount()
   })
 
+  test('on desktop nothing redraws the arrival when the Modster goes from appearing to waiting: it would restart (0051 point 5)', HUNTING, async ($, on) => {
+    const { ui, clock } = await startBand($, on, { ...sceneForest(), ...catcherFiles() }, 'desktop')
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(3_000 + BAND_TICK)
+    const first = await ui.find({ type: 'Client' })
+    expect(first?.props.props.showAfterMs).toBe(BUTTONS_AFTER_MS)
+    // Past the appearing phase (1 s): a redraw would hand the Client new props
+    await clock.advance(1_000)
+    expect((await ui.find({ type: 'Client' }))?.props.props).toEqual(first?.props.props)
+    // A press still works, and redraws
+    await ui.advance(BUTTONS_AFTER_MS)
+    await ui.press({ key: 'throw' })
+    expect((await ui.find({ type: 'Svg' }))?.props.source).toContain('data-throw')
+    await ui.unmount()
+  })
+
   test('on desktop a click on the Modster throws, and a click on the scene elsewhere does not (0051 point 3)', HUNTING, async ($, on) => {
     const { ui, clock } = await startBand($, on, { ...sceneForest(), ...catcherFiles() }, 'desktop')
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
