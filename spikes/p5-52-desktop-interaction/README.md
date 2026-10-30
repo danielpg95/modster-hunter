@@ -87,3 +87,6 @@ the mod show in the app's log (`~/Library/Logs/Claude/claude.ai-web.log`) as
   `next(e)`, so a band hook beneath it never runs: two mods can't share the
   band unless the upper one passes it on. A press on the band's Poke reaches
   the mod (its count went up).
+- **The terminal is unchanged with the spike installed**: the game's band, its
+  digit hotkeys and its layout work as before, and the spike draws nothing
+  there (`/interaction-spike` shows only its hint).

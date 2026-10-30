@@ -882,9 +882,9 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Size:** S
 - **Goal:** know what input and layout the Desktop Code tab allows, so the game can feel made for desktop and not only drawn for it (asked by @danielpg95, 2026-10-28). Ideas to test: click a Modster to throw, one encounter scene with the Modster in front of its biome, a dex grid with a detail card in the Collection tab, and a catch card.
 - **Done when:**
-  - [ ] A throwaway spike checks in the Code tab, inline and not fullscreen, whether a click reaches a band `Button`, a pane `Button` and an `Svg` (image mode and `isInteractive`). The findings and screenshots are in its README.
-  - [ ] It checks whether a pane can lay out a grid of animated Svg thumbnails and switch to a detail view on a press, within the Svg limit.
-  - [ ] Digit hotkeys and the terminal layout still work the same with the spike mod loaded.
+  - [x] A throwaway spike checks in the Code tab, inline and not fullscreen, whether a click reaches a band `Button`, a pane `Button` and an `Svg` (image mode and `isInteractive`). The findings and screenshots are in its README.
+  - [x] It checks whether a pane can lay out a grid of animated Svg thumbnails and switch to a detail view on a press, within the Svg limit.
+  - [x] Digit hotkeys and the terminal layout still work the same with the spike mod loaded.
   - [ ] A decision picks which ideas to build on desktop, keeps the terminal as the simple path (keys and text), and keeps rules 6 and 7. If any are picked, roadmap tasks build them.
 
 #### [x] P5-53 — Desktop reference prompts for Modsters and catchers
