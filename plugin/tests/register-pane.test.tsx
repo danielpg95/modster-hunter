@@ -5,7 +5,7 @@ import { desktopOnlyForest } from './fixtures/desktop-only-forest'
 import { oneModsterForest } from './fixtures/one-modster-forest'
 import { sceneForest } from './fixtures/scene-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
-import { CATCH, DESKTOP } from '../hooks/constants'
+import { CATCH, DESKTOP, IDLE_TAG } from '../hooks/constants'
 import { throwingMs } from '../hooks/game'
 
 // The game runs only while autoStart is on (decision 0038); these tests play it
@@ -418,6 +418,18 @@ describe('register: encounter pane', () => {
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await clock.advance(250)
     expect((await pane.find({ type: 'Svg' }))?.props.source).toContain('repeatCount="indefinite"')
+    await pane.unmount()
+  })
+
+  test('on desktop the idle pane shows the biome\'s name tag in its scene, which fades as in the band (0047)', HUNTING, async ($, on) => {
+    const clock = await start($, on, () => SHOWN, sceneForest())
+    const pane = await $.ui.mount({ plugin: 'modster-hunter', surface: 'desktop', component: 'Pane', requestId: 'modster-hunt', props: PANE_PROPS as any })
+    expect((await pane.find({ type: 'Svg' }))?.props.source).toContain('>Whispering Forest</text>')
+    await clock.advance(IDLE_TAG.showMs + IDLE_TAG.fadeMs)
+    await pane.redraw(PANE_PROPS as any)
+    const faded = await pane.find({ type: 'Svg' })
+    expect(faded?.props.source).toContain('fill="url(#bg)"')
+    expect(faded?.props.source).not.toContain('<text')
     await pane.unmount()
   })
 

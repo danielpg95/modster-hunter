@@ -591,11 +591,13 @@ export const register: Register = (on, options) => {
         )
       }
       removeSceneSite(e.requestId)
-      // On desktop the pane draws the band's vector scene (0044, 0045) above its idle text (0027);
-      // the header names the biome, so no tag (0047)
-      const desktopScene = e.surface === 'desktop' && sheetScene && showIdleScene ? desktopSceneSvg($, sheetScene, columns, rows - 1, sceneMoves()) : undefined
+      // On desktop the pane draws the band's vector scene (0044, 0045) above its idle text (0027),
+      // with the biome's name tag in it, as the band does (0047)
+      const tag = e.surface === 'desktop' ? currentIdleTag(biome) : undefined
+      const desktopScene = e.surface === 'desktop' && sheetScene && showIdleScene ? desktopSceneSvg($, sheetScene, columns, rows - 1, sceneMoves(), tag) : undefined
       if (desktopScene && e.surface === 'desktop') {
         const { Svg } = $.ui.resolve(e)
+        if (tag) startIdleTag($)
         return (
           <Box flexDirection="column">
             {header}
