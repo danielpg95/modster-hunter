@@ -5,8 +5,8 @@ import { desktopIdleScene, desktopSheetSvg, encounterSceneSvg, idleScene, pixels
 import { desktopSheetOf } from '../fixtures/desktop-sheet-of'
 import { encodeFrame } from '../fixtures/encode-frame'
 
-// Decision 0048: on desktop the encounter pane draws the biome's idle scene as a strip along the
-// bottom, moving, with the Modster standing on it in front, as one Svg.
+// Decisions 0048 and 0049: on desktop the encounter draws the biome's idle scene behind, grown to
+// the Modster's height, moving, with the Modster standing in front of it, as one Svg.
 
 const biome = { backgroundFps: 2, particles: { style: 'leaf' as const, color: '#9ccc65' } }
 
@@ -47,12 +47,12 @@ const terminalScene = () => {
 }
 
 describe('encounterSceneSvg', () => {
-  test('a desktop sheet stands on a desktop background: one Svg, the strip along the bottom, the Modster centred in front', () => {
+  test('a desktop sheet stands on a desktop background: one Svg, the strip grown to its height, the Modster centred in front', () => {
     const scene = desktopIdleScene(biome, desktopSheetOf(192, 48, 2))
-    const svg = encounterSceneSvg(scene, [], sheetActor(), { width: 120, center: 60, scale: 4 }) ?? ''
-    // The Modster is 32 tall, the strip 12: the strip sits at y 20, the Modster at x 60 − 12
+    const svg = encounterSceneSvg(scene, () => [], sheetActor(), { width: 120, center: 60, scale: 4 }) ?? ''
+    // The Modster is 32 tall, the strip 12: the strip grows to 32 (45 of its pixels fill the 120), the Modster at x 60 − 12
     expect(svg.startsWith('<svg xmlns="http://www.w3.org/2000/svg" width="480" height="128" viewBox="0 0 120 32"')).toBe(true)
-    expect(svg).toContain('<svg x="0" y="20" xmlns=')
+    expect(svg).toContain('<svg x="0" y="0" xmlns="http://www.w3.org/2000/svg" width="120" height="32" viewBox="0 0 45 12"')
     expect(svg).toContain('<svg x="48" y="0" xmlns=')
     // The strip comes first, so the Modster is drawn in front of it
     expect(svg.indexOf('fill="url(#bg)"')).toBeLessThan(svg.indexOf('<svg x="48"'))
@@ -61,12 +61,12 @@ describe('encounterSceneSvg', () => {
 
   test('the strip moves during the encounter', () => {
     const scene = desktopIdleScene(biome, desktopSheetOf(192, 48, 2))
-    const svg = encounterSceneSvg(scene, [], sheetActor(), { width: 120, center: 60, scale: 4 }) ?? ''
+    const svg = encounterSceneSvg(scene, () => [], sheetActor(), { width: 120, center: 60, scale: 4 }) ?? ''
     expect(svg).toContain('values="0;-192" keyTimes="0;0.5" calcMode="discrete" dur="1s"')
   })
 
   test('a terminal sprite stands on a biome with no desktop art', () => {
-    const svg = encounterSceneSvg(terminalScene(), [], spriteActor(), { width: 40, center: 20, scale: 4 }) ?? ''
+    const svg = encounterSceneSvg(terminalScene(), () => [], spriteActor(), { width: 40, center: 20, scale: 4 }) ?? ''
     // The strip is 8 tall and the sprite 6: the strip fills the height, the sprite stands on its bottom
     expect(svg).toContain('viewBox="0 0 40 8"')
     expect(svg).toContain('<svg x="0" y="0" xmlns=')
@@ -76,17 +76,17 @@ describe('encounterSceneSvg', () => {
   })
 
   test('the Modster stays inside the strip when the centre is near an edge', () => {
-    const svg = encounterSceneSvg(terminalScene(), [], spriteActor(), { width: 40, center: 0, scale: 4 }) ?? ''
+    const svg = encounterSceneSvg(terminalScene(), () => [], spriteActor(), { width: 40, center: 0, scale: 4 }) ?? ''
     expect(svg).toContain('<svg x="0" y="2" xmlns=')
-    const right = encounterSceneSvg(terminalScene(), [], spriteActor(), { width: 40, center: 40, scale: 4 }) ?? ''
+    const right = encounterSceneSvg(terminalScene(), () => [], spriteActor(), { width: 40, center: 40, scale: 4 }) ?? ''
     expect(right).toContain('<svg x="36" y="2" xmlns=')
   })
 
   test('over the limit there is no scene, so the pane draws the Modster alone', () => {
     const scene = desktopIdleScene(biome, desktopSheetOf(192, 48, 2))
     const actor = sheetActor()
-    const svg = encounterSceneSvg(scene, [], actor, { width: 120, center: 60, scale: 4 })
+    const svg = encounterSceneSvg(scene, () => [], actor, { width: 120, center: 60, scale: 4 })
     expect(svg).toBeDefined()
-    expect(encounterSceneSvg(scene, [], actor, { width: 120, center: 60, scale: 4, maxChars: (svg?.length ?? 0) - 1 })).toBeUndefined()
+    expect(encounterSceneSvg(scene, () => [], actor, { width: 120, center: 60, scale: 4, maxChars: (svg?.length ?? 0) - 1 })).toBeUndefined()
   })
 })

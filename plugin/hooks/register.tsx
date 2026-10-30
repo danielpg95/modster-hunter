@@ -2074,12 +2074,15 @@ function encounterScene($: EngineInterface, loaded: LoadedModster, current: Idle
   const width = Math.ceil(shown * DESKTOP.sceneOvershoot)
   const cached = encounterSceneCache
   if (cached && cached.scene === current && cached.actor === actor.source && cached.scale === scale && cached.width === width) return cached.drawn
-  let particles = particlesByColumns.get(width)
-  if (!particles) {
-    particles = makeParticles(current, width, Math.random)
-    particlesByColumns.set(width, particles)
+  const particlesFor = (stripWidth: number): Particle[] => {
+    let particles = particlesByColumns.get(stripWidth)
+    if (!particles) {
+      particles = makeParticles(current, stripWidth, Math.random)
+      particlesByColumns.set(stripWidth, particles)
+    }
+    return particles
   }
-  const source = encounterSceneSvg(current, particles, actor, { width, center: shown / 2, scale })
+  const source = encounterSceneSvg(current, particlesFor, actor, { width, center: shown / 2, scale })
   if (!source) $.ui.log(`encounter scene: no Svg for ${loaded.modster.id}, over ${DESKTOP.svgMaxChars} characters; showing the Modster alone`, { to: 'debug' })
   const image = current.sheet !== undefined || current.particleSheet !== undefined || !actor.isInteractive
   const drawn = source ? { source, height: stripPx * scale, image } : undefined
