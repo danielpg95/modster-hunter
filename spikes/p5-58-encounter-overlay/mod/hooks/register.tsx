@@ -105,6 +105,19 @@ function sceneSvg(stage: Stage, caught: boolean, at: number): string {
         `<rect x="10" y="88" width="150" height="22" rx="11" fill="#000" fill-opacity="0.45"/><text x="22" y="103" font-size="12" font-family="system-ui" fill="#fff">${caught ? 'Caught Sproutling!' : 'Sproutling fled'}</text></g>` +
         `<circle cx="${cx}" cy="${cy}" r="0" fill="${cueColor}" opacity="0.7"><animate attributeName="r" from="0" to="44" dur="${sec(CUE_S)}" fill="freeze"/><animate attributeName="opacity" from="0.7" to="0" dur="${sec(CUE_S)}" fill="freeze"/></circle>${rays}`
       : ''
+  // The buttons' backdrop: a panel at the left edge, there from the arrival's first frame (the buttons show at
+  // once, a redraw can't wait for the slide), faded out as the scene slides back on departure
+  const PANEL_FADE_S = 0.15
+  const panelRect = (anim: string, opacity: number) =>
+    `<rect width="${SLIDE}" height="${H}" fill="#1b1b1b" opacity="${opacity}">${anim}</rect>`
+  const panel =
+    stage === 'arrive'
+      ? panelRect(`<animate attributeName="opacity" from="0" to="1" dur="${sec(PANEL_FADE_S)}" fill="freeze"/>`, 0)
+      : stage === 'up'
+        ? panelRect('', 1)
+        : stage === 'leave'
+          ? panelRect(`<animate attributeName="opacity" from="1" to="0" begin="${sec(CUE_S)}" dur="${sec(SLIDE_S)}" fill="freeze"/>`, 1)
+          : ''
   // Each arrival and departure is a new source, stamped with its encounter's time: the surface reuses an
   // image it has drawn before, with its animation already over, so the same markup twice showed the end first
   const stamp = stage === 'arrive' || stage === 'leave' ? ` data-motion="${stage}/${at}"` : ''
@@ -113,7 +126,7 @@ function sceneSvg(stage: Stage, caught: boolean, at: number): string {
     `<rect width="${W}" height="${H}" fill="#1b1b1b"/>` +
     `<g transform="translate(${slid ? SLIDE : 0} 0)">${slide}<rect width="${W}" height="${H}" fill="#2e4a3a"/><rect y="96" width="${W}" height="24" fill="#4e6b3a"/>` +
     `<circle cx="40" cy="20" r="3" fill="#9ccc65"><animate attributeName="cy" values="10;100" dur="3s" repeatCount="indefinite"/></circle>` +
-    `${modster}${departing}</g>${flash}</svg>`
+    `${modster}${departing}</g>${panel}${flash}</svg>`
   )
 }
 
