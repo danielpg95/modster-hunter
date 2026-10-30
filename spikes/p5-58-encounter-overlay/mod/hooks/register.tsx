@@ -69,7 +69,7 @@ export const register: Register = (on) => {
     if (e.surface !== 'desktop' || !(await read($, band))) return next(e)
     const { Box, Svg, Client } = $.ui.resolve(e)
     return (
-      <Box key="spike-band" position="relative" width={W} height={H}>
+      <Box key="spike-band" position="relative">
         <Svg source={SCENE} alt="Band scene" width={W} height={H} />
         <Box position="absolute" top={0} left={0} right={0} bottom={0}>
           <Client key="spike-band-overlay" module="./overlay-probe.tsx" props="band" width="100%" height="100%" />
@@ -90,7 +90,7 @@ export const register: Register = (on) => {
       <Box flexDirection="column" gap={1}>
         <Text bold>1. A Client laid over the scene</Text>
         <Text dimColor>Is the scene fully visible, with the leaf falling? Click the Modster, the scene, and the Run tag.</Text>
-        <Box key="spike-pane" position="relative" width={W} height={H}>
+        <Box key="spike-pane" position="relative">
           <Svg source={SCENE} alt="Pane scene" width={W} height={H} />
           <Box position="absolute" top={0} left={0} right={0} bottom={0}>
             <Client key="spike-pane-overlay" module="./overlay-probe.tsx" props="pane" width="100%" height="100%" />
