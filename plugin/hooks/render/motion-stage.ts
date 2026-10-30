@@ -1,6 +1,6 @@
 import { MOTION } from '../constants'
 
-// Where the desktop encounter's motion stands (decisions 0051 and 0052). A redraw that changes an image Svg's
+// Where the desktop encounter's motion stands (decisions 0051 and 0053). A redraw that changes an image Svg's
 // source blinks and one that keeps it restarts its animation, so each motion is one source played
 // whole; this says which one a redraw draws at `now`.
 
@@ -11,7 +11,7 @@ export interface MotionTimes {
   appearedAt?: number
   /** When the departure starts: the result card, after a catch's animation */
   departAt?: number
-  /** The departure is a catch's: the burst, not the vanishing */
+  /** The departure is a catch's: the catcher fades, the Modster doesn't vanish */
   caught?: boolean
 }
 
@@ -30,12 +30,12 @@ export const ARRIVAL = (() => {
 })()
 
 /**
- * Seconds, as the departure's slide back starts and as it ends (0052): a catch's burst, then the
- * slide; any other departure is the arrival reversed (the sprite turns into its silhouette, which
+ * Seconds, as the departure's slide back starts and as it ends (0053): a catch's catcher fades,
+ * then the slide; any other departure is the arrival reversed (the sprite turns into its silhouette, which
  * holds, then vanishes), then the slide.
  */
 export function departure(caught: boolean): { slideAt: number; endS: number } {
-  const slideAt = caught ? MOTION.cueS : ms(MOTION.fadeS * 2 + MOTION.silhouetteHoldS)
+  const slideAt = caught ? MOTION.fadeS : ms(MOTION.fadeS * 2 + MOTION.silhouetteHoldS)
   return { slideAt, endS: ms(slideAt + MOTION.slideS) }
 }
 

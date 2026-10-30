@@ -9,8 +9,8 @@ describe('motionStage', () => {
     expect(BUTTONS_AFTER_MS).toBe(850)
   })
 
-  test('a catch leaves with its burst, then slides back; any other departure reverses the arrival first (0052)', () => {
-    expect(departure(true)).toEqual({ slideAt: 0.4, endS: 0.85 })
+  test('a catch leaves as its catcher fades, then slides back; any other departure reverses the arrival first (0053)', () => {
+    expect(departure(true)).toEqual({ slideAt: 0.25, endS: 0.7 })
     expect(departure(false)).toEqual({ slideAt: 1, endS: 1.45 })
     expect(BUTTONS_AFTER_MS).toBe(850)
   })
@@ -29,8 +29,8 @@ describe('motionStage', () => {
     const caught = { appearedAt: 0, departAt: 10_000, caught: true }
     expect(motionStage(caught, 9_999)).toBe('up')
     expect(motionStage(caught, 10_000)).toBe('leave')
-    expect(motionStage(caught, 10_849)).toBe('leave')
-    expect(motionStage(caught, 10_850)).toBe('gone')
+    expect(motionStage(caught, 10_699)).toBe('leave')
+    expect(motionStage(caught, 10_700)).toBe('gone')
     const fled = { appearedAt: 0, departAt: 10_000 }
     expect(motionStage(fled, 11_449)).toBe('leave')
     expect(motionStage(fled, 11_450)).toBe('gone')

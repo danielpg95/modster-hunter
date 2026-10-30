@@ -14,11 +14,11 @@ export interface MotionSvgInput {
   stage: Exclude<MotionStage, 'gone'>
   /** The arrival's or the departure's start, so each motion is a new source */
   stamp: number
-  /** The Modster or its throw, drawn at `layout.modster`; none for a caught Modster leaving */
+  /** The Modster or its throw, drawn at `layout.modster`; leaving after a catch, the catcher's last frame */
   actor?: string
   /** The name tag: name, caught mark and tier; the result while leaving */
   tag: string
-  /** Leaving: a gold burst for a catch, else the arrival reversed (0052) */
+  /** Leaving: the catcher fades for a catch, else the arrival reversed (0053) */
   caught?: boolean
   maxChars?: number
 }
@@ -46,9 +46,9 @@ export function encounterMotionSvg({ strip, layout, stage, stamp, actor, tag, ca
   } else if (stage === 'up') {
     content = `${drawn}${label}`
   } else if (caught) {
-    // The Modster and its tag fade under a gold burst, then the scene slides back (0051 point 4)
-    const fade = `<animate attributeName="opacity" from="1" to="0" dur="${sec(MOTION.cueS * 0.6)}" fill="freeze"/>`
-    content = `<g>${fade}${drawn}${label}</g>${burst(box)}`
+    // The catcher's last frame and the tag fade together, then the scene slides back (0053): its own animation was the cue
+    const fade = `<animate attributeName="opacity" from="1" to="0" dur="${sec(MOTION.fadeS)}" fill="freeze"/>`
+    content = `<g>${fade}${drawn}${label}</g>`
     motion = slideBy(slide, 0, departure(true).slideAt)
   } else {
     // The arrival reversed (0052): the sprite turns into its silhouette, which holds and vanishes with the tag
@@ -80,23 +80,6 @@ function tagMarkup(text: string, sceneHeight: number): string {
     `<g transform="translate(${margin} ${num(y)})"><rect width="${width}" height="${height}" rx="${height / 2}" fill="#000" fill-opacity="${backingOpacity}"/>` +
     `<text x="${padX}" y="${height / 2}" dominant-baseline="central" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="${fontPx}" font-weight="600" fill="#f2f2f2">${escape(text)}</text></g>`
   )
-}
-
-/** A gold burst where a caught Modster stood. */
-function burst(box: { x: number; y: number; width: number; height: number }): string {
-  const cx = num(box.x + box.width / 2)
-  const cy = num(box.y + box.height / 2)
-  const r = Math.max(box.width, box.height) * 0.6
-  const color = MOTION.caughtCue
-  const dur = sec(MOTION.cueS)
-  const rays = Array.from({ length: 8 }, (_, i) => {
-    const a = (i / 8) * Math.PI * 2
-    return (
-      `<circle cx="${cx}" cy="${cy}" r="4" fill="${color}"><animate attributeName="cx" from="${cx}" to="${num(+cx + Math.cos(a) * r)}" dur="${dur}" fill="freeze"/>` +
-      `<animate attributeName="cy" from="${cy}" to="${num(+cy + Math.sin(a) * r)}" dur="${dur}" fill="freeze"/><animate attributeName="r" from="4" to="0" dur="${dur}" fill="freeze"/></circle>`
-    )
-  }).join('')
-  return `<circle cx="${cx}" cy="${cy}" r="0" fill="${color}" opacity="0.7"><animate attributeName="r" from="0" to="${num(r)}" dur="${dur}" fill="freeze"/><animate attributeName="opacity" from="0.7" to="0" dur="${dur}" fill="freeze"/></circle>${rays}`
 }
 
 function fadingIn(at: number, markup: string): string {

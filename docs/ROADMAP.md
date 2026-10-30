@@ -941,7 +941,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 #### [ ] P5-58 — Desktop encounter inside the scene
 - **Depends on:** P5-57
 - **Size:** L
-- **Goal:** on desktop the encounter plays inside the biome's scene, in the band and the pane: the scene keeps its size, flashes and slides aside for Throw and Run, the Modster appears as a silhouette then its sprite, a click on the Modster throws, the details are tags in the scene, and a cue plays as it leaves (decisions 0050, 0051 and 0052; asked by @danielpg95, 2026-10-30).
+- **Goal:** on desktop the encounter plays inside the biome's scene, in the band and the pane: the scene keeps its size, flashes and slides aside for Throw and Run, the Modster appears as a silhouette then its sprite, a click on the Modster throws, the details are tags in the scene, and a cue plays as it leaves (decisions 0050 to 0053; asked by @danielpg95, 2026-10-30).
 - **Done when:**
   - [x] Checked first in the Code tab with a throwaway spike: a `Client` laid over the scene `Svg` leaves it visible and hears clicks with their cell; it doesn't hear the 1 and 2 keys (decision 0050).
   - [x] A decision records the layout and the press path from those findings (0050, superseding 0049).

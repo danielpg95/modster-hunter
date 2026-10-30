@@ -1,6 +1,6 @@
 # 0052 — On desktop, a Modster that isn't caught leaves by reversing its arrival
 
-- **Status:** Accepted
+- **Status:** Superseded by 0053
 - **Date:** 2026-10-30
 - **Decided by:** @danielpg95
 - **Supersedes:** 0051

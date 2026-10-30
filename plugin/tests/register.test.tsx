@@ -10,7 +10,7 @@ import { validBiome } from './fixtures/valid-biome'
 import { validModster } from './fixtures/valid-modster'
 import { validUserModster } from './fixtures/valid-user-modster'
 import { validSprite } from './fixtures/valid-sprite'
-import { CATCH, DESKTOP, IDLE_TAG, MOTION } from '../hooks/constants'
+import { CATCH, DESKTOP, IDLE_TAG } from '../hooks/constants'
 import { BUTTONS_AFTER_MS } from '../hooks/render'
 import { throwingMs } from '../hooks/game'
 
@@ -484,7 +484,7 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('on desktop a catch plays whole, then the departure with the result, then the still scene (0051 point 4)', HUNTING, async ($, on) => {
+  test('on desktop a catch plays whole, then its catcher holds still and fades with the result, then the still scene (0053)', HUNTING, async ($, on) => {
     const { ui, clock } = await startBand($, on, { ...sceneForest(), ...catcherFiles() }, 'desktop')
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await clock.advance(3_000 + BAND_TICK + 1_000)
@@ -498,7 +498,10 @@ describe('register', () => {
     const leaving = (await ui.find({ type: 'Svg' }))?.props.source
     expect(leaving).toContain('data-motion="leave/')
     expect(leaving).toContain('>Caught Sproutling!</text>')
-    expect(leaving).toContain(`fill="${MOTION.caughtCue}"`)
+    // The catcher's last frame, the Modster inside it, made from the throw's end so it plays nothing again
+    expect(leaving).toContain('data-part="catcher-move"')
+    expect(leaving).toContain('<g data-part="modster" display="none">')
+    expect(leaving).not.toContain('data-throw')
     expect(await ui.find({ type: 'Button', key: 'throw', in: 'encounter-controls' })).toBeUndefined()
     await clock.advance(1_000)
     await ui.redraw(BAND_PROPS as any)
@@ -506,7 +509,7 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('on desktop running reverses the arrival: the Modster turns into its silhouette and vanishes (0052)', HUNTING, async ($, on) => {
+  test('on desktop running reverses the arrival: the Modster turns into its silhouette and vanishes (0053)', HUNTING, async ($, on) => {
     const { ui, clock } = await startBand($, on, { ...sceneForest(), ...catcherFiles() }, 'desktop')
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await clock.advance(3_000 + BAND_TICK + 1_000)
@@ -515,7 +518,7 @@ describe('register', () => {
     const leaving = (await ui.find({ type: 'Svg' }))?.props.source
     expect(leaving).toContain('>You ran from Sproutling.</text>')
     expect(leaving).toContain('filter="url(#mm-dark)"')
-    expect(leaving).not.toContain(MOTION.caughtCue)
+    expect(leaving).not.toContain('data-part="catcher-move"')
     await ui.unmount()
   })
 

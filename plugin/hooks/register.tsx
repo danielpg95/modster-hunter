@@ -216,8 +216,9 @@ const particlesByColumns = new Map<number, Particle[]>()
 // The desktop's scene Svgs by size and motion (0044); checked against the scene they were made from
 const sceneSvgs = new Map<string, { scene: IdleScene; drawn: { source: string; width: number; height: number; image: boolean } | undefined }>()
 // The desktop encounter's motion (0051): an id for the encounter, when it appeared (none when it was
-// up before this load) and when it leaves; cleared when it ends
-let motion: { id: number; appearedAt?: number; departAt?: number; caught?: boolean } | undefined
+// up before this load) and when it leaves; cleared when it ends. A catch keeps its catcher's last
+// frame, still, to fade as it leaves (0053), with the throw's size in terminal pixels
+let motion: { id: number; appearedAt?: number; departAt?: number; caught?: boolean; lastFrame?: { svg: string; width: number; height: number } } | undefined
 // The last motion Svg, made again when anything in it changes
 let motionCache: { key: string; strip: string; actor: string | undefined; source: string | undefined } | undefined
 // The Client over the desktop encounter's scene (0051 point 3), by its key in the band and the pane
@@ -1708,7 +1709,13 @@ function updateMotion(now: number, appeared: boolean): void {
   motion ??= { id: now }
   if (encounter.phase === 'result' && motion.departAt === undefined) {
     motion.departAt = catchPlay?.outcome === 'caught' ? Math.max(now, catchPlay.endsAt) : now
-    if (encounter.outcome === 'caught') motion.caught = true
+    if (encounter.outcome === 'caught') {
+      motion.caught = true
+      const art = catchPlay?.outcome === 'caught' ? catchPlay.desktop : undefined
+      // Made from the throw's end, so it holds the final frame and plays nothing
+      const svg = art && catchSvg(art, 'caught', catchPlay?.rocks ?? CATCH.rocksToCatch, { scale: 1, fromMs: catchLengthMs('caught', catchPlay?.rocks ?? CATCH.rocksToCatch) })
+      if (art && svg) motion.lastFrame = { svg, width: art.width, height: art.height }
+    }
   }
 }
 
@@ -2138,17 +2145,21 @@ function desktopMotion($: EngineInterface, loaded: LoadedModster, encounter: Ban
   const off: ControlsProps = { encounter: null, showAfterMs: 0, buttons: false, triesLeft: null, panelColumns, rows, hit: null }
   // After the departure: the still strip until the encounter ends
   if (stage === 'gone') return { source: strip.source, height: strip.height, controls: off }
-  const art = desktopArt($, loaded, { ...scale, maxHeight: strip.height * MOTION.modsterFill })
+  // A caught Modster leaves as its catcher's last frame, sized as the throw was (0053)
+  const last = stage === 'leave' && times.caught ? times.lastFrame : undefined
+  const maxHeight = strip.height * MOTION.modsterFill
+  const lastScale = last ? Math.min(scale.scale, maxHeight / last.height) : 0
+  const art = last ? { source: last.svg, width: last.width * lastScale, height: last.height * lastScale } : desktopArt($, loaded, { ...scale, maxHeight })
   if (!art) return undefined
   const layout = motionLayout(strip, slot.columns * MOTION.columnPx, art)
-  // A caught Modster is already in its catcher as it leaves
-  const actor = stage === 'leave' && encounter.outcome === 'caught' ? undefined : art.source
+  // A catch with no catcher drawn leaves with its tag alone
+  const actor = stage === 'leave' && times.caught && !last ? undefined : art.source
   const tag = stage === 'leave' ? resultText(encounter) : `${encounter.name}${encounter.alreadyCaught ? ` ${BAND.caughtMark}` : ''} · ${encounter.tier}`
   const stamp = stage === 'leave' ? (times.departAt ?? now) : (times.appearedAt ?? times.id)
   const key = `${stage}/${stamp}/${tag}/${strip.width}/${strip.height}/${slot.columns}/${art.width}/${art.height}`
   let cached = motionCache
   if (!cached || cached.key !== key || cached.strip !== strip.source || cached.actor !== actor) {
-    const source = encounterMotionSvg({ strip, layout, stage, stamp, ...(actor ? { actor } : {}), tag, caught: encounter.outcome === 'caught' })
+    const source = encounterMotionSvg({ strip, layout, stage, stamp, ...(actor ? { actor } : {}), tag, caught: times.caught === true })
     if (!source) $.ui.log(`encounter motion: no Svg for ${loaded.modster.id}, over ${DESKTOP.svgMaxChars} characters; showing the Modster alone`, { to: 'debug' })
     cached = { key, strip: strip.source, actor, source }
     motionCache = cached
