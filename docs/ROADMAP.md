@@ -941,13 +941,15 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 #### [ ] P5-58 — Desktop encounter inside the scene
 - **Depends on:** P5-57
 - **Size:** L
-- **Goal:** on desktop the encounter happens inside the biome's scene, in the band and the pane: the scene keeps its idle size, the Modster shrinks to stand in it, a slight cue marks its arrival, its details and Run are subtle tags in the scene, a click on the Modster throws, and the 1 and 2 keys still work (decision 0048 point 5; asked by @danielpg95, 2026-10-30).
+- **Goal:** on desktop the encounter happens inside the biome's scene, in the band and the pane: the scene keeps its idle size, flashes and slides aside for the Throw and Run buttons, a click on the Modster throws, and the details are tags in the scene (decision 0050; asked by @danielpg95, 2026-10-30).
 - **Done when:**
-  - [ ] Checked first in the Code tab with a throwaway spike: a `Client` laid over the scene `Svg` (`position: absolute`, drawing nothing) leaves the scene visible, hears a click and the cell it landed in well enough to tell the Modster from a Run tag, and whether it takes 1 and 2 while its site has the focus (a `Client` can't draw an `Svg`, so the scene can't live inside one).
-  - [ ] A decision, superseding 0049 for the desktop encounter, records the layout and the press path from those findings, with a fallback if the keys can't reach the `Client`.
-  - [ ] Pure functions, with tests: the encounter scene keeps the idle scene's size; the Modster (or its throw) is scaled to the strip's height, feet on the ground; a slight cue on arrival; tags in the scene for the name, the caught mark, the tier, the results (caught, broke free, wandered off) and Run; hit boxes for the Modster and the Run tag.
-  - [ ] The desktop band and pane draw it: a click on the Modster throws, a click on Run runs, and 1 and 2 still work; tests press them. The terminal and the one-row band are unchanged.
-  - [ ] Checked in the Code tab, in the band and the pane: the scene doesn't change size when a Modster appears, the cue shows, the tags read well, clicks and keys work.
+  - [x] Checked first in the Code tab with a throwaway spike: a `Client` laid over the scene `Svg` leaves it visible and hears clicks with their cell; it doesn't hear the 1 and 2 keys (decision 0050).
+  - [x] A decision records the layout and the press path from those findings (0050, superseding 0049).
+  - [ ] The spike checks the slide in the Code tab: the flash, the slide right and back, the buttons in the uncovered strip with 1 and 2, a click on the Modster through the `Client`, and a redraw mid-encounter not replaying the motion.
+  - [ ] Pure functions, with tests: the encounter scene at the idle scene's size; the Modster (or its throw) scaled to the strip's height, feet on the ground; the flash and the slide, started at the elapsed time; tags for the name, the caught mark, the tier and the results; the Modster's hit box in cells.
+  - [ ] The desktop band and pane draw it: a click on the Modster throws, Throw and Run work by click and by 1 and 2; tests press them. The terminal, the one-row band and `showIdleScene` off are unchanged.
+  - [ ] Checked in the Code tab, in the band and the pane: the scene doesn't change size, it flashes and slides for an encounter and back after it, the tags read well, clicks and keys work.
+  - [ ] `spikes/p5-58-encounter-overlay/` is deleted.
 ---
 
 ## Phase 6 — Beyond the terminal

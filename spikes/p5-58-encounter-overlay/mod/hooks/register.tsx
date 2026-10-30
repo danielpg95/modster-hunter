@@ -1,33 +1,56 @@
 import { atom, read, update } from 'claude-code'
-import type { Register } from 'claude-code'
+import type { EngineInterface, Register } from 'claude-code'
+import type { Encounter } from '../types'
 
-// P5-58 spike, not part of Modster Hunter: `/overlay-spike` opens a pane with a
-// scene Svg and a Client laid over it that draws nothing. Clicks and keys the
-// Client hears are listed below the scene, with which target they landed on.
+// P5-58 spike, not part of Modster Hunter: `/overlay-spike` opens a pane with the
+// decision 0050 layout. Start an encounter: the scene flashes and slides right,
+// uncovering a strip with Throw and Run (1 and 2); a Client laid over the scene
+// hears clicks on the Modster. Redraw mid-encounter to see the motion doesn't replay.
 
 const PANE_ID = 'overlay-spike'
 const log = atom({ plugin: 'modster-overlay-spike', key: 'log' } as const, [])
 const band = atom({ plugin: 'modster-overlay-spike', key: 'band' } as const, false)
 const outline = atom({ plugin: 'modster-overlay-spike', key: 'outline' } as const, false)
+const encounter = atom({ plugin: 'modster-overlay-spike', key: 'encounter' } as const, { phase: 'idle', at: 0 })
+const redraws = atom({ plugin: 'modster-overlay-spike', key: 'redraws' } as const, 0)
 
-// The scene, in CSS pixels: a strip, a Modster in the middle and a Run tag at the right
+// The scene, in CSS pixels; SLIDE is the strip the slide uncovers at the left
 const W = 480
 const H = 120
-// The Client's size in cells: about 8.8 px per column (measured with 0.0.3) and an estimated 20 px per row
-const CELLS = { columns: Math.round(W / 8.8), rows: Math.ceil(H / 20) }
-const MODSTER = { x: 210, y: 40, w: 60, h: 70 }
-const RUN = { x: 404, y: 88, w: 64, h: 22 }
+const SLIDE = 120
+const SLIDE_S = 0.35
+const FLASH_S = 0.4
+const COLUMN_PX = 8.8
+const ROW_PX = 20
+const CELLS = { columns: Math.round(W / COLUMN_PX), rows: Math.ceil(H / ROW_PX) }
+// The Modster stands in the middle of the part the scene shows once slid
+const MODSTER = { x: SLIDE + (W - SLIDE) / 2 - 30, y: 40, w: 60, h: 70 }
 
-const SCENE =
-  `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">` +
-  `<rect width="${W}" height="${H}" fill="#2e4a3a"/><rect y="96" width="${W}" height="24" fill="#4e6b3a"/>` +
-  `<circle cx="40" cy="20" r="3" fill="#9ccc65"><animate attributeName="cy" values="10;100" dur="3s" repeatCount="indefinite"/></circle>` +
-  `<rect x="${MODSTER.x}" y="${MODSTER.y}" width="${MODSTER.w}" height="${MODSTER.h}" rx="18" fill="#7cb342"/>` +
-  `<circle cx="${MODSTER.x + 20}" cy="${MODSTER.y + 28}" r="5" fill="#111"/><circle cx="${MODSTER.x + 40}" cy="${MODSTER.y + 28}" r="5" fill="#111"/>` +
-  `<rect x="10" y="${RUN.y}" width="150" height="${RUN.h}" rx="11" fill="#000" fill-opacity="0.45"/>` +
-  `<text x="22" y="${RUN.y + 15}" font-size="12" font-family="system-ui" fill="#fff">Sproutling ● common</text>` +
-  `<rect x="${RUN.x}" y="${RUN.y}" width="${RUN.w}" height="${RUN.h}" rx="11" fill="#000" fill-opacity="0.45"/>` +
-  `<text x="${RUN.x + 20}" y="${RUN.y + 15}" font-size="12" font-family="system-ui" fill="#fff">Run</text></svg>`
+function sceneSvg(state: Encounter, now: number): string {
+  const elapsed = Math.max(0, (now - state.at) / 1000).toFixed(3)
+  // The slide starts at the time already elapsed, so a redraw doesn't replay it (0050 point 7)
+  const slide =
+    state.phase === 'idle'
+      ? ''
+      : `<animateTransform attributeName="transform" type="translate" from="${state.phase === 'up' ? '0 0' : `${SLIDE} 0`}" to="${state.phase === 'up' ? `${SLIDE} 0` : '0 0'}" dur="${SLIDE_S}s" begin="-${elapsed}s" fill="freeze"/>`
+  const up = state.phase === 'up'
+  const flash = up
+    ? `<rect width="${W}" height="${H}" fill="#fff" opacity="0"><animate attributeName="opacity" values="0;0.45;0" dur="${FLASH_S}s" begin="-${elapsed}s" fill="freeze"/></rect>`
+    : ''
+  const modster = up
+    ? `<rect x="${MODSTER.x - SLIDE}" y="${MODSTER.y}" width="${MODSTER.w}" height="${MODSTER.h}" rx="18" fill="#7cb342"/>` +
+      `<circle cx="${MODSTER.x - SLIDE + 20}" cy="${MODSTER.y + 28}" r="5" fill="#111"/><circle cx="${MODSTER.x - SLIDE + 40}" cy="${MODSTER.y + 28}" r="5" fill="#111"/>` +
+      `<rect x="10" y="88" width="150" height="22" rx="11" fill="#000" fill-opacity="0.45"/>` +
+      `<text x="22" y="103" font-size="12" font-family="system-ui" fill="#fff">Sproutling ● common</text>`
+    : ''
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">` +
+    `<rect width="${W}" height="${H}" fill="#1b1b1b"/>` +
+    `<g>${slide}<rect width="${W}" height="${H}" fill="#2e4a3a"/><rect y="96" width="${W}" height="24" fill="#4e6b3a"/>` +
+    `<circle cx="40" cy="20" r="3" fill="#9ccc65"><animate attributeName="cy" values="10;100" dur="3s" repeatCount="indefinite"/></circle>` +
+    `${modster}</g>${flash}</svg>`
+  )
+}
 
 interface Probe {
   site: string
@@ -37,23 +60,49 @@ interface Probe {
   columns: number
   rows: number
   key?: string
-  button?: string
 }
 
-function describe(p: Probe): string {
-  if (p.kind === 'key') return `${p.site}: key "${p.key}" (region ${p.columns}×${p.rows} cells)`
+async function onProbe($: EngineInterface, p: Probe): Promise<string> {
+  if (p.kind === 'key') return `${p.site}: key "${p.key}" reached the Client`
   const cw = W / Math.max(1, p.columns)
   const ch = H / Math.max(1, p.rows)
   const px = ((p.x ?? 0) + 0.5) * cw
   const py = ((p.y ?? 0) + 0.5) * ch
-  const inside = (r: { x: number; y: number; w: number; h: number }) => px >= r.x && px < r.x + r.w && py >= r.y && py < r.y + r.h
-  const target = inside(MODSTER) ? 'the Modster' : inside(RUN) ? 'the Run tag' : 'the scene'
-  return `${p.site}: click at cell ${p.x},${p.y} of ${p.columns}×${p.rows} (${cw.toFixed(1)}×${ch.toFixed(1)} px per cell) → ~${Math.round(px)},${Math.round(py)} px → ${target}`
+  const state = await read($, encounter)
+  const onModster = state.phase === 'up' && px >= MODSTER.x && px < MODSTER.x + MODSTER.w && py >= MODSTER.y && py < MODSTER.y + MODSTER.h
+  return `${p.site}: click at cell ${p.x},${p.y} (~${Math.round(px)},${Math.round(py)} px) → ${onModster ? 'THROW (the Modster)' : 'the scene'}`
 }
+
+function note($: EngineInterface, line: string) {
+return update($, log, (now) => [line, ...now].slice(0, 8))
+}
+
+// The scene with the strip's buttons and the Client laid over it, for the band or the pane
+async function scene($: EngineInterface, e: Parameters<EngineInterface['ui']['resolve']>[0], site: string) {
+  const { Box, Button, Svg, Client } = $.ui.resolve(e) as any
+  const state = await read($, encounter)
+  const now = await $.clock.now()
+  const show = await read($, outline)
+  return (
+    <Box key={`spike-${site}`} position="relative">
+      <Svg source={sceneSvg(state, now)} alt={`${site} scene`} width={W} height={H} />
+      <Box position="absolute" top={0} left={0}>
+        <Client key={`spike-${site}-overlay`} module="./overlay-probe.tsx" props={{ site, outline: show, rows: CELLS.rows }} width={CELLS.columns} height={CELLS.rows} />
+      </Box>
+      {state.phase === 'up' ? (
+        <Box position="absolute" top={0} left={1} flexDirection="column" gap={1}>
+          <Button key={`spike-${site}-throw`} label="Throw" hotkey="1" plain onPress={() => note($, `${site}: Throw button`)} />
+          <Button key={`spike-${site}-run`} label="Run" hotkey="2" plain onPress={() => note($, `${site}: Run button`)} />
+        </Box>
+      ) : null}
+    </Box>
+  )
+}
+
 
 export const register: Register = (on) => {
   on('session.start', async ($, e, next) => {
-    await $.command.register({ name: 'overlay-spike', description: 'P5-58: test a Client laid over a scene in the Desktop Code tab', immediate: true })
+    await $.command.register({ name: 'overlay-spike', description: 'P5-58: test the sliding encounter scene in the Desktop Code tab', immediate: true })
     return next(e)
   })
 
@@ -63,22 +112,14 @@ export const register: Register = (on) => {
   })
 
   on('ui.message', async ($, e, next) => {
-    const line = describe(e.data as unknown as Probe)
+    const line = await onProbe($, e.data as unknown as Probe)
     await update($, log, (now) => [line, ...now].slice(0, 8))
     return next(e)
   })
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     if (e.surface !== 'desktop' || !(await read($, band))) return next(e)
-    const { Box, Svg, Client } = $.ui.resolve(e)
-    return (
-      <Box key="spike-band" position="relative">
-        <Svg source={SCENE} alt="Band scene" width={W} height={H} />
-        <Box position="absolute" top={0} left={0} right={0} bottom={0}>
-          <Client key="spike-band-overlay" module="./overlay-probe.tsx" props={{ site: 'band', outline: await read($, outline), rows: CELLS.rows }} width={CELLS.columns} height={CELLS.rows} />
-        </Box>
-      </Box>
-    )
+    return scene($, e, 'band')
   })
 
   on('ui.render', { component: 'Pane' }, async ($, e, next) => {
@@ -87,23 +128,25 @@ export const register: Register = (on) => {
       const { Text } = $.ui.resolve(e)
       return <Text>Open /overlay-spike in the Desktop app's Code tab.</Text>
     }
-    const { Box, Text, Button, Svg, Client } = $.ui.resolve(e)
+    const { Box, Text, Button } = $.ui.resolve(e)
     const lines = await read($, log)
+    const state = await read($, encounter)
+    const count = await read($, redraws)
+    const setPhase = async (phase: Encounter['phase']) => {
+      const at = await $.clock.now()
+      await update($, encounter, () => ({ phase, at }))
+    }
     return (
       <Box flexDirection="column" gap={1}>
-        <Text bold>1. A Client laid over the scene</Text>
-        <Text dimColor>Is the scene fully visible, with the leaf falling? Click the Modster, the scene, and the Run tag.</Text>
-        <Box key="spike-pane" position="relative">
-          <Svg source={SCENE} alt="Pane scene" width={W} height={H} />
-          <Box position="absolute" top={0} left={0} right={0} bottom={0}>
-            <Client key="spike-pane-overlay" module="./overlay-probe.tsx" props={{ site: 'pane', outline: await read($, outline), rows: CELLS.rows }} width={CELLS.columns} height={CELLS.rows} />
-          </Box>
+        <Text bold>The sliding scene (decision 0050)</Text>
+        <Text dimColor>Start: does it flash, then slide right, with Throw and Run in the strip? Click the Modster, the buttons, and press 1 and 2. Redraw mid-encounter: does the slide replay? End: does it slide back?</Text>
+        {await scene($, e, 'pane')}
+        <Box flexDirection="row" gap={1}>
+          <Button key="spike-start" label={state.phase === 'up' ? 'End encounter' : 'Start encounter'} onPress={() => setPhase(state.phase === 'up' ? 'leaving' : 'up')} />
+          <Button key="spike-redraw" label={`Redraw (${count})`} onPress={() => update($, redraws, (n) => n + 1)} />
+          <Button key="spike-outline" label={(await read($, outline)) ? 'Hide the Client outline' : 'Outline the Client'} onPress={() => update($, outline, (now) => !now)} />
+          <Button key="spike-band-toggle" label={(await read($, band)) ? 'Hide the band test' : 'Show the band test'} onPress={() => update($, band, (now) => !now)} />
         </Box>
-        <Button key="spike-outline" label={(await read($, outline)) ? 'Hide the Client outline' : 'Outline the Client'} onPress={() => update($, outline, (now) => !now)} />
-        <Text bold>2. Keys</Text>
-        <Text dimColor>After a click on the scene, press 1 and 2. Then Escape, ctrl+x tab, and press 1 and 2 again.</Text>
-        <Text bold>3. The band</Text>
-        <Button key="spike-band-toggle" label={(await read($, band)) ? 'Hide the band test' : 'Show the band test'} onPress={() => update($, band, (now) => !now)} />
         <Text bold>What reached the mod (newest first)</Text>
         {lines.length ? lines.map((l, i) => <Text key={`log-${i}`}>{l}</Text>) : <Text dimColor>Nothing yet.</Text>}
         <Button key="spike-clear" label="Clear" onPress={() => update($, log, () => [])} />
