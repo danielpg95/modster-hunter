@@ -8,10 +8,13 @@ import type { Register } from 'claude-code'
 const PANE_ID = 'overlay-spike'
 const log = atom({ plugin: 'modster-overlay-spike', key: 'log' } as const, [])
 const band = atom({ plugin: 'modster-overlay-spike', key: 'band' } as const, false)
+const outline = atom({ plugin: 'modster-overlay-spike', key: 'outline' } as const, false)
 
 // The scene, in CSS pixels: a strip, a Modster in the middle and a Run tag at the right
 const W = 480
 const H = 120
+// The Client's size in cells: an estimate of 8×20 px per cell on desktop (DESKTOP.columnPx, rowPx)
+const CELLS = { columns: Math.ceil(W / 8), rows: Math.ceil(H / 20) }
 const MODSTER = { x: 210, y: 40, w: 60, h: 70 }
 const RUN = { x: 404, y: 88, w: 64, h: 22 }
 
@@ -72,7 +75,7 @@ export const register: Register = (on) => {
       <Box key="spike-band" position="relative">
         <Svg source={SCENE} alt="Band scene" width={W} height={H} />
         <Box position="absolute" top={0} left={0} right={0} bottom={0}>
-          <Client key="spike-band-overlay" module="./overlay-probe.tsx" props="band" width="100%" height="100%" />
+          <Client key="spike-band-overlay" module="./overlay-probe.tsx" props={{ site: 'band', outline: await read($, outline) }} width={CELLS.columns} height={CELLS.rows} />
         </Box>
       </Box>
     )
@@ -93,9 +96,10 @@ export const register: Register = (on) => {
         <Box key="spike-pane" position="relative">
           <Svg source={SCENE} alt="Pane scene" width={W} height={H} />
           <Box position="absolute" top={0} left={0} right={0} bottom={0}>
-            <Client key="spike-pane-overlay" module="./overlay-probe.tsx" props="pane" width="100%" height="100%" />
+            <Client key="spike-pane-overlay" module="./overlay-probe.tsx" props={{ site: 'pane', outline: await read($, outline) }} width={CELLS.columns} height={CELLS.rows} />
           </Box>
         </Box>
+        <Button key="spike-outline" label={(await read($, outline)) ? 'Hide the Client outline' : 'Outline the Client'} onPress={() => update($, outline, (now) => !now)} />
         <Text bold>2. Keys</Text>
         <Text dimColor>After a click on the scene, press 1 and 2. Then Escape, ctrl+x tab, and press 1 and 2 again.</Text>
         <Text bold>3. The band</Text>

@@ -6,6 +6,7 @@ declare module 'claude-code' {
     'modster-overlay-spike': {
       log: Log
       band: boolean
+      outline: boolean
     }
   }
 }
