@@ -494,6 +494,8 @@ describe('register: collection pane', () => {
     // No width: the markup, drawn wider than the pane, is cropped at its edge (P5-48)
     expect(svg?.props.width).toBeUndefined()
     expect(svg?.props.source).toContain(`width="${Math.ceil(120 * DESKTOP.sceneOvershoot) * DESKTOP.columnPx}"`)
+    // Pixel art too is an image, which takes its own width; interactive, it stopped at 300 px (P5-60)
+    expect(svg?.props.isInteractive).toBeUndefined()
     await clock.advance(1_000)
     expect(blits).toHaveLength(0)
     await pane.unmount()

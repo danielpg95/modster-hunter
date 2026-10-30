@@ -382,6 +382,8 @@ describe('register', () => {
     expect((await ui.find({ type: 'Svg' }))?.props.source).toContain('<animate attributeName="opacity" from="1" to="0"')
     await clock.advance(IDLE_TAG.fadeMs)
     expect((await ui.find({ type: 'Svg' }))?.props.source).not.toContain('<text')
+    // Without the tag the pixel-art strip stays an image, which takes its own width (P5-60)
+    expect((await ui.find({ type: 'Svg' }))?.props.isInteractive).toBeUndefined()
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await $.turn.complete({ reason: 'answer', answer: 'ok', durationMs: 1 } as any)
     expect((await ui.find({ type: 'Svg' }))?.props.source).not.toContain('<text')

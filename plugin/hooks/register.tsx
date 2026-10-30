@@ -214,7 +214,7 @@ const IDLE_TAG_COLOR = '#d0d0d0'
 let sheetScene: IdleScene | undefined
 const particlesByColumns = new Map<number, Particle[]>()
 // The desktop's scene Svgs by size and motion (0044); checked against the scene they were made from
-const sceneSvgs = new Map<string, { scene: IdleScene; drawn: { source: string; width: number; height: number; image: boolean } | undefined }>()
+const sceneSvgs = new Map<string, { scene: IdleScene; drawn: { source: string; width: number; height: number } | undefined }>()
 // The desktop encounter's motion (0051): an id for the encounter, when it appeared (none when it was
 // up before this load) and when it leaves; cleared when it ends. A catch keeps its catcher's last
 // frame, still, to fade as it leaves (0053), with the throw's size in terminal pixels
@@ -495,7 +495,7 @@ export const register: Register = (on, options) => {
       // On desktop the idle line is a tag in the scene that fades once the biome is shown (0047)
       if (tag) startIdleTag($)
       if (desktopScene) {
-        return <Svg source={desktopScene.source} alt={`${biome?.name ?? 'Biome'} scene`} height={desktopScene.height} {...(desktopScene.image ? {} : { isInteractive: true })} />
+        return <Svg source={desktopScene.source} alt={`${biome?.name ?? 'Biome'} scene`} height={desktopScene.height} />
       }
       if (!tag) return next(e)
       const size = idleTagSize(tag)
@@ -624,7 +624,7 @@ export const register: Register = (on, options) => {
       if (desktopScene && e.surface === 'desktop') {
         const { Svg } = $.ui.resolve(e)
         if (tag) startIdleTag($)
-        return <Svg source={desktopScene.source} alt={`${biomeName} scene`} height={desktopScene.height} {...(desktopScene.image ? {} : { isInteractive: true })} />
+        return <Svg source={desktopScene.source} alt={`${biomeName} scene`} height={desktopScene.height} />
       }
       if (scene && showIdleScene) {
         const skip = `idle scene: not drawn in the pane (surface ${e.surface}, ${rows} rows, scene needs ${scene.rows + 1})`
@@ -1078,7 +1078,7 @@ export const register: Register = (on, options) => {
         const drawn = desktop ? desktopSceneSvg($, desktop, e.props.bodyColumns, undefined, true) : undefined
         if (drawn && e.surface === 'desktop') {
           const { Svg } = $.ui.resolve(e)
-          sceneView = <Svg source={drawn.source} alt={`${selected.name} scene`} height={drawn.height} {...(drawn.image ? {} : { isInteractive: true })} />
+          sceneView = <Svg source={drawn.source} alt={`${selected.name} scene`} height={drawn.height} />
         }
       }
       const window = listWindow(entries.length, index, plan.listRows)
@@ -2119,8 +2119,12 @@ function sceneMoves(): boolean {
  * The desktop's idle scene as one vector Svg (0044), sized from the band or pane's columns and,
  * in the band, its `maxRows`; undefined when it doesn't fit. Particles are made once per width.
  */
-/** The scene as the desktop draws it; `image` when a desktop background is embedded (0045 point 9), so not interactive. */
-function desktopSceneSvg($: EngineInterface, current: IdleScene, bodyColumns: number, maxRows: number | undefined, moving: boolean, tag?: IdleTag): { source: string; width: number; height: number; image: boolean } | undefined {
+/**
+ * The scene as the desktop draws it, always in image mode (P5-60): an image takes its width from its own
+ * size, while an interactive Svg with only a height stopped at the default 300 px. SMIL and text run in
+ * image mode too (0047).
+ */
+function desktopSceneSvg($: EngineInterface, current: IdleScene, bodyColumns: number, maxRows: number | undefined, moving: boolean, tag?: IdleTag): { source: string; width: number; height: number } | undefined {
   // On desktop the idle line is a tag inside the scene (0047), so the strip may take every row
   const estimate = sceneSvgSize(current, bodyColumns, maxRows, 0)
   if (!estimate) return undefined
@@ -2136,8 +2140,7 @@ function desktopSceneSvg($: EngineInterface, current: IdleScene, bodyColumns: nu
   }
   const source = sceneSvg(current, particles, { ...size, moving, crop: true, ...(tag ? { tag } : {}) })
   if (!source) $.ui.log(`idle scene: no Svg, over ${DESKTOP.svgMaxChars} characters; showing the idle line`, { to: 'debug' })
-  // Text in an image-mode Svg draws (0047); SMIL runs there too, so the tag never needs interactive mode
-  const drawn = source ? { source, width: size.width * size.scale, height: current.rows * 2 * size.scale, image: current.sheet !== undefined || current.particleSheet !== undefined || tag !== undefined } : undefined
+  const drawn = source ? { source, width: size.width * size.scale, height: current.rows * 2 * size.scale } : undefined
   sceneSvgs.set(key, { scene: current, drawn })
   return drawn
 }
