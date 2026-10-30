@@ -18,7 +18,6 @@ this file lists only tasks someone has claimed.
 | P5-21 | @victor-aguilars | in-progress | p5-21-inkspector | 2026-10-14 | 2026-10-27 | Merge the Inkspector (#034) PR; then pick a Tidecrown (#036) design (axolotl king on hold, needs a higher-contrast reference) |
 | P5-34 | @victor-aguilars | in-progress | p5-34-readme-install | 2026-10-22 | 2026-10-22 | Hand check on a second computer: fresh install of 0.1.0 from the marketplace, then tick the items (README merged in #149) |
 | P5-36 | @victor-aguilars | in-review | p5-36-in-game-settings | 2026-10-22 | 2026-10-22 | Merge #155, #156, then the P5-36 PR; then close the task |
-| P5-58 | @danielpg95 | in-progress | p5-58-desktop-click-to-throw | 2026-10-30 | 2026-10-30 | Check 0.1.18 in the Code tab (band and pane, clicks, 1 and 2 keys), then delete the spike |
 
 ## Up next
 

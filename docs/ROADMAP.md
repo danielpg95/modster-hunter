@@ -938,7 +938,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Checked in the Code tab, in the band and the pane: the idle and encounter scenes animate, the Modster stands in front, and Throw and Run work.
   - [x] `spikes/p5-52-desktop-interaction/` is deleted.
 
-#### [ ] P5-58 — Desktop encounter inside the scene
+#### [x] P5-58 — Desktop encounter inside the scene
 - **Depends on:** P5-57
 - **Size:** L
 - **Goal:** on desktop the encounter plays inside the biome's scene, in the band and the pane: the scene keeps its size, flashes and slides aside for Throw and Run, the Modster appears as a silhouette then its sprite, a click on the Modster throws, the details are tags in the scene, and a cue plays as it leaves (decisions 0050 to 0053; asked by @danielpg95, 2026-10-30).
@@ -948,8 +948,8 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] The spike checks the motion in the Code tab: the arrival and the departure as one stamped `Svg` each, the buttons drawn by the `Client` after the slide, no blink or replay (decision 0051, superseding 0050). The hotkeys inside the `Client` are assumed (0051 point 3).
   - [x] Pure functions, with tests: the encounter scene at the idle scene's size, the Modster (or its throw) scaled to the strip's height; the arrival (flash, slide, silhouette, sprite, tag) and the departure (caught or fled cue, slide back) as stamped `Svg`s with the timings in `constants.ts`; the still scene; the Modster's hit box in cells.
   - [x] A surface module draws Throw, Run and the tries left after the slide, and hears a click on the Modster; the desktop band and pane draw the scene with it laid over. Tests press Throw, Run and the Modster. The terminal, the one-row band and `showIdleScene` off are unchanged.
-  - [ ] Checked in the Code tab, in the band and the pane: the scene doesn't change size, the arrival and departure play once with no blink, clicks and the 1 and 2 keys work.
-  - [ ] `spikes/p5-58-encounter-overlay/` is deleted.
+  - [x] Checked in the Code tab, in the band and the pane: the scene doesn't change size, the arrival and departure play once with no blink, clicks and the 1 and 2 keys work. (The keys inside the `Client` stay assumed, 0051 point 3.)
+  - [x] `spikes/p5-58-encounter-overlay/` is deleted.
 ---
 
 ## Phase 6 — Beyond the terminal
