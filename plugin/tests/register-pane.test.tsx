@@ -407,14 +407,15 @@ describe('register: encounter pane', () => {
     await pane.unmount()
   })
 
-  test('on desktop the idle pane shows the band\'s vector scene above its idle text: still between turns, moving while Claude works (0027, 0044)', HUNTING, async ($, on) => {
+  test('on desktop the idle pane shows the band\'s vector scene with no idle text: still between turns, moving while Claude works (0027, 0044)', HUNTING, async ($, on) => {
     const clock = await start($, on, () => SHOWN, sceneForest())
     const pane = await $.ui.mount({ plugin: 'modster-hunter', surface: 'desktop', component: 'Pane', requestId: 'modster-hunt', props: PANE_PROPS as any })
     const still = await pane.find({ type: 'Svg' })
     expect(still?.props.alt).toBe('Whispering Forest scene')
     expect(still?.props.source).toContain('fill="url(#bg)"')
     expect(still?.props.source).not.toContain('<animate')
-    expect(await pane.find({ type: 'Text', text: /Listening for Modsters/ })).toBeDefined()
+    // The tag in the scene takes the idle text's place (0047)
+    expect(await pane.find({ type: 'Text', text: /Listening for Modsters/ })).toBeUndefined()
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await clock.advance(250)
     expect((await pane.find({ type: 'Svg' }))?.props.source).toContain('repeatCount="indefinite"')
