@@ -62,4 +62,8 @@ settled questions and avoid making assumptions about open ones.
 | [0046](0046-desktop-particle-art.md) | On desktop, a biome may draw its particles with its own art | Accepted |
 | [0047](0047-desktop-idle-tag.md) | On desktop, the idle line is a name tag in the scene that fades | Accepted |
 | [0048](0048-desktop-encounter-scene.md) | On desktop, the encounter pane shows the Modster in front of its biome | Superseded by 0049 |
-| [0049](0049-desktop-encounter-scene-in-band.md) | On desktop, the band and the encounter pane show the Modster in front of its biome | Accepted |
+| [0049](0049-desktop-encounter-scene-in-band.md) | On desktop, the band and the encounter pane show the Modster in front of its biome | Superseded by 0050 |
+| [0050](0050-desktop-encounter-slide.md) | On desktop, the scene slides aside for the encounter's buttons | Superseded by 0051 |
+| [0051](0051-desktop-encounter-motion.md) | On desktop, the encounter plays in the scene, one Svg per motion | Superseded by 0052 |
+| [0052](0052-desktop-departure-reverses-arrival.md) | On desktop, a Modster that isn't caught leaves by reversing its arrival | Superseded by 0053 |
+| [0053](0053-desktop-catch-leaves-as-catcher.md) | On desktop, a caught Modster leaves as its catcher fading, with no extra cue | Accepted |

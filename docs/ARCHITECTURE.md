@@ -35,6 +35,7 @@ plugin/
 │   ├── hooks.json
 │   ├── register.ts          # wiring: on(...) calls, and the only file that calls $ (builds ports)
 │   ├── constants.ts         # tunables: tier table, timings, limits (one place)
+│   ├── encounter-controls.tsx # surface module (a Client): the desktop encounter's Throw, Run and Modster clicks (0051); no `$`, posts to `ui.message`
 │   ├── content/             # pure: schema types, validate, load through a ContentReader port, merge
 │   ├── game/                # pure: random source, rarity resolver, encounter machine, scheduler
 │   ├── render/              # pure: pixels → Raster cells, band and pane trees from state
@@ -56,6 +57,7 @@ plugin/
 | `classic.SubagentStart` / `classic.SubagentStop` | Tell the scheduler a subagent is running / stopped, by `agent_id`; work time includes it (0018) |
 | `ui.render` `{ component: 'AbovePrompt' }` | Draw the encounter, or the idle line with the biome's scene above it (0026); one row during encounters only with `showInBand` off (0023) |
 | `ui.render` `{ component: 'Pane' }` (our id) | Draw the collection pane (P3), or the encounter pane `modster-hunt` (0015), with the biome's scene between encounters (0027) |
+| `ui.message` (key `encounter-controls`) | Throw or Run from the desktop encounter's Client: its buttons or a click on the Modster (0051) |
 | `ui.render` `{ component: 'Spinner' }` | Name the Modster in the main turn's spinner while an encounter is up (`showInSpinner`, 0023) |
 | `ui.close` | The encounter pane closed: redraw so the band takes the encounter back (0015); a close by hand stores `prefs:huntPane` `open: false` (0019) |
 | `command.run` `{ command: 'modsters' }` | Registered `immediate`, so it runs during a turn too, and never reads the turn (0039). Open the collection pane; `hunt` and `stop` turn the game on and off through `$.config.set` on `autoStart` (0038); `pane` opens the encounter pane (0015), starting the game if it's off, and stores `prefs:huntPane` `open: true` (0019), or answers that it's off with `encounterPane: off` (0023); `settings` opens the collection pane on its Settings tab (0040); `reload` reloads content; `help` and an unknown word reply with the commands (0038) |

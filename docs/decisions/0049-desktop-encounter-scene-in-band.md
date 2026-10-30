@@ -1,6 +1,6 @@
 # 0049 — On desktop, the band and the encounter pane show the Modster in front of its biome
 
-- **Status:** Accepted
+- **Status:** Superseded by 0050
 - **Date:** 2026-10-29
 - **Decided by:** @danielpg95
 - **Supersedes:** 0048

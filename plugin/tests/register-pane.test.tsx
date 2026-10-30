@@ -6,6 +6,7 @@ import { oneModsterForest } from './fixtures/one-modster-forest'
 import { sceneForest } from './fixtures/scene-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
 import { CATCH, DESKTOP, IDLE_TAG } from '../hooks/constants'
+import { BUTTONS_AFTER_MS } from '../hooks/render'
 import { throwingMs } from '../hooks/game'
 
 // The game runs only while autoStart is on (decision 0038); these tests play it
@@ -116,17 +117,18 @@ describe('register: encounter pane', () => {
     await pane.unmount()
   })
 
-  test('a Modster with desktop art only shows as text on the terminal and as its sheet in front of the biome on desktop, and Throw works (0045 points 9–10, 0048)', HUNTING, async ($, on) => {
+  test('a Modster with desktop art only shows as text on the terminal and as its sheet in its biome on desktop, and Throw works (0045 points 9–10, 0051)', HUNTING, async ($, on) => {
     const clock = await start($, on, () => [], desktopOnlyForest())
     const pane = await mountPane($)
     const desktop = await $.ui.mount({ plugin: 'modster-hunter', surface: 'desktop', component: 'Pane', requestId: 'modster-hunt', props: PANE_PROPS as any })
+    const idle = await desktop.find({ type: 'Svg' })
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await clock.advance(4_250)
     expect(await pane.find({ type: 'Raster' })).toBeUndefined()
-    // It stands in front of the desktop background (0048): both sheets embedded in one Svg, as tall as the 40 px background
+    // It stands in the desktop background (0051): both sheets embedded in one Svg, at the idle scene's size
     const svg = await desktop.find({ type: 'Svg' })
     expect(String(svg?.props.source).split('<image href="data:image/png;base64,').length - 1).toBe(2)
-    expect([svg?.props.width, svg?.props.height]).toEqual([undefined, 10 * DESKTOP.paneScale])
+    expect([svg?.props.width, svg?.props.height]).toEqual([undefined, idle?.props.height])
     expect(svg?.props.isInteractive).toBeUndefined()
     expect(await pane.find({ type: 'Text', text: /Sproutling/ })).toBeDefined()
     await pane.press({ key: 'throw' })
@@ -154,25 +156,26 @@ describe('register: encounter pane', () => {
     await pane.unmount()
   })
 
-  test('on desktop the Modster stands in front of its biome as one Svg, the throw plays over the scene, and Throw works (0048)', HUNTING, async ($, on) => {
+  test('on desktop the encounter plays in the biome scene with the Client over it, and Throw works from the Client (0051)', HUNTING, async ($, on) => {
     const clock = await start($, on, () => [], { ...sceneForest(), ...catcherFiles() })
     const pane = await $.ui.mount({ plugin: 'modster-hunter', surface: 'desktop', component: 'Pane', requestId: 'modster-hunt', props: PANE_PROPS as any })
+    const idle = await pane.find({ type: 'Svg' })
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await clock.advance(3_250)
     const svgs = await pane.findAll({ type: 'Svg' })
     expect(svgs).toHaveLength(1)
     const scene = svgs[0]
     expect(scene?.props.alt).toBe('Sproutling in Whispering Forest')
-    // The strip (its background tiled by a pattern) and the Modster, nested in one document
+    expect(scene?.props.source).toContain('data-motion="arrive/')
     expect(scene?.props.source).toContain('fill="url(#bg)"')
     expect(scene?.props.source).toContain('#8d6e63')
-    expect(String(scene?.props.source).split('<svg ').length - 1).toBe(3)
-    expect(scene?.props.width).toBeUndefined()
-    expect(scene?.props.height).toBe(8 * DESKTOP.paneScale)
-    // The scene shows the biome, so there's no header
+    expect(scene?.props.height).toBe(idle?.props.height)
+    // The scene shows the biome and the Modster's tag, so there's no header and no lines
     expect(await pane.find({ type: 'Text', text: 'Whispering Forest' })).toBeUndefined()
+    expect(await pane.find({ type: 'Text', text: /Sproutling/ })).toBeUndefined()
 
     await clock.advance(1_000)
+    await pane.advance(BUTTONS_AFTER_MS)
     await pane.press({ key: 'throw' })
     await clock.advance(250)
     const thrown = await pane.find({ type: 'Svg' })
@@ -180,8 +183,8 @@ describe('register: encounter pane', () => {
     expect(thrown?.props.source).toContain('fill="url(#bg)"')
     // The vector throw (0043) stands where the Modster stood
     expect(thrown?.props.source).toContain('data-throw=')
-    await clock.advance(CATCH_THROW_MS)
-    expect(await pane.find({ type: 'Text', text: 'Caught Sproutling!' })).toBeDefined()
+    await clock.advance(CATCH_THROW_MS + CATCH.beatMs.caught)
+    expect((await pane.find({ type: 'Svg' }))?.props.source).toContain('>Caught Sproutling!</text>')
     await pane.unmount()
   })
 

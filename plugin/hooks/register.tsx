@@ -1,5 +1,6 @@
 import type { EngineInterface, Register, Timer } from 'claude-code'
-import { BAND, CATCH, COLLECTION, CONTENT, DESKTOP, IDLE_TAG, USER_CONTENT, WELCOME_TOAST_MS } from './constants'
+import { BAND, CATCH, COLLECTION, CONTENT, DESKTOP, IDLE_TAG, MOTION, USER_CONTENT, WELCOME_TOAST_MS } from './constants'
+import type { ControlsProps } from './encounter-controls'
 import {
   cachedSheetLoader,
   formatIssue,
@@ -42,7 +43,12 @@ import {
   catchLengthMs,
   catchSvg,
   sceneSvg,
-  encounterSceneSvg,
+  BUTTONS_AFTER_MS,
+  encounterMotionSvg,
+  hitCells,
+  motionLayout,
+  motionStage,
+  resultText,
   idleTagSize,
   idleTagSvg,
   type IdleTag,
@@ -209,8 +215,17 @@ let sheetScene: IdleScene | undefined
 const particlesByColumns = new Map<number, Particle[]>()
 // The desktop's scene Svgs by size and motion (0044); checked against the scene they were made from
 const sceneSvgs = new Map<string, { scene: IdleScene; drawn: { source: string; width: number; height: number; image: boolean } | undefined }>()
-// The encounter's last scene (0049), made again when the scene, the art, the scale or the width changes
-let encounterSceneCache: { scene: IdleScene; actor: string; scale: number; width: number; drawn: { source: string; height: number; image: boolean } | undefined } | undefined
+// The desktop encounter's motion (0051): an id for the encounter, when it appeared (none when it was
+// up before this load) and when it leaves; cleared when it ends. A catch keeps its catcher's last
+// frame, still, to fade as it leaves (0053), with the throw's size in terminal pixels
+let motion: { id: number; appearedAt?: number; departAt?: number; caught?: boolean; lastFrame?: { svg: string; width: number; height: number } } | undefined
+// The last motion Svg, made again when anything in it changes
+let motionCache: { key: string; strip: string; actor: string | undefined; source: string | undefined } | undefined
+// Where the encounter is drawn, by surface and requestId: true where it's the desktop motion. A redraw there restarts
+// the Svg's animation, so steps only the other sites show skip it when every site is a motion (0051 point 5)
+const encounterSites = new Map<string, boolean>()
+// The Client over the desktop encounter's scene (0051 point 3), by its key in the band and the pane
+const CONTROLS_KEY = 'encounter-controls'
 const sceneSites = new Map<string, number>() // requestId → columns
 let sceneTimer: Timer | undefined
 let sceneTick = 0
@@ -384,6 +399,15 @@ export const register: Register = (on, options) => {
     return next(e)
   })
 
+  // The desktop encounter's controls (0051 point 3): Throw and Run, or a click on the Modster.
+  // What a Client posts is input, so anything but a known action is ignored
+  on('ui.message', async ($, e, next) => {
+    if (e.element !== CONTROLS_KEY) return next(e)
+    const action = typeof e.data === 'object' && e.data !== null && 'action' in e.data ? e.data.action : undefined
+    if (action === 'throw' || action === 'run') await advanceMachine($, { type: action })
+    return next(e)
+  })
+
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     // A survey owns the band while it's up
     if (e.props.hasSurvey) return next(e)
@@ -391,6 +415,7 @@ export const register: Register = (on, options) => {
     if (!hunting) {
       removeSite(e.requestId)
       removeSceneSite(e.requestId)
+      encounterSites.delete(`${e.surface}/${e.requestId}`)
       return next(e)
     }
     // While the encounter pane is on screen the band steps aside, so the same
@@ -398,6 +423,7 @@ export const register: Register = (on, options) => {
     if (await isPaneShown($)) {
       removeSite(e.requestId)
       removeSceneSite(e.requestId)
+      encounterSites.delete(`${e.surface}/${e.requestId}`)
       return next(e)
     }
     const modster = currentModster()
@@ -419,6 +445,8 @@ export const register: Register = (on, options) => {
 
     if (view.kind !== 'full') removeSite(e.requestId)
     if (view.kind !== 'scene') removeSceneSite(e.requestId)
+    if (band) encounterSites.set(`${e.surface}/${e.requestId}`, false)
+    else encounterSites.delete(`${e.surface}/${e.requestId}`)
     // P5-38: the desktop draws the idle scene as one vector Svg above the idle line (0044)
     const tag = e.surface === 'desktop' && view.kind === 'idle' ? currentIdleTag(biome) : undefined
     const desktopScene = e.surface === 'desktop' && view.kind === 'idle' && sheetScene && showIdleScene ? desktopSceneSvg($, sheetScene, e.props.bodyColumns, e.props.maxRows, sceneMoves(), tag) : undefined
@@ -491,21 +519,18 @@ export const register: Register = (on, options) => {
       // P5-06: the Desktop Code tab draws the Modster as an Svg beside the text, scaled
       // down when needed so it stays within the band's maxRows (rowPx is an estimate)
       if (e.surface !== 'desktop' || !modster || !band || currentPlan().band === 'one-row') return lines
-      const { Svg } = $.ui.resolve(e)
-      // 0049: the lines on the left, the biome's strip filling the rest with the Modster in front
-      const staged =
-        sheetScene && showIdleScene
-          ? encounterScene($, modster, sheetScene, {
-              shownPx: (e.props.bodyColumns - BAND.textColumns - BAND.gapColumns) * DESKTOP.columnPx,
-              scale: DESKTOP.bandScale,
-              maxHeightPx: e.props.maxRows * DESKTOP.rowPx,
-            })
-          : undefined
+      const { Svg, Client } = $.ui.resolve(e)
+      // 0051: the encounter plays in the idle scene, at its size, with the controls in a Client over it
+      const slot = { columns: e.props.bodyColumns, maxRows: e.props.maxRows }
+      const staged = sheetScene && showIdleScene ? desktopMotion($, modster, band, sheetScene, slot, { scale: DESKTOP.bandScale, sheetScale: DESKTOP.sheetBandScale }, await $.clock.now()) : undefined
+      encounterSites.set(`${e.surface}/${e.requestId}`, staged !== undefined)
       if (staged) {
         return (
-          <Box flexDirection="row" columnGap={BAND.gapColumns}>
-            {lines}
-            <Svg source={staged.source} alt={`${modster.modster.name} in ${biome?.name ?? 'its biome'}`} height={staged.height} {...(staged.image ? {} : { isInteractive: true })} />
+          <Box position="relative">
+            <Svg source={staged.source} alt={`${modster.modster.name} in ${biome?.name ?? 'its biome'}`} height={staged.height} />
+            <Box position="absolute" top={0} left={0}>
+              <Client key={CONTROLS_KEY} module="./encounter-controls.tsx" props={staged.controls} width={slot.columns} height={staged.controls.rows} />
+            </Box>
           </Box>
         )
       }
@@ -536,7 +561,7 @@ export const register: Register = (on, options) => {
 
   // The same encounter in a pane the person opens (0015). It docks beside the
   // transcript in fullscreen from 110 columns, else sits inline above the prompt.
-  on('ui.render', { component: 'Pane' }, ($, e, next) => {
+  on('ui.render', { component: 'Pane' }, async ($, e, next) => {
     if (e.requestId !== PANE_ID) return next(e)
     const { Box, Text, Button } = $.ui.resolve(e)
     const modster = currentModster()
@@ -564,6 +589,7 @@ export const register: Register = (on, options) => {
     )
     if (!encounter || !modster) {
       removeSite(e.requestId)
+      encounterSites.delete(`${e.surface}/${e.requestId}`)
       const idleText = (
         <Text key="idle" dimColor>
           Listening for Modsters… they appear while Claude works.
@@ -617,6 +643,7 @@ export const register: Register = (on, options) => {
     }
 
     removeSceneSite(e.requestId)
+    encounterSites.set(`${e.surface}/${e.requestId}`, false)
     // The sprite's normal size, as in the band: 2x looked far too big in a real terminal (0015)
     const sprite = modster.sprite
     // No terminal sprite means the compact text (0045 point 10)
@@ -658,16 +685,27 @@ export const register: Register = (on, options) => {
     if (e.surface === 'desktop') {
       // P5-06: the Desktop Code tab has Svg but no Raster; the text keeps the compact layout
       removeSite(e.requestId)
-      const { Svg } = $.ui.resolve(e)
+      const { Svg, Client } = $.ui.resolve(e)
       const lines = view.kind === 'compact' ? view.lines : []
-      // 0048: the Modster stands in front of its biome; without a scene, or over the limit, it stands alone
-      const staged = sheetScene && showIdleScene ? encounterScene($, modster, sheetScene, { shownPx: columns * DESKTOP.columnPx, scale: DESKTOP.paneScale }) : undefined
-      const art = staged ? undefined : desktopArt($, modster, { scale: DESKTOP.paneScale, sheetScale: DESKTOP.sheetPaneScale })
+      // 0051: the encounter plays in the idle scene, at its size, with the controls in a Client over it;
+      // the scene shows the biome, so there's no header. Without a scene, or over the limit, the Modster stands alone
+      const slot = { columns, maxRows: e.props.scroll.bodyRows }
+      const staged = sheetScene && showIdleScene ? desktopMotion($, modster, encounter, sheetScene, slot, { scale: DESKTOP.paneScale, sheetScale: DESKTOP.sheetPaneScale }, await $.clock.now()) : undefined
+      encounterSites.set(`${e.surface}/${e.requestId}`, staged !== undefined)
+      if (staged) {
+        return (
+          <Box position="relative">
+            <Svg source={staged.source} alt={`${modster.modster.name} in ${biomeName}`} height={staged.height} />
+            <Box position="absolute" top={0} left={0}>
+              <Client key={CONTROLS_KEY} module="./encounter-controls.tsx" props={staged.controls} width={slot.columns} height={staged.controls.rows} />
+            </Box>
+          </Box>
+        )
+      }
+      const art = desktopArt($, modster, { scale: DESKTOP.paneScale, sheetScale: DESKTOP.sheetPaneScale })
       return (
         <Box flexDirection="column">
-          {/* The scene shows the biome, so it takes the header's place */}
-          {staged ? null : header}
-          {staged ? <Svg source={staged.source} alt={`${modster.modster.name} in ${biomeName}`} height={staged.height} {...(staged.image ? {} : { isInteractive: true })} /> : null}
+          {header}
           {art ? <Svg source={art.source} alt={modster.modster.name} width={art.width} height={art.height} {...(art.isInteractive ? { isInteractive: true } : {})} /> : null}
           {lines.map(line)}
         </Box>
@@ -1629,6 +1667,7 @@ async function advanceMachine($: EngineInterface, action: MachineAction): Promis
   if (!machine || !machineContext) return
   const now = await $.clock.now()
   const hadEncounter = machine.encounter !== undefined
+  const phaseBefore = machine.encounter?.phase
   const step = stepEncounter(machine, { ...action, now } as EncounterInput, machineContext)
   if (step.state === machine) {
     // The dots move on while the state holds still
@@ -1648,9 +1687,14 @@ async function advanceMachine($: EngineInterface, action: MachineAction): Promis
   updateDots(now)
   // Before the redraw, so a throw's first frame is what the band draws
   updateCatch($, now)
+  // Before the redraw too, so the desktop draws the arrival or the departure from its start
+  updateMotion(now, step.events.some((event) => event.type === 'appeared'))
   // Before the redraw, so a scene that stops is drawn still
   updateSceneTimer($)
-  $.ui.invalidate('ui.render')
+  // Appearing to waiting changes nothing the desktop draws (the Client times its buttons), and the
+  // redraw would restart the arrival a second in
+  const unseen = motionOnly() && step.events.length === 0 && phaseBefore === 'appearing' && machine.encounter?.phase === 'waiting'
+  if (!unseen) $.ui.invalidate('ui.render')
   updateStatus($)
   const where = { sessionId, biomeId: machineContext.biome.id }
   if (step.events.length > 0) queueWrite($, (store) => recordEncounterEvents(store, where, step.events, now))
@@ -1666,6 +1710,36 @@ async function advanceMachine($: EngineInterface, action: MachineAction): Promis
   }
 }
 
+/** Every site drawing the encounter draws it as the desktop motion. */
+function motionOnly(): boolean {
+  return encounterSites.size > 0 && [...encounterSites.values()].every(Boolean)
+}
+
+/**
+ * Times the desktop encounter's motion (0051): the arrival from the appearance, the departure from
+ * the result card, or after a catch's animation when one plays, so the catch is seen whole.
+ */
+function updateMotion(now: number, appeared: boolean): void {
+  const encounter = machine?.encounter
+  if (!encounter) {
+    motion = undefined
+    encounterSites.clear()
+    return
+  }
+  if (appeared) motion = { id: now, appearedAt: now }
+  motion ??= { id: now }
+  if (encounter.phase === 'result' && motion.departAt === undefined) {
+    motion.departAt = catchPlay?.outcome === 'caught' ? Math.max(now, catchPlay.endsAt) : now
+    if (encounter.outcome === 'caught') {
+      motion.caught = true
+      const art = catchPlay?.outcome === 'caught' ? catchPlay.desktop : undefined
+      // Made from the throw's end, so it holds the final frame and plays nothing
+      const svg = art && catchSvg(art, 'caught', catchPlay?.rocks ?? CATCH.rocksToCatch, { scale: 1, fromMs: catchLengthMs('caught', catchPlay?.rocks ?? CATCH.rocksToCatch) })
+      if (art && svg) motion.lastFrame = { svg, width: art.width, height: art.height }
+    }
+  }
+}
+
 /**
  * Reads whether the collection has `modsterId`, once, as it appears (P5-10).
  * Queued after earlier writes so the last encounter's catch counts; a catch in
@@ -1678,6 +1752,8 @@ function checkAlreadyCaught($: EngineInterface, modsterId: string): void {
     const caught = await isCaught(store, modsterId)
     if (!caught || check !== caughtCheck) return
     alreadyCaught = true
+    // Not during the desktop arrival, which a redraw restarts: the mark shows from the next one
+    if (motionOnly() && motion && motionStage(motion, await $.clock.now()) === 'arrive') return
     $.ui.invalidate('ui.render')
   })
 }
@@ -2066,38 +2142,73 @@ function desktopSceneSvg($: EngineInterface, current: IdleScene, bodyColumns: nu
   return drawn
 }
 
+/** The desktop encounter in its scene (0051): one Svg and the Client's props, in the band or the pane. */
+interface DesktopMotion {
+  source: string
+  height: number
+  controls: ControlsProps
+}
+
 /**
- * The desktop encounter's scene (0048, 0049): the biome's strip, moving, with the Modster or its
- * throw standing in front, drawn wider than the `shownPx` the slot shows and cropped at its edge,
- * as the band's idle strip is. `scale` is CSS pixels per strip pixel, lowered to a whole number
- * that fits `maxHeightPx`. Undefined without desktop or terminal art for the Modster, below a
- * scale of 1, or over the Svg limit.
+ * The desktop encounter at `now` (0051): the biome's strip at its idle size (point 1), slid aside
+ * with the Modster or its throw standing in it, as the arrival, the departure or still. Each is one
+ * Svg made once, so an unplanned redraw draws the same source. Undefined without the strip or art,
+ * or over the Svg limit; the caller then draws the Modster and the text as before.
  */
-function encounterScene($: EngineInterface, loaded: LoadedModster, current: IdleScene, size: { shownPx: number; scale: number; maxHeightPx?: number }): { source: string; height: number; image: boolean } | undefined {
-  // In strip pixels: terminal sprites and throws at 1, desktop sheets at a quarter of their pixels (0045 point 9)
-  const actor = desktopArt($, loaded, { scale: 1, sheetScale: 1 / DESKTOP.sheetPixels })
-  if (!actor) return undefined
-  const stripPx = Math.max(current.rows * 2, actor.height)
-  const scale = size.maxHeightPx === undefined ? size.scale : Math.min(size.scale, Math.floor(size.maxHeightPx / stripPx))
-  if (scale < 1 || size.shownPx <= 0) return undefined
-  const shown = size.shownPx / scale
-  const width = Math.ceil(shown * DESKTOP.sceneOvershoot)
-  const cached = encounterSceneCache
-  if (cached && cached.scene === current && cached.actor === actor.source && cached.scale === scale && cached.width === width) return cached.drawn
-  const particlesFor = (stripWidth: number): Particle[] => {
-    let particles = particlesByColumns.get(stripWidth)
-    if (!particles) {
-      particles = makeParticles(current, stripWidth, Math.random)
-      particlesByColumns.set(stripWidth, particles)
-    }
-    return particles
+function desktopMotion($: EngineInterface, loaded: LoadedModster, encounter: BandEncounter, current: IdleScene, slot: { columns: number; maxRows: number | undefined }, scale: { scale: number; sheetScale: number }, now: number): DesktopMotion | undefined {
+  const strip = desktopSceneSvg($, current, slot.columns, slot.maxRows, true)
+  if (!strip) return undefined
+  const times = (motion ??= { id: now })
+  // A throw ends the arrival: its own motion takes the Svg (0051 point 5)
+  const settled = encounter.phase === 'appearing' || encounter.phase === 'waiting'
+  const at = motionStage(times, now)
+  const stage = at === 'arrive' && !settled ? 'up' : at
+  const rows = Math.max(1, Math.floor(strip.height / DESKTOP.rowPx))
+  const panelColumns = Math.floor(MOTION.slidePx / MOTION.columnPx)
+  const maxTries = machine?.encounter?.maxAttempts ?? encounter.attemptsLeft
+  const fills = { ...MOTION.buttonFills }
+  const off: ControlsProps = { encounter: null, showAfterMs: 0, buttons: false, triesLeft: null, maxTries, fills, panelColumns, rows, hit: null }
+  // After the departure: the still strip until the encounter ends
+  if (stage === 'gone') return { source: strip.source, height: strip.height, controls: off }
+  // A caught Modster leaves as its catcher's last frame, sized as the throw was (0053)
+  const last = stage === 'leave' && times.caught ? times.lastFrame : undefined
+  const maxHeight = strip.height * MOTION.modsterFill
+  const lastScale = last ? Math.min(scale.scale, maxHeight / last.height) : 0
+  const art = last ? { source: last.svg, width: last.width * lastScale, height: last.height * lastScale } : desktopArt($, loaded, { ...scale, maxHeight })
+  if (!art) return undefined
+  const layout = motionLayout(strip, slot.columns * MOTION.columnPx, art)
+  // A catch with no catcher drawn leaves with its tag alone
+  const actor = stage === 'leave' && times.caught && !last ? undefined : art.source
+  const tag = stage === 'leave' ? resultText(encounter) : `${encounter.name}${encounter.alreadyCaught ? ` ${BAND.caughtMark}` : ''} · ${encounter.tier}`
+  const stamp = stage === 'leave' ? (times.departAt ?? now) : (times.appearedAt ?? times.id)
+  // The arrival keeps its first source: a caught mark read mid-arrival waits for the next motion
+  const key = `${stage}/${stamp}/${stage === 'arrive' ? '' : tag}/${strip.width}/${strip.height}/${slot.columns}/${art.width}/${art.height}`
+  let cached = motionCache
+  if (!cached || cached.key !== key || cached.strip !== strip.source || cached.actor !== actor) {
+    const source = encounterMotionSvg({ strip, layout, stage, stamp, ...(actor ? { actor } : {}), tag, caught: times.caught === true })
+    if (!source) $.ui.log(`encounter motion: no Svg for ${loaded.modster.id}, over ${DESKTOP.svgMaxChars} characters; showing the Modster alone`, { to: 'debug' })
+    cached = { key, strip: strip.source, actor, source }
+    motionCache = cached
   }
-  const source = encounterSceneSvg(current, particlesFor, actor, { width, center: shown / 2, scale })
-  if (!source) $.ui.log(`encounter scene: no Svg for ${loaded.modster.id}, over ${DESKTOP.svgMaxChars} characters; showing the Modster alone`, { to: 'debug' })
-  const image = current.sheet !== undefined || current.particleSheet !== undefined || !actor.isInteractive
-  const drawn = source ? { source, height: stripPx * scale, image } : undefined
-  encounterSceneCache = { scene: current, actor: actor.source, scale, width, drawn }
-  return drawn
+  if (!cached.source) return undefined
+  if (stage === 'leave') return { source: cached.source, height: strip.height, controls: off }
+  const elapsed = times.appearedAt === undefined ? Infinity : now - times.appearedAt
+  const buttons = settled
+  return {
+    source: cached.source,
+    height: strip.height,
+    controls: {
+      encounter: times.id,
+      showAfterMs: Math.max(0, BUTTONS_AFTER_MS - elapsed),
+      buttons,
+      triesLeft: encounter.phase === 'result' ? null : encounter.attemptsLeft,
+      maxTries,
+      fills,
+      panelColumns,
+      rows,
+      hit: buttons ? hitCells(layout.modster) : null,
+    },
+  }
 }
 
 /** Runs the scene's timer only while Claude works, no encounter is up and the band draws the scene (0026 point 5). */
