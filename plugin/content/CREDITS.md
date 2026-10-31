@@ -56,6 +56,8 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `biomes/saltbreeze-bay/background.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Idle scene (decision 0026) |
 | `biomes/dustwind-expanse/background.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Idle scene (decision 0026) |
 | `biomes/crystal-grotto/background.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Idle scene (decision 0026) |
+| `biomes/crystal-grotto/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Crystal Grotto's desktop background (P5-61, decision 0045), reduced from @danielpg95's reference; the crystal clusters glint in turn |
+| `biomes/crystal-grotto/particles.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Crystal Grotto's sparkle on desktop (P5-61, decision 0046): it twinkles from a dot to a four-point star |
 
 The `.sprite.json` next to each sheet is generated from it with `npm run sprite`.
 | `catchers/jar/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Glass jar, the default catcher (decision 0035); P5-29 |

@@ -6,6 +6,8 @@
   "accentColor": "#f48fb1",
   "background": "background.sprite.json",
   "backgroundFps": 2,
+  "desktopBackground": { "file": "desktop.png", "frames": 4 },
+  "desktopParticles": { "file": "particles.png", "frames": 4 },
   "particles": { "style": "sparkle", "color": "#ffd6e8", "density": 2 },
   "encounterEverySec": [10, 30],
   "modsters": [
