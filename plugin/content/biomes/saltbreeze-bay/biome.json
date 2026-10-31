@@ -6,7 +6,7 @@
   "accentColor": "#2196f3",
   "background": "background.sprite.json",
   "backgroundFps": 1,
-  "particles": { "style": "bubble", "color": "#e3f2fd", "density": 1 },
+  "desktopBackground": { "file": "desktop.png", "frames": 4 },
   "encounterEverySec": [10, 30],
   "modsters": [
     { "id": "crabbit" },

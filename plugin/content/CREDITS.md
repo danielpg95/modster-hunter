@@ -54,8 +54,13 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `biomes/whispering-forest/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Whispering Forest's desktop background (P5-48, decision 0045), reduced from @danielpg95's reference; the undergrowth sways |
 | `biomes/whispering-forest/particles.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Whispering Forest's falling leaf on desktop (P5-48, decision 0046): it turns and flips as it falls |
 | `biomes/saltbreeze-bay/background.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Idle scene (decision 0026) |
+| `biomes/saltbreeze-bay/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Saltbreeze Bay's desktop background (P5-61, decision 0045), reduced from @danielpg95's reference; the waves roll toward the shore |
 | `biomes/dustwind-expanse/background.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Idle scene (decision 0026) |
+| `biomes/dustwind-expanse/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Dustwind Expanse's desktop background (P5-61, decision 0045), reduced from @danielpg95's reference; the dry bushes bend in the wind |
+| `biomes/dustwind-expanse/particles.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Dustwind Expanse's blown dust on desktop (P5-61, decision 0046): three loose grains that drift apart and back |
 | `biomes/crystal-grotto/background.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Idle scene (decision 0026) |
+| `biomes/crystal-grotto/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Crystal Grotto's desktop background (P5-61, decision 0045), reduced from @danielpg95's reference; the crystal clusters glint in turn |
+| `biomes/crystal-grotto/particles.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Crystal Grotto's sparkle on desktop (P5-61, decision 0046): it twinkles from a dot to a four-point star |
 
 The `.sprite.json` next to each sheet is generated from it with `npm run sprite`.
 | `catchers/jar/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Glass jar, the default catcher (decision 0035); P5-29 |
