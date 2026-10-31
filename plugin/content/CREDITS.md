@@ -33,6 +33,7 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/shardling/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Shardling, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/shardling/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Shardling's desktop sheet (P5-63, decision 0045), reduced from @danielpg95's reference, with a third shard in place of the blush; a body bob, a glint across the crystals, sparkles and a blink |
 | `modsters/glowcap/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Glowcap, redrawn in P5-26 from @danielpg95's reference |
+| `modsters/glowcap/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Glowcap's desktop sheet (P5-63, decision 0045), reduced from @danielpg95's reference; a body bob, twinkling sparkles, and a cap that dims and lights up again with a blink |
 | `modsters/mossmole/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Mossmole, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/echobat/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Echobat, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/prismite/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Prismite, redrawn in P5-26 from @danielpg95's reference |
