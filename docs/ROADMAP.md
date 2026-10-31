@@ -975,7 +975,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Goal:** Crystal Grotto, Dustwind Expanse and Saltbreeze Bay each have a desktop scene like Whispering Forest's: a `desktopBackground` and `desktopParticles` (asked by @danielpg95, 2026-10-30). Their Modsters' desktop sheets are separate tasks.
 - **Done when:**
   - [ ] Each of the three biomes ships a `desktopBackground` made from a reference with `add-biome`'s background prompt, keeping its theme and terminal background's feel, approved by @danielpg95 one at a time.
-  - [ ] Each ships `desktopParticles` matching its terminal `particles` style, approved by @danielpg95.
+  - [ ] Crystal Grotto and Dustwind Expanse ship `desktopParticles` matching their terminal `particles` style, approved by @danielpg95. Saltbreeze Bay drops its particles on desktop and in the terminal (@danielpg95, 2026-10-30: the waves read better alone).
   - [ ] A credits row for every new image in `plugin/content/CREDITS.md`.
   - [ ] `node tools/check-content.mjs` passes, and the PR shows a desktop preview of each scene.
   - [ ] Checked in the Code tab: the band, the pane and the Biomes tab for each biome.
