@@ -988,6 +988,16 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] The caught mark comes from the collection records in memory before the arrival's first draw; the store check still adds it for a catch another session saved. A test covers a store that answers after the first draw.
   - [x] Checked in the Code tab: a caught Modster's name tag shows the mark as it fades in, before any throw.
 
+#### [ ] P5-63 — Desktop art for the Crystal Grotto roster
+- **Depends on:** P5-53, P5-61
+- **Size:** M
+- **Goal:** every Crystal Grotto Modster (#011–#020) has a desktop sheet, so the grotto is fully migrated to desktop art like Whispering Forest (asked by @danielpg95, 2026-10-31). Each keeps its design, colours, types and dex entry; Gemsnake keeps its close-up pose.
+- **Done when:**
+  - [ ] Shardling, Glowcap, Mossmole, Echobat, Prismite, Quartzclaw, Geodon, Gemsnake, Amethowl and Geolem each ship a `desktopSprite` made from a reference with `add-modster`'s desktop prompt: the same design as the terminal sprite, at least 76×80 so every built-in catcher fits, with a smooth idle animation, approved by @danielpg95 one at a time.
+  - [ ] A credits row for every new sheet in `plugin/content/CREDITS.md`.
+  - [ ] `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
+  - [ ] Checked in the Code tab: the band, the encounter pane and the Collection tab.
+
 ---
 
 ## Phase 6 — Beyond the terminal
