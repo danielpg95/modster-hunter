@@ -870,11 +870,11 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 #### [ ] P5-51 — First desktop art set
 - **Depends on:** P5-21, P5-47, P5-48, P5-49
 - **Size:** M
-- **Goal:** the first built-in desktop art, made with the new skills: Tidecrown (#036), Saltbreeze Bay's background and one catcher (not the puzzle cube, which got its sheet in P5-47).
+- **Goal:** the first built-in desktop art, made with the new skills: Tidecrown (#036) and one catcher (not the puzzle cube, which got its sheet in P5-47). Saltbreeze Bay's background moved to P5-61 on 2026-10-30.
 - **Done when:**
-  - [ ] Tidecrown's desktop sheet (from @victor-aguilars's detailed design), Saltbreeze Bay's `desktopBackground` and one catcher's `desktopSprite` are original, credited and pass the validator.
+  - [ ] Tidecrown's desktop sheet (from @victor-aguilars's detailed design) and one catcher's `desktopSprite` are original, credited and pass the validator.
   - [ ] A preview of each in the PR description, every frame, dark and light.
-  - [ ] Checked in the Code tab: band, pane, Collection, Biomes tab and a throw.
+  - [ ] Checked in the Code tab: band, pane, Collection and a throw.
 
 
 #### [x] P5-52 — Desktop interaction (spike)
@@ -968,6 +968,18 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Done when:**
   - [x] The desktop idle scene (band and pane) and the Biomes tab's scene are drawn in image mode whatever the biome's art, so they take their own width; tests cover a terminal-art biome in each.
   - [x] Checked in the Code tab with a biome without desktop art: the scene fills the slot in the band, the pane and the Biomes tab, and still animates.
+
+#### [ ] P5-61 — Desktop scenes for the other biomes
+- **Depends on:** P5-48, P5-49
+- **Size:** M
+- **Goal:** Crystal Grotto, Dustwind Expanse and Saltbreeze Bay each have a desktop scene like Whispering Forest's: a `desktopBackground` and `desktopParticles` (asked by @danielpg95, 2026-10-30). Their Modsters' desktop sheets are separate tasks.
+- **Done when:**
+  - [ ] Each of the three biomes ships a `desktopBackground` made from a reference with `add-biome`'s background prompt, keeping its theme and terminal background's feel, approved by @danielpg95 one at a time.
+  - [ ] Each ships `desktopParticles` matching its terminal `particles` style, approved by @danielpg95.
+  - [ ] A credits row for every new image in `plugin/content/CREDITS.md`.
+  - [ ] `node tools/check-content.mjs` passes, and the PR shows a desktop preview of each scene.
+  - [ ] Checked in the Code tab: the band, the pane and the Biomes tab for each biome.
+
 ---
 
 ## Phase 6 — Beyond the terminal
