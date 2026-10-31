@@ -37,6 +37,7 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/mossmole/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Mossmole, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/mossmole/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Mossmole's desktop sheet (P5-63, decision 0045), reduced from @danielpg95's reference; a nose sniff, a body bob and a crystal glint |
 | `modsters/echobat/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Echobat, redrawn in P5-26 from @danielpg95's reference |
+| `modsters/echobat/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Echobat's desktop sheet (P5-63, decision 0045), reduced from @danielpg95's reference; a bending wing flap, a 1 px hover, sound rings from its ears and a blink |
 | `modsters/prismite/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Prismite, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/quartzclaw/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Quartzclaw, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/geodon/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Geodon, redrawn in P5-26 from @danielpg95's reference |
