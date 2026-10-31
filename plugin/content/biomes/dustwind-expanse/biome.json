@@ -6,7 +6,9 @@
   "accentColor": "#e0a040",
   "background": "background.sprite.json",
   "backgroundFps": 2,
-  "particles": { "style": "sand", "color": "#b47c34", "density": 3 },
+  "desktopBackground": { "file": "desktop.png", "frames": 4 },
+  "desktopParticles": { "file": "particles.png", "frames": 4 },
+  "particles": { "style": "sand", "color": "#b47c34", "density": 2 },
   "encounterEverySec": [10, 30],
   "modsters": [
     { "id": "dunebun" },
