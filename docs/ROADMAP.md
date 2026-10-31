@@ -980,13 +980,13 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `node tools/check-content.mjs` passes, and the PR shows a desktop preview of each scene.
   - [x] Checked in the Code tab: the band, the pane and the Biomes tab for each biome.
 
-#### [ ] P5-62 — Desktop caught mark on arrival
+#### [x] P5-62 — Desktop caught mark on arrival
 - **Depends on:** P5-58
 - **Size:** S
 - **Goal:** on desktop a Modster already in the collection arrives with its caught mark. Today the mark shows only after the first throw: the store check answers after the arrival is drawn, and the redraw is skipped so the arrival doesn't restart (found by @danielpg95, 2026-10-30).
 - **Done when:**
-  - [ ] The caught mark comes from the collection records in memory before the arrival's first draw; the store check still adds it for a catch another session saved. A test covers a store that answers after the first draw.
-  - [ ] Checked in the Code tab: a caught Modster's name tag shows the mark as it fades in, before any throw.
+  - [x] The caught mark comes from the collection records in memory before the arrival's first draw; the store check still adds it for a catch another session saved. A test covers a store that answers after the first draw.
+  - [x] Checked in the Code tab: a caught Modster's name tag shows the mark as it fades in, before any throw.
 
 ---
 
