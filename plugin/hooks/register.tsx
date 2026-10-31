@@ -1694,16 +1694,17 @@ async function advanceMachine($: EngineInterface, action: MachineAction): Promis
   // Appearing to waiting changes nothing the desktop draws (the Client times its buttons), and the
   // redraw would restart the arrival a second in
   const unseen = motionOnly() && step.events.length === 0 && phaseBefore === 'appearing' && machine.encounter?.phase === 'waiting'
+  const appeared = step.events.find((event) => event.type === 'appeared')
+  // Before the redraw, so the arrival is drawn with the caught mark
+  if (appeared) {
+    encounterModster = content?.modsters.get(appeared.modsterId)
+    checkAlreadyCaught($, appeared.modsterId)
+  }
   if (!unseen) $.ui.invalidate('ui.render')
   updateStatus($)
   const where = { sessionId, biomeId: machineContext.biome.id }
   if (step.events.length > 0) queueWrite($, (store) => recordEncounterEvents(store, where, step.events, now))
   for (const event of step.events) if (event.type === 'caught') refreshCollectionRecord($, event.modsterId)
-  const appeared = step.events.find((event) => event.type === 'appeared')
-  if (appeared) {
-    encounterModster = content?.modsters.get(appeared.modsterId)
-    checkAlreadyCaught($, appeared.modsterId)
-  }
   if (retiredBiome && !machine.encounter) {
     const loaded = moveToNewBiome($, machineContext.idleTimeoutMs / 1000)
     $.ui.toast(loaded ? `Modster Hunter: now in ${loaded.biome.name}` : `Modster Hunter: ${noBiomesMessage(builtinsIncluded, USER_FOLDER_LABEL)}`)
@@ -1741,16 +1742,17 @@ function updateMotion(now: number, appeared: boolean): void {
 }
 
 /**
- * Reads whether the collection has `modsterId`, once, as it appears (P5-10).
- * Queued after earlier writes so the last encounter's catch counts; a catch in
- * this encounter doesn't add the mark until the next one.
+ * Whether the collection has `modsterId`, once, as it appears (P5-10): from the
+ * records in memory, so the first draw has the mark, then from the store, for a
+ * catch another session saved since they loaded. A catch in this encounter
+ * doesn't add the mark until the next one.
  */
 function checkAlreadyCaught($: EngineInterface, modsterId: string): void {
-  alreadyCaught = false
+  alreadyCaught = collectionRecords.has(modsterId)
   const check = ++caughtCheck
   queueWrite($, async (store) => {
     const caught = await isCaught(store, modsterId)
-    if (!caught || check !== caughtCheck) return
+    if (!caught || alreadyCaught || check !== caughtCheck) return
     alreadyCaught = true
     // Not during the desktop arrival, which a redraw restarts: the mark shows from the next one
     if (motionOnly() && motion && motionStage(motion, await $.clock.now()) === 'arrive') return

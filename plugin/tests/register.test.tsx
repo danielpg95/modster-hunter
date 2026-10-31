@@ -10,7 +10,7 @@ import { validBiome } from './fixtures/valid-biome'
 import { validModster } from './fixtures/valid-modster'
 import { validUserModster } from './fixtures/valid-user-modster'
 import { validSprite } from './fixtures/valid-sprite'
-import { CATCH, DESKTOP, IDLE_TAG, MOTION } from '../hooks/constants'
+import { BAND, CATCH, DESKTOP, IDLE_TAG, MOTION } from '../hooks/constants'
 import { BUTTONS_AFTER_MS } from '../hooks/render'
 import { throwingMs } from '../hooks/game'
 
@@ -490,6 +490,33 @@ describe('register', () => {
     await ui.advance(BUTTONS_AFTER_MS)
     await ui.press({ key: 'throw' })
     expect((await ui.find({ type: 'Svg' }))?.props.source).toContain('data-throw')
+    await ui.unmount()
+  })
+
+  test('on desktop a Modster already in the collection arrives with the caught mark, before any throw (P5-10)', HUNTING, async ($, on) => {
+    // Same in-memory stand-in for $.store as the catch test above
+    const store: Record<string, unknown> = {
+      'caught:sproutling': { v: 1, count: 1, shinyCount: 0, firstCaughtAt: 1, lastCaughtAt: 1, bestTier: 'common', biomes: { 'whispering-forest': 1 } },
+    }
+    // Reads after session start hang until released: the store answers after the first draw, as it can live
+    let held = false
+    const waiting: (() => void)[] = []
+    on('store.get', async ($, e) => {
+      if (held) await new Promise<void>((resolve) => waiting.push(resolve))
+      return { value: structuredClone(store[e.key]) }
+    })
+    on('store.set', ($, e) => {
+      store[e.key] = structuredClone(e.value)
+      return { value: undefined }
+    })
+    const { ui, clock } = await startBand($, on, { ...sceneForest(), ...catcherFiles() }, 'desktop')
+    held = true
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(3_000 + BAND_TICK)
+    const arrival = (await ui.find({ type: 'Svg' }))?.props.source
+    expect(arrival).toContain('data-motion="arrive/')
+    expect(arrival).toContain(`>Sproutling ${BAND.caughtMark} · common</text>`)
+    for (const release of waiting.splice(0)) release()
     await ui.unmount()
   })
 
