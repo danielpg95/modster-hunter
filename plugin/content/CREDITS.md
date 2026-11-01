@@ -43,6 +43,7 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/quartzclaw/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Quartzclaw, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/quartzclaw/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Quartzclaw's desktop sheet (P5-63, decision 0045), reduced from @danielpg95's reference; a bending claw sway, a body bob, a claw glint with a sparkle and a blink |
 | `modsters/geodon/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Geodon, redrawn in P5-26 from @danielpg95's reference |
+| `modsters/geodon/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Geodon's desktop sheet (P5-63, decision 0045), reduced from @danielpg95's reference; twinkling amethyst, a head nod, rising motes and a blink |
 | `modsters/gemsnake/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Gemsnake, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/amethowl/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Amethowl, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/geolem/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Geolem, redrawn in P5-26 from @danielpg95's reference |
