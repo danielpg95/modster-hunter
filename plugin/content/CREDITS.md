@@ -39,6 +39,7 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/echobat/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Echobat, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/echobat/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Echobat's desktop sheet (P5-63, decision 0045), reduced from @danielpg95's reference; a bending wing flap, a 1 px hover, sound rings from its ears and a blink |
 | `modsters/prismite/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Prismite, redrawn in P5-26 from @danielpg95's reference |
+| `modsters/prismite/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Prismite's desktop sheet (P5-63, decision 0045), reduced from @danielpg95's reference, with its rainbow redrawn as stripes; a cycling rainbow, a hover, a wing flutter and twinkling sparkles |
 | `modsters/quartzclaw/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Quartzclaw, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/geodon/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Geodon, redrawn in P5-26 from @danielpg95's reference |
 | `modsters/gemsnake/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Gemsnake, redrawn in P5-26 from @danielpg95's reference |
