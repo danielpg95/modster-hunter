@@ -19,7 +19,6 @@ this file lists only tasks someone has claimed.
 | P5-34 | @victor-aguilars | in-progress | p5-34-readme-install | 2026-10-22 | 2026-10-22 | Hand check on a second computer: fresh install of 0.1.0 from the marketplace, then tick the items (README merged in #149) |
 | P5-36 | @victor-aguilars | in-review | p5-36-in-game-settings | 2026-10-22 | 2026-10-22 | Merge #155, #156, then the P5-36 PR; then close the task |
 | P5-64 | @victor-aguilars | in-review | p5-64-desktop-collection-cards | 2026-11-01 | 2026-11-01 | Get the P5-64 PR reviewed; @danielpg95 accepts or reworks 0054, then tick the last item and close the task |
-| P5-66 | @danielpg95 | in-progress | p5-66-desktop-fit-height | 2026-11-02 | 2026-11-02 | Write decision 0056 (target height, width cap, catchers), then fit the sheet scale |
 
 ## Up next
 

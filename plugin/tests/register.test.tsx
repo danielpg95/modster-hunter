@@ -232,11 +232,26 @@ describe('register', () => {
     expect(svg?.props.alt).toBe('Sproutling')
     expect(svg?.props.source).toContain('<image href="data:image/png;base64,')
     expect(svg?.props.isInteractive).toBeUndefined()
-    // The fixture sheet is 32×32 at the band's 0.5
-    expect([svg?.props.width, svg?.props.height]).toEqual([32 * DESKTOP.sheetBandScale, 32 * DESKTOP.sheetBandScale])
+    // The fixture's 20 rows of art reach the band's target, its 32×32 frame scaled with them (0056)
+    const scale = DESKTOP.bandFitPx / 20
+    expect([svg?.props.width, svg?.props.height]).toEqual([32 * scale, 32 * scale])
     await ui.redraw({ ...BAND_PROPS, maxRows: 2 } as any)
     expect((await ui.find({ type: 'Svg' }))?.props.height).toBeLessThanOrEqual(2 * DESKTOP.rowPx)
     expect(await ui.find({ type: 'Button', key: 'throw' })).toBeDefined()
+    await ui.unmount()
+  })
+
+  test('on desktop the band\'s scene fits the Modster\'s art to the strip, as the pane does (0056 point 2)', HUNTING, async ($, on) => {
+    const { ui, clock } = await startBand($, on, desktopOnlyForest(), 'desktop')
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(3_000 + BAND_TICK + 1_000)
+    const svg = await ui.find({ type: 'Svg' })
+    const strip = svg?.props.height as number
+    // The fixture's 20 rows of art aim for the strip's share; its 32-row frame may take the whole strip
+    const scale = Math.min((strip * MOTION.artFill) / 20, strip / 32)
+    const actor = (svg?.props.source as string).match(/<svg x="[^"]*" y="[^"]*" width="[^"]*" height="([^"]*)"/)
+    expect(Number(actor?.[1])).toBeGreaterThan(32 * DESKTOP.sheetBandScale)
+    expect(Math.round(Number(actor?.[1]))).toBe(Math.round(32 * scale))
     await ui.unmount()
   })
 

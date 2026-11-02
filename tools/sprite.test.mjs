@@ -219,7 +219,7 @@ test('--desktop --preview writes a browser page: the GIF and the mod\'s own Svg 
   assert.equal(code, 0, stderr)
   const html = readFileSync(page, 'utf8')
   assert.match(html, /data:image\/svg\+xml;utf8,/)
-  assert.match(html, /pane, 1×/)
+  assert.match(html, /pane, [\d.]+×/)
   assert.match(html, /uncaught silhouette/)
   assert.match(html, /data%3Aimage%2Fpng%3Bbase64%2C/)
 })

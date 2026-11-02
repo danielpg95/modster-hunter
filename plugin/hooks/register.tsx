@@ -82,6 +82,7 @@ import {
   settingsLines,
   pixelsToSvg,
   desktopSheetSvg,
+  sheetFitScale,
   spriteCells,
   spriteRgba,
   statsCards,
@@ -536,7 +537,7 @@ export const register: Register = (on, options) => {
       const { Svg, Client } = $.ui.resolve(e)
       // 0051: the encounter plays in the idle scene, at its size, with the controls in a Client over it
       const slot = { columns: e.props.bodyColumns, maxRows: e.props.maxRows }
-      const staged = sheetScene && showIdleScene ? desktopMotion($, modster, band, sheetScene, slot, { scale: DESKTOP.bandScale, sheetScale: DESKTOP.sheetBandScale }, await $.clock.now()) : undefined
+      const staged = sheetScene && showIdleScene ? desktopMotion($, modster, band, sheetScene, slot, BAND_ART, await $.clock.now()) : undefined
       encounterSites.set(`${e.surface}/${e.requestId}`, staged !== undefined)
       if (staged) {
         return (
@@ -548,7 +549,7 @@ export const register: Register = (on, options) => {
           </Box>
         )
       }
-      const art = desktopArt($, modster, { scale: DESKTOP.bandScale, sheetScale: DESKTOP.sheetBandScale, maxHeight: e.props.maxRows * DESKTOP.rowPx })
+      const art = desktopArt($, modster, { ...BAND_ART, maxHeight: e.props.maxRows * DESKTOP.rowPx })
       if (!art) return lines
       return (
         <Box flexDirection="row" columnGap={BAND.gapColumns}>
@@ -704,7 +705,7 @@ export const register: Register = (on, options) => {
       // 0051: the encounter plays in the idle scene, at its size, with the controls in a Client over it;
       // the scene shows the biome, so there's no header. Without a scene, or over the limit, the Modster stands alone
       const slot = { columns, maxRows: e.props.scroll.bodyRows }
-      const staged = sheetScene && showIdleScene ? desktopMotion($, modster, encounter, sheetScene, slot, { scale: DESKTOP.paneScale, sheetScale: DESKTOP.sheetPaneScale }, await $.clock.now()) : undefined
+      const staged = sheetScene && showIdleScene ? desktopMotion($, modster, encounter, sheetScene, slot, PANE_ART, await $.clock.now()) : undefined
       encounterSites.set(`${e.surface}/${e.requestId}`, staged !== undefined)
       if (staged) {
         return (
@@ -716,7 +717,7 @@ export const register: Register = (on, options) => {
           </Box>
         )
       }
-      const art = desktopArt($, modster, { scale: DESKTOP.paneScale, sheetScale: DESKTOP.sheetPaneScale })
+      const art = desktopArt($, modster, PANE_ART)
       return (
         <Box flexDirection="column">
           {header}
@@ -1360,7 +1361,7 @@ export const register: Register = (on, options) => {
         const { Svg } = $.ui.resolve(e)
         const caught = selected.record !== undefined
         const art = loaded.desktop
-          ? sheetArt(loaded.modster, loaded.desktop, DESKTOP.sheetCollectionScale, caught ? undefined : COLLECTION.silhouetteColor)
+          ? sheetArt(loaded.modster, loaded.desktop, fitScale(loaded.desktop, DESKTOP.collectionFitPx), caught ? undefined : COLLECTION.silhouetteColor)
           : hasSprite(loaded)
             ? {
                 source: caught ? svgFor(loaded) : silhouetteSvgFor(loaded),
@@ -1403,7 +1404,7 @@ export const register: Register = (on, options) => {
         const shown = entries.slice(page * pageSize, (page + 1) * pageSize)
         const arts = shown.map((entry) => {
           const entryLoaded = content?.modsters.get(entry.id) ?? content?.off.modsters.get(entry.id)
-          return entryLoaded ? cardArt(entryLoaded, entry.record !== undefined, thumbPx) : undefined
+          return entryLoaded ? cardArt(entryLoaded, entry.record !== undefined, thumbPx, { width: cardColumns * DESKTOP.columnPx, height: thumbRows * DESKTOP.rowPx }) : undefined
         })
         // A page over the budget drops its sprites rather than have the whole drawing refused
         const cardChars = arts.reduce((sum, art) => sum + (art?.source.length ?? 0), 0)
@@ -1702,22 +1703,44 @@ interface DesktopArt {
   isInteractive: boolean
 }
 
+/** How the desktop sizes a Modster on a surface: terminal art at `scale`, a sheet's art at `fitPx` tall (0056). */
+interface ArtSize {
+  scale: number
+  /** The old size per sheet pixel (0045): a sheet's fit scale over it is how much its throw grows (0056 point 5) */
+  sheetScale: number
+  fitPx: number
+}
+
+const PANE_ART: ArtSize = { scale: DESKTOP.paneScale, sheetScale: DESKTOP.sheetPaneScale, fitPx: DESKTOP.paneFitPx }
+const BAND_ART: ArtSize = { scale: DESKTOP.bandScale, sheetScale: DESKTOP.sheetBandScale, fitPx: DESKTOP.bandFitPx }
+
+/** A sheet's scale so its art reaches `fitPx` tall, within the width cap and `maxHeight` for the frame (0056 points 2–3). */
+function fitScale(sheet: DesktopSheet, fitPx: number, maxHeight?: number): number {
+  return sheetFitScale(sheet, { artWidth: fitPx * DESKTOP.fitWidthShare, artHeight: fitPx, ...(maxHeight === undefined ? {} : { frameHeight: maxHeight }) })
+}
+
+/** How much bigger than 0045's size a Modster's sheet is drawn, so its throw and caught frame grow with it (0056 point 5). */
+function growth(loaded: LoadedModster, size: ArtSize): number {
+  return loaded.desktop ? fitScale(loaded.desktop, size.fitPx) / size.sheetScale : 1
+}
+
 /**
- * The Modster as the desktop draws it at `scale` per terminal pixel, or `sheetScale` per
- * desktop sheet pixel, made smaller to fit `maxHeight`. A desktop sheet wins over the
+ * The Modster as the desktop draws it: a desktop sheet fitted to `fitPx` (0056), else the terminal
+ * sprite at `scale` per pixel, made smaller to fit `maxHeight`. A desktop sheet wins over the
  * terminal sprite (0045 point 2); with neither, undefined, and the text stands alone.
- * The sheet holds still in its idle loop during a throw until P5-47 draws desktop throws.
  */
-function desktopArt($: EngineInterface, loaded: LoadedModster, size: { scale: number; sheetScale: number; maxHeight?: number }): DesktopArt | undefined {
+function desktopArt($: EngineInterface, loaded: LoadedModster, size: ArtSize & { maxHeight?: number; sheetRoom?: { art: number; frame: number } }): DesktopArt | undefined {
   const fit = (scale: number, height: number) => Math.min(scale, (size.maxHeight ?? Infinity) / height)
   // A throw plays as one Svg in terminal pixels at the terminal scale (0043); desktop sheets in it are quarter size (0045 point 5)
   const play = catchPlay
   const thrown = play?.desktop && throwSvg($, loaded, play)
   if (play?.desktop && thrown) {
-    const scale = fit(size.scale, play.desktop.height)
+    const scale = fit(size.scale * growth(loaded, size), play.desktop.height)
     return { source: thrown.svg, width: Math.round(play.desktop.width * scale), height: Math.round(play.desktop.height * scale), isInteractive: !thrown.image }
   }
-  if (loaded.desktop) return sheetArt(loaded.modster, loaded.desktop, fit(size.sheetScale, loaded.desktop.height))
+  // In the scene the art stays within maxHeight and its clear margins may take the rest of the strip (0056 point 3)
+  const room = size.sheetRoom
+  if (loaded.desktop) return sheetArt(loaded.modster, loaded.desktop, fitScale(loaded.desktop, Math.min(size.fitPx, room?.art ?? Infinity), room?.frame ?? size.maxHeight))
   if (!hasSprite(loaded)) return undefined
   const scale = fit(size.scale, loaded.sprite.height)
   return { source: svgFor(loaded), width: Math.round(loaded.sprite.width * scale), height: Math.round(loaded.sprite.height * scale), isInteractive: true }
@@ -2418,7 +2441,7 @@ interface DesktopMotion {
  * Svg made once, so an unplanned redraw draws the same source. Undefined without the strip or art,
  * or over the Svg limit; the caller then draws the Modster and the text as before.
  */
-function desktopMotion($: EngineInterface, loaded: LoadedModster, encounter: BandEncounter, current: IdleScene, slot: { columns: number; maxRows: number | undefined }, scale: { scale: number; sheetScale: number }, now: number): DesktopMotion | undefined {
+function desktopMotion($: EngineInterface, loaded: LoadedModster, encounter: BandEncounter, current: IdleScene, slot: { columns: number; maxRows: number | undefined }, scale: ArtSize, now: number): DesktopMotion | undefined {
   const strip = desktopSceneSvg($, current, slot.columns, slot.maxRows, true)
   if (!strip) return undefined
   const times = (motion ??= { id: now })
@@ -2433,11 +2456,13 @@ function desktopMotion($: EngineInterface, loaded: LoadedModster, encounter: Ban
   const off: ControlsProps = { encounter: null, showAfterMs: 0, buttons: false, triesLeft: null, maxTries, fills, panelColumns, rows, hit: null }
   // After the departure: the still strip until the encounter ends
   if (stage === 'gone') return { source: strip.source, height: strip.height, controls: off }
-  // A caught Modster leaves as its catcher's last frame, sized as the throw was (0053)
+  // A caught Modster leaves as its catcher's last frame, sized as the throw was (0053, 0056 point 5)
   const last = stage === 'leave' && times.caught ? times.lastFrame : undefined
+  // In the scene the art's target is the strip's own share, in the band as in the pane (0056 point 2)
   const maxHeight = strip.height * MOTION.modsterFill
-  const lastScale = last ? Math.min(scale.scale, maxHeight / last.height) : 0
-  const art = last ? { source: last.svg, width: last.width * lastScale, height: last.height * lastScale } : desktopArt($, loaded, { ...scale, maxHeight })
+  const size = { ...scale, fitPx: strip.height * MOTION.artFill }
+  const lastScale = last ? Math.min(scale.scale * growth(loaded, size), maxHeight / last.height) : 0
+  const art = last ? { source: last.svg, width: last.width * lastScale, height: last.height * lastScale } : desktopArt($, loaded, { ...size, maxHeight, sheetRoom: { art: size.fitPx, frame: strip.height } })
   if (!art) return undefined
   const layout = motionLayout(strip, slot.columns * MOTION.columnPx, art)
   // A catch with no catcher drawn leaves with its tag alone
@@ -2607,11 +2632,15 @@ function useCatcher($: EngineInterface, entry: CatcherEntry): void {
 /** The Collection tab's silhouette as a still Svg (P5-38), made once per Modster. */
 /**
  * A card's sprite on desktop (0054): fitted into the thumbnail square, holding its first frame (only the
- * selected Modster moves, in the detail), a gray silhouette until caught.
+ * selected Modster moves, in the detail), a gray silhouette until caught. A sheet's art fills the square,
+ * not its frame, with the margins kept within the card's `room` (0056 point 4).
  */
-function cardArt(loaded: LoadedModster, caught: boolean, thumbPx: number): { source: string; width: number; height: number } | undefined {
+function cardArt(loaded: LoadedModster, caught: boolean, thumbPx: number, room: { width: number; height: number }): { source: string; width: number; height: number } | undefined {
   const fit = (width: number, height: number) => Math.min(thumbPx / width, thumbPx / height)
-  if (loaded.desktop) return sheetArt(loaded.modster, loaded.desktop, fit(loaded.desktop.width, loaded.desktop.height), caught ? undefined : COLLECTION.silhouetteColor, true)
+  if (loaded.desktop) {
+    const scale = sheetFitScale(loaded.desktop, { artWidth: thumbPx, artHeight: thumbPx, frameWidth: room.width, frameHeight: room.height })
+    return sheetArt(loaded.modster, loaded.desktop, scale, caught ? undefined : COLLECTION.silhouetteColor, true)
+  }
   if (!hasSprite(loaded)) return undefined
   const scale = fit(loaded.sprite.width, loaded.sprite.height)
   return { source: caught ? stillSvgFor(loaded) : silhouetteSvgFor(loaded), width: Math.round(loaded.sprite.width * scale), height: Math.round(loaded.sprite.height * scale) }

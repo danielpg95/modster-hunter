@@ -5,10 +5,11 @@ import { desktopSheetOf } from '../../fixtures/desktop-sheet-of'
 // The preview page for desktop art (P5-49, P5-50): the mod's own renderers, as images.
 
 describe('desktopPreviewPage', () => {
-  test('a Modster shows at the pane, Collection and band sizes, and as a silhouette', () => {
+  test('a Modster shows at the pane, Collection and band sizes, its art fitted to each (0056), and as a silhouette', () => {
     const page = desktopPreviewPage({ kind: 'modster', sheet: desktopSheetOf(32, 32, 2), bytes: 2048, fps: 4, title: 'blobby <desktop>' })
     expect(page).toContain('blobby &lt;desktop&gt;: 2 frames of 32×32, 2 colours, 2.0 KiB, 4 fps')
-    for (const label of ['pane, 1×', 'collection, 0.75×', 'uncaught silhouette', 'band, 0.5×']) expect(page).toContain(label)
+    // 32 rows of art reach 80, 60 and 40 px
+    for (const label of ['pane, 2.5×', 'collection, 1.88×', 'uncaught silhouette', 'band, 1.25×']) expect(page).toContain(label)
     expect(page).toContain('data:image/svg+xml;utf8,')
   })
 

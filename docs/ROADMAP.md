@@ -1019,15 +1019,15 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Checked in the Code tab: a catch lingers about as long as a run before the slide back.
   - [x] 0055 is accepted; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
-#### [ ] P5-66 — Desktop Modsters fit a set height
+#### [x] P5-66 — Desktop Modsters fit a set height
 - **Depends on:** P5-63
 - **Size:** M
 - **Goal:** decision 0056: on the Desktop app, each Modster is drawn so the art in its frames reaches a set height on the encounter pane, the collection and the band, instead of at its sheet's own pixel size (0045), so small sheets like most of the Crystal Grotto read clearly. `heightM` stays lore only (asked by @danielpg95, 2026-11-02).
 - **Done when:**
-  - [ ] 0056 is written and accepted, saying the target height, the width cap and what happens to catchers and throws.
-  - [ ] The pane, the collection and the band draw a desktop sheet at its fit scale; the band stays within `maxRows`. Render tests cover a small and a large sheet.
-  - [ ] Checked in the Code tab: Grotto and forest Modsters look about the same size, and a catch still lines up.
-  - [ ] `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
+  - [x] 0056 is written and accepted, saying the target height, the width cap and what happens to catchers and throws.
+  - [x] The pane, the collection and the band draw a desktop sheet at its fit scale; the band stays within `maxRows`. Render tests cover a small and a large sheet.
+  - [x] Checked in the Code tab: Grotto and forest Modsters look about the same size, and a catch still lines up (by @danielpg95 with 0.1.28, 2026-11-02).
+  - [x] `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
 ---
 

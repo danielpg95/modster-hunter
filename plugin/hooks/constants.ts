@@ -109,7 +109,14 @@ export const DESKTOP = {
   catchSampleMs: 1000 / 24,
   /** The most an `Svg` source may hold; a bigger throw keeps the idle Svg and dots (0043 point 8) */
   svgMaxChars: 131072,
-  // Desktop sheets (0045 point 9) are 4× finer than terminal sprites, so a quarter of the scales above
+  /** A desktop sheet's art reaches this height, in CSS px, whatever size it was drawn at (0056 point 2) */
+  paneFitPx: 80,
+  collectionFitPx: 60,
+  bandFitPx: 40,
+  /** The art is at most this many times its target height wide (0056 point 3) */
+  fitWidthShare: 1.6,
+  // Desktop sheets (0045 point 9) are 4× finer than terminal sprites, so a quarter of the scales above.
+  // They no longer size a Modster (0056): a sheet's fit scale over these is how much its throw grows
   sheetPaneScale: 1,
   sheetCollectionScale: 0.75,
   sheetBandScale: 0.5,
@@ -138,6 +145,8 @@ export const MOTION = {
   buttonFills: { throw: '#2e7d4f', run: '#3a3a3a' },
   /** The Modster stands at most this share of the scene's height */
   modsterFill: 0.85,
+  /** A desktop sheet's art fills this share of the scene's height, in the band and the pane (0056 point 2) */
+  artFill: 0.75,
   /** A desktop column as a Client's cells measure it, for clicks on the Modster (measured in the P5-58 spike) */
   columnPx: 8.8,
   /** Cells around the Modster that still count as a click on it */
