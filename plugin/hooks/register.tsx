@@ -64,6 +64,7 @@ import {
   tierSections,
   collectionBody,
   collectionEntries,
+  dexNumber,
   collectionLayout,
   detailLines,
   listRow,
@@ -291,6 +292,8 @@ let isBlittingPreview = false
 const silhouettes = new Map<string, string>()
 // Desktop's Svg versions of the collection's silhouettes and the Catchers tab's preview (P5-38)
 const silhouetteSvgs = new Map<string, { sprite: Sprite; svg: string }>()
+// A caught Modster's card on desktop: its first frame (0054)
+const stillSvgs = new Map<string, { sprite: Sprite; svg: string }>()
 // Desktop sheets' Svgs by Modster, scale and look (0045 point 9)
 const sheetSvgs = new Map<string, { sheet: DesktopSheet; svg: string }>()
 const catcherPreviewSvgs = new Map<string, { catcher: LoadedCatcher; modster: LoadedModster; preview: CatcherPreview | undefined }>()
@@ -1210,9 +1213,11 @@ export const register: Register = (on, options) => {
           {more ? <Text dimColor>{more}</Text> : null}
         </Box>
       )
-      // Always the same height: a short detail leaves room, a long entry is cut
+      // Always the same height: a short detail leaves room, a long entry is cut. The desktop's
+      // narrow dock wraps the dex entry over more rows, so it keeps more (0054)
+      const detailRows = e.surface === 'desktop' ? COLLECTION.desktopDetailRows : COLLECTION.detailRows
       const text = (
-        <Box key="detail-text" flexDirection="column" width={plan.textColumns} height={COLLECTION.detailRows} overflow="hidden">
+        <Box key="detail-text" flexDirection="column" width={plan.textColumns} height={detailRows} overflow="hidden">
           {lines.map((line, at) => (
             <Box key={`detail-${at}`} flexDirection="row">
               {texts(line, 'wrap')}
@@ -1260,6 +1265,87 @@ export const register: Register = (on, options) => {
         )
       } else {
         dropCollectionSite(e.requestId)
+      }
+      // 0054: on desktop the Collection tab is a grid of cards, beside the detail when the pane is wide
+      if (e.surface === 'desktop') {
+        const { Svg } = $.ui.resolve(e)
+        // The Code tab's dock is ~30 columns and a plugin can't widen it (0054 point 1), so a narrow pane gets
+        // three cards a row, with the detail above the grid so the selection is always in view
+        const isWide = e.props.bodyColumns >= COLLECTION.gridMinColumns
+        const cardColumns = isWide ? COLLECTION.cardColumns : Math.max(COLLECTION.cardMinColumns, Math.floor((e.props.bodyColumns - 1) / COLLECTION.narrowCardsPerRow))
+        const thumbPx = Math.min(COLLECTION.cardThumbPx, cardColumns * DESKTOP.columnPx - COLLECTION.cardPadPx)
+        // The pane can't be trusted to scroll back, and the whole roster's sprites are too big for one drawing
+        // (292k characters for 35 refused it), so the grid shows one page that fits, the page with the selection
+        const thumbRows = Math.ceil(thumbPx / DESKTOP.rowPx)
+        // Padding, the sprite, the number, and a name of up to two rows
+        const cardRows = 2 + thumbRows + 1 + COLLECTION.cardNameRows
+        const gridColumns = isWide ? e.props.bodyColumns - COLLECTION.gridDetailColumns - COLLECTION.gapColumns : e.props.bodyColumns
+        const perRow = Math.max(1, Math.floor(gridColumns / cardColumns))
+        // Less the summary, the pager, and (narrow) the detail and its gap
+        const gridRows = rows - 2 - (isWide ? 0 : detailRows + COLLECTION.detailArtRows + 1)
+        const pageSize = Math.min(COLLECTION.cardsPerPageMax, perRow * Math.max(1, Math.floor(gridRows / cardRows)))
+        const page = Math.floor(index / pageSize)
+        const pageCount = Math.max(1, Math.ceil(entries.length / pageSize))
+        const shown = entries.slice(page * pageSize, (page + 1) * pageSize)
+        const arts = shown.map((entry) => {
+          const entryLoaded = content?.modsters.get(entry.id) ?? content?.off.modsters.get(entry.id)
+          return entryLoaded ? cardArt(entryLoaded, entry.record !== undefined, thumbPx) : undefined
+        })
+        // A page over the budget drops its sprites rather than have the whole drawing refused
+        const cardChars = arts.reduce((sum, art) => sum + (art?.source.length ?? 0), 0)
+        const drawThumbs = cardChars <= COLLECTION.cardSvgCharsMax
+        const cards = shown.map((entry, at) => {
+          const isSelected = entry.id === selected.id
+          const art = drawThumbs ? arts[at] : undefined
+          return (
+            <Box key={`card-${entry.id}`} flexDirection="column" alignItems="center" width={cardColumns} paddingY={1} {...(isSelected ? { backgroundColor: COLLECTION.cardSelectedColor } : {})}>
+              <Box key="thumb" width={cardColumns} height={thumbRows} alignItems="center" justifyContent="center">
+                {art ? <Svg source={art.source} alt={entry.record ? entry.name : 'An uncaught Modster'} width={art.width} height={art.height} /> : <Text dimColor>?</Text>}
+              </Box>
+              {/* A Button holds only Text, so the number selects. The name is plain text: the desktop's native button cuts a long one */}
+              <Button key={`pick-${entry.id}`} plain onPress={() => select(entry)}>
+                <Text {...(isSelected ? {} : { dimColor: true })}>{dexNumber(entry)}</Text>
+              </Button>
+              <Text key="name" wrap="wrap" {...(entry.record ? {} : { dimColor: true })}>
+                {entry.record ? entry.name : '???'}
+              </Text>
+            </Box>
+          )
+        })
+        const pager = (
+          <Box key="pager" flexDirection="row" columnGap={COLLECTION.gapColumns}>
+            <Button key="page-prev" label="Prev" plain {...(page > 0 ? {} : { dimColor: true })} onPress={() => select(entries[(page - 1) * pageSize])} />
+            <Text key="page-at" dimColor>{`Page ${page + 1}/${pageCount}`}</Text>
+            <Button key="page-next" label="Next" plain {...(page < pageCount - 1 ? {} : { dimColor: true })} onPress={() => select(entries[(page + 1) * pageSize])} />
+          </Box>
+        )
+        return (
+          <Box key="collection" flexDirection="column">
+            {summary}
+            {isWide ? (
+              <Box key="split" flexDirection="row" columnGap={COLLECTION.gapColumns}>
+                <Box key="cards-page" flexDirection="column" flexGrow={1}>
+                  <Box key="cards" flexDirection="row" flexWrap="wrap">
+                    {cards}
+                  </Box>
+                  {pager}
+                </Box>
+                <Box key="detail-wide" flexDirection="column" width={COLLECTION.gridDetailColumns}>
+                  {detail}
+                </Box>
+              </Box>
+            ) : (
+              <Box key="split" flexDirection="column">
+                {detail}
+                <Text key="grid-gap"> </Text>
+                <Box key="cards" flexDirection="row" flexWrap="wrap">
+                  {cards}
+                </Box>
+                {pager}
+              </Box>
+            )}
+          </Box>
+        )
       }
       return (
         <Box key="collection" flexDirection="column">
@@ -1467,12 +1553,12 @@ function desktopArt($: EngineInterface, loaded: LoadedModster, size: { scale: nu
 }
 
 /** A desktop sheet's Svg, made once per Modster, scale and look; `silhouette` paints an uncaught one. */
-function sheetArt(modster: Modster, sheet: DesktopSheet, scale: number, silhouette?: string): DesktopArt {
-  const key = `${modster.id}/${scale}/${silhouette ?? ''}`
+function sheetArt(modster: Modster, sheet: DesktopSheet, scale: number, silhouette?: string, still = false): DesktopArt {
+  const key = `${modster.id}/${scale}/${silhouette ?? ''}/${still ? 'still' : ''}`
   let cached = sheetSvgs.get(key)
   if (cached?.sheet !== sheet) {
     const fps = modster.desktopSprite?.fps ?? CONTENT.modster.defaultFps
-    cached = { sheet, svg: desktopSheetSvg(sheet, { scale, fps, ...(silhouette ? { silhouette } : {}) }) }
+    cached = { sheet, svg: desktopSheetSvg(sheet, { scale, fps, ...(silhouette ? { silhouette } : {}), ...(still ? { still } : {}) }) }
     sheetSvgs.set(key, cached)
   }
   return { source: cached.svg, width: Math.round(sheet.width * scale), height: Math.round(sheet.height * scale), isInteractive: false }
@@ -2347,6 +2433,29 @@ function useCatcher($: EngineInterface, entry: CatcherEntry): void {
 }
 
 /** The Collection tab's silhouette as a still Svg (P5-38), made once per Modster. */
+/**
+ * A card's sprite on desktop (0054): fitted into the thumbnail square, holding its first frame (only the
+ * selected Modster moves, in the detail), a gray silhouette until caught.
+ */
+function cardArt(loaded: LoadedModster, caught: boolean, thumbPx: number): { source: string; width: number; height: number } | undefined {
+  const fit = (width: number, height: number) => Math.min(thumbPx / width, thumbPx / height)
+  if (loaded.desktop) return sheetArt(loaded.modster, loaded.desktop, fit(loaded.desktop.width, loaded.desktop.height), caught ? undefined : COLLECTION.silhouetteColor, true)
+  if (!hasSprite(loaded)) return undefined
+  const scale = fit(loaded.sprite.width, loaded.sprite.height)
+  return { source: caught ? stillSvgFor(loaded) : silhouetteSvgFor(loaded), width: Math.round(loaded.sprite.width * scale), height: Math.round(loaded.sprite.height * scale) }
+}
+
+/** A terminal sprite's first frame as an Svg: a caught Modster's card (0054). */
+function stillSvgFor(loaded: DrawnModster): string {
+  const cached = stillSvgs.get(loaded.modster.id)
+  if (cached?.sprite === loaded.sprite) return cached.svg
+  const { width, height } = loaded.sprite
+  const rgba = spriteRgba(loaded.sprite)[0] ?? new Uint8Array(width * height * 4)
+  const svg = pixelsToSvg([{ width, height, rgba }], { scale: 1, fps: 1 })
+  stillSvgs.set(loaded.modster.id, { sprite: loaded.sprite, svg })
+  return svg
+}
+
 function silhouetteSvgFor(loaded: DrawnModster): string {
   const cached = silhouetteSvgs.get(loaded.modster.id)
   if (cached?.sprite === loaded.sprite) return cached.svg

@@ -84,6 +84,8 @@ const record = (count = 1) => ({
 
 /** A tall, wide dock: room for the list, the sprite and the text side by side. */
 const DOCK = { placement: 'dock', bodyColumns: 120, scroll: { offset: 0, bodyRows: 30 } } as const
+// Under COLLECTION.gridMinColumns, so desktop keeps the stacked list and detail (0054)
+const NARROW_DOCK = { ...DOCK, bodyColumns: 60 } as const
 
 /** Records the collection sprite's blits. */
 function collectionBlits(on: On): string[] {
@@ -282,7 +284,7 @@ describe('register: collection pane', () => {
     const pane = await mountPane($, DOCK)
     expect(await pane.find({ type: 'Raster', key: 'collection-sprite' })).toBeUndefined()
     expect(await pane.find({ type: 'Text', text: /Sproutling/ })).toBeDefined()
-    const desktop = await mountPane($, DOCK, 'desktop')
+    const desktop = await mountPane($, NARROW_DOCK, 'desktop')
     const svg = await desktop.find({ type: 'Svg' })
     expect(svg?.props.alt).toBe('Sproutling')
     expect(svg?.props.source).toContain('<animate attributeName="x"')
@@ -293,7 +295,7 @@ describe('register: collection pane', () => {
 
   test("on desktop an uncaught Modster's sheet is its silhouette: the same sheet through a gray filter, holding still", HUNTING, async ($, on) => {
     await start($, on, () => [], desktopOnlyForest())
-    const desktop = await mountPane($, DOCK, 'desktop')
+    const desktop = await mountPane($, NARROW_DOCK, 'desktop')
     const svg = await desktop.find({ type: 'Svg' })
     expect(svg?.props.alt).toBe('An uncaught Modster')
     expect(svg?.props.source).toContain(`flood-color="${COLLECTION.silhouetteColor}"`)
@@ -586,7 +588,7 @@ describe('register: collection pane', () => {
   test('on desktop the selected Modster is an Svg above its details: a still silhouette, then its looping idle once caught (P5-38)', HUNTING, async ($, on) => {
     const blits = collectionBlits(on)
     await start($, on, () => [], collectionForest(3), { 'caught:mon-02': record() })
-    const pane = await mountPane($, DOCK, 'desktop')
+    const pane = await mountPane($, NARROW_DOCK, 'desktop')
     const silhouette = await pane.find({ type: 'Svg' })
     // An uncaught Modster's name isn't given away, even to a screen reader
     expect(silhouette?.props.alt).toBe('An uncaught Modster')
@@ -600,6 +602,24 @@ describe('register: collection pane', () => {
     expect([caught?.props.width, caught?.props.height]).toEqual([8 * DESKTOP.collectionScale, 8 * DESKTOP.collectionScale])
     expect(caught?.props.source).not.toBe(silhouette?.props.source)
     expect(blits).toHaveLength(0)
+    await pane.unmount()
+  })
+
+  test('on desktop the Collection tab draws a page of cards, and pressing a card’s number selects it (0054)', HUNTING, async ($, on) => {
+    collectionBlits(on)
+    await start($, on, () => [], collectionForest(3), { 'caught:mon-02': record() })
+    const pane = await mountPane($, DOCK, 'desktop')
+    const cards = await pane.findAll({ type: 'Svg' })
+    // Only the selected Modster moves: the cards hold their first frame
+    expect(cards.slice(1).every((card: any) => !card.props.source.includes('<animate'))).toBe(true)
+    // Three cards and the selected Modster's detail
+    expect(cards.length).toBeGreaterThan(3)
+    expect(await pane.find({ type: 'Button', key: 'pick-mon-02' })).toBeDefined()
+    await pane.press({ key: 'pick-mon-02' })
+    const detail = (await pane.findAll({ type: 'Svg' })).map((svg: any) => svg.props.alt)
+    expect(detail).toContain('Mon 02')
+    // One page holds all three, so there's nowhere to page to
+    expect(await pane.find({ type: 'Text', text: 'Page 1/1' })).toBeDefined()
     await pane.unmount()
   })
 })
