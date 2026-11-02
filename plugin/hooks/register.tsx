@@ -2458,9 +2458,11 @@ function desktopMotion($: EngineInterface, loaded: LoadedModster, encounter: Ban
   if (stage === 'gone') return { source: strip.source, height: strip.height, controls: off }
   // A caught Modster leaves as its catcher's last frame, sized as the throw was (0053, 0056 point 5)
   const last = stage === 'leave' && times.caught ? times.lastFrame : undefined
+  // In the scene the art's target is the strip's own share, in the band as in the pane (0056 point 2)
   const maxHeight = strip.height * MOTION.modsterFill
-  const lastScale = last ? Math.min(scale.scale * growth(loaded, scale), maxHeight / last.height) : 0
-  const art = last ? { source: last.svg, width: last.width * lastScale, height: last.height * lastScale } : desktopArt($, loaded, { ...scale, maxHeight, sheetRoom: { art: maxHeight, frame: strip.height } })
+  const size = { ...scale, fitPx: maxHeight }
+  const lastScale = last ? Math.min(scale.scale * growth(loaded, size), maxHeight / last.height) : 0
+  const art = last ? { source: last.svg, width: last.width * lastScale, height: last.height * lastScale } : desktopArt($, loaded, { ...size, maxHeight, sheetRoom: { art: maxHeight, frame: strip.height } })
   if (!art) return undefined
   const layout = motionLayout(strip, slot.columns * MOTION.columnPx, art)
   // A catch with no catcher drawn leaves with its tag alone

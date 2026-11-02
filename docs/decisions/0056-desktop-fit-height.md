@@ -41,11 +41,14 @@ collection and the band. Terminal sprites and terminal surfaces don't change.
 1. **The art's height** is `bounds.y1 − bounds.y0 + 1` of the sheet: the
    opaque rows across every frame, so a Modster doesn't change size while it
    animates.
-2. **Each surface has a target** in CSS px (`DESKTOP` in `constants.ts`):
-   - encounter pane: `paneFitPx` 80;
+2. **Each surface has a target** in CSS px. In the scene (0051), on the pane
+   and in the band alike, it is `MOTION.modsterFill` of the strip: about 82 px
+   of the 96 px strip. Elsewhere it is set in `DESKTOP` (`constants.ts`):
+   - encounter pane without the scene: `paneFitPx` 80;
    - collection detail: `collectionFitPx` 60;
-   - band: `bandFitPx` 40.
-   The sheet's scale is `target ÷ art height`, applied to the whole frame, so
+   - band without the scene: `bandFitPx` 40.
+   @danielpg95 found the band's 40 px too small in the Code tab with 0.1.26:
+   the band's strip is as tall as the pane's. The sheet's scale is `target ÷ art height`, applied to the whole frame, so
    the art reaches the target and the margins scale with it.
 3. **Caps stay.** The art is never wider than `fitWidthShare` (1.6) × the
    target: a wide sheet scales down until its art fits that width. In the
