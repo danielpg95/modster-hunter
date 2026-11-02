@@ -1124,7 +1124,8 @@ export const register: Register = (on, options) => {
           sceneView = <Svg source={drawn.source} alt={`${selected.name} scene`} height={drawn.height} />
         }
       }
-      const window = listWindow(entries.length, index, plan.listRows)
+      // 0054: on desktop every biome is listed (there are few), so the list never scrolls inside the pane
+      const window = e.surface === 'desktop' ? listWindow(entries.length, index, entries.length) : listWindow(entries.length, index, plan.listRows)
       const more = moreText(window)
       const list = (
         <Box key="biome-list" flexDirection="column" {...(plan.split === 'side' ? { width: COLLECTION.biomeListColumns } : {})}>
@@ -1159,6 +1160,19 @@ export const register: Register = (on, options) => {
           ))}
         </Box>
       )
+      if (e.surface === 'desktop' && plan.split !== 'side') {
+        // 0054: in the narrow dock the biomes come first, like tabs, then the selected one's scene and odds
+        return (
+          <Box key="biomes" flexDirection="column">
+            {summary}
+            {list}
+            <Text key="list-gap"> </Text>
+            {sceneView}
+            {sceneView ? <Text key="scene-gap"> </Text> : null}
+            {odds}
+          </Box>
+        )
+      }
       return (
         <Box key="biomes" flexDirection="column">
           {summary}

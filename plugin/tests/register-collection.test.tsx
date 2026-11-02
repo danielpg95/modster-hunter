@@ -514,6 +514,17 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
+  test('in a narrow desktop dock the Biomes tab lists every biome first, then the scene and the odds, with nothing windowed (0054)', HUNTING, async ($, on) => {
+    await start($, on, () => [], sceneForest())
+    const pane = await mountPane($, { ...NARROW_DOCK, scroll: { offset: 0, bodyRows: 12 } }, 'desktop')
+    await pane.press({ key: 'biomes' })
+    // Summary, list, gap, scene, gap, odds
+    const types = (await pane.find({ type: 'Box', key: 'biomes' }))?.children.map((child: any) => child.type)
+    expect(types).toEqual(['Box', 'Box', 'Text', 'Svg', 'Text', 'Box'])
+    expect((await pane.find({ type: 'Box', key: 'biome-list' }))?.text).not.toContain('more')
+    await pane.unmount()
+  })
+
   test('another tab stops the Biomes tab\'s scene', HUNTING, async ($, on) => {
     const blits = biomesSceneBlits(on)
     const { clock } = await start($, on, () => [], sceneForest())
