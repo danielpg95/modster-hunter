@@ -1015,7 +1015,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Size:** S
 - **Goal:** decision 0055: on the Desktop app, a caught Modster's departure holds the catcher's last frame for as long as a run holds its silhouette (0.5 s) before the fade, so a catch doesn't feel rushed next to a run (asked by @danielpg95, 2026-11-02).
 - **Done when:**
-  - [ ] `MOTION` has the caught hold, and the caught departure's fade and slide start after it. Render tests cover the new timing.
+  - [x] `MOTION` has the caught hold, and the caught departure's fade and slide start after it. Render tests cover the new timing.
   - [ ] Checked in the Code tab: a catch lingers about as long as a run before the slide back.
   - [ ] 0055 is accepted; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 

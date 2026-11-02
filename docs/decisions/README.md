@@ -66,5 +66,6 @@ settled questions and avoid making assumptions about open ones.
 | [0050](0050-desktop-encounter-slide.md) | On desktop, the scene slides aside for the encounter's buttons | Superseded by 0051 |
 | [0051](0051-desktop-encounter-motion.md) | On desktop, the encounter plays in the scene, one Svg per motion | Superseded by 0052 |
 | [0052](0052-desktop-departure-reverses-arrival.md) | On desktop, a Modster that isn't caught leaves by reversing its arrival | Superseded by 0053 |
-| [0053](0053-desktop-catch-leaves-as-catcher.md) | On desktop, a caught Modster leaves as its catcher fading, with no extra cue | Accepted |
+| [0053](0053-desktop-catch-leaves-as-catcher.md) | On desktop, a caught Modster leaves as its catcher fading, with no extra cue | Accepted (caught timing amended by 0055) |
 | [0054](0054-desktop-collection-cards.md) | On desktop, the collection pane fits the dock: cards, tiles and controls under what they change | Proposed (extends 0040 with Reset to defaults) |
+| [0055](0055-desktop-caught-hold.md) | On desktop, a caught catcher holds before it fades | Accepted |

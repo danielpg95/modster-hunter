@@ -118,7 +118,7 @@ export const DESKTOP = {
 } as const
 
 /**
- * The desktop encounter's motion (decisions 0051, 0053): times in seconds, sizes in CSS pixels. The arrival
+ * The desktop encounter's motion (decisions 0051, 0053, 0055): times in seconds, sizes in CSS pixels. The arrival
  * plays flash, slide, silhouette (fade in, hold), sprite, tag; a catch leaves as its catcher fading, any
  * other departure plays the arrival reversed (sprite to silhouette, hold, vanish); then the slide back.
  */
@@ -127,6 +127,8 @@ export const MOTION = {
   slideS: 0.45,
   fadeS: 0.25,
   silhouetteHoldS: 0.5,
+  /** A caught catcher's last frame stays still this long before it fades (0055), like the silhouette's hold */
+  caughtHoldS: 0.5,
   /** How far the scene slides right, uncovering the backdrop Throw and Run sit on */
   slidePx: 120,
   flashOpacity: 0.45,
