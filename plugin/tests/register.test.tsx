@@ -11,7 +11,7 @@ import { validModster } from './fixtures/valid-modster'
 import { validUserModster } from './fixtures/valid-user-modster'
 import { validSprite } from './fixtures/valid-sprite'
 import { BAND, CATCH, DESKTOP, IDLE_TAG, MOTION } from '../hooks/constants'
-import { BUTTONS_AFTER_MS } from '../hooks/render'
+import { BUTTONS_AFTER_MS, departure } from '../hooks/render'
 import { throwingMs } from '../hooks/game'
 
 // The game runs only while autoStart is on (decision 0038); these tests play it
@@ -537,7 +537,7 @@ describe('register', () => {
     await ui.unmount()
   })
 
-  test('on desktop a catch plays whole, then its catcher holds still and fades with the result, then the still scene (0053)', HUNTING, async ($, on) => {
+  test('on desktop a catch plays whole, then its catcher holds still and fades with the result, then the still scene (0053, 0055)', HUNTING, async ($, on) => {
     const { ui, clock } = await startBand($, on, { ...sceneForest(), ...catcherFiles() }, 'desktop')
     await $.turn.start({ text: 'go', turnId: 't1' } as any)
     await clock.advance(3_000 + BAND_TICK + 1_000)
@@ -556,7 +556,11 @@ describe('register', () => {
     expect(leaving).toContain('<g data-part="modster" display="none">')
     expect(leaving).not.toContain('data-throw')
     expect(await ui.find({ type: 'Button', key: 'throw', in: 'encounter-controls' })).toBeUndefined()
+    // The catcher holds before it fades (0055), so the scene is still leaving after the old 0.7 s
     await clock.advance(1_000)
+    await ui.redraw(BAND_PROPS as any)
+    expect((await ui.find({ type: 'Svg' }))?.props.source).toContain('data-motion="leave/')
+    await clock.advance(departure(true).endS * 1000)
     await ui.redraw(BAND_PROPS as any)
     expect((await ui.find({ type: 'Svg' }))?.props.source).not.toContain('data-motion')
     await ui.unmount()

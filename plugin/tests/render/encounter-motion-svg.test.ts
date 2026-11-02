@@ -56,14 +56,14 @@ describe('encounterMotionSvg', () => {
     expect(svg).toContain('from="120 0" to="0 0" begin="1s"')
   })
 
-  test('a catch leaves as its catcher, faded with the tag, then the slide back; no silhouette (0053)', () => {
+  test('a catch leaves as its catcher, held then faded with the tag, then the slide back; no silhouette (0053, 0055)', () => {
     const catcher = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="32" viewBox="0 0 24 32"><rect id="catcher"/></svg>'
     const svg = encounterMotionSvg(input({ stage: 'leave', actor: catcher, caught: true, tag: 'Caught Sproutling!' })) ?? ''
-    expect(svg).toContain('<g><animate attributeName="opacity" from="1" to="0" dur="0.25s" fill="freeze"/><svg x="170" y="40" width="60" height="80"')
+    expect(svg).toContain('<g><animate attributeName="opacity" from="1" to="0" begin="0.5s" dur="0.25s" fill="freeze"/><svg x="170" y="40" width="60" height="80"')
     expect(svg).toContain('id="catcher"')
     expect(svg).toContain('>Caught Sproutling!</text>')
     expect(svg).not.toContain('mm-dark')
-    expect(svg).toContain('from="120 0" to="0 0" begin="0.25s" dur="0.45s"')
+    expect(svg).toContain('from="120 0" to="0 0" begin="0.75s" dur="0.45s"')
   })
 
   test('tag text is escaped', () => {

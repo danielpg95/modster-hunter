@@ -30,12 +30,12 @@ export const ARRIVAL = (() => {
 })()
 
 /**
- * Seconds, as the departure's slide back starts and as it ends (0053): a catch's catcher fades,
- * then the slide; any other departure is the arrival reversed (the sprite turns into its silhouette, which
+ * Seconds, as the departure's slide back starts and as it ends (0053, 0055): a catch's catcher holds,
+ * fades, then the slide; any other departure is the arrival reversed (the sprite turns into its silhouette, which
  * holds, then vanishes), then the slide.
  */
 export function departure(caught: boolean): { slideAt: number; endS: number } {
-  const slideAt = caught ? MOTION.fadeS : ms(MOTION.fadeS * 2 + MOTION.silhouetteHoldS)
+  const slideAt = caught ? ms(MOTION.caughtHoldS + MOTION.fadeS) : ms(MOTION.fadeS * 2 + MOTION.silhouetteHoldS)
   return { slideAt, endS: ms(slideAt + MOTION.slideS) }
 }
 
