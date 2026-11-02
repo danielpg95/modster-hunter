@@ -19,6 +19,7 @@ this file lists only tasks someone has claimed.
 | P5-34 | @victor-aguilars | in-progress | p5-34-readme-install | 2026-10-22 | 2026-10-22 | Hand check on a second computer: fresh install of 0.1.0 from the marketplace, then tick the items (README merged in #149) |
 | P5-36 | @victor-aguilars | in-review | p5-36-in-game-settings | 2026-10-22 | 2026-10-22 | Merge #155, #156, then the P5-36 PR; then close the task |
 | P5-63 | @danielpg95 | in-progress | p5-63-grotto-desktop-roster | 2026-10-31 | 2026-10-31 | Shardling first: a reference from add-modster's desktop prompt, then the desktop sheet for approval |
+| P5-64 | @victor-aguilars | in-progress | p5-64-desktop-collection-cards | 2026-11-01 | 2026-11-01 | Collection tab cards done locally (0.1.30 checked in the Code tab); next the Stats tab for the 30-column dock |
 
 ## Up next
 
