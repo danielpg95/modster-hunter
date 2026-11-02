@@ -23,21 +23,23 @@ export type SettingValues = Readonly<Record<SettingField, SettingValue>>
 interface SettingSpec {
   field: SettingField
   label: string
+  /** One short line on what it does, shown under the row on desktop (0054); from the manifest's descriptions */
+  help: string
   kind: 'toggle' | 'choice' | 'seconds'
   choices?: readonly string[]
 }
 
 /** The rows in 0040 point 2's order. */
 export const SETTING_SPECS: readonly SettingSpec[] = [
-  { field: 'autoStart', label: 'Auto start', kind: 'toggle' },
-  { field: 'showInBand', label: 'Show in the band', kind: 'toggle' },
-  { field: 'encounterPane', label: 'Encounter pane', kind: 'choice', choices: ['off', 'when-opened', 'always'] },
-  { field: 'showInSpinner', label: 'Show in the spinner', kind: 'toggle' },
-  { field: 'showInStatusLine', label: 'Show in the status line', kind: 'toggle' },
-  { field: 'showIdleLine', label: 'Idle line', kind: 'toggle' },
-  { field: 'showIdleScene', label: 'Idle scene', kind: 'toggle' },
-  { field: 'includeBuiltins', label: 'Built-in content', kind: 'toggle' },
-  { field: 'encounterIdleTimeoutSec', label: 'Idle timeout', kind: 'seconds' },
+  { field: 'autoStart', label: 'Auto start', help: 'Start hunting every session.', kind: 'toggle' },
+  { field: 'showInBand', label: 'Show in the band', help: 'Draw the game above the prompt.', kind: 'toggle' },
+  { field: 'encounterPane', label: 'Encounter pane', help: 'The bigger encounter pane: never, after /modsters pane, or every session.', kind: 'choice', choices: ['off', 'when-opened', 'always'] },
+  { field: 'showInSpinner', label: 'Show in the spinner', help: 'Name the Modster in the spinner while Claude works.', kind: 'toggle' },
+  { field: 'showInStatusLine', label: 'Show in the status line', help: 'Show the encounter in the status line.', kind: 'toggle' },
+  { field: 'showIdleLine', label: 'Idle line', help: 'Show the biome between encounters.', kind: 'toggle' },
+  { field: 'showIdleScene', label: 'Idle scene', help: 'Draw the biome as a moving scene between encounters.', kind: 'toggle' },
+  { field: 'includeBuiltins', label: 'Built-in content', help: 'Load the biomes and Modsters that ship with the mod.', kind: 'toggle' },
+  { field: 'encounterIdleTimeoutSec', label: 'Idle timeout', help: 'Seconds without a throw before a Modster wanders off.', kind: 'seconds' },
 ]
 
 /** Each field's value when the option was never set: the manifest's defaults (0041 for `autoStart`). */
@@ -85,6 +87,22 @@ export function settingText(field: SettingField, value: SettingValue): string {
   if (spec.kind === 'toggle') return value === true ? 'on' : 'off'
   if (spec.kind === 'seconds') return `${value} s`
   return String(value)
+}
+
+/** The options whose value isn't the default, in the tab's order: what Reset to defaults writes (0054). */
+export function changedSettings(values: SettingValues): SettingField[] {
+  return SETTING_SPECS.map((spec) => spec.field).filter((field) => values[field] !== SETTING_DEFAULTS[field])
+}
+
+/** `reset 3 settings to their defaults`, or `reset 1 setting to its default`. */
+export function resetText(count: number): string {
+  return count === 1 ? 'reset 1 setting to its default' : `reset ${count} settings to their defaults`
+}
+
+/** A value as the desktop's button shows it (0054): `On`, `Off`, `When opened`, `90 s`. */
+export function settingButtonText(field: SettingField, value: SettingValue): string {
+  const text = settingText(field, value).replace(/-/g, ' ')
+  return text.charAt(0).toUpperCase() + text.slice(1)
 }
 
 /** One row: the selection mark, the label padded so values line up, then the value. */

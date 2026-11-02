@@ -64,6 +64,7 @@ import {
   tierSections,
   collectionBody,
   collectionEntries,
+  dexNumber,
   collectionLayout,
   detailLines,
   listRow,
@@ -83,6 +84,9 @@ import {
   desktopSheetSvg,
   spriteCells,
   spriteRgba,
+  statsCards,
+  DESKTOP_TOGGLE_TEXT,
+  TOGGLE_TEXT,
   statsLines,
   TOGGLE_HOTKEY,
   itemNotes,
@@ -100,11 +104,15 @@ import {
   type Particle,
   MODSTERS_ARGUMENT_HINT,
   PANE_OFF_REPLY,
+  SETTING_DEFAULTS,
   SETTING_SPECS,
   STOP_REPLY,
   nextSettingValue,
   readSettingValues,
   settingDeniedText,
+  changedSettings,
+  resetText,
+  settingButtonText,
   settingRow,
   type SettingField,
   type SettingValue,
@@ -291,6 +299,10 @@ let isBlittingPreview = false
 const silhouettes = new Map<string, string>()
 // Desktop's Svg versions of the collection's silhouettes and the Catchers tab's preview (P5-38)
 const silhouetteSvgs = new Map<string, { sprite: Sprite; svg: string }>()
+// The Settings tab's Reset to defaults waits for a second press (0054)
+let resetArmed = false
+// A caught Modster's card on desktop: its first frame (0054)
+const stillSvgs = new Map<string, { sprite: Sprite; svg: string }>()
 // Desktop sheets' Svgs by Modster, scale and look (0045 point 9)
 const sheetSvgs = new Map<string, { sheet: DesktopSheet; svg: string }>()
 const catcherPreviewSvgs = new Map<string, { catcher: LoadedCatcher; modster: LoadedModster; preview: CatcherPreview | undefined }>()
@@ -341,6 +353,8 @@ export const register: Register = (on, options) => {
     // The encounter pane waits for hunting too; one left open is closed (0038 point 1)
     if (hunting) await openHuntPaneAtStart($)
     else await closeHuntPane($)
+    // A Reset to defaults cut short by the reload one of its writes caused carries on (0054)
+    void resumeReset($)
     // Register last: a taken name throws and would skip the rest of this hook. Immediate, so it
     // runs while Claude works, when people play; the command.run hook never reads the turn (0039)
     await $.command.register({ name: 'modsters', description: 'Open your Modster collection', argumentHint: MODSTERS_ARGUMENT_HINT, immediate: true })
@@ -974,6 +988,7 @@ export const register: Register = (on, options) => {
       const index = Math.max(0, fields.indexOf(settingsSelected))
       const select = (field: SettingField | undefined) => {
         if (!field || field === settingsSelected) return
+        resetArmed = false
         settingsSelected = field
         void keepState($, 'settingsSelected', field)
         $.ui.invalidate('ui.render')
@@ -984,15 +999,50 @@ export const register: Register = (on, options) => {
             <Text bold>Settings</Text>
             <Button key="setting-up" label="Up" hotkey="k" plain dimColor onPress={() => select(fields[index - 1])} />
             <Button key="setting-down" label="Down" hotkey="j" plain dimColor onPress={() => select(fields[index + 1])} />
-            <Button key="setting-change" label="Change" hotkey={TOGGLE_HOTKEY} plain dimColor onPress={() => void changeSetting($, fields[index] ?? 'autoStart')} />
+            {e.surface === 'desktop' ? null : (
+              <Button key="setting-change" label="Change" hotkey={TOGGLE_HOTKEY} plain dimColor onPress={() => void changeSetting($, fields[index] ?? 'autoStart')} />
+            )}
           </Box>
-          {fields.map((field) => (
-            <Button key={`setting-${field}`} plain onPress={() => select(field)}>
-              {texts(settingRow(field, settingValues, field === fields[index]), 'truncate')}
-            </Button>
-          ))}
+          {e.surface === 'desktop'
+            ? // 0054: on desktop each option is its name, a button showing its value that changes it, and a line on
+              // what it does; a click on the row's name only selects it. o changes the selected one
+              SETTING_SPECS.map((spec) => {
+                const isSelected = spec.field === fields[index]
+                return (
+                  <Box key={`setting-${spec.field}`} flexDirection="column" marginBottom={1} {...(isSelected ? { backgroundColor: COLLECTION.cardSelectedColor } : {})}>
+                    <Box key="setting-line" flexDirection="row" justifyContent="space-between">
+                      <Button key={`setting-name-${spec.field}`} label={spec.label} plain onPress={() => select(spec.field)} />
+                      <Button
+                        key={`setting-value-${spec.field}`}
+                        label={settingButtonText(spec.field, settingValues[spec.field])}
+                        {...(isSelected ? { hotkey: TOGGLE_HOTKEY } : {})}
+                        onPress={() => {
+                          select(spec.field)
+                          void changeSetting($, spec.field)
+                        }}
+                      />
+                    </Box>
+                    <Text key="setting-help" dimColor wrap="wrap">
+                      {spec.help}
+                    </Text>
+                  </Box>
+                )
+              })
+            : fields.map((field) => (
+                <Button key={`setting-${field}`} plain onPress={() => select(field)}>
+                  {texts(settingRow(field, settingValues, field === fields[index]), 'truncate')}
+                </Button>
+              ))}
+          <Box key="settings-reset-row" flexDirection="row">
+            <Button
+              key="setting-reset"
+              label={resetArmed ? `Press again: ${resetText(changedSettings(settingValues).length)}` : 'Reset to defaults'}
+              {...(e.surface === 'desktop' ? {} : { plain: true, ...(resetArmed ? {} : { dimColor: true }) })}
+              onPress={() => void resetSettings($)}
+            />
+          </Box>
           <Text key="settings-gap"> </Text>
-          {settingsLines(content?.issues ?? []).map((line, at) => (
+          {settingsLines(content?.issues ?? [], e.surface === 'desktop' ? DESKTOP_TOGGLE_TEXT : TOGGLE_TEXT).map((line, at) => (
             <Box key={`settings-${at}`} flexDirection="row">
               {texts(line, 'wrap')}
             </Box>
@@ -1011,6 +1061,45 @@ export const register: Register = (on, options) => {
         )
       }
       const biomes = new Map([...(content?.biomes.values() ?? []), ...(content?.off.biomes.values() ?? [])].map(({ biome: loaded }) => [loaded.id, { name: loaded.name, ...(loaded.accentColor ? { accentColor: loaded.accentColor } : {}) }]))
+      if (e.surface === 'desktop') {
+        // 0054: the terminal's table is cut in the Code tab's ~30-column dock; tiles and a card per biome fit it
+        const cards = statsCards(statsShown.stats, biomes)
+        if (cards.kind === 'empty') {
+          return (
+            <Text key="stats" dimColor wrap="wrap">
+              {cards.text}
+            </Text>
+          )
+        }
+        return (
+          <Box key="stats" flexDirection="column">
+            <Box key="stat-tiles" flexDirection="row" flexWrap="wrap">
+              {cards.tiles.map((tile) => (
+                <Box key={`tile-${tile.label}`} flexDirection="column" width={COLLECTION.statTileColumns} marginBottom={1}>
+                  <Text key="value" bold>
+                    {tile.value}
+                  </Text>
+                  <Text key="label" dimColor>
+                    {tile.label}
+                  </Text>
+                </Box>
+              ))}
+            </Box>
+            {cards.biomes.map((biome) => (
+              <Box key={`stats-biome-${biome.id}`} flexDirection="column" marginTop={1}>
+                <Text key="name" bold wrap="wrap" {...(biome.isLoaded ? (biome.color ? { color: biome.color } : {}) : { dimColor: true })}>
+                  {biome.name}
+                </Text>
+                {biome.lines.map((line, at) => (
+                  <Box key={`line-${at}`} flexDirection="row">
+                    {texts(line, 'wrap')}
+                  </Box>
+                ))}
+              </Box>
+            ))}
+          </Box>
+        )
+      }
       return (
         <Box key="stats" flexDirection="column">
           {statsLines(statsShown.stats, biomes).map((line, at) => (
@@ -1045,7 +1134,8 @@ export const register: Register = (on, options) => {
           <Text bold>{`Biomes ${entries.length}`}</Text>
           <Button key="biome-up" label="Up" hotkey="k" plain dimColor onPress={() => select(entries[index - 1])} />
           <Button key="biome-down" label="Down" hotkey="j" plain dimColor onPress={() => select(entries[index + 1])} />
-          {selected ? (
+          {/* On desktop it sits under the biome it acts on, with its name (0054) */}
+          {selected && e.surface !== 'desktop' ? (
             <Button
               key="biome-toggle"
               label={toggleLabel(selected)}
@@ -1081,7 +1171,8 @@ export const register: Register = (on, options) => {
           sceneView = <Svg source={drawn.source} alt={`${selected.name} scene`} height={drawn.height} />
         }
       }
-      const window = listWindow(entries.length, index, plan.listRows)
+      // 0054: on desktop every biome is listed (there are few), so the list never scrolls inside the pane
+      const window = e.surface === 'desktop' ? listWindow(entries.length, index, entries.length) : listWindow(entries.length, index, plan.listRows)
       const more = moreText(window)
       const list = (
         <Box key="biome-list" flexDirection="column" {...(plan.split === 'side' ? { width: COLLECTION.biomeListColumns } : {})}>
@@ -1116,10 +1207,35 @@ export const register: Register = (on, options) => {
           ))}
         </Box>
       )
+      // On desktop the button names the biome and sits under its scene (0054)
+      const desktopToggle =
+        e.surface === 'desktop' ? (
+          <Button
+            key="biome-toggle"
+            label={`${toggleLabel(selected)} ${selected.name}`}
+            hotkey={TOGGLE_HOTKEY}
+            onPress={() => toggle($, { kind: 'biome', id: selected.id, off: !selected.isOff }, selected.name, includeBuiltins, idleTimeoutSec)}
+          />
+        ) : null
+      if (e.surface === 'desktop' && plan.split !== 'side') {
+        // 0054: in the narrow dock the biomes come first, like tabs, then the selected one's scene and odds
+        return (
+          <Box key="biomes" flexDirection="column">
+            {summary}
+            {list}
+            <Text key="list-gap"> </Text>
+            {sceneView}
+            {desktopToggle}
+            <Text key="scene-gap"> </Text>
+            {odds}
+          </Box>
+        )
+      }
       return (
         <Box key="biomes" flexDirection="column">
           {summary}
           {sceneView}
+          {desktopToggle}
           {plan.split === 'side' ? (
             <Box key="split" flexDirection="row" columnGap={COLLECTION.gapColumns}>
               {list}
@@ -1158,7 +1274,8 @@ export const register: Register = (on, options) => {
           <Text bold>{`Caught ${caught}/${entries.length}`}</Text>
           <Button key="up" label="Up" hotkey="k" plain dimColor onPress={() => select(entries[index - 1])} />
           <Button key="down" label="Down" hotkey="j" plain dimColor onPress={() => select(entries[index + 1])} />
-          {selected ? (
+          {/* On desktop it sits under the Modster it acts on, with its name (0054) */}
+          {selected && e.surface !== 'desktop' ? (
             <Button
               key="toggle"
               label={toggleLabel(selected)}
@@ -1210,9 +1327,11 @@ export const register: Register = (on, options) => {
           {more ? <Text dimColor>{more}</Text> : null}
         </Box>
       )
-      // Always the same height: a short detail leaves room, a long entry is cut
+      // Always the same height: a short detail leaves room, a long entry is cut. The desktop's
+      // narrow dock wraps the dex entry over more rows, so it keeps more (0054)
+      const detailRows = e.surface === 'desktop' ? COLLECTION.desktopDetailRows : COLLECTION.detailRows
       const text = (
-        <Box key="detail-text" flexDirection="column" width={plan.textColumns} height={COLLECTION.detailRows} overflow="hidden">
+        <Box key="detail-text" flexDirection="column" width={plan.textColumns} height={detailRows} overflow="hidden">
           {lines.map((line, at) => (
             <Box key={`detail-${at}`} flexDirection="row">
               {texts(line, 'wrap')}
@@ -1260,6 +1379,105 @@ export const register: Register = (on, options) => {
         )
       } else {
         dropCollectionSite(e.requestId)
+      }
+      // 0054: on desktop the Collection tab is a grid of cards, beside the detail when the pane is wide
+      if (e.surface === 'desktop') {
+        const { Svg } = $.ui.resolve(e)
+        // The Code tab's dock is ~30 columns and a plugin can't widen it (0054 point 1), so a narrow pane gets
+        // three cards a row, with the detail above the grid so the selection is always in view
+        const isWide = e.props.bodyColumns >= COLLECTION.gridMinColumns
+        const cardColumns = isWide ? COLLECTION.cardColumns : Math.max(COLLECTION.cardMinColumns, Math.floor((e.props.bodyColumns - 1) / COLLECTION.narrowCardsPerRow))
+        const thumbPx = Math.min(COLLECTION.cardThumbPx, cardColumns * DESKTOP.columnPx - COLLECTION.cardPadPx)
+        // The pane can't be trusted to scroll back, and the whole roster's sprites are too big for one drawing
+        // (292k characters for 35 refused it), so the grid shows one page that fits, the page with the selection
+        const thumbRows = Math.ceil(thumbPx / DESKTOP.rowPx)
+        // Padding, the sprite, the number, and a name of up to two rows
+        const cardRows = 2 + thumbRows + 1 + COLLECTION.cardNameRows
+        const gridColumns = isWide ? e.props.bodyColumns - COLLECTION.gridDetailColumns - COLLECTION.gapColumns : e.props.bodyColumns
+        const perRow = Math.max(1, Math.floor(gridColumns / cardColumns))
+        // Less the summary, the pager, and (narrow) the detail and its gap
+        const gridRows = rows - 2 - (isWide ? 0 : detailRows + COLLECTION.detailArtRows + 1)
+        const pageSize = Math.min(COLLECTION.cardsPerPageMax, perRow * Math.max(1, Math.floor(gridRows / cardRows)))
+        const page = Math.floor(index / pageSize)
+        const pageCount = Math.max(1, Math.ceil(entries.length / pageSize))
+        const shown = entries.slice(page * pageSize, (page + 1) * pageSize)
+        const arts = shown.map((entry) => {
+          const entryLoaded = content?.modsters.get(entry.id) ?? content?.off.modsters.get(entry.id)
+          return entryLoaded ? cardArt(entryLoaded, entry.record !== undefined, thumbPx) : undefined
+        })
+        // A page over the budget drops its sprites rather than have the whole drawing refused
+        const cardChars = arts.reduce((sum, art) => sum + (art?.source.length ?? 0), 0)
+        const drawThumbs = cardChars <= COLLECTION.cardSvgCharsMax
+        const cards = shown.map((entry, at) => {
+          const isSelected = entry.id === selected.id
+          const art = drawThumbs ? arts[at] : undefined
+          return (
+            <Box key={`card-${entry.id}`} flexDirection="column" alignItems="center" width={cardColumns} paddingY={1} {...(isSelected ? { backgroundColor: COLLECTION.cardSelectedColor } : {})}>
+              <Box key="thumb" width={cardColumns} height={thumbRows} alignItems="center" justifyContent="center">
+                {art ? <Svg source={art.source} alt={entry.record ? entry.name : 'An uncaught Modster'} width={art.width} height={art.height} /> : <Text dimColor>?</Text>}
+              </Box>
+              {/* A Button holds only Text, so the number selects. The name is plain text: the desktop's native button cuts a long one */}
+              <Button key={`pick-${entry.id}`} plain onPress={() => select(entry)}>
+                <Text {...(isSelected ? {} : { dimColor: true })}>{dexNumber(entry)}</Text>
+              </Button>
+              <Text key="name" wrap="wrap" {...(entry.record && !entry.isOff ? {} : { dimColor: true })}>
+                {entry.record ? entry.name : '???'}
+              </Text>
+              {entry.isOff ? (
+                <Text key="off" dimColor>
+                  off
+                </Text>
+              ) : null}
+            </Box>
+          )
+        })
+        // An uncaught Modster's name stays a secret (0032 point 4)
+        const secretName = selected.record ? selected.name : 'That Modster'
+        const detailWithToggle = (
+          <Box key="detail-toggle" flexDirection="column">
+            {detail}
+            <Button
+              key="toggle"
+              label={`${toggleLabel(selected)} ${selected.record ? selected.name : 'this Modster'}`}
+              hotkey={TOGGLE_HOTKEY}
+              onPress={() => toggle($, { kind: 'modster', id: selected.id, off: !selected.isOff }, secretName, includeBuiltins, idleTimeoutSec)}
+            />
+          </Box>
+        )
+        const pager = (
+          <Box key="pager" flexDirection="row" columnGap={COLLECTION.gapColumns}>
+            <Button key="page-prev" label="Prev" plain {...(page > 0 ? {} : { dimColor: true })} onPress={() => select(entries[(page - 1) * pageSize])} />
+            <Text key="page-at" dimColor>{`Page ${page + 1}/${pageCount}`}</Text>
+            <Button key="page-next" label="Next" plain {...(page < pageCount - 1 ? {} : { dimColor: true })} onPress={() => select(entries[(page + 1) * pageSize])} />
+          </Box>
+        )
+        return (
+          <Box key="collection" flexDirection="column">
+            {summary}
+            {isWide ? (
+              <Box key="split" flexDirection="row" columnGap={COLLECTION.gapColumns}>
+                <Box key="cards-page" flexDirection="column" flexGrow={1}>
+                  <Box key="cards" flexDirection="row" flexWrap="wrap">
+                    {cards}
+                  </Box>
+                  {pager}
+                </Box>
+                <Box key="detail-wide" flexDirection="column" width={COLLECTION.gridDetailColumns}>
+                  {detailWithToggle}
+                </Box>
+              </Box>
+            ) : (
+              <Box key="split" flexDirection="column">
+                {detailWithToggle}
+                <Text key="grid-gap"> </Text>
+                <Box key="cards" flexDirection="row" flexWrap="wrap">
+                  {cards}
+                </Box>
+                {pager}
+              </Box>
+            )}
+          </Box>
+        )
       }
       return (
         <Box key="collection" flexDirection="column">
@@ -1356,7 +1574,46 @@ export const register: Register = (on, options) => {
  * /config and applies it at once. A refused write keeps the value and says why.
  */
 async function changeSetting($: EngineInterface, field: SettingField): Promise<void> {
-  const next = nextSettingValue(field, settingValues[field])
+  resetArmed = false
+  await applySetting($, field, nextSettingValue(field, settingValues[field]))
+}
+
+/**
+ * Reset to defaults (0054): every option back to the manifest's default, after a second press.
+ * Only the options that differ are written, one at a time. A write may reload the mod, so what's
+ * left is kept in $.state and the next load carries on (resumeReset).
+ */
+async function resetSettings($: EngineInterface): Promise<void> {
+  const fields = changedSettings(settingValues)
+  if (!resetArmed) {
+    resetArmed = fields.length > 0
+    if (fields.length === 0) $.ui.toast('Modster Hunter: the settings are already the defaults')
+    $.ui.invalidate('ui.render')
+    return
+  }
+  resetArmed = false
+  $.ui.toast(`Modster Hunter: ${resetText(fields.length)}`)
+  await keepState($, 'resetPending', fields.join(','))
+  await resumeReset($)
+}
+
+/** Writes the settings a reset still has to, each taken off the list before its write. */
+async function resumeReset($: EngineInterface): Promise<void> {
+  let pending: string[]
+  try {
+    pending = ((await $.state.get({ plugin: 'modster-hunter', key: 'resetPending' })).value ?? '').split(',').filter((field) => SETTING_SPECS.some((spec) => spec.field === field))
+  } catch {
+    return
+  }
+  while (pending.length > 0) {
+    const field = pending.shift() as SettingField
+    await keepState($, 'resetPending', pending.join(','))
+    if (settingValues[field] !== SETTING_DEFAULTS[field]) await applySetting($, field, SETTING_DEFAULTS[field])
+  }
+}
+
+/** Sets one option to `next` (0040 points 4–5). */
+async function applySetting($: EngineInterface, field: SettingField, next: SettingValue): Promise<void> {
   // The write below reloads the mod (0023): the pane must come back here, on this row (0040 point 5)
   await keepState($, 'paneTab', 'settings')
   await keepState($, 'settingsSelected', field)
@@ -1467,12 +1724,12 @@ function desktopArt($: EngineInterface, loaded: LoadedModster, size: { scale: nu
 }
 
 /** A desktop sheet's Svg, made once per Modster, scale and look; `silhouette` paints an uncaught one. */
-function sheetArt(modster: Modster, sheet: DesktopSheet, scale: number, silhouette?: string): DesktopArt {
-  const key = `${modster.id}/${scale}/${silhouette ?? ''}`
+function sheetArt(modster: Modster, sheet: DesktopSheet, scale: number, silhouette?: string, still = false): DesktopArt {
+  const key = `${modster.id}/${scale}/${silhouette ?? ''}/${still ? 'still' : ''}`
   let cached = sheetSvgs.get(key)
   if (cached?.sheet !== sheet) {
     const fps = modster.desktopSprite?.fps ?? CONTENT.modster.defaultFps
-    cached = { sheet, svg: desktopSheetSvg(sheet, { scale, fps, ...(silhouette ? { silhouette } : {}) }) }
+    cached = { sheet, svg: desktopSheetSvg(sheet, { scale, fps, ...(silhouette ? { silhouette } : {}), ...(still ? { still } : {}) }) }
     sheetSvgs.set(key, cached)
   }
   return { source: cached.svg, width: Math.round(sheet.width * scale), height: Math.round(sheet.height * scale), isInteractive: false }
@@ -1942,10 +2199,11 @@ async function openHuntPaneAtStart($: EngineInterface): Promise<void> {
 }
 
 /** Writes a session value that must survive a reload (`types/index.d.ts`); a failure is logged, never thrown. */
-async function keepState($: EngineInterface, key: 'paneTab' | 'settingsSelected' | 'biomeId', value: string): Promise<void> {
+async function keepState($: EngineInterface, key: 'paneTab' | 'settingsSelected' | 'biomeId' | 'resetPending', value: string): Promise<void> {
   try {
     if (key === 'paneTab') await $.state.set({ plugin: 'modster-hunter', key: 'paneTab' }, value as CollectionTab)
     else if (key === 'settingsSelected') await $.state.set({ plugin: 'modster-hunter', key: 'settingsSelected' }, value)
+    else if (key === 'resetPending') await $.state.set({ plugin: 'modster-hunter', key: 'resetPending' }, value)
     else await $.state.set({ plugin: 'modster-hunter', key: 'biomeId' }, value)
   } catch (error) {
     $.ui.log(`state: ${key} not kept: ${error instanceof Error ? error.message : String(error)}`, { to: 'debug' })
@@ -2347,6 +2605,29 @@ function useCatcher($: EngineInterface, entry: CatcherEntry): void {
 }
 
 /** The Collection tab's silhouette as a still Svg (P5-38), made once per Modster. */
+/**
+ * A card's sprite on desktop (0054): fitted into the thumbnail square, holding its first frame (only the
+ * selected Modster moves, in the detail), a gray silhouette until caught.
+ */
+function cardArt(loaded: LoadedModster, caught: boolean, thumbPx: number): { source: string; width: number; height: number } | undefined {
+  const fit = (width: number, height: number) => Math.min(thumbPx / width, thumbPx / height)
+  if (loaded.desktop) return sheetArt(loaded.modster, loaded.desktop, fit(loaded.desktop.width, loaded.desktop.height), caught ? undefined : COLLECTION.silhouetteColor, true)
+  if (!hasSprite(loaded)) return undefined
+  const scale = fit(loaded.sprite.width, loaded.sprite.height)
+  return { source: caught ? stillSvgFor(loaded) : silhouetteSvgFor(loaded), width: Math.round(loaded.sprite.width * scale), height: Math.round(loaded.sprite.height * scale) }
+}
+
+/** A terminal sprite's first frame as an Svg: a caught Modster's card (0054). */
+function stillSvgFor(loaded: DrawnModster): string {
+  const cached = stillSvgs.get(loaded.modster.id)
+  if (cached?.sprite === loaded.sprite) return cached.svg
+  const { width, height } = loaded.sprite
+  const rgba = spriteRgba(loaded.sprite)[0] ?? new Uint8Array(width * height * 4)
+  const svg = pixelsToSvg([{ width, height, rgba }], { scale: 1, fps: 1 })
+  stillSvgs.set(loaded.modster.id, { sprite: loaded.sprite, svg })
+  return svg
+}
+
 function silhouetteSvgFor(loaded: DrawnModster): string {
   const cached = silhouetteSvgs.get(loaded.modster.id)
   if (cached?.sprite === loaded.sprite) return cached.svg

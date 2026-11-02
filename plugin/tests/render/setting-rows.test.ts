@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { SETTING_DEFAULTS, SETTING_SPECS, nextSettingValue, readSettingValues, settingRow, settingText } from '../../hooks/render'
+import { SETTING_DEFAULTS, SETTING_SPECS, changedSettings, nextSettingValue, resetText, readSettingValues, settingButtonText, settingRow, settingText } from '../../hooks/render'
 
 describe('setting rows (0040)', () => {
   test('lists the options in 0040 point 2\'s order, without sounds', () => {
@@ -57,5 +57,16 @@ describe('setting rows (0040)', () => {
     const other = settingRow('encounterIdleTimeoutSec', SETTING_DEFAULTS, false)
     expect(selected.map((segment) => ('text' in segment ? segment.text : '')).join('')).toBe('▸ Auto start              on')
     expect(other.map((segment) => ('text' in segment ? segment.text : '')).join('')).toBe('  Idle timeout            90 s')
+  })
+  test('on desktop a value reads as a button label, and every option says what it does (0054)', () => {
+    expect([settingButtonText('autoStart', true), settingButtonText('showInBand', false)]).toEqual(['On', 'Off'])
+    expect(settingButtonText('encounterPane', 'when-opened')).toBe('When opened')
+    expect(settingButtonText('encounterIdleTimeoutSec', 90)).toBe('90 s')
+    expect(SETTING_SPECS.every((spec) => spec.help.length > 0 && spec.help.endsWith('.'))).toBe(true)
+  })
+  test('a reset writes the options that differ from their defaults, in the tab\'s order (0054)', () => {
+    expect(changedSettings(SETTING_DEFAULTS)).toEqual([])
+    expect(changedSettings({ ...SETTING_DEFAULTS, encounterIdleTimeoutSec: 30, showInBand: false })).toEqual(['showInBand', 'encounterIdleTimeoutSec'])
+    expect([resetText(1), resetText(3)]).toEqual(['reset 1 setting to its default', 'reset 3 settings to their defaults'])
   })
 })

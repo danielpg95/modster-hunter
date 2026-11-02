@@ -13,6 +13,13 @@ describe('desktopSheetSvg', () => {
     expect(svg).toContain('values="0;-96;-192;-288" keyTimes="0;0.25;0.5;0.75" calcMode="discrete" dur="0.5s" repeatCount="indefinite"')
   })
 
+  test('a still sheet holds its first frame, in colour: a card in the Collection grid (0054)', () => {
+    const svg = desktopSheetSvg(sheet(4), { scale: DESKTOP.sheetPaneScale, fps: 8, still: true })
+    expect(svg).toContain('<image href="data:image/png;base64,UE5H" width="384" height="80"')
+    expect(svg).not.toContain('<animate')
+    expect(svg).not.toContain('filter=')
+  })
+
   test('it is drawn pixelated, at the scale it is given', () => {
     const band = desktopSheetSvg(sheet(2), { scale: DESKTOP.sheetBandScale, fps: 6 })
     expect(band).toContain('width="48" height="40" viewBox="0 0 96 80"')

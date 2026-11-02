@@ -40,6 +40,55 @@ export function statsLines(stats: SessionStats | undefined, biomes: ReadonlyMap<
   return lines
 }
 
+/** One total on desktop: the number big, its name under it (0054). */
+export interface StatTile {
+  label: string
+  value: string
+}
+
+/** One biome hunted in on desktop: its name, then its counts as short wrapped lines. */
+export interface StatsBiomeCard {
+  id: string
+  name: string
+  color?: string
+  /** False when the biome no longer loads: its name is dimmed */
+  isLoaded: boolean
+  lines: BandLine[]
+}
+
+export type StatsCards = { kind: 'empty'; text: string } | { kind: 'cards'; tiles: StatTile[]; biomes: StatsBiomeCard[] }
+
+/**
+ * The Stats tab on desktop (decision 0054): the Code tab's dock is ~30 columns, so the
+ * terminal's five-column table is cut. The totals become tiles and each biome a small card.
+ */
+export function statsCards(stats: SessionStats | undefined, biomes: ReadonlyMap<string, StatsBiome>): StatsCards {
+  if (!stats || (stats.encounters === 0 && stats.turns === 0)) return { kind: 'empty', text: NO_STATS_TEXT }
+  const tiles: StatTile[] = [
+    { label: 'Encounters', value: String(stats.encounters) },
+    { label: 'Caught', value: String(stats.catches) },
+    { label: 'Catch ratio', value: ratio(stats) },
+    { label: 'Turns', value: String(stats.turns) },
+    { label: 'Fled', value: String(stats.flees) },
+    { label: 'Ran', value: String(stats.runs) },
+  ]
+  const cards = Object.entries(stats.biomes)
+    .filter(([, counts]) => counts.encounters > 0)
+    .map(([id, counts]) => ({ id, counts, biome: biomes.get(id) }))
+    .sort((a, b) => b.counts.encounters - a.counts.encounters || (a.biome?.name ?? a.id).localeCompare(b.biome?.name ?? b.id))
+    .map(({ id, counts, biome }): StatsBiomeCard => ({
+      id,
+      name: biome?.name ?? id,
+      ...(biome?.accentColor ? { color: biome.accentColor } : {}),
+      isLoaded: biome !== undefined,
+      lines: [
+        [...pair('Seen', counts.encounters), gap(), ...pair('Caught', counts.catches), gap(), { text: ratio(counts), bold: true }],
+        [...pair('Fled', counts.flees), gap(), ...pair('Ran', counts.runs)],
+      ],
+    }))
+  return { kind: 'cards', tiles, biomes: cards }
+}
+
 /** `48%` of encounters caught; `—` before any encounter. */
 export function ratio(counts: BiomeStats): string {
   return counts.encounters === 0 ? '—' : `${Math.round((counts.catches / counts.encounters) * 100)}%`

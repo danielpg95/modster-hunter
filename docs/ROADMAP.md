@@ -998,6 +998,18 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
   - [ ] Checked in the Code tab: the band, the encounter pane and the Collection tab.
 
+#### [ ] P5-64 — Desktop collection pane that fits the dock
+- **Depends on:** P5-38, P5-61
+- **Size:** L
+- **Goal:** decision 0054 (Proposed): on the Desktop app, the collection pane fits the Code tab's ~30-column dock: the Collection tab as a page of cards under the selected Modster, then Stats and Biomes without cut columns or nested scrolling, Turn off and Settings controls placed under what they change, and Reset to defaults (asked by @victor-aguilars, 2026-11-01).
+- **Done when:**
+  - [x] Whether the dock honours `$.ui.open({ columns })` is checked in the Code tab, and 0054 records what was found (it doesn't; the expand view takes no input; a drawing too big is refused).
+  - [x] On desktop the Collection tab shows the selected Modster on top and a page of still cards under it, with Prev and Next; the number selects a card; the terminal keeps its list. Render tests cover it, and @victor-aguilars checked it in the Code tab.
+  - [x] Stats fits the dock with no `…` cuts; Biomes shows its scene, list and odds without a list scrolling inside the pane. Checked in the Code tab.
+  - [x] On desktop Turn off sits under the Modster or biome it acts on, named; Settings options are value buttons with a help line; Reset to defaults asks first and writes only what differs (0054 points 11–13). Render tests cover them, and @victor-aguilars checked them in the Code tab.
+  - [x] `docs/DEVELOPMENT.md` says how to see local changes in the Code tab and notes the dock width and the drawing size limit.
+  - [ ] 0054 is accepted or reworked; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
+
 ---
 
 ## Phase 6 — Beyond the terminal
