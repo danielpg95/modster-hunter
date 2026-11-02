@@ -46,8 +46,8 @@ export function encounterMotionSvg({ strip, layout, stage, stamp, actor, tag, ca
   } else if (stage === 'up') {
     content = `${drawn}${label}`
   } else if (caught) {
-    // The catcher's last frame and the tag fade together, then the scene slides back (0053): its own animation was the cue
-    const fade = `<animate attributeName="opacity" from="1" to="0" dur="${sec(MOTION.fadeS)}" fill="freeze"/>`
+    // The catcher's last frame and the tag hold, fade together, then the scene slides back (0053, 0055): its own animation was the cue
+    const fade = `<animate attributeName="opacity" from="1" to="0" begin="${sec(MOTION.caughtHoldS)}" dur="${sec(MOTION.fadeS)}" fill="freeze"/>`
     content = `<g>${fade}${drawn}${label}</g>`
     motion = slideBy(slide, 0, departure(true).slideAt)
   } else {
