@@ -85,6 +85,8 @@ import {
   spriteCells,
   spriteRgba,
   statsCards,
+  DESKTOP_TOGGLE_TEXT,
+  TOGGLE_TEXT,
   statsLines,
   TOGGLE_HOTKEY,
   itemNotes,
@@ -102,11 +104,15 @@ import {
   type Particle,
   MODSTERS_ARGUMENT_HINT,
   PANE_OFF_REPLY,
+  SETTING_DEFAULTS,
   SETTING_SPECS,
   STOP_REPLY,
   nextSettingValue,
   readSettingValues,
   settingDeniedText,
+  changedSettings,
+  resetText,
+  settingButtonText,
   settingRow,
   type SettingField,
   type SettingValue,
@@ -293,6 +299,8 @@ let isBlittingPreview = false
 const silhouettes = new Map<string, string>()
 // Desktop's Svg versions of the collection's silhouettes and the Catchers tab's preview (P5-38)
 const silhouetteSvgs = new Map<string, { sprite: Sprite; svg: string }>()
+// The Settings tab's Reset to defaults waits for a second press (0054)
+let resetArmed = false
 // A caught Modster's card on desktop: its first frame (0054)
 const stillSvgs = new Map<string, { sprite: Sprite; svg: string }>()
 // Desktop sheets' Svgs by Modster, scale and look (0045 point 9)
@@ -345,6 +353,8 @@ export const register: Register = (on, options) => {
     // The encounter pane waits for hunting too; one left open is closed (0038 point 1)
     if (hunting) await openHuntPaneAtStart($)
     else await closeHuntPane($)
+    // A Reset to defaults cut short by the reload one of its writes caused carries on (0054)
+    void resumeReset($)
     // Register last: a taken name throws and would skip the rest of this hook. Immediate, so it
     // runs while Claude works, when people play; the command.run hook never reads the turn (0039)
     await $.command.register({ name: 'modsters', description: 'Open your Modster collection', argumentHint: MODSTERS_ARGUMENT_HINT, immediate: true })
@@ -978,6 +988,7 @@ export const register: Register = (on, options) => {
       const index = Math.max(0, fields.indexOf(settingsSelected))
       const select = (field: SettingField | undefined) => {
         if (!field || field === settingsSelected) return
+        resetArmed = false
         settingsSelected = field
         void keepState($, 'settingsSelected', field)
         $.ui.invalidate('ui.render')
@@ -988,15 +999,50 @@ export const register: Register = (on, options) => {
             <Text bold>Settings</Text>
             <Button key="setting-up" label="Up" hotkey="k" plain dimColor onPress={() => select(fields[index - 1])} />
             <Button key="setting-down" label="Down" hotkey="j" plain dimColor onPress={() => select(fields[index + 1])} />
-            <Button key="setting-change" label="Change" hotkey={TOGGLE_HOTKEY} plain dimColor onPress={() => void changeSetting($, fields[index] ?? 'autoStart')} />
+            {e.surface === 'desktop' ? null : (
+              <Button key="setting-change" label="Change" hotkey={TOGGLE_HOTKEY} plain dimColor onPress={() => void changeSetting($, fields[index] ?? 'autoStart')} />
+            )}
           </Box>
-          {fields.map((field) => (
-            <Button key={`setting-${field}`} plain onPress={() => select(field)}>
-              {texts(settingRow(field, settingValues, field === fields[index]), 'truncate')}
-            </Button>
-          ))}
+          {e.surface === 'desktop'
+            ? // 0054: on desktop each option is its name, a button showing its value that changes it, and a line on
+              // what it does; a click on the row's name only selects it. o changes the selected one
+              SETTING_SPECS.map((spec) => {
+                const isSelected = spec.field === fields[index]
+                return (
+                  <Box key={`setting-${spec.field}`} flexDirection="column" marginBottom={1} {...(isSelected ? { backgroundColor: COLLECTION.cardSelectedColor } : {})}>
+                    <Box key="setting-line" flexDirection="row" justifyContent="space-between">
+                      <Button key={`setting-name-${spec.field}`} label={spec.label} plain onPress={() => select(spec.field)} />
+                      <Button
+                        key={`setting-value-${spec.field}`}
+                        label={settingButtonText(spec.field, settingValues[spec.field])}
+                        {...(isSelected ? { hotkey: TOGGLE_HOTKEY } : {})}
+                        onPress={() => {
+                          select(spec.field)
+                          void changeSetting($, spec.field)
+                        }}
+                      />
+                    </Box>
+                    <Text key="setting-help" dimColor wrap="wrap">
+                      {spec.help}
+                    </Text>
+                  </Box>
+                )
+              })
+            : fields.map((field) => (
+                <Button key={`setting-${field}`} plain onPress={() => select(field)}>
+                  {texts(settingRow(field, settingValues, field === fields[index]), 'truncate')}
+                </Button>
+              ))}
+          <Box key="settings-reset-row" flexDirection="row">
+            <Button
+              key="setting-reset"
+              label={resetArmed ? `Press again: ${resetText(changedSettings(settingValues).length)}` : 'Reset to defaults'}
+              {...(e.surface === 'desktop' ? {} : { plain: true, ...(resetArmed ? {} : { dimColor: true }) })}
+              onPress={() => void resetSettings($)}
+            />
+          </Box>
           <Text key="settings-gap"> </Text>
-          {settingsLines(content?.issues ?? []).map((line, at) => (
+          {settingsLines(content?.issues ?? [], e.surface === 'desktop' ? DESKTOP_TOGGLE_TEXT : TOGGLE_TEXT).map((line, at) => (
             <Box key={`settings-${at}`} flexDirection="row">
               {texts(line, 'wrap')}
             </Box>
@@ -1088,7 +1134,8 @@ export const register: Register = (on, options) => {
           <Text bold>{`Biomes ${entries.length}`}</Text>
           <Button key="biome-up" label="Up" hotkey="k" plain dimColor onPress={() => select(entries[index - 1])} />
           <Button key="biome-down" label="Down" hotkey="j" plain dimColor onPress={() => select(entries[index + 1])} />
-          {selected ? (
+          {/* On desktop it sits under the biome it acts on, with its name (0054) */}
+          {selected && e.surface !== 'desktop' ? (
             <Button
               key="biome-toggle"
               label={toggleLabel(selected)}
@@ -1160,6 +1207,16 @@ export const register: Register = (on, options) => {
           ))}
         </Box>
       )
+      // On desktop the button names the biome and sits under its scene (0054)
+      const desktopToggle =
+        e.surface === 'desktop' ? (
+          <Button
+            key="biome-toggle"
+            label={`${toggleLabel(selected)} ${selected.name}`}
+            hotkey={TOGGLE_HOTKEY}
+            onPress={() => toggle($, { kind: 'biome', id: selected.id, off: !selected.isOff }, selected.name, includeBuiltins, idleTimeoutSec)}
+          />
+        ) : null
       if (e.surface === 'desktop' && plan.split !== 'side') {
         // 0054: in the narrow dock the biomes come first, like tabs, then the selected one's scene and odds
         return (
@@ -1168,7 +1225,8 @@ export const register: Register = (on, options) => {
             {list}
             <Text key="list-gap"> </Text>
             {sceneView}
-            {sceneView ? <Text key="scene-gap"> </Text> : null}
+            {desktopToggle}
+            <Text key="scene-gap"> </Text>
             {odds}
           </Box>
         )
@@ -1177,6 +1235,7 @@ export const register: Register = (on, options) => {
         <Box key="biomes" flexDirection="column">
           {summary}
           {sceneView}
+          {desktopToggle}
           {plan.split === 'side' ? (
             <Box key="split" flexDirection="row" columnGap={COLLECTION.gapColumns}>
               {list}
@@ -1215,7 +1274,8 @@ export const register: Register = (on, options) => {
           <Text bold>{`Caught ${caught}/${entries.length}`}</Text>
           <Button key="up" label="Up" hotkey="k" plain dimColor onPress={() => select(entries[index - 1])} />
           <Button key="down" label="Down" hotkey="j" plain dimColor onPress={() => select(entries[index + 1])} />
-          {selected ? (
+          {/* On desktop it sits under the Modster it acts on, with its name (0054) */}
+          {selected && e.surface !== 'desktop' ? (
             <Button
               key="toggle"
               label={toggleLabel(selected)}
@@ -1360,12 +1420,30 @@ export const register: Register = (on, options) => {
               <Button key={`pick-${entry.id}`} plain onPress={() => select(entry)}>
                 <Text {...(isSelected ? {} : { dimColor: true })}>{dexNumber(entry)}</Text>
               </Button>
-              <Text key="name" wrap="wrap" {...(entry.record ? {} : { dimColor: true })}>
+              <Text key="name" wrap="wrap" {...(entry.record && !entry.isOff ? {} : { dimColor: true })}>
                 {entry.record ? entry.name : '???'}
               </Text>
+              {entry.isOff ? (
+                <Text key="off" dimColor>
+                  off
+                </Text>
+              ) : null}
             </Box>
           )
         })
+        // An uncaught Modster's name stays a secret (0032 point 4)
+        const secretName = selected.record ? selected.name : 'That Modster'
+        const detailWithToggle = (
+          <Box key="detail-toggle" flexDirection="column">
+            {detail}
+            <Button
+              key="toggle"
+              label={`${toggleLabel(selected)} ${selected.record ? selected.name : 'this Modster'}`}
+              hotkey={TOGGLE_HOTKEY}
+              onPress={() => toggle($, { kind: 'modster', id: selected.id, off: !selected.isOff }, secretName, includeBuiltins, idleTimeoutSec)}
+            />
+          </Box>
+        )
         const pager = (
           <Box key="pager" flexDirection="row" columnGap={COLLECTION.gapColumns}>
             <Button key="page-prev" label="Prev" plain {...(page > 0 ? {} : { dimColor: true })} onPress={() => select(entries[(page - 1) * pageSize])} />
@@ -1385,12 +1463,12 @@ export const register: Register = (on, options) => {
                   {pager}
                 </Box>
                 <Box key="detail-wide" flexDirection="column" width={COLLECTION.gridDetailColumns}>
-                  {detail}
+                  {detailWithToggle}
                 </Box>
               </Box>
             ) : (
               <Box key="split" flexDirection="column">
-                {detail}
+                {detailWithToggle}
                 <Text key="grid-gap"> </Text>
                 <Box key="cards" flexDirection="row" flexWrap="wrap">
                   {cards}
@@ -1496,7 +1574,46 @@ export const register: Register = (on, options) => {
  * /config and applies it at once. A refused write keeps the value and says why.
  */
 async function changeSetting($: EngineInterface, field: SettingField): Promise<void> {
-  const next = nextSettingValue(field, settingValues[field])
+  resetArmed = false
+  await applySetting($, field, nextSettingValue(field, settingValues[field]))
+}
+
+/**
+ * Reset to defaults (0054): every option back to the manifest's default, after a second press.
+ * Only the options that differ are written, one at a time. A write may reload the mod, so what's
+ * left is kept in $.state and the next load carries on (resumeReset).
+ */
+async function resetSettings($: EngineInterface): Promise<void> {
+  const fields = changedSettings(settingValues)
+  if (!resetArmed) {
+    resetArmed = fields.length > 0
+    if (fields.length === 0) $.ui.toast('Modster Hunter: the settings are already the defaults')
+    $.ui.invalidate('ui.render')
+    return
+  }
+  resetArmed = false
+  $.ui.toast(`Modster Hunter: ${resetText(fields.length)}`)
+  await keepState($, 'resetPending', fields.join(','))
+  await resumeReset($)
+}
+
+/** Writes the settings a reset still has to, each taken off the list before its write. */
+async function resumeReset($: EngineInterface): Promise<void> {
+  let pending: string[]
+  try {
+    pending = ((await $.state.get({ plugin: 'modster-hunter', key: 'resetPending' })).value ?? '').split(',').filter((field) => SETTING_SPECS.some((spec) => spec.field === field))
+  } catch {
+    return
+  }
+  while (pending.length > 0) {
+    const field = pending.shift() as SettingField
+    await keepState($, 'resetPending', pending.join(','))
+    if (settingValues[field] !== SETTING_DEFAULTS[field]) await applySetting($, field, SETTING_DEFAULTS[field])
+  }
+}
+
+/** Sets one option to `next` (0040 points 4–5). */
+async function applySetting($: EngineInterface, field: SettingField, next: SettingValue): Promise<void> {
   // The write below reloads the mod (0023): the pane must come back here, on this row (0040 point 5)
   await keepState($, 'paneTab', 'settings')
   await keepState($, 'settingsSelected', field)
@@ -2082,10 +2199,11 @@ async function openHuntPaneAtStart($: EngineInterface): Promise<void> {
 }
 
 /** Writes a session value that must survive a reload (`types/index.d.ts`); a failure is logged, never thrown. */
-async function keepState($: EngineInterface, key: 'paneTab' | 'settingsSelected' | 'biomeId', value: string): Promise<void> {
+async function keepState($: EngineInterface, key: 'paneTab' | 'settingsSelected' | 'biomeId' | 'resetPending', value: string): Promise<void> {
   try {
     if (key === 'paneTab') await $.state.set({ plugin: 'modster-hunter', key: 'paneTab' }, value as CollectionTab)
     else if (key === 'settingsSelected') await $.state.set({ plugin: 'modster-hunter', key: 'settingsSelected' }, value)
+    else if (key === 'resetPending') await $.state.set({ plugin: 'modster-hunter', key: 'resetPending' }, value)
     else await $.state.set({ plugin: 'modster-hunter', key: 'biomeId' }, value)
   } catch (error) {
     $.ui.log(`state: ${key} not kept: ${error instanceof Error ? error.message : String(error)}`, { to: 'debug' })

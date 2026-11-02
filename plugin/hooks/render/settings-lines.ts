@@ -12,9 +12,11 @@ import { TOGGLE_HOTKEY } from './item-notes'
 export const NO_ISSUES_TEXT = 'All content loaded, no problems.'
 // The `o` key is otherwise only a dim button on the Collection and Biomes summary rows
 export const TOGGLE_TEXT = `Press ${TOGGLE_HOTKEY} in Collection or Biomes to turn one off or on.`
+// On desktop the button sits under the Modster or biome it turns off (0054)
+export const DESKTOP_TOGGLE_TEXT = 'To turn a Modster or biome off, use the button under it in Collection or Biomes.'
 export const RELOAD_TEXT = 'Changed a file? Run /modsters reload.'
 
-export function settingsLines(issues: readonly ContentIssue[]): BandLine[] {
+export function settingsLines(issues: readonly ContentIssue[], toggleText: string = TOGGLE_TEXT): BandLine[] {
   const lines: BandLine[] = []
   if (issues.length === 0) {
     lines.push([{ text: NO_ISSUES_TEXT, dim: true }])
@@ -25,7 +27,7 @@ export function settingsLines(issues: readonly ContentIssue[]): BandLine[] {
     for (const issue of sorted) lines.push([{ text: formatIssue(issue), ...(issue.severity === 'warning' ? { dim: true } : {}) }])
   }
   lines.push([{ text: '' }])
-  lines.push([{ text: TOGGLE_TEXT, dim: true }])
+  lines.push([{ text: toggleText, dim: true }])
   lines.push([{ text: RELOAD_TEXT, dim: true }])
   return lines
 }

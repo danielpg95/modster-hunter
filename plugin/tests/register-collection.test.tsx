@@ -518,9 +518,9 @@ describe('register: collection pane', () => {
     await start($, on, () => [], sceneForest())
     const pane = await mountPane($, { ...NARROW_DOCK, scroll: { offset: 0, bodyRows: 12 } }, 'desktop')
     await pane.press({ key: 'biomes' })
-    // Summary, list, gap, scene, gap, odds
+    // Summary, list, gap, scene, its Turn off button, gap, odds
     const types = (await pane.find({ type: 'Box', key: 'biomes' }))?.children.map((child: any) => child.type)
-    expect(types).toEqual(['Box', 'Box', 'Text', 'Svg', 'Text', 'Box'])
+    expect(types).toEqual(['Box', 'Box', 'Text', 'Svg', 'Button', 'Text', 'Box'])
     expect((await pane.find({ type: 'Box', key: 'biome-list' }))?.text).not.toContain('more')
     await pane.unmount()
   })
