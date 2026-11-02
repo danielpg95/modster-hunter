@@ -248,7 +248,7 @@ describe('register', () => {
     const svg = await ui.find({ type: 'Svg' })
     const strip = svg?.props.height as number
     // The fixture's 20 rows of art aim for the strip's share; its 32-row frame may take the whole strip
-    const scale = Math.min((strip * MOTION.modsterFill) / 20, strip / 32)
+    const scale = Math.min((strip * MOTION.artFill) / 20, strip / 32)
     const actor = (svg?.props.source as string).match(/<svg x="[^"]*" y="[^"]*" width="[^"]*" height="([^"]*)"/)
     expect(Number(actor?.[1])).toBeGreaterThan(32 * DESKTOP.sheetBandScale)
     expect(Math.round(Number(actor?.[1]))).toBe(Math.round(32 * scale))

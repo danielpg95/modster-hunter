@@ -145,6 +145,8 @@ export const MOTION = {
   buttonFills: { throw: '#2e7d4f', run: '#3a3a3a' },
   /** The Modster stands at most this share of the scene's height */
   modsterFill: 0.85,
+  /** A desktop sheet's art fills this share of the scene's height, in the band and the pane (0056 point 2) */
+  artFill: 0.75,
   /** A desktop column as a Client's cells measure it, for clicks on the Modster (measured in the P5-58 spike) */
   columnPx: 8.8,
   /** Cells around the Modster that still count as a click on it */

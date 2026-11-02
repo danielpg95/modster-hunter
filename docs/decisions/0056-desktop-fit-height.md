@@ -42,17 +42,20 @@ collection and the band. Terminal sprites and terminal surfaces don't change.
    opaque rows across every frame, so a Modster doesn't change size while it
    animates.
 2. **Each surface has a target** in CSS px. In the scene (0051), on the pane
-   and in the band alike, it is `MOTION.modsterFill` of the strip: about 82 px
-   of the 96 px strip. Elsewhere it is set in `DESKTOP` (`constants.ts`):
+   and in the band alike, it is `MOTION.artFill` (0.75) of the strip: about
+   72 px of the 96 px strip. Elsewhere it is set in `DESKTOP` (`constants.ts`):
    - encounter pane without the scene: `paneFitPx` 80;
    - collection detail: `collectionFitPx` 60;
    - band without the scene: `bandFitPx` 40.
    @danielpg95 found the band's 40 px too small in the Code tab with 0.1.26:
-   the band's strip is as tall as the pane's. The sheet's scale is `target ÷ art height`, applied to the whole frame, so
+   the band's strip is as tall as the pane's. With 0.1.27 the art filled 85%
+   of the strip, which looked a bit too big; 75% leaves room above it and
+   brings every built-in Modster, Echobat included, to the same size. The
+   sheet's scale is `target ÷ art height`, applied to the whole frame, so
    the art reaches the target and the margins scale with it.
 3. **Caps stay.** The art is never wider than `fitWidthShare` (1.6) × the
    target: a wide sheet scales down until its art fits that width. In the
-   scene the art is at most `MOTION.modsterFill` of the strip and the frame at
+   scene the art is at most `MOTION.artFill` of the strip and the frame at
    most the strip's height, so clear margins may reach the strip's top instead
    of shrinking the art. Outside the scene, in the band, the frame stays within
    `maxRows × rowPx`. A cap lowers the scale and never raises it.
@@ -73,8 +76,8 @@ collection and the band. Terminal sprites and terminal surfaces don't change.
   "up to 128×128 per frame" stays as a limit on the file.
 - Small sheets lose some crispness when scaled by an uneven amount.
 - A catcher looks a little bigger next to a small Modster than next to a big one.
-- The strip still caps the pane's art at about 82 px, and a sheet with a deep
-  margin (Echobat's 21 empty rows) stops short of it when its frame fills the strip. Making every Modster clearly
-  bigger would need a taller strip; that is a separate change.
+- In the scene the art is about 72 px. A sheet with a deeper margin than
+  Echobat's 21 empty rows would stop short of that when its frame fills the
+  strip. A bigger Modster would need a taller strip; that is a separate change.
 - `DESKTOP.sheet*Scale` stop sizing Modsters; they stay where sheets join
   terminal geometry. Task P5-66 does the work.
