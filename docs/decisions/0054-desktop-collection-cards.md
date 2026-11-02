@@ -1,4 +1,4 @@
-# 0054 — On desktop, the Collection tab is a page of Modster cards under the selected one
+# 0054 — On desktop, the collection pane fits the dock: cards, tiles and controls under what they change
 
 - **Status:** Proposed — settled by P5-64 / @victor-aguilars
 - **Date:** 2026-11-01
@@ -63,12 +63,36 @@ Option 2 (@victor-aguilars, 2026-11-01, after trying each in the Code tab):
 8. **A pane at least `gridMinColumns` (70) wide** puts the grid beside the
    detail instead of under it, should the dock ever be that wide.
 
+The other tabs, on desktop, after trying them in the Code tab:
+
+9. **Stats** shows the totals as six tiles, two a row, and each biome hunted in
+   as a short card in its accent colour, so no column is cut.
+10. **Biomes** lists every biome first, like tabs, with no window, then the
+    selected biome's scene and its odds.
+11. **Turn off sits under the item it acts on, with its name** (0032 points 1
+    and 4): `Turn off Serpentide` under the Modster's detail, `Turn off
+    Saltbreeze Bay` under the biome's scene; an uncaught Modster reads `Turn off
+    this Modster`. It's a full button with the `o` key, no longer a dim one in
+    the summary row next to Down. A card that's off says `off`.
+12. **Settings**: each option is its name, a button showing its value (`On`,
+    `Off`, `When opened`, `90 s`) that moves it to the next value, and a line
+    on what it does. A click on the name only selects it; `o` changes the
+    selected one. There's no `Change` button. The hint reads `To turn a
+    Modster or biome off, use the button under it in Collection or Biomes.`
+13. **Reset to defaults** (desktop and terminal, extends 0040): the first press
+    asks (`Press again: reset 2 settings to their defaults`), the second writes
+    only the options that differ from their defaults and toasts how many. On
+    defaults it says so and writes nothing. A write may reload the mod, so what's
+    left is kept in `$.state` (`resetPending`) and the next load finishes it.
+
+The terminal keeps its layouts for every tab, except point 13.
+
 ## Consequences
 
 - The Collection tab no longer depends on the pane scrolling on desktop.
-- The other tabs (Biomes, Stats, Catchers, Settings) still use the terminal
-  layout; Stats cuts its columns in the dock. P5-64 covers Stats and Biomes next.
+- Catchers still uses the terminal layout; it fits the dock as it is.
+- Reset to defaults extends 0040, which listed no reset.
 - The 30-column dock, the dead expand view and the size limit are worth raising
   with the Claude Code team; if the dock can be widened later, point 8 is ready.
-- `docs/DEVELOPMENT.md` should note how to see local changes in the Code tab
-  (bump the version, `claude plugin update`, restart) and the size limit.
+- `docs/DEVELOPMENT.md` notes how to see local changes in the Code tab and
+  these limits.
