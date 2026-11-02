@@ -84,6 +84,7 @@ import {
   desktopSheetSvg,
   spriteCells,
   spriteRgba,
+  statsCards,
   statsLines,
   TOGGLE_HOTKEY,
   itemNotes,
@@ -1014,6 +1015,45 @@ export const register: Register = (on, options) => {
         )
       }
       const biomes = new Map([...(content?.biomes.values() ?? []), ...(content?.off.biomes.values() ?? [])].map(({ biome: loaded }) => [loaded.id, { name: loaded.name, ...(loaded.accentColor ? { accentColor: loaded.accentColor } : {}) }]))
+      if (e.surface === 'desktop') {
+        // 0054: the terminal's table is cut in the Code tab's ~30-column dock; tiles and a card per biome fit it
+        const cards = statsCards(statsShown.stats, biomes)
+        if (cards.kind === 'empty') {
+          return (
+            <Text key="stats" dimColor wrap="wrap">
+              {cards.text}
+            </Text>
+          )
+        }
+        return (
+          <Box key="stats" flexDirection="column">
+            <Box key="stat-tiles" flexDirection="row" flexWrap="wrap">
+              {cards.tiles.map((tile) => (
+                <Box key={`tile-${tile.label}`} flexDirection="column" width={COLLECTION.statTileColumns} marginBottom={1}>
+                  <Text key="value" bold>
+                    {tile.value}
+                  </Text>
+                  <Text key="label" dimColor>
+                    {tile.label}
+                  </Text>
+                </Box>
+              ))}
+            </Box>
+            {cards.biomes.map((biome) => (
+              <Box key={`stats-biome-${biome.id}`} flexDirection="column" marginTop={1}>
+                <Text key="name" bold wrap="wrap" {...(biome.isLoaded ? (biome.color ? { color: biome.color } : {}) : { dimColor: true })}>
+                  {biome.name}
+                </Text>
+                {biome.lines.map((line, at) => (
+                  <Box key={`line-${at}`} flexDirection="row">
+                    {texts(line, 'wrap')}
+                  </Box>
+                ))}
+              </Box>
+            ))}
+          </Box>
+        )
+      }
       return (
         <Box key="stats" flexDirection="column">
           {statsLines(statsShown.stats, biomes).map((line, at) => (

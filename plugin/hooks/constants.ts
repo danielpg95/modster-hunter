@@ -228,6 +228,8 @@ export const COLLECTION = {
   cardSelectedColor: '#2f3b52',
   /** A card's name wraps to this many rows: `Sir Kelpsie` doesn't fit one */
   cardNameRows: 2,
+  /** A Stats tile's width on desktop (0054): two a row in the Code tab's ~30-column dock, three in a wider pane */
+  statTileColumns: 14,
   /** The detail's text rows on desktop: the longest dex entry (195 characters) wraps to about six in a 30-column dock */
   desktopDetailRows: 14,
   /** P3-03's biome list: `▸ Whispering Forest 2/5 here`; names past `biomeNameColumns` are cut */

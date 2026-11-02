@@ -572,6 +572,19 @@ describe('register: collection pane', () => {
     await pane.unmount()
   })
 
+  test('on desktop the Stats tab draws tiles and a card per biome, not the table the dock would cut (0054)', HUNTING, async ($, on) => {
+    const stored: Record<string, unknown> = { 'stats:recent': sessionStats(3 * DAY - 1000) }
+    await start($, on, () => [], oneModsterForest(), stored, 3 * DAY)
+    const pane = await mountPane($, NARROW_DOCK, 'desktop')
+    await pane.press({ key: 'stats' })
+    expect(await statsRows(pane)).toEqual([])
+    const tiles = (await pane.findAll({ type: 'Box' })).filter((box: any) => /^tile-/.test(box.key ?? '')).map((box: any) => box.text)
+    expect(tiles).toContain('100%Catch ratio')
+    const biome = await pane.find({ type: 'Box', key: 'stats-biome-whispering-forest' })
+    expect(biome?.text).toContain('Seen 1  Caught 1  100%')
+    await pane.unmount()
+  })
+
   test('this session\'s turns show when the Stats tab opens again', HUNTING, async ($, on) => {
     await start($, on)
     const pane = await mountPane($)
