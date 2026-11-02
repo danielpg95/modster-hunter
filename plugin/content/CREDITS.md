@@ -31,15 +31,25 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/fernox/sprite.png` | @danielpg95 and @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Fernox, redrawn in P5-19 from @danielpg95's reference, keeping @victor-aguilars' design (fern-tail fox kit) |
 | `modsters/fernox/desktop.png` | @danielpg95 and @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Fernox's desktop sheet (P5-55, decision 0045), reduced from @danielpg95's reference, keeping @victor-aguilars' design; a bending tail wag and a blink |
 | `modsters/shardling/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Shardling, redrawn in P5-26 from @danielpg95's reference |
+| `modsters/shardling/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Shardling's desktop sheet (P5-63, decision 0045), reduced from @danielpg95's reference, with a third shard in place of the blush; a body bob, a glint across the crystals, sparkles and a blink |
 | `modsters/glowcap/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Glowcap, redrawn in P5-26 from @danielpg95's reference |
+| `modsters/glowcap/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Glowcap's desktop sheet (P5-63, decision 0045), reduced from @danielpg95's reference; a body bob, twinkling sparkles, and a cap that dims and lights up again with a blink |
 | `modsters/mossmole/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Mossmole, redrawn in P5-26 from @danielpg95's reference |
+| `modsters/mossmole/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Mossmole's desktop sheet (P5-63, decision 0045), reduced from @danielpg95's reference; a nose sniff, a body bob and a crystal glint |
 | `modsters/echobat/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Echobat, redrawn in P5-26 from @danielpg95's reference |
+| `modsters/echobat/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Echobat's desktop sheet (P5-63, decision 0045), reduced from @danielpg95's reference; a bending wing flap, a 1 px hover, sound rings from its ears and a blink |
 | `modsters/prismite/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Prismite, redrawn in P5-26 from @danielpg95's reference |
+| `modsters/prismite/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Prismite's desktop sheet (P5-63, decision 0045), reduced from @danielpg95's reference, with its rainbow redrawn as stripes; a cycling rainbow, a hover, a wing flutter and twinkling sparkles |
 | `modsters/quartzclaw/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Quartzclaw, redrawn in P5-26 from @danielpg95's reference |
+| `modsters/quartzclaw/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Quartzclaw's desktop sheet (P5-63, decision 0045), reduced from @danielpg95's reference; a bending claw sway, a body bob, a claw glint with a sparkle and a blink |
 | `modsters/geodon/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Geodon, redrawn in P5-26 from @danielpg95's reference |
+| `modsters/geodon/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Geodon's desktop sheet (P5-63, decision 0045), reduced from @danielpg95's reference; twinkling amethyst, a head nod, rising motes and a blink |
 | `modsters/gemsnake/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Gemsnake, redrawn in P5-26 from @danielpg95's reference |
+| `modsters/gemsnake/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Gemsnake's desktop sheet (P5-63, decision 0045), reduced from @danielpg95's reference, as a full coil instead of the terminal close-up; a neck sway with the head moving as one, a tongue flick, glinting gem scales and a blink |
 | `modsters/amethowl/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Amethowl, redrawn in P5-26 from @danielpg95's reference |
+| `modsters/amethowl/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Amethowl's desktop sheet (P5-63, decision 0045), reduced from @danielpg95's reference, with the right eye mirrored from the left; a bending wing beat, sparkles by the wings, glowing eyes and a blink |
 | `modsters/geolem/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Geolem, redrawn in P5-26 from @danielpg95's reference |
+| `modsters/geolem/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Geolem's desktop sheet (P5-63, decision 0045), reduced from @danielpg95's reference; a heart crystal that fades through aqua, pink and violet with its eyes, a shine on the core, a breathing bob, a doze and glinting crystals |
 | `modsters/pinekin/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | P5-19 |
 | `modsters/pinekin/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Pinekin's desktop sheet (P5-55, decision 0045), reduced from @danielpg95's reference; a body bob and a blink |
 | `modsters/hollowmask/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | P5-19 |
