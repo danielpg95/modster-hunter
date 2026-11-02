@@ -3,10 +3,12 @@ import type { DesktopSheet } from '../content'
 export interface DesktopSheetSvgOptions {
   /** CSS pixels per sheet pixel (`DESKTOP.sheet*Scale`) */
   scale: number
-  /** Frames per second; ignored with one frame or a silhouette */
+  /** Frames per second; ignored with one frame, a silhouette or `still` */
   fps: number
   /** Paints the shape in this one colour and holds frame 0: the Collection tab's uncaught Modster */
   silhouette?: string
+  /** Holds frame 0: the Collection tab's cards, which move only once selected (0054) */
+  still?: boolean
 }
 
 /**
@@ -16,7 +18,7 @@ export interface DesktopSheetSvgOptions {
  * as an image, so the `Svg` must not be `isInteractive`; SMIL runs there too
  * (P5-39 spike).
  */
-export function desktopSheetSvg(sheet: DesktopSheet, { scale, fps, silhouette }: DesktopSheetSvgOptions): string {
+export function desktopSheetSvg(sheet: DesktopSheet, { scale, fps, silhouette, still }: DesktopSheetSvgOptions): string {
   const { width, height, frames } = sheet
   const head = `<svg xmlns="http://www.w3.org/2000/svg" width="${width * scale}" height="${height * scale}" viewBox="0 0 ${width} ${height}">`
   const filter = silhouette
@@ -24,7 +26,7 @@ export function desktopSheetSvg(sheet: DesktopSheet, { scale, fps, silhouette }:
     : ''
   const image =
     `<image href="data:image/png;base64,${sheet.png}" width="${width * frames}" height="${height}" image-rendering="pixelated" style="image-rendering:pixelated"` +
-    `${silhouette ? ' filter="url(#silhouette)"' : ''}>${silhouette ? '' : stepFrames(width, frames, fps)}</image>`
+    `${silhouette ? ' filter="url(#silhouette)"' : ''}>${silhouette || still ? '' : stepFrames(width, frames, fps)}</image>`
   return `${head}${filter}${image}</svg>`
 }
 

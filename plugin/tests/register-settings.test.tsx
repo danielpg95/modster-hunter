@@ -62,7 +62,7 @@ async function start($: any, on: On, init: { denyConfig?: string; panes?: () => 
   return { clock, seen }
 }
 
-const mountPane = ($: any) => $.ui.mount({ plugin: 'modster-hunter', surface: 'terminal', component: 'Pane', requestId: 'modster-collection', props: PANE_PROPS })
+const mountPane = ($: any, surface: 'terminal' | 'desktop' = 'terminal') => $.ui.mount({ plugin: 'modster-hunter', surface, component: 'Pane', requestId: 'modster-collection', props: PANE_PROPS })
 const mountBand = ($: any) => $.ui.mount({ plugin: 'modster-hunter', surface: 'terminal', component: 'AbovePrompt', props: BAND_PROPS })
 const run = ($: any, args: string) => $.command.run({ command: 'modsters', args } as any)
 
@@ -106,6 +106,55 @@ describe('register: Settings tab', () => {
     await pane.press({ key: 'setting-change' })
     expect(seen.configSets).toEqual(['modster-hunter.showInBand=false'])
     expect(await row(pane, 'showInBand')).toMatch(/off$/)
+    await pane.unmount()
+  })
+
+  test('on desktop each option shows its value on a button that changes it, with a line on what it does (0054)', async ($, on) => {
+    const { seen } = await start($, on)
+    await run($, 'settings')
+    const pane = await mountPane($, 'desktop')
+    expect(await pane.find({ type: 'Button', key: 'setting-change' })).toBeUndefined()
+    const value = async (field: string) => (await pane.find({ type: 'Button', key: `setting-value-${field}` }))?.props
+    expect(await value('autoStart')).toMatchObject({ label: 'On', hotkey: 'o' })
+    expect((await value('encounterPane'))?.label).toBe('When opened')
+    expect((await value('encounterIdleTimeoutSec'))?.label).toBe('90 s')
+    expect((await pane.find({ type: 'Box', key: 'setting-autoStart' }))?.text).toContain('Start hunting every session.')
+    // A click on a name only selects it; a click on the value changes it
+    await pane.press({ key: 'setting-name-showInBand' })
+    expect(seen.configSets).toEqual([])
+    expect((await value('showInBand'))?.hotkey).toBe('o')
+    await pane.press({ key: 'setting-value-showInBand' })
+    expect(seen.configSets).toEqual(['modster-hunter.showInBand=false'])
+    expect((await value('showInBand'))?.label).toBe('Off')
+    expect(await pane.find({ type: 'Text', text: 'To turn a Modster or biome off, use the button under it in Collection or Biomes.' })).toBeDefined()
+    await pane.unmount()
+  })
+
+  test('Reset to defaults asks for a second press, then writes only the options that differ (0054)', async ($, on) => {
+    const { seen } = await start($, on)
+    await run($, 'settings')
+    const pane = await mountPane($, 'desktop')
+    await pane.press({ key: 'setting-value-showInBand' })
+    await pane.press({ key: 'setting-value-encounterIdleTimeoutSec' })
+    expect(seen.configSets).toEqual(['modster-hunter.showInBand=false', 'modster-hunter.encounterIdleTimeoutSec=180'])
+    await pane.press({ key: 'setting-reset' })
+    expect((await pane.find({ type: 'Button', key: 'setting-reset' }))?.props.label).toBe('Press again: reset 2 settings to their defaults')
+    expect(seen.configSets).toHaveLength(2)
+    await pane.press({ key: 'setting-reset' })
+    expect(seen.configSets.slice(2)).toEqual(['modster-hunter.showInBand=true', 'modster-hunter.encounterIdleTimeoutSec=90'])
+    expect(seen.toasts).toContain('Modster Hunter: reset 2 settings to their defaults')
+    // Nothing left for a reload to carry on
+    expect(seen.state.resetPending).toBe('')
+    expect((await pane.find({ type: 'Button', key: 'setting-reset' }))?.props.label).toBe('Reset to defaults')
+    await pane.unmount()
+  })
+
+  test('Reset to defaults on default settings says so and writes nothing', async ($, on) => {
+    const { seen } = await start($, on)
+    const pane = await settingsPane($)
+    await pane.press({ key: 'setting-reset' })
+    expect(seen.toasts).toContain('Modster Hunter: the settings are already the defaults')
+    expect(seen.configSets).toEqual([])
     await pane.unmount()
   })
 

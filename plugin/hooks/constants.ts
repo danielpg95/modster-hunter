@@ -208,6 +208,30 @@ export const COLLECTION = {
   detailRows: 9,
   /** An uncaught Modster's still silhouette: one gray that reads on dark and light terminals */
   silhouetteColor: '#5a5a5a',
+  /** 0054: on desktop a pane this wide (columns) shows the Collection tab as a card grid beside the detail */
+  gridMinColumns: 70,
+  /** The detail's width beside the card grid */
+  gridDetailColumns: 32,
+  /** One card's width in columns, and the square its sprite is fitted into, in CSS pixels */
+  cardColumns: 11,
+  cardThumbPx: 72,
+  /** A narrow dock (the Code tab gives ~30 columns, and the plugin can't widen it) lays cards this many a row, no narrower than cardMinColumns */
+  narrowCardsPerRow: 3,
+  cardMinColumns: 8,
+  /** Pixels a card keeps free around its thumbnail */
+  cardPadPx: 12,
+  /** Rows kept for the detail's sprite above its text in a narrow dock, so the grid under it holds still */
+  detailArtRows: 5,
+  /** At most this many cards a page, and their sprites at most this many characters: 35 cards (292k) were refused by the Code tab */
+  cardsPerPageMax: 12,
+  cardSvgCharsMax: 150000,
+  cardSelectedColor: '#2f3b52',
+  /** A card's name wraps to this many rows: `Sir Kelpsie` doesn't fit one */
+  cardNameRows: 2,
+  /** A Stats tile's width on desktop (0054): two a row in the Code tab's ~30-column dock, three in a wider pane */
+  statTileColumns: 14,
+  /** The detail's text rows on desktop: the longest dex entry (195 characters) wraps to about six in a 30-column dock */
+  desktopDetailRows: 14,
   /** P3-03's biome list: `▸ Whispering Forest 2/5 here`; names past `biomeNameColumns` are cut */
   biomeListColumns: 30,
   biomeNameColumns: 17,

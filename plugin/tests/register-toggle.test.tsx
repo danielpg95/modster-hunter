@@ -75,6 +75,22 @@ describe('register: toggle', () => {
     await pane.unmount()
   })
 
+  test('on desktop the toggle sits under the selected Modster with its name, and an off card says off (0054)', HUNTING, async ($, on) => {
+    const { toasts } = await start($, on, twoBiomes(), {}, { 'caught:emberkit': caught() })
+    const pane = await $.ui.mount({ plugin: 'modster-hunter', surface: 'desktop', component: 'Pane', requestId: 'modster-collection', props: { ...PANE_PROPS, bodyColumns: 30 } })
+    await pane.press({ key: 'collection' })
+    // Uncaught: not named, on the button or in the toast
+    expect((await pane.find({ type: 'Button', key: 'toggle' }))?.props.label).toBe('Turn off this Modster')
+    await pane.press({ key: 'down' })
+    const button = await pane.find({ type: 'Button', key: 'toggle' })
+    expect([button?.props.label, button?.props.hotkey]).toEqual(['Turn off Emberkit', 'o'])
+    expect((await pane.find({ type: 'Box', key: 'summary' }))?.text).not.toContain('Turn off')
+    expect(await pressForToast(pane, 'toggle', toasts)).toBe('Modster Hunter: Emberkit is off')
+    expect((await pane.find({ type: 'Box', key: 'card-emberkit' }))?.text).toContain('off')
+    expect((await pane.find({ type: 'Button', key: 'toggle' }))?.props.label).toBe('Turn on Emberkit')
+    await pane.unmount()
+  })
+
   test('an uncaught Modster is not named in the toast', HUNTING, async ($, on) => {
     const { toasts } = await start($, on, twoBiomes())
     const pane = await paneOn($, 'collection')
@@ -138,12 +154,15 @@ describe('register: toggle', () => {
     await pane.unmount()
   })
 
-  test('on desktop the Biomes summary row wraps, so the o toggle stays in the narrow pane (P5-06)', HUNTING, async ($, on) => {
+  test('the Biomes o toggle is in the summary row on the terminal, and under the biome, named, on desktop (P5-06, 0054)', HUNTING, async ($, on) => {
     await start($, on, twoBiomes())
     for (const surface of ['desktop', 'terminal'] as const) {
       const pane = await $.ui.mount({ plugin: 'modster-hunter', surface, component: 'Pane', requestId: 'modster-collection', props: PANE_PROPS })
       await pane.press({ key: 'biomes' })
-      expect(await pane.find({ type: 'Button', key: 'biome-toggle' })).toBeDefined()
+      const button = await pane.find({ type: 'Button', key: 'biome-toggle' })
+      expect(button?.props.hotkey).toBe('o')
+      expect(String(button?.props.label).startsWith('Turn off')).toBe(true)
+      expect(button?.props.label === 'Turn off').toBe(surface === 'terminal')
       const summary = await pane.find({ type: 'Box', key: 'summary' })
       expect(summary?.props.flexWrap).toBe(surface === 'desktop' ? 'wrap' : undefined)
       await pane.unmount()

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'claude-code/testing'
 import type { ContentIssue } from '../../hooks/content'
-import { NO_ISSUES_TEXT, RELOAD_TEXT, TOGGLE_TEXT, settingsLines } from '../../hooks/render'
+import { DESKTOP_TOGGLE_TEXT, NO_ISSUES_TEXT, RELOAD_TEXT, TOGGLE_TEXT, settingsLines } from '../../hooks/render'
 
 // P4-02: every content issue, formatted as formatIssue writes it (0025), then how to
 // turn content off (P4-03, 0032) and how to reload.
@@ -45,5 +45,8 @@ describe('settingsLines', () => {
   test('the count leaves out a kind with none and says one in the singular', () => {
     expect(text(settingsLines([warning('b.json', '', 'is odd')])[0] ?? [])).toBe('Content problems 1 warning')
     expect(text(settingsLines([error('a.json', '', 'x'), error('c.json', '', 'y')])[0] ?? [])).toBe('Content problems 2 errors')
+  })
+  test('desktop passes its own toggle hint, since the button sits under the item there (0054)', () => {
+    expect(settingsLines([], DESKTOP_TOGGLE_TEXT).map(text)).toEqual([NO_ISSUES_TEXT, '', DESKTOP_TOGGLE_TEXT, RELOAD_TEXT])
   })
 })

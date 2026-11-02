@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { NO_STATS_TEXT, ratio, statsLines, type StatsBiome } from '../../hooks/render'
+import { NO_STATS_TEXT, ratio, statsCards, statsLines, type StatsBiome } from '../../hooks/render'
 import type { SessionStats } from '../../hooks/store'
 
 // P3-04: the totals, then a row per biome hunted in, most encounters first.
@@ -50,5 +50,29 @@ describe('statsLines', () => {
 
   test('the ratio rounds to a whole percent, and is a dash before any encounter', () => {
     expect([ratio(counts(3, 1, 0, 0)), ratio(counts(3, 2, 0, 0)), ratio(counts(0, 0, 0, 0))]).toEqual(['33%', '67%', '—'])
+  })
+})
+
+describe('statsCards', () => {
+  test('nothing stored says there are no hunts, as on the terminal', () => {
+    expect(statsCards(undefined, LOADED)).toEqual({ kind: 'empty', text: NO_STATS_TEXT })
+  })
+
+  test('the totals are six tiles, so no column is cut in a narrow dock (0054)', () => {
+    const cards = statsCards(stats({ 'whispering-forest': counts(4, 2, 1, 1) }, 12), LOADED)
+    if (cards.kind !== 'cards') throw new Error('expected cards')
+    expect(cards.tiles.map((tile) => `${tile.value} ${tile.label}`)).toEqual(['4 Encounters', '2 Caught', '50% Catch ratio', '12 Turns', '1 Fled', '1 Ran'])
+  })
+
+  test('each biome is a card of short lines, most encounters first, a biome that no longer loads dimmed', () => {
+    const cards = statsCards(stats({ 'whispering-forest': counts(2, 1, 1, 0), 'gone-biome': counts(6, 2, 3, 1) }), LOADED)
+    if (cards.kind !== 'cards') throw new Error('expected cards')
+    expect(cards.biomes.map((biome) => [biome.name, biome.isLoaded, ...biome.lines.map(text)])).toEqual([
+      ['gone-biome', false, 'Seen 6  Caught 2  33%', 'Fled 3  Ran 1'],
+      ['Whispering Forest', true, 'Seen 2  Caught 1  50%', 'Fled 1  Ran 0'],
+    ])
+    expect(cards.biomes[1]?.color).toBe('#4caf50')
+    // The longest line fits the Code tab's ~30-column dock
+    expect(Math.max(...cards.biomes.flatMap((biome) => biome.lines.map((line) => text(line).length)))).toBeLessThanOrEqual(30)
   })
 })

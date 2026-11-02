@@ -12,6 +12,8 @@ declare module 'claude-code' {
       settingsSelected: string
       /** The session's biome (decision 0006), so a reload doesn't pick a new one */
       biomeId: string
+      /** Settings a Reset to defaults still has to write, comma-separated (0054): each write may reload the mod */
+      resetPending: string
     }
   }
 }

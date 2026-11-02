@@ -53,7 +53,7 @@ settled questions and avoid making assumptions about open ones.
 | [0037](0037-portable-core-and-hosts.md) | Claude Code users first, then a portable core shared by other hosts | Proposed |
 | [0038](0038-opt-in-hunting.md) | The game runs only while `autoStart` is on; `/modsters hunt` and `stop` flip it | Accepted (default, point 2 and welcome texts superseded by 0041; amended by 0040) |
 | [0039](0039-modsters-runs-immediately.md) | `/modsters` runs at once, even while Claude works | Accepted |
-| [0040](0040-in-game-settings.md) | `/modsters settings` opens a Settings tab where players change every option | Accepted |
+| [0040](0040-in-game-settings.md) | `/modsters settings` opens a Settings tab where players change every option | Accepted (Reset to defaults added by 0054, Proposed) |
 | [0041](0041-auto-start-on-by-default.md) | Auto start is on by default; one welcome toast says how to stop | Accepted |
 | [0042](0042-desktop-svg-sprites.md) | On the desktop app, sprites are one animated Svg each | Proposed (point 4: the catch animation in 0043, the biome scenes in 0044) |
 | [0043](0043-desktop-vector-catch.md) | On the desktop app, a throw plays as one vector Svg | Proposed |
@@ -67,4 +67,4 @@ settled questions and avoid making assumptions about open ones.
 | [0051](0051-desktop-encounter-motion.md) | On desktop, the encounter plays in the scene, one Svg per motion | Superseded by 0052 |
 | [0052](0052-desktop-departure-reverses-arrival.md) | On desktop, a Modster that isn't caught leaves by reversing its arrival | Superseded by 0053 |
 | [0053](0053-desktop-catch-leaves-as-catcher.md) | On desktop, a caught Modster leaves as its catcher fading, with no extra cue | Accepted |
-| [0054](0054-desktop-collection-cards.md) | On desktop, the Collection tab is a page of Modster cards under the selected one | Proposed |
+| [0054](0054-desktop-collection-cards.md) | On desktop, the collection pane fits the dock: cards, tiles and controls under what they change | Proposed (extends 0040 with Reset to defaults) |

@@ -157,6 +157,40 @@ before pushing; CI won't catch type errors.
 When you upgrade Claude Code for development, bump `CLAUDE_CODE_VERSION` in the
 workflow in the same PR.
 
+## Trying it in the Desktop app
+
+The Desktop app's Code tab doesn't take `--plugin-dir`. Install the mod from
+this checkout instead, once:
+
+```bash
+claude plugin marketplace add /path/to/modster-hunter   # remove the GitHub one first if it's added
+claude plugin install modster-hunter@modster-hunter
+```
+
+The Code tab then runs a **copy** of `plugin/`, cached under
+`~/.claude/plugins/cache/modster-hunter/modster-hunter/<version>/`, not the
+files you edit. To see a change:
+
+1. Raise `version` in `plugin/.claude-plugin/plugin.json` (locally; above the
+   last one you installed).
+2. `claude plugin update modster-hunter@modster-hunter`.
+3. Restart the Desktop app and start a new session.
+
+Set the version back before committing. The app bundles its own Claude Code
+(under `~/.config/Claude/claude-code/<version>/`); run that binary's
+`plugin test ./plugin` to test against the build the app runs.
+
+What the Code tab does differently (decision 0054, checked with 2.1.308):
+
+- **The dock is about 30 body columns**, and `$.ui.open({ columns })` doesn't
+  widen it. Lay desktop panes out for 30 columns.
+- **The expand view takes no clicks or keys.** Don't rely on it.
+- **A drawing that's too big is refused whole:** the pane says it "has not
+  drawn in this pane". About 290k characters of Svg was refused, 90k drew.
+  Tests don't catch it; their sprites are tiny.
+- **A Button holds only `Text`**, drawn as a native button that cuts a long
+  label.
+
 ## Things that are easy to get wrong
 
 - **`focus`, `closeOnEscape`, `holdToasts`, `autoFocus` accept only `true`.**
