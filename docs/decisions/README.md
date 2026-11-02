@@ -58,7 +58,7 @@ settled questions and avoid making assumptions about open ones.
 | [0042](0042-desktop-svg-sprites.md) | On the desktop app, sprites are one animated Svg each | Proposed (point 4: the catch animation in 0043, the biome scenes in 0044) |
 | [0043](0043-desktop-vector-catch.md) | On the desktop app, a throw plays as one vector Svg | Proposed |
 | [0044](0044-desktop-vector-scenes.md) | On the desktop app, a biome's idle scene is one vector Svg | Proposed (point 4 amended by 0046 on desktop) |
-| [0045](0045-desktop-sprites.md) | Desktop first: new built-in art is hi-res pixel art for the Desktop app | Accepted |
+| [0045](0045-desktop-sprites.md) | Desktop first: new built-in art is hi-res pixel art for the Desktop app | Accepted (sizes amended by 0056) |
 | [0046](0046-desktop-particle-art.md) | On desktop, a biome may draw its particles with its own art | Accepted |
 | [0047](0047-desktop-idle-tag.md) | On desktop, the idle line is a name tag in the scene that fades | Accepted |
 | [0048](0048-desktop-encounter-scene.md) | On desktop, the encounter pane shows the Modster in front of its biome | Superseded by 0049 |
@@ -69,3 +69,4 @@ settled questions and avoid making assumptions about open ones.
 | [0053](0053-desktop-catch-leaves-as-catcher.md) | On desktop, a caught Modster leaves as its catcher fading, with no extra cue | Accepted (caught timing amended by 0055) |
 | [0054](0054-desktop-collection-cards.md) | On desktop, the collection pane fits the dock: cards, tiles and controls under what they change | Proposed (extends 0040 with Reset to defaults) |
 | [0055](0055-desktop-caught-hold.md) | On desktop, a caught catcher holds before it fades | Accepted |
+| [0056](0056-desktop-fit-height.md) | On desktop, every Modster's art fits a set height | Proposed |
