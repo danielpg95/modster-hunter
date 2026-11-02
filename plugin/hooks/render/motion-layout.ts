@@ -19,10 +19,12 @@ export interface MotionLayout {
 /**
  * The Modster scaled to stand inside the strip, feet on its bottom (0051 point 1), centred in
  * the part the slot shows once the scene has slid. `shownPx` is the slot's width, an estimate.
+ * The caller sizes the art within `MOTION.modsterFill` (0056 point 3); here the frame, clear
+ * margins included, only has to fit the strip.
  */
 export function motionLayout(scene: { height: number }, shownPx: number, actor: { width: number; height: number }): MotionLayout {
   const slide = MOTION.slidePx
-  const fit = Math.min(1, (scene.height * MOTION.modsterFill) / Math.max(1, actor.height))
+  const fit = Math.min(1, scene.height / Math.max(1, actor.height))
   const width = actor.width * fit
   const height = actor.height * fit
   const center = slide + Math.max(0, shownPx - slide) / 2

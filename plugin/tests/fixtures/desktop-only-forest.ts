@@ -7,6 +7,7 @@ import { validModster } from './valid-modster'
  * (decision 0045): its one Modster has a `desktopSprite` and no terminal
  * sprite, and the biome has a `desktopBackground` and no terminal background.
  * As `oneModsterForest`, the Modster appears after exactly 3 s and is always caught.
+ * Its 32×32 frames hold a 16×20 block of art in a margin, as real sheets do (0056).
  */
 export function desktopOnlyForest(): Record<string, string> {
   const biome = {
@@ -23,6 +24,6 @@ export function desktopOnlyForest(): Record<string, string> {
     'biomes/whispering-forest/biome.json': JSON.stringify(biome),
     'biomes/whispering-forest/desktop.png': base64FromBytes(desktopPng(64, 40, 1)),
     'modsters/sproutling/modster.json': JSON.stringify({ ...modster, catchRate: 1, desktopSprite: { file: 'desktop.png', frames: 2 } }),
-    'modsters/sproutling/desktop.png': base64FromBytes(desktopPng(32, 32, 2)),
+    'modsters/sproutling/desktop.png': base64FromBytes(desktopPng(32, 32, 2, (x, y) => (x % 32 >= 8 && x % 32 < 24 && y >= 6 && y < 26 ? [255, 0, 0, 255] : undefined))),
   }
 }

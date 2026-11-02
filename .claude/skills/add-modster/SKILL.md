@@ -52,9 +52,10 @@ image](#desktop-art-from-a-reference-image) is the desktop path;
      height, weight, and the entry text (≤ 240 chars).
    - Look: color scheme, size, and the idle animation.
      - **Desktop:** up to 128×128 per frame, up to 64 colours, 2–8 frames at
-       its own fps. It shows at 1 CSS px per pixel in the pane, 0.75 in the
-       Collection and 0.5 in the band, so a 128 px Modster is as big on screen
-       as a 32 px terminal one is today. Use the room for detail: shading,
+       its own fps. Its art is scaled to the same height as every other
+       Modster's: about 80 px in the pane, 60 in the Collection and 40 in the
+       band (decision 0056), so the sheet's size doesn't make it look bigger.
+       Keep margins tight around the art. Use the room for detail: shading,
        texture, a readable face. Make it at least 76×80, whatever the tier: a
        throw plays only when the catcher fits in the Modster's frame (0035
        point 8), and the largest built-in catcher, the puzzle cube, is 76×80

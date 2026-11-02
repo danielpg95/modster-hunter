@@ -49,9 +49,10 @@ collection and the band. Terminal sprites and terminal surfaces don't change.
    the art reaches the target and the margins scale with it.
 3. **Caps stay.** The art is never wider than `fitWidthShare` (1.6) × the
    target: a wide sheet scales down until its art fits that width. In the
-   scene the art is at most `MOTION.modsterFill` of the strip, and in the band
-   the frame stays within `maxRows × rowPx`. A cap lowers the scale and never
-   raises it.
+   scene the art is at most `MOTION.modsterFill` of the strip and the frame at
+   most the strip's height, so clear margins may reach the strip's top instead
+   of shrinking the art. Outside the scene, in the band, the frame stays within
+   `maxRows × rowPx`. A cap lowers the scale and never raises it.
 4. **Collection cards** fit the art's box, not the frame, into the thumbnail
    square, so margins don't shrink a card's Modster.
 5. **Throws and the caught frame scale with the Modster.** A throw is one
@@ -69,7 +70,8 @@ collection and the band. Terminal sprites and terminal surfaces don't change.
   "up to 128×128 per frame" stays as a limit on the file.
 - Small sheets lose some crispness when scaled by an uneven amount.
 - A catcher looks a little bigger next to a small Modster than next to a big one.
-- The strip still caps the pane at about 82 px. Making every Modster clearly
+- The strip still caps the pane's art at about 82 px, and a sheet with a deep
+  margin (Echobat's 21 empty rows) stops short of it when its frame fills the strip. Making every Modster clearly
   bigger would need a taller strip; that is a separate change.
 - `DESKTOP.sheet*Scale` stop sizing Modsters; they stay where sheets join
   terminal geometry. Task P5-66 does the work.

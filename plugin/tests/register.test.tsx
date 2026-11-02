@@ -232,8 +232,9 @@ describe('register', () => {
     expect(svg?.props.alt).toBe('Sproutling')
     expect(svg?.props.source).toContain('<image href="data:image/png;base64,')
     expect(svg?.props.isInteractive).toBeUndefined()
-    // The fixture sheet is 32×32 at the band's 0.5
-    expect([svg?.props.width, svg?.props.height]).toEqual([32 * DESKTOP.sheetBandScale, 32 * DESKTOP.sheetBandScale])
+    // The fixture's 20 rows of art reach the band's target, its 32×32 frame scaled with them (0056)
+    const scale = DESKTOP.bandFitPx / 20
+    expect([svg?.props.width, svg?.props.height]).toEqual([32 * scale, 32 * scale])
     await ui.redraw({ ...BAND_PROPS, maxRows: 2 } as any)
     expect((await ui.find({ type: 'Svg' }))?.props.height).toBeLessThanOrEqual(2 * DESKTOP.rowPx)
     expect(await ui.find({ type: 'Button', key: 'throw' })).toBeDefined()

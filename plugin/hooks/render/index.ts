@@ -13,6 +13,7 @@ export { idleTagMarkup, idleTagSize, idleTagSvg, type IdleTag } from './idle-tag
 export { DEFAULT_COLOR, pixelsToCells, type Frame } from './pixels-to-cells'
 export { pixelsToSvg, type SvgOptions } from './pixels-to-svg'
 export { desktopSheetSvg, type DesktopSheetSvgOptions } from './desktop-sheet-svg'
+export { sheetFitScale, type SheetFitBox } from './sheet-fit'
 export { paneHint, type PaneHintInput } from './pane-hint'
 export { rgbaOf, spriteCells, spriteRgba } from './sprite-cells'
 export { artFrame, desktopIdleScene, idleScene, isAnimated, makeParticles, particlePixel, sceneCells, type IdleScene, type Particle } from './idle-scene'

@@ -1,6 +1,6 @@
 import { COLLECTION, DESKTOP } from '../../../../hooks/constants'
 import type { Catcher, DesktopSheet } from '../../../../hooks/content'
-import { catchSvg, desktopSheetSvg, prepareDesktopCatch, type ThrowArt } from '../../../../hooks/render'
+import { catchSvg, desktopSheetSvg, prepareDesktopCatch, sheetFitScale, type ThrowArt } from '../../../../hooks/render'
 
 // The browser page that previews desktop art (decisions 0045 and 0046), for the
 // helper's `check-desktop --preview` and the repo's `tools/sprite.mjs --preview`.
@@ -44,12 +44,16 @@ export function desktopPreviewPage({ kind, sheet, bytes, fps, title, catcher, ta
 
 function modsterSizes(sheet: DesktopSheet, fps: number): string {
   const svg = (scale: number, silhouette?: string) => desktopSheetSvg(sheet, { scale, fps, ...(silhouette ? { silhouette } : {}) })
+  // Its art fitted to each surface's height, as the Code tab does (decision 0056)
+  const fit = (px: number) => sheetFitScale(sheet, { artWidth: px * DESKTOP.fitWidthShare, artHeight: px })
+  const label = (where: string, scale: number) => `${where}, ${+scale.toFixed(2)}×`
+  const [pane, collection, band] = [fit(DESKTOP.paneFitPx), fit(DESKTOP.collectionFitPx), fit(DESKTOP.bandFitPx)]
   const row = (bg: string) =>
     [
-      cell(`pane, ${DESKTOP.sheetPaneScale}×`, img(svg(DESKTOP.sheetPaneScale)), bg),
-      cell(`collection, ${DESKTOP.sheetCollectionScale}×`, img(svg(DESKTOP.sheetCollectionScale)), bg),
-      cell('uncaught silhouette', img(svg(DESKTOP.sheetCollectionScale, COLLECTION.silhouetteColor)), bg),
-      cell(`band, ${DESKTOP.sheetBandScale}×`, img(svg(DESKTOP.sheetBandScale)), bg),
+      cell(label('pane', pane), img(svg(pane)), bg),
+      cell(label('collection', collection), img(svg(collection)), bg),
+      cell('uncaught silhouette', img(svg(collection, COLLECTION.silhouetteColor)), bg),
+      cell(label('band', band), img(svg(band)), bg),
     ].join('')
   return `<p>At the sizes the Code tab draws:</p>${flex(row('#1e1e1e'))}${flex(row('#f5f5f5'))}`
 }

@@ -12,11 +12,9 @@ describe('motionLayout', () => {
     expect(layout.modster).toEqual({ x: 290, y: 40, width: 60, height: 80 })
   })
 
-  test('a Modster taller than the strip shrinks to fit it', () => {
+  test('a Modster taller than the strip shrinks to fit it (0056 point 3)', () => {
     const { modster } = motionLayout({ height: 100 }, 520, { width: 200, height: 200 })
-    expect(Math.round(modster.height)).toBe(85)
-    expect(Math.round(modster.width)).toBe(85)
-    expect(Math.round(modster.y)).toBe(15)
+    expect(modster).toMatchObject({ width: 100, height: 100, y: 0 })
   })
 
   test('a narrow slot keeps the Modster right of the backdrop', () => {
