@@ -69,4 +69,4 @@ settled questions and avoid making assumptions about open ones.
 | [0053](0053-desktop-catch-leaves-as-catcher.md) | On desktop, a caught Modster leaves as its catcher fading, with no extra cue | Accepted (caught timing amended by 0055) |
 | [0054](0054-desktop-collection-cards.md) | On desktop, the collection pane fits the dock: cards, tiles and controls under what they change | Proposed (extends 0040 with Reset to defaults) |
 | [0055](0055-desktop-caught-hold.md) | On desktop, a caught catcher holds before it fades | Accepted |
-| [0056](0056-desktop-fit-height.md) | On desktop, every Modster's art fits a set height | Proposed |
+| [0056](0056-desktop-fit-height.md) | On desktop, every Modster's art fits a set height | Accepted |

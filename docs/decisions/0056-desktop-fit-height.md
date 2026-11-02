@@ -1,8 +1,8 @@
 # 0056 — On desktop, every Modster's art fits a set height
 
-- **Status:** Proposed — settled by P5-66 / @danielpg95
+- **Status:** Accepted
 - **Date:** 2026-11-02
-- **Proposed by:** @danielpg95
+- **Decided by:** @danielpg95
 - **Amends:** 0045
 
 ## Context
