@@ -287,7 +287,8 @@ const collectionRecords = new Map<string, CaughtRecord>()
 let collectionSelected: string | undefined
 // The Biomes tab's selection (P3-03); none yet means the session's biome
 let biomesSelected: string | undefined
-// The Stats tab (P3-04): every session's counts summed, read when the tab shows.
+// The Stats tab (P3-04): every session's counts summed, read when the tab shows and
+// after an encounter ends while it's open (P5-18).
 // Undefined until the first read finishes
 let statsShown: { stats: SessionStats | undefined } | undefined
 // Its sprite animates on a loop of its own: the encounter's loop follows the encounter's Modster
@@ -1997,6 +1998,8 @@ async function advanceMachine($: EngineInterface, action: MachineAction): Promis
   const where = { sessionId, biomeId: machineContext.biome.id }
   if (step.events.length > 0) queueWrite($, (store) => recordEncounterEvents(store, where, step.events, now))
   for (const event of step.events) if (event.type === 'caught') refreshCollectionRecord($, event.modsterId)
+  // A Stats tab left open counts the encounter that just ended (P5-18)
+  if (step.events.some((event) => event.type === 'caught' || event.type === 'fled' || event.type === 'ran')) refreshShownStats($)
   if (retiredBiome && !machine.encounter) {
     const loaded = moveToNewBiome($, machineContext.idleTimeoutMs / 1000)
     $.ui.toast(loaded ? `Modster Hunter: now in ${loaded.biome.name}` : `Modster Hunter: ${noBiomesMessage(builtinsIncluded, USER_FOLDER_LABEL)}`)
@@ -2557,6 +2560,23 @@ function loadStats($: EngineInterface): void {
     statsShown = { stats: await compactStats(store, { sessionId, now }) }
     $.ui.invalidate('ui.render')
   })
+}
+
+/** Re-reads the stats when the collection pane is open on the Stats tab; else no store reads. */
+function refreshShownStats($: EngineInterface): void {
+  if (collectionTab !== 'stats') return
+  void isCollectionOpen($).then((open) => {
+    if (open && collectionTab === 'stats') loadStats($)
+  })
+}
+
+/** Whether the collection pane is open, shown or not. Unknown counts as no. */
+async function isCollectionOpen($: EngineInterface): Promise<boolean> {
+  try {
+    return (await $.ui.panes()).some((pane) => pane.id === COLLECTION_PANE_ID)
+  } catch {
+    return false
+  }
 }
 
 /** Re-reads one record once the catch before it is written. */
