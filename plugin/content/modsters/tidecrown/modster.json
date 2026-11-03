@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "tidecrown",
+  "name": "Tidecrown",
+  "description": "When the moon is full it rises from the bay, and the tide rises with it.",
+  "rarity": "legendary",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 36,
+    "types": ["water", "fairy"],
+    "category": "Tide Spirit Modster",
+    "heightM": 3.2,
+    "weightKg": 180,
+    "entry": "A spirit of moonlit water shaped like a great ray. The moon glowing in its chest pulls the tide in and out of Saltbreeze Bay. Whatever the tide leaves behind, it left there on purpose."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 6
+  }
+}
