@@ -408,12 +408,12 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Done when:**
   - [ ] Shiny counted separately in the collection; sparkle effect on appear.
 
-#### [ ] P5-02 — Sounds
+#### [x] P5-02 — Sounds
 - **Depends on:** P2-10
 - **Size:** S
 - **Goal:** short sounds via `$.audio.play` on appear, catch and flee, off by default.
 - **Done when:**
-  - [ ] `userConfig` toggle; every sound licensed and credited.
+  - [x] Closed as won't do on 2026-11-02 by @danielpg95: the mod stays quiet (rule 7), and no audio call is confirmed in the mods API. The unused `sounds` option is left for a follow-up.
 
 #### [ ] P5-03 — Extended stats and milestones
 - **Depends on:** P3-04
@@ -422,12 +422,12 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Done when:**
   - [ ] Milestones never interrupt typing (toasts only).
 
-#### [ ] P5-05 — Light skill catch experiment
+#### [x] P5-05 — Light skill catch experiment
 - **Depends on:** P2-10
 - **Size:** M
 - **Goal:** prototype the moving-marker mechanic (decision 0003), behind a setting.
 - **Done when:**
-  - [ ] Playtested; a decision accepts or rejects it.
+  - [x] Closed as won't do on 2026-11-02 by @danielpg95: catchers (0035, 0036) and the desktop scene now carry the catch's feel, and nobody picked the experiment up. Catching stays pure luck (0003).
 
 #### [x] P5-06 — Desktop app support
 - **Depends on:** P2-07, P3-02
@@ -452,14 +452,12 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Every place draws from the same encounter machine; one Throw per encounter, and turning the band off never leaves Throw unreachable.
   - [x] Option documented in CONTENT_FORMAT.md's `userConfig` table; tested with each place on and off.
 
-#### [ ] P5-09 — Sprite miniatures (spike)
+#### [x] P5-09 — Sprite miniatures (spike)
 - **Depends on:** P2-16
 - **Size:** S
 - **Goal:** when a sprite doesn't fit the band or pane, show a miniature instead of the text-only layout (issue #54, accepted by @danielpg95). Decision 0033 makes this the way small terminals get a picture: sprites are up to 32 px tall, so almost none fit an 80×24 band.
 - **Done when:**
-  - [ ] A spike checks whether `Raster` takes quadrant characters (`▘▝▖▗▚▞▙▛▜▟▌▐`), how they render in Ghostty, iTerm2, kitty and Windows Terminal, and whether a 2× downscale still reads as the Modster; screenshots of a 2× downscale and quadrant blocks for Sunmane in an 80×24 band.
-  - [ ] A decision picks an approach (2× downscale, quadrants, a hand-drawn mini sprite, a mix, or none).
-  - [ ] If one is picked, a roadmap task implements it, with render tests at `maxRows` 7 for a sprite taller than 14 px and the miniature never taller than `maxRows`.
+  - [x] Closed as won't do on 2026-11-02 by @danielpg95: since 0045 the game is desktop first, and the desktop fits any sprite to its surface (0056, 0057). Small terminals keep the text-only layout.
 
 #### [x] P5-10 — Mark caught Modsters in the band
 - **Depends on:** P2-07, P2-08
@@ -585,6 +583,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Goal:** give Saltbreeze Bay a fuller roster (asked by @victor-aguilars, 2026-10-14). Crabbit, Flopple and Serpentide stay; 5 new Modsters join them.
 - **Done when:**
   - [ ] Peekashell (common, replaces Toastle), Flexton (common, replaces Gullet; 2026-10-22), Inkspector (uncommon, replaces Puffloaf; 2026-10-27), Sir Kelpsie (rare, replaces Lanternmaw; @victor-aguilars dropped both on 2026-10-16) and Tidecrown (legendary), with dex numbers #032–#036, each with `sprite.png` and a `sprite.sprite.json` converted with `npm run sprite`.
+  - [ ] Tidecrown also has a desktop sheet, from @victor-aguilars's detailed design, checked in the Code tab: band, pane, Collection and a throw (moved from P5-51, 2026-11-02).
   - [ ] `saltbreeze-bay/biome.json` lists all 8, and the odds table is checked.
   - [ ] A credits row in `plugin/content/CREDITS.md` for every new sprite.
   - [ ] `npm run check:content` passes.
@@ -716,17 +715,18 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Where the catcher doesn't fit the sprite area, the sprite holds still and the text lines show the dot count. The band never takes more rows than it does today.
   - [x] No `wobble` text is left in `plugin/hooks/`.
 
-#### [ ] P5-34 — README: marketplace install and Modsters first
+#### [x] P5-34 — README: marketplace install and Modsters first
 - **Depends on:** —
 - **Size:** S
 - **Goal:** the README leads with Modsters and says plainly how to install from the marketplace and keep the mod updated (asked by @victor-aguilars, 2026-10-22). This moves the marketplace install ahead of P5-07. The recording, CHANGELOG and version tag stay in P5-07.
 - **Done when:**
-  - [ ] The Musketail and Lamparito previews sit right under the title, and the four-biome scene GIF and biome table are gone. A short Biomes section shows two biomes, each with an animated GIF of its idle scene drawn by the mod's own compositor, and leaves the rest to find. A Catchers section shows three catchers (Seed pod, Lantern, Puzzle Cube) each catching one of three more Modsters (Hootlet, Echobat, Glowcap), drawn by the mod's own `catchFrame` (asked by @victor-aguilars, 2026-10-22).
-  - [ ] An Install section gives the marketplace commands (shell and in-session) and the Claude Code version they need. Update steps stay out of the README (asked by @victor-aguilars, 2026-10-22). Contributing keeps the from-source path.
-  - [ ] `plugin/.claude-plugin/plugin.json` says `"version": "0.1.0"`, so players who installed `0.0.1` get this update. From now on the version goes up whenever players should get changes (asked by @victor-aguilars, 2026-10-22; P5-07 writes down the rule). `claude plugin validate ./plugin --strict` passes.
-  - [ ] Checked by hand: the README's install commands work on a second computer, and an update reaches it.
-  - [ ] The README stays lean: a short pitch, Biomes, Catchers, Install, a How to play table of the keys and main commands (`1`/`2`, `/modsters`, `hunt`, `reload`, `/config`), Contributing with run-from-source, and License (asked by @victor-aguilars, 2026-10-22).
-  - [ ] `node tools/check-tracking.mjs` passes.
+  - [x] The Musketail and Lamparito previews sit right under the title, and the four-biome scene GIF and biome table are gone. A short Biomes section shows two biomes, each with an animated GIF of its idle scene drawn by the mod's own compositor, and leaves the rest to find. A Catchers section shows three catchers (Seed pod, Lantern, Puzzle Cube) each catching one of three more Modsters (Hootlet, Echobat, Glowcap), drawn by the mod's own `catchFrame` (asked by @victor-aguilars, 2026-10-22).
+  - [x] An Install section gives the marketplace commands (shell and in-session) and the Claude Code version they need. Update steps stay out of the README (asked by @victor-aguilars, 2026-10-22). Contributing keeps the from-source path.
+  - [x] `plugin/.claude-plugin/plugin.json` says `"version": "0.1.0"`, so players who installed `0.0.1` get this update. From now on the version goes up whenever players should get changes (asked by @victor-aguilars, 2026-10-22; P5-07 writes down the rule). `claude plugin validate ./plugin --strict` passes.
+  - [x] Checked by hand: the README's install commands work on a second computer, and an update reaches it.
+  - [x] The README stays lean: a short pitch, Biomes, Catchers, Install, a How to play table of the keys and main commands (`1`/`2`, `/modsters`, `hunt`, `reload`, `/config`), Contributing with run-from-source, and License (asked by @victor-aguilars, 2026-10-22).
+  - [x] `node tools/check-tracking.mjs` passes.
+- **Closed:** 2026-11-02 by @danielpg95. The README meets every item (merged in #149). The version has since moved past 0.1.0 (0.1.29), and @danielpg95's installs and updates from the marketplace (0.1.28 → 0.1.29) stand in for the second-computer check.
 
 #### [x] P5-35 — Opt-in hunting, commands and a welcome toast
 - **Depends on:** —
@@ -741,7 +741,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `/modsters` registers as `immediate`, so it runs during a turn (decision 0039, asked by @victor-aguilars, 2026-10-22). A register test checks the flag.
   - [x] `claude plugin test ./plugin` and `claude plugin validate ./plugin --strict` pass. Checked by hand on a fresh install (passed, @victor-aguilars, 2026-10-22): the toast shows and the game plays, `/modsters stop` clears everything and `/config` shows Auto start off, and `/modsters hunt` brings it back. `/modsters pane` and `/modsters stop` typed while Claude works act at once without disturbing the turn (0039).
 
-#### [ ] P5-36 — In-game settings
+#### [x] P5-36 — In-game settings
 - **Depends on:** P5-35
 - **Size:** M
 - **Goal:** `/modsters settings` opens the collection pane's Settings tab, where players see and change every option with `k`, `j` and `o`, written through `$.config.set` (decision 0040, asked by @victor-aguilars, 2026-10-22).
@@ -752,6 +752,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `/modsters settings` opens the pane on the Settings tab with focus. The typeahead hint and `/modsters help` list it, and the help and the pane-off reply point to `/modsters settings` (0040 points 1 and 6).
   - [x] Docs follow 0040's consequences: decision status lines and index rows, CONTENT_FORMAT.md, ARCHITECTURE.md, and the README.
   - [x] `claude plugin test ./plugin` and `claude plugin validate ./plugin --strict` pass. Checked by hand: changing each kind of row in the tab updates `/config`, and the pane stays on the Settings tab after a change (passed after the `$.state` fix, @victor-aguilars, 2026-10-22).
+- **Closed:** 2026-11-02 by @danielpg95. Every item was done and #157 merged on 2026-10-22; only the heading and workboard row were left open.
 
 #### [x] P5-37 — English names for the Dustwind roster
 - **Depends on:** —
@@ -867,15 +868,12 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Its helper `modster-content.mjs`, which ships with the mod, gets desktop modes, so players can follow the desktop path without the repo's tools (asked by @danielpg95, 2026-10-28): reduce a reference image, check a desktop sheet against 0045 and 0046, and write the preview page (Modsters, backgrounds, particles, catcher throws). It stays offline, with no installs. Tests cover them.
   - [x] `plugin.json`'s version goes up.
 
-#### [ ] P5-51 — First desktop art set
+#### [x] P5-51 — First desktop art set
 - **Depends on:** P5-21, P5-47, P5-48, P5-49
 - **Size:** M
 - **Goal:** the first built-in desktop art, made with the new skills: Tidecrown (#036) and one catcher (not the puzzle cube, which got its sheet in P5-47). Saltbreeze Bay's background moved to P5-61 on 2026-10-30.
 - **Done when:**
-  - [ ] Tidecrown's desktop sheet (from @victor-aguilars's detailed design) and one catcher's `desktopSprite` are original, credited and pass the validator.
-  - [ ] A preview of each in the PR description, every frame, dark and light.
-  - [ ] Checked in the Code tab: band, pane, Collection and a throw.
-
+  - [x] Closed as superseded on 2026-11-02 by @danielpg95: the catcher's desktop art landed in P5-53 (the jar), and many Modsters got theirs in P5-53 and P5-63. Tidecrown's desktop sheet moved to P5-21.
 
 #### [x] P5-52 — Desktop interaction (spike)
 - **Depends on:** P5-38
