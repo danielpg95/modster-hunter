@@ -16,6 +16,7 @@ this file lists only tasks someone has claimed.
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
 | P5-64 | @victor-aguilars | in-review | p5-64-desktop-collection-cards | 2026-11-01 | 2026-11-01 | Get the P5-64 PR reviewed; @danielpg95 accepts or reworks 0054, then tick the last item and close the task |
+| P5-18 | @danielpg95 | in-progress | p5-18-live-stats-tab | 2026-11-03 | 2026-11-03 | Find where the Stats tab reads `$.store` and refresh it when an encounter ends while the tab is shown |
 
 ## Up next
 
@@ -24,5 +25,4 @@ list when you finish a task.
 
 - **P5-01** — Shiny variants
 - **P5-03** — Extended stats and milestones
-- **P5-18** — Live Stats tab
 - **P4-07** — In-pane field editor
