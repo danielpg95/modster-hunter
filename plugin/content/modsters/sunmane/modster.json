@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "sunmane",
   "name": "Sunmane",
-  "description": "It only appears at noon, when the dunes have no shadows to hide in.",
+  "description": "It only appears at noon, when the sundial horn on its nose casts no shadow at all.",
   "rarity": "rare",
   "maxAttempts": null,
   "catchRate": null,
@@ -10,13 +10,14 @@
   "dex": {
     "number": 4,
     "types": ["fire"],
-    "category": "Sun Lion Modster",
+    "category": "Sundial Modster",
     "heightM": 3.2,
     "weightKg": 640,
-    "entry": "Old desert tales say it carries the sun up over the dunes each morning. On cloudy days it is said to be sulking."
+    "entry": "Its mane is a bronze sun disc carved with old marks. Desert travellers once told the time by the shadow of its horn. At noon there is none, and Sunmane walks out into the open."
   },
-  "sprite": {
-    "file": "sprite.sprite.json",
-    "fps": 3
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 5
   }
 }
