@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "twiggle",
   "name": "Twiggle",
-  "description": "Rolls wherever the wind goes. Peeks out only when it thinks nobody is looking.",
+  "description": "Wears a tumbleweed like a hood. Peeks out only when it thinks nobody is looking.",
   "rarity": "uncommon",
   "maxAttempts": null,
   "catchRate": null,
@@ -13,10 +13,11 @@
     "category": "Tumbleweed Modster",
     "heightM": 0.6,
     "weightKg": 0.3,
-    "entry": "Travelers say each Twiggle is the wish of someone who got lost in the dunes. It rolls on, looking for the way home they never found."
+    "entry": "A shy ghost that hides inside a tumbleweed and lets the wind decide where it goes. The two flowers on top are the only part of it that it keeps tidy."
   },
-  "sprite": {
-    "file": "sprite.sprite.json",
-    "fps": 2
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 5
   }
 }

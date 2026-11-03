@@ -23,7 +23,7 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/hootlet/desktop.png` | @danielpg95 and @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Hootlet's desktop sheet (P5-55, decision 0045), reduced from @danielpg95's reference, keeping @victor-aguilars' design; a body bob and a blink |
 | `modsters/crabbit/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Crabbit, redrawn in P5-24 from @victor-aguilars' reference |
 | `modsters/sunmane/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Sunmane, redrawn in P5-24 from @victor-aguilars' reference as a close-up (head, mane and tail) |
-| `modsters/twiggle/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Twiggle, redrawn in P5-24 from @victor-aguilars' reference |
+| `modsters/twiggle/desktop.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Twiggle redesigned as a shy ghost in a tumbleweed hood (P5-69, decision 0045), reduced from @victor-aguilars' reference; its tail sways and it blinks |
 | `modsters/flopple/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Flopple, redrawn in P5-24 from @victor-aguilars' reference |
 | `modsters/serpentide/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Serpentide, redrawn in P5-24 from @victor-aguilars' reference as a close-up; the water ring is hand-drawn |
 | `modsters/sporrow/sprite.png` | @danielpg95 and @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Sporrow, redrawn in P5-19 from @danielpg95's reference, keeping @victor-aguilars' design (puppet fungus) |
