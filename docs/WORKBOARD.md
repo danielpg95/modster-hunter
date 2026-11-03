@@ -24,5 +24,5 @@ list when you finish a task.
 
 - **P5-01** — Shiny variants
 - **P5-03** — Extended stats and milestones
-- **P5-17** — Player-defined tiers (spike)
 - **P5-18** — Live Stats tab
+- **P4-07** — In-pane field editor
