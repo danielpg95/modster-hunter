@@ -5,14 +5,14 @@
 <table align="center">
   <tr>
     <td align="center" width="50%">
-      <img src="docs/previews/readme-musketail.gif" alt="Musketail, a mouse in a feathered hat and leaf cloak, raising a pine-needle sword" height="160"><br>
+      <img src="docs/previews/readme-musketail-desktop.gif" alt="Musketail, a mouse in a feathered hat and leaf cloak, raising a leaf sword" height="160"><br>
       <b>Musketail</b><br>
       <sub>It picks a fresh leaf cloak each season. Autumn ones are its favorite, because red looks heroic.</sub>
     </td>
     <td align="center" width="50%">
-      <img src="docs/previews/readme-lamparito.gif" alt="Lamparito, a grinning purple smoke spirit rising from a brass lamp" height="160"><br>
+      <img src="docs/previews/readme-lamparito-desktop.gif" alt="Lamparito, a scowling purple smoke spirit rising from a brass lamp, wearing the lamp's lid as a hat" height="160"><br>
       <b>Lamparito</b><br>
-      <sub>A spirit of hot smoke that sleeps in a brass lamp half-buried in the sand. It offers every traveler three wishes and twists every one of them. Its grin is the only part of it that is never smoke.</sub>
+      <sub>A spirit of hot smoke that lives in a brass lamp half-buried in the sand. It wears the lamp's lid as a hat, so nobody can shut it back inside. It has never once smiled at a traveller.</sub>
     </td>
   </tr>
 </table>
@@ -31,11 +31,11 @@ Each session drops you into one biome at random, each with its own Modsters:
 
 🌲 **Whispering Forest**: tall pines, soft moss, something rustling.
 
-<img src="docs/previews/readme-whispering-forest.gif" alt="The Whispering Forest: dusk pines with leaves drifting by" width="600">
+<img src="docs/previews/readme-whispering-forest-desktop.gif" alt="The Whispering Forest: mossy pines with leaves drifting by" width="600">
 
 💎 **Crystal Grotto**: whisper here and the crystals whisper back, a little out of tune.
 
-<img src="docs/previews/readme-crystal-grotto.gif" alt="The Crystal Grotto: pink and cyan crystals glinting in a dark cave" width="600">
+<img src="docs/previews/readme-crystal-grotto-desktop.gif" alt="The Crystal Grotto: pink and blue crystals in a purple cave, with sparkles twinkling" width="600">
 
 Two more are out there for you to find.
 
@@ -45,9 +45,8 @@ Every throw plays a catcher. Pick yours in `/modsters`, on the Catchers tab:
 
 <table align="center">
   <tr>
-    <td align="center"><img src="docs/previews/readme-catch-hootlet.gif" alt="Hootlet, a mossy owl, shrinks into a seed pod, which rocks three times and sparkles" height="128"><br><b>Seed pod</b></td>
-    <td align="center"><img src="docs/previews/readme-catch-echobat.gif" alt="Echobat, a purple bat with crystal ears, is drawn into a brass lantern, which rocks three times and sparkles" height="128"><br><b>Lantern</b></td>
-    <td align="center"><img src="docs/previews/readme-catch-glowcap.gif" alt="Glowcap, a blue mushroom, goes into a scrambled puzzle cube, which comes out solved" height="128"><br><b>Puzzle Cube</b></td>
+    <td align="center"><img src="docs/previews/readme-catch-jar-hootlet.gif" alt="Hootlet, a leafy owl, goes into a corked glass jar, which rocks three times and sparkles" height="160"><br><b>Glass jar</b></td>
+    <td align="center"><img src="docs/previews/readme-catch-cube-glowcap.gif" alt="Glowcap, a blue mushroom, goes into a scrambled puzzle cube, which comes out solved" height="160"><br><b>Puzzle Cube</b></td>
   </tr>
 </table>
 
