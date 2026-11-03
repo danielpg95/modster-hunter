@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "dunebun",
   "name": "Dunebun",
-  "description": "Hears you coming from three dunes away. Pretends it didn't.",
+  "description": "Wraps its own ears into a scarf. Its goggles have never once been over its eyes.",
   "rarity": "common",
   "maxAttempts": null,
   "catchRate": null,
@@ -10,13 +10,14 @@
   "dex": {
     "number": 1,
     "types": ["ground"],
-    "category": "Sand Hare Modster",
+    "category": "Dune Scout Modster",
     "heightM": 0.4,
     "weightKg": 2.8,
-    "entry": "It naps buried in warm sand with only its ears showing. The ears turn toward every sound, so a hidden Dunebun always knows you're there first."
+    "entry": "It ties its long ears around its head to keep the sand out, so it hears every step three dunes away, just a little muffled. It wears its goggles on its forehead and squints instead."
   },
-  "sprite": {
-    "file": "sprite.sprite.json",
-    "fps": 4
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 5
   }
 }

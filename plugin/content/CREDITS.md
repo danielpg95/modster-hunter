@@ -18,7 +18,7 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/reyrayo/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
 | `modsters/torbellin/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
 | `modsters/lamparito/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
-| `modsters/dunebun/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
+| `modsters/dunebun/desktop.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Dunebun redesigned as a dune scout (P5-69, decision 0045), reduced from @victor-aguilars' reference; the wind lifts its ear and scarf, and a blink |
 | `modsters/hootlet/sprite.png` | @danielpg95 and @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Hootlet, redrawn in P5-23 from @danielpg95's reference, keeping @victor-aguilars' design (leafy owlet with a head sprout) |
 | `modsters/hootlet/desktop.png` | @danielpg95 and @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Hootlet's desktop sheet (P5-55, decision 0045), reduced from @danielpg95's reference, keeping @victor-aguilars' design; a body bob and a blink |
 | `modsters/crabbit/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Crabbit, redrawn in P5-24 from @victor-aguilars' reference |
