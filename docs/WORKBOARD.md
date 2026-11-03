@@ -19,7 +19,7 @@ this file lists only tasks someone has claimed.
 | P5-34 | @victor-aguilars | in-progress | p5-34-readme-install | 2026-10-22 | 2026-10-22 | Hand check on a second computer: fresh install of 0.1.0 from the marketplace, then tick the items (README merged in #149) |
 | P5-36 | @victor-aguilars | in-review | p5-36-in-game-settings | 2026-10-22 | 2026-10-22 | Merge #155, #156, then the P5-36 PR; then close the task |
 | P5-64 | @victor-aguilars | in-review | p5-64-desktop-collection-cards | 2026-11-01 | 2026-11-01 | Get the P5-64 PR reviewed; @danielpg95 accepts or reworks 0054, then tick the last item and close the task |
-| P5-67 | @danielpg95 | in-progress | p5-67-collection-fit | 2026-11-02 | 2026-11-02 | Amend 0056 with the collection's 96 px target, then fit terminal sprites too |
+| P5-67 | @danielpg95 | in-progress | p5-67-collection-fit | 2026-11-02 | 2026-11-02 | @danielpg95 checks 0.1.29 in the Code tab's collection; then accept 0057 and close the task |
 
 ## Up next
 

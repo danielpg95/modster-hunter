@@ -4,6 +4,7 @@ import { resolveBeats, type ResolvedBeat, type ResolvedBeats } from './catch-bea
 import { catchBeatAt, type CatchBeatAt, type CatchOutcome } from '../game'
 import type { Frame } from './pixels-to-cells'
 import { rgbaOf, spriteRgba } from './sprite-cells'
+import { opaqueBounds } from './opaque-bounds'
 
 // One frame of a throw (decision 0035), drawn in the Modster's own sprite area
 // so it never takes more rows than the Modster does (0012). Terminal cells
@@ -515,26 +516,6 @@ function mainColor(art: Art): string {
   const bright = ranked.find((key) => ((key >> 16) & 255) + ((key >> 8) & 255) + (key & 255) > CATCH.glowMinBrightness)
   const key = bright ?? ranked[0] ?? 0xffffff
   return `#${key.toString(16).padStart(6, '0')}ff`
-}
-
-function opaqueBounds(art: Art): CatchArt['bounds'] {
-  let x0 = art.width
-  let y0 = art.height
-  let x1 = -1
-  let y1 = -1
-  for (const rgba of art.frames) {
-    for (let y = 0; y < art.height; y++) {
-      for (let x = 0; x < art.width; x++) {
-        if ((rgba[(y * art.width + x) * 4 + 3] ?? 0) < 128) continue
-        x0 = Math.min(x0, x)
-        x1 = Math.max(x1, x)
-        y0 = Math.min(y0, y)
-        y1 = Math.max(y1, y)
-      }
-    }
-  }
-  // A blank sprite: the whole area
-  return x1 < 0 ? { x0: 0, y0: 0, x1: art.width - 1, y1: art.height - 1 } : { x0, y0, x1, y1 }
 }
 
 const easeOut = (u: number): number => 1 - (1 - u) * (1 - u)
