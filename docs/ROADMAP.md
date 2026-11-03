@@ -384,11 +384,11 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 #### [ ] P4-07 — In-pane field editor
 - **Depends on:** P4-03, P5-17
 - **Size:** M
-- **Goal:** edit a biome's or Modster's name, tier, throws and catch rate from the collection pane, using the tier model P5-17 settles (0030 or its successor).
+- **Goal:** edit a biome's or Modster's name, tier, throws and catch rate from the collection pane, using the four built-in tiers (0030; P5-17 closed as won't do on 2026-11-03).
 - **Done when:**
   - [ ] Edits write valid JSON into the user folder; editing a built-in creates a user override (0007).
   - [ ] Every edit is validated before writing, with tests.
-- **Why:** split from P4-03 in the phase 3 review. Tier-first encounters (0030) replaced weights, and P5-17 may change which tier fields a player can set.
+- **Why:** split from P4-03 in the phase 3 review. Tier-first encounters (0030) replaced weights, and P5-17 was closed without player-defined tiers, so a player picks one of the four.
 
 #### [ ] P4-05 — Phase 4 review
 - **Depends on:** P4-02, P4-03, P4-04, P4-06, P4-07
@@ -532,14 +532,12 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] The Biomes tab and `formatOddsTable` show the tier share and each Modster's share (0030 point 7).
   - [x] `docs/CONTENT_FORMAT.md`, the `add-biome` and `add-modster` skills, and `plugin/skills/create-modster-content/` (with `reference/format.md`) describe tiers instead of weights.
 
-#### [ ] P5-17 — Player-defined tiers (spike)
+#### [x] P5-17 — Player-defined tiers (spike)
 - **Depends on:** P5-16
 - **Size:** S
 - **Goal:** decide whether players may define their own rarity tiers in user content, and how (asked by @danielpg95 after P5-16).
 - **Done when:**
-  - [ ] A spike looks at three options for user content: new named tiers (e.g. `mythic`) with their own weight, throws and catch rate; tier weights set per user biome; and retuning the four built-in tiers for all of a player's content. For each: the file shape, how it merges with built-in content (0007), what the stored `bestTier`, the Biomes tab and the lopsided-tier warning (0030 point 6) do with it, and whether band text still fits (0012).
-  - [ ] The findings go in a Proposed decision in `docs/decisions/` that picks one or more options, or none, for @danielpg95 to settle.
-  - [ ] If an option is picked, roadmap tasks implement it, each with validator and pick tests.
+  - [x] Closed as won't do on 2026-11-03 by @danielpg95: players keep the four built-in tiers (0030); no player-defined tiers.
 
 #### [ ] P5-18 — Live Stats tab
 - **Depends on:** P3-04
