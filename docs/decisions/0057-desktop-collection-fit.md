@@ -1,8 +1,8 @@
 # 0057 — On desktop, the collection fits every Modster to Kingbolt's height
 
-- **Status:** Proposed — settled by P5-67 / @danielpg95
+- **Status:** Accepted
 - **Date:** 2026-11-02
-- **Proposed by:** @danielpg95
+- **Decided by:** @danielpg95
 - **Amends:** 0056
 
 ## Context
@@ -43,4 +43,5 @@ Option 1, chosen by @danielpg95 on 2026-11-02, for the collection detail only.
 - The widest frames reach about 154 px (Cactoad 141, Echobat's frame 138),
   which still fits a narrow dock.
 - Small terminal sprites, like Dunebun, lose some crispness when scaled up.
-- Task P5-67 does the work.
+- Task P5-67 does the work. @danielpg95 checked 0.1.29 in the Code tab on
+  2026-11-02: the collection's Modsters look the same size and fit the dock.

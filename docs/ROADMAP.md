@@ -1029,14 +1029,14 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Checked in the Code tab: Grotto and forest Modsters look about the same size, and a catch still lines up (by @danielpg95 with 0.1.28, 2026-11-02).
   - [x] `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
-#### [ ] P5-67 — Collection Modsters as big as Kingbolt
+#### [x] P5-67 — Collection Modsters as big as Kingbolt
 - **Depends on:** P5-66
 - **Size:** S
 - **Goal:** on the Desktop app, the collection detail fits every Modster's art, desktop sheet or terminal sprite, to Kingbolt's 96 px, instead of sheets to 60 px and terminal sprites at a fixed 3×, so every Modster in the collection reads the same size (asked by @danielpg95, 2026-11-02).
 - **Done when:**
-  - [ ] 0056 is amended: the collection's target height is 96 px, and it applies to terminal sprites too (0057, Proposed until the Code tab check).
+  - [x] 0056 is amended: the collection's target height is 96 px, and it applies to terminal sprites too (0057, accepted).
   - [x] The collection detail draws sheets and terminal sprites at their fit scale. Render tests cover a small terminal sprite and a sheet.
-  - [ ] Checked in the Code tab: Kingbolt, Dunebun and a Grotto Modster look about the same size in the collection, and the detail fits the dock.
+  - [x] Checked in the Code tab: Kingbolt, Dunebun and a Grotto Modster look about the same size in the collection, and the detail fits the dock (by @danielpg95 with 0.1.29, 2026-11-02).
   - [x] `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
 ---
