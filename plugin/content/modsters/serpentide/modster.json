@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "serpentide",
   "name": "Serpentide",
-  "description": "Small now, but sailors still steer around the ripples it makes.",
+  "description": "A serpent made of sea water. Sailors steer around any wave that grins back.",
   "rarity": "rare",
   "maxAttempts": null,
   "catchRate": null,
@@ -10,13 +10,14 @@
   "dex": {
     "number": 7,
     "types": ["water", "dragon"],
-    "category": "Sea Serpent Modster",
+    "category": "Wave Serpent Modster",
     "heightM": 2.5,
     "weightKg": 60,
-    "entry": "Fishers say the tides grow a little higher every year it lives. When it is grown, they say, it will carry the whole bay on its back."
+    "entry": "Its body is the tide itself, held in the shape of a serpent. When it dives it simply turns back into a wave, so nobody has ever caught one out of the water."
   },
-  "sprite": {
-    "file": "sprite.sprite.json",
-    "fps": 2
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 5
   }
 }

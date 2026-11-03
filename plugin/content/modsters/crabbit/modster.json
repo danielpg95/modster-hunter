@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "crabbit",
   "name": "Crabbit",
-  "description": "Lives in a shell three sizes too big. Says it'll grow into it.",
+  "description": "Lives in a diving helmet three sizes too big. Says it'll grow into it.",
   "rarity": "common",
   "maxAttempts": null,
   "catchRate": null,
@@ -13,10 +13,11 @@
     "category": "Hermit Modster",
     "heightM": 0.2,
     "weightKg": 1.5,
-    "entry": "It trades shells with other Crabbit at low tide. Nobody is sure who gets the better deal, including the Crabbit."
+    "entry": "Half crab, half rabbit, all nerves. It listens along the shore with its long shell ears, and at the first footstep it pops back inside its helmet."
   },
-  "sprite": {
-    "file": "sprite.sprite.json",
-    "fps": 2
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 5
   }
 }
