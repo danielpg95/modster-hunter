@@ -373,6 +373,5 @@ biome entry naming a disabled Modster is dropped without an issue.
 | `encounterPane` | `off`, `when-opened`, `always` | `when-opened` | When the encounter pane opens, while `autoStart` is on: never (`/modsters pane` says it's off), after `/modsters pane` until closed by hand (0019), or every session (0023; 0038) |
 | `showInSpinner` | boolean | `true` | Name the Modster in the spinner line while Claude works (0023) |
 | `showInStatusLine` | boolean | `true` | Show the encounter in the status line while one is up; cleared between encounters (0023) |
-| `sounds` | boolean | `false` | Play sounds (P5-02) |
 
-Players change these in the game with `/modsters settings` (every option but `sounds`, decision 0040), or in `/config`. A change from `/config` reloads the mod, which ends an encounter in progress (decision 0005); a change in the Settings tab applies at once.
+Players change these in the game with `/modsters settings` (every option, decision 0040), or in `/config`. A change from `/config` reloads the mod, which ends an encounter in progress (decision 0005); a change in the Settings tab applies at once.

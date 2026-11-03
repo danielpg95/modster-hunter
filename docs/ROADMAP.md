@@ -1039,15 +1039,15 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Checked in the Code tab: Kingbolt, Dunebun and a Grotto Modster look about the same size in the collection, and the detail fits the dock (by @danielpg95 with 0.1.29, 2026-11-02).
   - [x] `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
-#### [ ] P5-68 — Remove the unused `sounds` option
+#### [x] P5-68 — Remove the unused `sounds` option
 - **Depends on:** —
 - **Size:** S
 - **Goal:** P5-02 (Sounds) is closed as won't do, so the placeholder `sounds` option goes: it does nothing, yet shows up in `/config` (asked by @danielpg95, 2026-11-02).
 - **Done when:**
-  - [ ] `sounds` is gone from `userConfig` in `plugin/.claude-plugin/plugin.json`, and the plugin version is bumped.
-  - [ ] `docs/CONTENT_FORMAT.md` no longer lists `sounds`, and no code comment or test mentions it.
-  - [ ] Decision 0040's mention of `sounds` is marked moot in the decisions index (the decision itself is not rewritten).
-  - [ ] `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict`, `pnpm test:tools` and `node tools/check-tracking.mjs` pass.
+  - [x] `sounds` is gone from `userConfig` in `plugin/.claude-plugin/plugin.json`, and the plugin version is bumped.
+  - [x] `docs/CONTENT_FORMAT.md` no longer lists `sounds`, and no code comment or test mentions it.
+  - [x] Decision 0040's mention of `sounds` is marked moot in the decisions index (the decision itself is not rewritten).
+  - [x] `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict`, `pnpm test:tools` and `node tools/check-tracking.mjs` pass.
 
 ---
 

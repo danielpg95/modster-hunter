@@ -2,7 +2,7 @@ import { describe, expect, test } from 'claude-code/testing'
 import { SETTING_DEFAULTS, SETTING_SPECS, changedSettings, nextSettingValue, resetText, readSettingValues, settingButtonText, settingRow, settingText } from '../../hooks/render'
 
 describe('setting rows (0040)', () => {
-  test('lists the options in 0040 point 2\'s order, without sounds', () => {
+  test('lists the options in 0040 point 2\'s order', () => {
     expect(SETTING_SPECS.map((spec) => spec.label)).toEqual([
       'Auto start',
       'Show in the band',
@@ -14,7 +14,6 @@ describe('setting rows (0040)', () => {
       'Built-in content',
       'Idle timeout',
     ])
-    expect(SETTING_SPECS.some((spec) => (spec.field as string) === 'sounds')).toBe(false)
   })
 
   test('reads a load\'s options, falling back to the defaults for anything missing or wrong', () => {

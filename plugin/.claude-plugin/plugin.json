@@ -1,7 +1,7 @@
 {
   "name": "modster-hunter",
   "displayName": "Modster Hunter",
-  "version": "0.1.29",
+  "version": "0.1.30",
   "description": "Catch Modsters while you wait for Claude.",
   "author": {
     "name": "Daniel Pena"
@@ -66,12 +66,6 @@
       "title": "Show in the status line",
       "description": "Show the encounter in the status line while one is up",
       "default": true
-    },
-    "sounds": {
-      "type": "boolean",
-      "title": "Sounds",
-      "description": "Play sounds (not available yet)",
-      "default": false
     }
   }
 }
