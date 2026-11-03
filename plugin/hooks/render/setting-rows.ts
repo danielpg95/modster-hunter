@@ -3,7 +3,6 @@ import type { BandLine } from './band-view'
 
 // The Settings tab's option rows (decision 0040): every `userConfig` field a
 // player can change in the game, in a fixed order, with what `o` changes it to.
-// `sounds` stays out until P5-02 makes it do something.
 
 export type SettingField =
   | 'autoStart'

@@ -91,7 +91,6 @@ describe('register: Settings tab', () => {
     expect(await row(pane, 'autoStart')).toMatch(/^▸ Auto start +on$/)
     expect(await row(pane, 'encounterPane')).toMatch(/^ {2}Encounter pane +when-opened$/)
     expect(await row(pane, 'encounterIdleTimeoutSec')).toMatch(/^ {2}Idle timeout +90 s$/)
-    expect(await pane.find({ type: 'Button', key: 'setting-sounds' })).toBeUndefined()
     await pane.unmount()
   })
 

@@ -53,7 +53,7 @@ settled questions and avoid making assumptions about open ones.
 | [0037](0037-portable-core-and-hosts.md) | Claude Code users first, then a portable core shared by other hosts | Proposed |
 | [0038](0038-opt-in-hunting.md) | The game runs only while `autoStart` is on; `/modsters hunt` and `stop` flip it | Accepted (default, point 2 and welcome texts superseded by 0041; amended by 0040) |
 | [0039](0039-modsters-runs-immediately.md) | `/modsters` runs at once, even while Claude works | Accepted |
-| [0040](0040-in-game-settings.md) | `/modsters settings` opens a Settings tab where players change every option | Accepted (Reset to defaults added by 0054, Proposed) |
+| [0040](0040-in-game-settings.md) | `/modsters settings` opens a Settings tab where players change every option | Accepted (Reset to defaults added by 0054, Proposed; its `sounds` note is moot: P5-02 is won't do and P5-68 removed the option) |
 | [0041](0041-auto-start-on-by-default.md) | Auto start is on by default; one welcome toast says how to stop | Accepted |
 | [0042](0042-desktop-svg-sprites.md) | On the desktop app, sprites are one animated Svg each | Proposed (point 4: the catch animation in 0043, the biome scenes in 0044) |
 | [0043](0043-desktop-vector-catch.md) | On the desktop app, a throw plays as one vector Svg | Proposed |
