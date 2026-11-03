@@ -13,10 +13,11 @@
     "category": "Storm Modster",
     "heightM": 4.5,
     "weightKg": 120,
-    "entry": "It rules the dunes from the highest rock, crowned in gold and wrapped in a cloak of wings. When it raises its head the sky goes dark, and lightning falls wherever it looks."
+    "entry": "It rules the dunes from the highest rock, crowned in lightning and wrapped in a cape of thundercloud. When it raises its head the sky goes dark, and lightning falls wherever it looks."
   },
-  "sprite": {
-    "file": "sprite.sprite.json",
-    "fps": 3
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 5
   }
 }
