@@ -15,8 +15,8 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P5-21 | @victor-aguilars | in-progress | p5-21-inkspector | 2026-10-14 | 2026-10-27 | Merge the Inkspector (#034) PR; then pick a Tidecrown (#036) design (axolotl king on hold, needs a higher-contrast reference) |
 | P5-64 | @victor-aguilars | in-review | p5-64-desktop-collection-cards | 2026-11-01 | 2026-11-01 | Get the P5-64 PR reviewed; @danielpg95 accepts or reworks 0054, then tick the last item and close the task |
+| P5-70 | @victor-aguilars | in-progress | p5-70-bay-redesign | 2026-11-02 | 2026-11-02 | Agree on new designs for Crabbit, Flopple, Serpentide and Tidecrown, then write the reference prompts |
 
 ## Up next
 
