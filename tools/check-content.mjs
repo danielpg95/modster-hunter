@@ -52,7 +52,7 @@ for (const { biome } of content.biomes.values()) {
 if (content.biomes.size > 0 && !tiersSeen.has('legendary')) problems.push('no biome has a legendary Modster (P2-09)')
 for (const [id, { sprite }] of content.modsters) {
   // Desktop art only has no terminal sprite to count (0045 point 2)
-  if (sprite && sprite.frames.length < 2 || sprite.frames.length > 4) {
+  if (sprite && (sprite.frames.length < 2 || sprite.frames.length > 4)) {
     problems.push(`modsters/${id}: ${sprite.frames.length} frames; built-in sprites have 2–4 (P2-09)`)
   }
 }

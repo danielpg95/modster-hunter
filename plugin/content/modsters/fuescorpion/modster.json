@@ -15,8 +15,9 @@
     "weightKg": 6,
     "entry": "Its shell glows like coals and cooks swear by it: a pot beside a Scorchion makes the spiciest food in the dunes. Never pet the tail."
   },
-  "sprite": {
-    "file": "sprite.sprite.json",
-    "fps": 4
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 5
   }
 }

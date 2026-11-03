@@ -40,7 +40,7 @@ const { decodePng } = await import('../../../hooks/vendor/png.ts')
 const BUILT_IN_ROOT = new URL('../../../content', import.meta.url).pathname
 const PREVIEW_SCALE = { default: 8, min: 1, max: 32 }
 // A catcher's preview plays on a big and the smallest built-in Modster unless --on says otherwise
-const CATCHER_PREVIEW = { scale: 4, on: ['elderbark', 'dunebun'] }
+const CATCHER_PREVIEW = { scale: 4, on: ['elderbark', 'sporrow'] }
 
 const USAGE = [
   'usage: node modster-content.mjs convert <sheet.png> --frames N [--out file.sprite.json] [--catcher]',
@@ -384,7 +384,7 @@ async function checkDesktop(argv) {
   console.log(`${args.values.preview}: preview page`)
 }
 
-/** Built-in Modsters a catcher's preview throws at: Shellsprout (desktop art) and Dunebun (terminal art, the smallest). */
+/** Built-in Modsters a catcher's preview throws at: Shellsprout (desktop art) and Inkspector (terminal art only, the smallest). */
 async function throwTargets() {
   const reader = {
     listFolders: async (path) => (existsSync(path) ? readdirSync(path, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name) : []),
@@ -392,7 +392,7 @@ async function throwTargets() {
     readBase64: async (path) => (existsSync(path) ? readFileSync(path).toString('base64') : undefined),
   }
   const content = await loadContent(reader, BUILT_IN_ROOT)
-  return ['sproutling', 'dunebun'].flatMap((id) => {
+  return ['sproutling', 'inkspector'].flatMap((id) => {
     const loaded = content.modsters.get(id)
     if (!loaded) return []
     const fps = (loaded.desktop ? loaded.modster.desktopSprite?.fps : loaded.modster.sprite?.fps) ?? CONTENT.modster.defaultFps

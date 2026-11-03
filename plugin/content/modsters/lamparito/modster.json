@@ -13,10 +13,11 @@
     "category": "Lamp Modster",
     "heightM": 0.6,
     "weightKg": 1.5,
-    "entry": "A spirit of hot smoke that sleeps in a brass lamp half-buried in the sand. It offers every traveler three wishes and twists every one of them. Its grin is the only part of it that is never smoke."
+    "entry": "A spirit of hot smoke that lives in a brass lamp half-buried in the sand. It wears the lamp's lid as a hat, so nobody can shut it back inside. It has never once smiled at a traveller."
   },
-  "sprite": {
-    "file": "sprite.sprite.json",
-    "fps": 4
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 5
   }
 }

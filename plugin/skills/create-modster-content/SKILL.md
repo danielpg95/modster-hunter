@@ -200,8 +200,7 @@ only changes looks, never the odds. Format: [reference/format.md](reference/form
    `rock`, `caught` and `broken`. For each, ask what the Modster does and where
    the catcher sits. Explain each choice in a few words.
 3. **Size and colors.** For `contain` and `custom`, keep the catcher at most
-   20 px tall and 22 wide, the size of the smallest built-in Modster (Dunebun),
-   so it shows on every Modster. A bigger one still works, but on smaller
+   20 px tall and 22 wide, so it shows on every built-in Modster. A bigger one still works, but on smaller
    Modsters the throw shows as a dot count instead. For `cover`, the art is a
    tile about 8×8 that repeats over the Modster. Leave gaps so the Modster
    shows through, and use a dark color for knots or edges: `rimIndex` points
@@ -219,7 +218,7 @@ only changes looks, never the odds. Format: [reference/format.md](reference/form
      the preset makes the motion from frame 0.
 5. **Write `catcher.json`**, then preview it:
    `preview-catcher ~/.claude/modster-hunter/content/catchers/<id> --out <tmp>/catcher.html`.
-   It plays a catch and both kinds of miss on Elderbark (large) and Dunebun
+   It plays a catch and both kinds of miss on Elderbark (large) and Sporrow
    (small), on dark and light, and says where the catcher is too big. Open the
    page, post its full path in chat on its own line, and wait for the
    player's reply. Fix colors that vanish on either background. For a

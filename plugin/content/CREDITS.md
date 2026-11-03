@@ -13,17 +13,17 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/acornsprite/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Acornsprite's desktop sheet (P5-55, decision 0045), reduced from @danielpg95's reference; flapping wings, a hover and a blink |
 | `modsters/elderbark/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Elderbark, redrawn in P5-19 from @danielpg95's reference; replaces @victor-aguilars' design |
 | `modsters/elderbark/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Elderbark's desktop sheet (P5-55, decision 0045), reduced from @danielpg95's reference; a crystal pulse, twinkling sparkles and a falling leaf |
-| `modsters/ranactus/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
-| `modsters/fuescorpion/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
-| `modsters/reyrayo/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
-| `modsters/torbellin/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
-| `modsters/lamparito/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
-| `modsters/dunebun/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
+| `modsters/ranactus/desktop.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Cactoad redesigned as a barrel cactus with a flower lure (P5-69, decision 0045), reduced from @victor-aguilars' reference; the lure sways and it blinks |
+| `modsters/fuescorpion/desktop.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Scorchion redrawn as a lava scorpion with flaming claws (P5-69, decision 0045), reduced from @victor-aguilars' reference; its flames and lava cracks pulse, and it blinks |
+| `modsters/reyrayo/desktop.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Kingbolt redesigned with a thundercloud cape and a lightning crown (P5-69, decision 0045), reduced from @victor-aguilars' reference; lightning crackles down its cape and it blinks |
+| `modsters/torbellin/desktop.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Twirlwind redesigned as a dust devil with furry paws (P5-69, decision 0045), reduced from @victor-aguilars' reference; its funnel sways and its spiral eyes turn |
+| `modsters/lamparito/desktop.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Lamparito redesigned as a smoke genie wearing its lamp lid as a fez (P5-69, decision 0045), reduced from @victor-aguilars' reference; it floats, its tassel swings and it blinks |
+| `modsters/dunebun/desktop.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Dunebun redesigned as a dune scout (P5-69, decision 0045), reduced from @victor-aguilars' reference; the wind lifts its ear and scarf, and a blink |
 | `modsters/hootlet/sprite.png` | @danielpg95 and @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Hootlet, redrawn in P5-23 from @danielpg95's reference, keeping @victor-aguilars' design (leafy owlet with a head sprout) |
 | `modsters/hootlet/desktop.png` | @danielpg95 and @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Hootlet's desktop sheet (P5-55, decision 0045), reduced from @danielpg95's reference, keeping @victor-aguilars' design; a body bob and a blink |
 | `modsters/crabbit/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Crabbit, redrawn in P5-24 from @victor-aguilars' reference |
-| `modsters/sunmane/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Sunmane, redrawn in P5-24 from @victor-aguilars' reference as a close-up (head, mane and tail) |
-| `modsters/twiggle/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Twiggle, redrawn in P5-24 from @victor-aguilars' reference |
+| `modsters/sunmane/desktop.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Sunmane redesigned as a lion with a bronze sun-disc mane and a sundial horn (P5-69, decision 0045), reduced from @victor-aguilars' reference; its flame tail swishes and it blinks |
+| `modsters/twiggle/desktop.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Twiggle redesigned as a shy ghost in a tumbleweed hood (P5-69, decision 0045), reduced from @victor-aguilars' reference; its tail sways and it blinks |
 | `modsters/flopple/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Flopple, redrawn in P5-24 from @victor-aguilars' reference |
 | `modsters/serpentide/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Serpentide, redrawn in P5-24 from @victor-aguilars' reference as a close-up; the water ring is hand-drawn |
 | `modsters/sporrow/sprite.png` | @danielpg95 and @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Sporrow, redrawn in P5-19 from @danielpg95's reference, keeping @victor-aguilars' design (puppet fungus) |
