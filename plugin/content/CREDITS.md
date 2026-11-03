@@ -14,7 +14,7 @@ noted (decision 0011). Add a row whenever you add or change an asset.
 | `modsters/elderbark/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Elderbark, redrawn in P5-19 from @danielpg95's reference; replaces @victor-aguilars' design |
 | `modsters/elderbark/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Elderbark's desktop sheet (P5-55, decision 0045), reduced from @danielpg95's reference; a crystal pulse, twinkling sparkles and a falling leaf |
 | `modsters/ranactus/desktop.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Cactoad redesigned as a barrel cactus with a flower lure (P5-69, decision 0045), reduced from @victor-aguilars' reference; the lure sways and it blinks |
-| `modsters/fuescorpion/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
+| `modsters/fuescorpion/desktop.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | Scorchion redrawn as a lava scorpion with flaming claws (P5-69, decision 0045), reduced from @victor-aguilars' reference; its flames and lava cracks pulse, and it blinks |
 | `modsters/reyrayo/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
 | `modsters/torbellin/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
 | `modsters/lamparito/sprite.png` | @victor-aguilars (drawn with Claude Code) | CC BY 4.0 | |
