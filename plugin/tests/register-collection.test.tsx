@@ -6,7 +6,7 @@ import { desktopOnlyForest } from './fixtures/desktop-only-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
 import { sceneForest } from './fixtures/scene-forest'
 import { twoBiomes } from './fixtures/two-biomes'
-import { CATCH, COLLECTION, DESKTOP } from '../hooks/constants'
+import { CATCH, COLLECTION, DESKTOP, ENCOUNTER } from '../hooks/constants'
 import { throwingMs } from '../hooks/game'
 
 // The game runs only while autoStart is on (decision 0038); these tests play it
@@ -19,6 +19,7 @@ const CATCH_THROW_MS = throwingMs('caught', CATCH.rocksToCatch)
 // closes it, tabs switch on 1–5. The one-Modster forest is "Whispering Forest".
 
 const PANE_PROPS = { title: 'Modster collection', isFocused: true, bodyColumns: 120, placement: 'inline', scroll: { offset: 0, bodyRows: 8 }, view: {} }
+const COLLECTION_OPEN: UiPane = { id: 'modster-collection', title: 'Modster collection', isShown: true, isFocused: false, isPlaced: true }
 const BAND_PROPS = { hasSurvey: false, isWorking: true, maxRows: 7, bodyColumns: 120 }
 
 type Open = { id: string; title?: string; focus?: boolean; closeOnEscape?: boolean }
@@ -27,6 +28,7 @@ async function start($: any, on: On, panes: () => UiPane[] = () => [], files = o
   on('session.start', ($, e) => ({ cwd: e.cwd }))
   on('command.register', ($, e) => ({ value: { command: e.name } }))
   on('turn.start', ($, e) => ({ turnId: e.turnId }))
+  on('turn.complete', () => ({ text: '' }))
   on('ui.panes', () => ({ value: panes() }))
   on('ui.render', ($, e) => {
     const { Box } = $.ui.resolve(e)
@@ -54,10 +56,15 @@ async function start($: any, on: On, panes: () => UiPane[] = () => [], files = o
     delete store[e.key]
     return { value: undefined }
   })
-  on('store.keys', () => ({ value: Object.keys(store) }))
+  // The Stats tab is the only reader that lists keys, so this counts its reads
+  let keysReads = 0
+  on('store.keys', () => {
+    keysReads++
+    return { value: Object.keys(store) }
+  })
   const clock = mock.clock(on, { now })
   await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' })
-  return { clock, opens }
+  return { clock, opens, keysReads: () => keysReads }
 }
 
 const mountPane = ($: any, props: Partial<typeof PANE_PROPS> = {}, surface = 'terminal') =>
@@ -607,6 +614,53 @@ describe('register: collection pane', () => {
     await $.turn.start({ text: 'again', turnId: 't2' } as any)
     await pane.press({ key: 'stats' })
     expect((await statsRows(pane))[1]).toBe('Catch ratio —  Turns 2')
+    await pane.unmount()
+  })
+
+  // P5-18: the open Stats tab counts an encounter once it ends
+  test('an encounter that ends while the Stats tab is shown updates its totals and biome table', HUNTING, async ($, on) => {
+    const { clock } = await start($, on, () => [COLLECTION_OPEN])
+    const pane = await mountPane($)
+    await pane.press({ key: 'stats' })
+    const before = await statsRows(pane)
+    const band = await mountBand($)
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(4_250)
+    await band.press({ key: 'throw' })
+    await clock.advance(CATCH_THROW_MS + 250)
+    const rows = await statsRows(pane)
+    expect(rows).not.toEqual(before)
+    expect(rows.slice(0, 2)).toEqual(['Encounters 1  Caught 1  Fled 0  Ran 0', 'Catch ratio 100%  Turns 1'])
+    expect(rows.at(-1)).toBe('Whispering Forest      1      1      0      0   100%')
+    await band.unmount()
+    await pane.unmount()
+  })
+
+  test('an encounter that ends on another tab, or with the pane closed, reads no stats', HUNTING, async ($, on) => {
+    let panes: UiPane[] = [COLLECTION_OPEN]
+    const { clock, keysReads } = await start($, on, () => panes)
+    const pane = await mountPane($)
+    await pane.press({ key: 'stats' })
+    await pane.press({ key: 'collection' })
+    const band = await mountBand($)
+    const play = async (turnId: string) => {
+      await $.turn.start({ text: 'go', turnId } as any)
+      await clock.advance(4_250)
+      await band.press({ key: 'throw' })
+      await clock.advance(CATCH_THROW_MS + 250)
+      await $.turn.complete({ reason: 'answer', answer: 'ok', durationMs: 1 } as any)
+      await clock.advance(ENCOUNTER.resultMs)
+    }
+    const before = keysReads()
+    await play('t1')
+    expect(keysReads()).toBe(before)
+    // The Stats tab was the last shown, but the pane is closed
+    await pane.press({ key: 'stats' })
+    panes = []
+    const closed = keysReads()
+    await play('t2')
+    expect(keysReads()).toBe(closed)
+    await band.unmount()
     await pane.unmount()
   })
 

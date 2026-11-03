@@ -539,13 +539,13 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Done when:**
   - [x] Closed as won't do on 2026-11-03 by @danielpg95: players keep the four built-in tiers (0030); no player-defined tiers.
 
-#### [ ] P5-18 — Live Stats tab
+#### [x] P5-18 — Live Stats tab
 - **Depends on:** P3-04
 - **Size:** S
 - **Goal:** the Stats tab refreshes while it's open, after each encounter ends, instead of only when `3` is pressed.
 - **Done when:**
-  - [ ] An encounter that ends while the Stats tab is shown updates its totals and biome table, with a register test.
-  - [ ] No extra `$.store` reads while another tab is shown or the pane is closed.
+  - [x] An encounter that ends while the Stats tab is shown updates its totals and biome table, with a register test.
+  - [x] No extra `$.store` reads while another tab is shown or the pane is closed.
 - **Why:** found during P3-04 (2026-10-13), recorded in the phase 3 review.
 
 #### [x] P5-19 — Fill Whispering Forest
