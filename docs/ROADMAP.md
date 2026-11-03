@@ -1067,16 +1067,16 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Checked in the Code tab: the band, the encounter pane and the Collection tab for a few of the eight.
   - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
-#### [ ] P5-71 — README art from the desktop sheets
+#### [x] P5-71 — README art from the desktop sheets
 - **Depends on:** P5-69
 - **Size:** S
 - **Goal:** the README's art shows what Code tab players see now (asked by @victor-aguilars, 2026-11-03). The layout and text stay as P5-34 left them; the GIFs are redrawn from the desktop art, and the Catchers section shows only catchers that have desktop art.
 - **Done when:**
-  - [ ] The Musketail and Lamparito pair shows their desktop sheets, animated, with each one's current dex `entry`.
-  - [ ] The Whispering Forest and Crystal Grotto GIFs show each biome's desktop scene.
-  - [ ] The Catchers section shows a catch with the Jar and one with the Puzzle Cube, drawn with their desktop art on Modsters from the two biomes shown.
-  - [ ] New GIFs get new file names, so no one sees a cached old one, and the old ones are removed. The alt texts match the new art.
-  - [ ] `node tools/check-tracking.mjs` passes.
+  - [x] The Musketail and Lamparito pair shows their desktop sheets, animated, with each one's current dex `entry`.
+  - [x] The Whispering Forest and Crystal Grotto GIFs show each biome's desktop scene.
+  - [x] The Catchers section shows a catch with the Jar and one with the Puzzle Cube, drawn with their desktop art on Modsters from the two biomes shown.
+  - [x] New GIFs get new file names, so no one sees a cached old one, and the old ones are removed. The alt texts match the new art.
+  - [x] `node tools/check-tracking.mjs` passes.
 
 ---
 
