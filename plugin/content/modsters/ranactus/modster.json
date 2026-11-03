@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "ranactus",
   "name": "Cactoad",
-  "description": "Its tongue is faster than its temper. Its temper is very fast.",
+  "description": "Its flower smells sweet. Its mood does not.",
   "rarity": "common",
   "maxAttempts": null,
   "catchRate": null,
@@ -13,10 +13,11 @@
     "category": "Lure Modster",
     "heightM": 0.4,
     "weightKg": 2,
-    "entry": "It sits under its cactus for hours, perfectly still. Bugs come for the flower on its back, and the tongue gets them before they land."
+    "entry": "It sits so still in the sand that travellers take it for a cactus. The pink flower on its spine draws curious bugs right up to its mouth, and then it isn't a cactus anymore."
   },
-  "sprite": {
-    "file": "sprite.sprite.json",
-    "fps": 3
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 5
   }
 }
