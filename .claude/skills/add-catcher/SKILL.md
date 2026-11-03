@@ -104,8 +104,8 @@ at most 4× the smallest built-in Modster's terminal size.
      ```
 
      It checks every 0045 rule and plays real throws (a catch and a miss) on
-     Shellsprout, which has desktop art, and on Sporrow, the smallest built-in
-     with terminal art, drawn as images the way the Code tab draws them. A throw over the
+     Shellsprout, which has desktop art, and on Inkspector, the smallest built-in
+     with terminal art only, drawn as images the way the Code tab draws them. A throw over the
      Svg limit or that doesn't fit says so.
    - Terminal: `node plugin/skills/create-modster-content/scripts/modster-content.mjs preview-catcher plugin/content/catchers/<id> --out preview.html`.
 

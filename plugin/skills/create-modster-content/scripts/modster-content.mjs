@@ -384,7 +384,7 @@ async function checkDesktop(argv) {
   console.log(`${args.values.preview}: preview page`)
 }
 
-/** Built-in Modsters a catcher's preview throws at: Shellsprout (desktop art) and Sporrow (terminal art, the smallest). */
+/** Built-in Modsters a catcher's preview throws at: Shellsprout (desktop art) and Inkspector (terminal art only, the smallest). */
 async function throwTargets() {
   const reader = {
     listFolders: async (path) => (existsSync(path) ? readdirSync(path, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name) : []),
@@ -392,7 +392,7 @@ async function throwTargets() {
     readBase64: async (path) => (existsSync(path) ? readFileSync(path).toString('base64') : undefined),
   }
   const content = await loadContent(reader, BUILT_IN_ROOT)
-  return ['sproutling', 'sporrow'].flatMap((id) => {
+  return ['sproutling', 'inkspector'].flatMap((id) => {
     const loaded = content.modsters.get(id)
     if (!loaded) return []
     const fps = (loaded.desktop ? loaded.modster.desktopSprite?.fps : loaded.modster.sprite?.fps) ?? CONTENT.modster.defaultFps
