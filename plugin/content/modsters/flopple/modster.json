@@ -10,13 +10,14 @@
   "dex": {
     "number": 6,
     "types": ["water"],
-    "category": "Seal Pup Modster",
+    "category": "Tide Loaf Modster",
     "heightM": 0.7,
     "weightKg": 18,
-    "entry": "It falls asleep on the same rock every day. When the tide rises, it floats away without waking, and washes up somewhere new by evening."
+    "entry": "A soft tide creature that has never been fully awake. It wears a seashell nightcap so it can fall asleep anywhere, and it usually does."
   },
-  "sprite": {
-    "file": "sprite.sprite.json",
-    "fps": 2
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 4
   }
 }

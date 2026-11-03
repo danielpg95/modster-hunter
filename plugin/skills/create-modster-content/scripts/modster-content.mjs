@@ -384,7 +384,7 @@ async function checkDesktop(argv) {
   console.log(`${args.values.preview}: preview page`)
 }
 
-/** Built-in Modsters a catcher's preview throws at: Shellsprout (desktop art) and Inkspector (terminal art only, the smallest). */
+/** Built-in Modsters a catcher's preview throws at: Shellsprout's desktop art and Sporrow's terminal sprite (the smallest). */
 async function throwTargets() {
   const reader = {
     listFolders: async (path) => (existsSync(path) ? readdirSync(path, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name) : []),
@@ -392,11 +392,12 @@ async function throwTargets() {
     readBase64: async (path) => (existsSync(path) ? readFileSync(path).toString('base64') : undefined),
   }
   const content = await loadContent(reader, BUILT_IN_ROOT)
-  return ['sproutling', 'inkspector'].flatMap((id) => {
+  // Only the named art is passed, so Sporrow's throw uses its terminal sprite although it has desktop art too
+  return [['sproutling', 'desktop'], ['sporrow', 'sprite']].flatMap(([id, kind]) => {
     const loaded = content.modsters.get(id)
-    if (!loaded) return []
-    const fps = (loaded.desktop ? loaded.modster.desktopSprite?.fps : loaded.modster.sprite?.fps) ?? CONTENT.modster.defaultFps
-    return [{ name: loaded.modster.name, art: { ...(loaded.sprite ? { sprite: loaded.sprite } : {}), ...(loaded.desktop ? { desktop: loaded.desktop } : {}) }, fps }]
+    if (!loaded?.[kind]) return []
+    const fps = (kind === 'desktop' ? loaded.modster.desktopSprite?.fps : loaded.modster.sprite?.fps) ?? CONTENT.modster.defaultFps
+    return [{ name: loaded.modster.name, art: { [kind]: loaded[kind] }, fps }]
   })
 }
 
