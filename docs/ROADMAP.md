@@ -1061,11 +1061,11 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Done when:**
   - [ ] Crabbit, Flopple and Serpentide have new designs approved by @victor-aguilars, and Tidecrown has an approved design; each `modster.json` matches its design, and ids, dex numbers and rarities of the existing seven are unchanged.
   - [ ] All eight ship a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @victor-aguilars one at a time. The seven existing ones lose their `sprite` entry, `sprite.png` and `sprite.sprite.json`.
-  - [ ] `saltbreeze-bay/biome.json` lists all eight, and the odds table is checked.
-  - [ ] Catcher previews that throw at a terminal sprite still work once Inkspector has desktop art only. Tests cover it.
-  - [ ] `plugin/content/CREDITS.md` has a row for every new sheet and none for the removed sprites; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
+  - [x] `saltbreeze-bay/biome.json` lists all eight, and the odds table is checked.
+  - [x] Catcher previews that throw at a terminal sprite still work once Inkspector has desktop art only. Tests cover it.
+  - [x] `plugin/content/CREDITS.md` has a row for every new sheet and none for the removed sprites; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
   - [ ] Checked in the Code tab: the band, the encounter pane and the Collection tab for a few of the eight.
-  - [ ] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
+  - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
 ---
 
