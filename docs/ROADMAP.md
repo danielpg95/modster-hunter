@@ -1047,7 +1047,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Decision 0040's mention of `sounds` is marked moot in the decisions index (the decision itself is not rewritten).
   - [x] `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict`, `pnpm test:tools` and `node tools/check-tracking.mjs` pass.
 
-#### [ ] P5-69 — Redesign the Dustwind Expanse roster with desktop art
+#### [x] P5-69 — Redesign the Dustwind Expanse roster with desktop art
 - **Depends on:** P5-63
 - **Size:** L
 - **Goal:** every Dustwind Expanse Modster (Dunebun, Cactoad, Twirlwind, Twiggle, Scorchion, Sunmane, Lamparito, Kingbolt) gets a new design and a desktop sheet, like the grotto in P5-63. The redesigns make each one unique, with its own features, so none reads as a plain animal (asked by @victor-aguilars, 2026-11-02). Each keeps its id, dex number and rarity; its name, types, description and dex entry may change with the design. The art is desktop only (decision 0045): the old terminal sprites go, so the terminal shows them as text.
@@ -1056,7 +1056,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Each ships a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80 so every built-in catcher fits, with a calm idle animation, approved by @victor-aguilars one at a time. Its `sprite` entry, `sprite.png` and `sprite.sprite.json` are removed.
   - [x] `plugin/content/CREDITS.md` has a row for every new sheet and none for the removed sprites.
   - [x] `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
-  - [ ] Checked in the Code tab: the band, the encounter pane and the Collection tab for a few of the eight.
+  - [x] Checked in the Code tab: the band, the encounter pane and the Collection tab for a few of the eight (by @victor-aguilars with 0.1.31, 2026-11-02).
   - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
 ---
