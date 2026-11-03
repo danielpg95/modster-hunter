@@ -103,7 +103,7 @@ export const DESKTOP = {
   sceneOvershoot: 1.5,
   /** A particle's sway is drawn from this many samples of one period of its sine (0044 point 4) */
   swaySamples: 16,
-  /** The collection's Modster and the Catchers tab's preview (P5-38): a little under the pane's 4, to fit a narrow dock */
+  /** The Catchers tab's preview (P5-38): a little under the pane's 4, to fit a narrow dock; the collection fits its art instead (0057) */
   collectionScale: 3,
   /** A throw's motion is sampled this often for its SMIL values, which blend between samples (0043 point 3) */
   catchSampleMs: 1000 / 24,
@@ -111,7 +111,8 @@ export const DESKTOP = {
   svgMaxChars: 131072,
   /** A desktop sheet's art reaches this height, in CSS px, whatever size it was drawn at (0056 point 2) */
   paneFitPx: 80,
-  collectionFitPx: 60,
+  /** Kingbolt's art height at the old 3×; terminal sprites fit it too (0057) */
+  collectionFitPx: 96,
   bandFitPx: 40,
   /** The art is at most this many times its target height wide (0056 point 3) */
   fitWidthShare: 1.6,

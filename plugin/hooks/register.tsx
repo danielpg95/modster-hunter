@@ -83,6 +83,7 @@ import {
   pixelsToSvg,
   desktopSheetSvg,
   sheetFitScale,
+  opaqueBounds,
   spriteCells,
   spriteRgba,
   statsCards,
@@ -96,6 +97,7 @@ import {
   type BandLine,
   type BiomeEntry,
   type CatchArt,
+  type OpaqueBounds,
   type ThrowArt,
   type CatcherEntry,
   type CollectionEntry,
@@ -1363,12 +1365,7 @@ export const register: Register = (on, options) => {
         const art = loaded.desktop
           ? sheetArt(loaded.modster, loaded.desktop, fitScale(loaded.desktop, DESKTOP.collectionFitPx), caught ? undefined : COLLECTION.silhouetteColor)
           : hasSprite(loaded)
-            ? {
-                source: caught ? svgFor(loaded) : silhouetteSvgFor(loaded),
-                width: loaded.sprite.width * DESKTOP.collectionScale,
-                height: loaded.sprite.height * DESKTOP.collectionScale,
-                isInteractive: true,
-              }
+            ? spriteFitArt(loaded, caught ? svgFor(loaded) : silhouetteSvgFor(loaded), DESKTOP.collectionFitPx)
             : undefined
         detail = art ? (
           <Box key="detail" flexDirection="column">
@@ -1717,6 +1714,21 @@ const BAND_ART: ArtSize = { scale: DESKTOP.bandScale, sheetScale: DESKTOP.sheetB
 /** A sheet's scale so its art reaches `fitPx` tall, within the width cap and `maxHeight` for the frame (0056 points 2–3). */
 function fitScale(sheet: DesktopSheet, fitPx: number, maxHeight?: number): number {
   return sheetFitScale(sheet, { artWidth: fitPx * DESKTOP.fitWidthShare, artHeight: fitPx, ...(maxHeight === undefined ? {} : { frameHeight: maxHeight }) })
+}
+
+/** A terminal sprite's opaque box across every frame, measured once per sprite (0057 point 2). */
+const spriteBounds = new WeakMap<Sprite, OpaqueBounds>()
+
+/** A terminal sprite's Svg sized so its art reaches `fitPx` tall, within the width cap, as a sheet is (0057 point 2). */
+function spriteFitArt(loaded: DrawnModster, source: string, fitPx: number): DesktopArt {
+  const { sprite } = loaded
+  let bounds = spriteBounds.get(sprite)
+  if (!bounds) {
+    bounds = opaqueBounds({ width: sprite.width, height: sprite.height, frames: spriteRgba(sprite) })
+    spriteBounds.set(sprite, bounds)
+  }
+  const scale = sheetFitScale({ width: sprite.width, height: sprite.height, bounds }, { artWidth: fitPx * DESKTOP.fitWidthShare, artHeight: fitPx })
+  return { source, width: Math.round(sprite.width * scale), height: Math.round(sprite.height * scale), isInteractive: true }
 }
 
 /** How much bigger than 0045's size a Modster's sheet is drawn, so its throw and caught frame grow with it (0056 point 5). */

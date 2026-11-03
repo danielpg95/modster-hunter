@@ -9,7 +9,7 @@ describe('desktopPreviewPage', () => {
     const page = desktopPreviewPage({ kind: 'modster', sheet: desktopSheetOf(32, 32, 2), bytes: 2048, fps: 4, title: 'blobby <desktop>' })
     expect(page).toContain('blobby &lt;desktop&gt;: 2 frames of 32×32, 2 colours, 2.0 KiB, 4 fps')
     // 32 rows of art reach 80, 60 and 40 px
-    for (const label of ['pane, 2.5×', 'collection, 1.88×', 'uncaught silhouette', 'band, 1.25×']) expect(page).toContain(label)
+    for (const label of ['pane, 2.5×', 'collection, 3×', 'uncaught silhouette', 'band, 1.25×']) expect(page).toContain(label)
     expect(page).toContain('data:image/svg+xml;utf8,')
   })
 
