@@ -180,7 +180,7 @@ test('preview-catcher: a catcher folder becomes an HTML page of its throw on bui
   const out = join(dir, 'blob-jar.html')
   const made = run('preview-catcher', folder, '--out', out, '--scale', '1')
   assert.equal(made.code, 0, made.stderr)
-  assert.match(made.stdout, /Blob Jar on Elderbark, Dunebun, \d+ frames at 1×/)
+  assert.match(made.stdout, /Blob Jar on Elderbark, Sporrow, \d+ frames at 1×/)
   const page = readFileSync(out, 'utf8')
   assert.ok((page.match(/<img /g) ?? []).length > 10)
   assert.ok(!/https?:\/\//.test(page))
@@ -291,12 +291,12 @@ test('check-desktop: checks a sheet like the mod, and --preview writes the page 
   assert.match(run('check-desktop', sheet, '--frames', '2', '--kind', 'sprite').stderr, /--kind must be modster, background, catcher or particles/)
 })
 
-test('check-desktop: a catcher\'s preview throws at Shellsprout and Dunebun', () => {
+test('check-desktop: a catcher\'s preview throws at Shellsprout and Sporrow', () => {
   const sheet = writePng('catch.png', 32, 16, () => [60, 60, 200, 255])
   const page = join(dir, 'catch.html')
   const ok = run('check-desktop', sheet, '--frames', '2', '--kind', 'catcher', '--preview', page)
   assert.equal(ok.code, 0, ok.stderr)
   const html = readFileSync(page, 'utf8')
   assert.match(html, /catches Shellsprout \(desktop art\)/)
-  assert.match(html, /misses Dunebun \(terminal art\)/)
+  assert.match(html, /misses Sporrow \(terminal art\)/)
 })
