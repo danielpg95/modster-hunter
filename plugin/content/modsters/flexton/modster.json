@@ -15,8 +15,9 @@
     "weightKg": 0.01,
     "entry": "A plankton that decided to stop drifting and start lifting. It trains on tide-pool pebbles all day and has never once trained its legs."
   },
-  "sprite": {
-    "file": "sprite.sprite.json",
-    "fps": 2
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 5
   }
 }
