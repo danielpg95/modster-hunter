@@ -1054,7 +1054,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Checked in the Code tab: the band, the encounter pane and the Collection tab for a few of the eight (by @victor-aguilars with 0.1.31, 2026-11-02).
   - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
-#### [ ] P5-70 — Redesign the Saltbreeze Bay roster with desktop art
+#### [x] P5-70 — Redesign the Saltbreeze Bay roster with desktop art
 - **Depends on:** P5-69
 - **Size:** L
 - **Goal:** every Saltbreeze Bay Modster gets a desktop sheet, like the desert in P5-69, and the bay gets its legendary (asked by @victor-aguilars, 2026-11-02). Crabbit, Flopple and Serpentide get new designs so none reads as a plain animal; Peekashell, Flexton, Inkspector and Sir Kelpsie keep theirs. Tidecrown (#036, legendary) is designed and added, taking over from P5-21. Each existing Modster keeps its id, dex number and rarity; the redesigned ones may change name, types, description and dex entry. The art is desktop only (decision 0045): the old terminal sprites go.
@@ -1064,7 +1064,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `saltbreeze-bay/biome.json` lists all eight, and the odds table is checked.
   - [x] Catcher previews that throw at a terminal sprite still work once Inkspector has desktop art only. Tests cover it.
   - [x] `plugin/content/CREDITS.md` has a row for every new sheet and none for the removed sprites; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
-  - [ ] Checked in the Code tab: the band, the encounter pane and the Collection tab for a few of the eight.
+  - [x] Checked in the Code tab: the band, the encounter pane and the Collection tab for a few of the eight.
   - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
 ---

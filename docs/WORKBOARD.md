@@ -16,7 +16,6 @@ this file lists only tasks someone has claimed.
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
 | P5-64 | @victor-aguilars | in-review | p5-64-desktop-collection-cards | 2026-11-01 | 2026-11-01 | Get the P5-64 PR reviewed; @danielpg95 accepts or reworks 0054, then tick the last item and close the task |
-| P5-70 | @victor-aguilars | in-review | p5-70-bay-redesign | 2026-11-02 | 2026-11-03 | Check a few of the eight in the Code tab with 0.1.34 (band, encounter pane, Collection tab), then close P5-70 |
 
 ## Up next
 
