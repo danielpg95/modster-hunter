@@ -1076,13 +1076,13 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] New GIFs get new file names, so no one sees a cached old one, and the old ones are removed. The alt texts match the new art.
   - [x] `node tools/check-tracking.mjs` passes.
 
-#### [ ] P5-72 — Grow the Whispering Forest roster to 8/5/3/1
+#### [x] P5-72 — Grow the Whispering Forest roster to 8/5/3/1
 - **Depends on:** P5-70
 - **Size:** L
 - **Goal:** Whispering Forest has 8 common, 5 uncommon, 3 rare and 1 legendary Modster, so each tier has more variety (asked by @victor-aguilars, 2026-11-03). 7 new Modsters join it: 5 common, 2 uncommon. None is a grass type, so the forest gets more variety (asked by @victor-aguilars, 2026-11-03). Existing Modsters keep their id, dex number and rarity.
 - **Done when:**
   - [x] @victor-aguilars approves a concept list for the biome (name, tier, one-line concept), and each `modster.json` matches it.
-  - [ ] Each new Modster ships a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @victor-aguilars one at a time.
+  - [x] Each new Modster ships a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @victor-aguilars one at a time.
   - [x] `whispering-forest/biome.json` lists all 17, and the odds table is checked.
   - [x] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
   - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
