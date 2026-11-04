@@ -3,7 +3,7 @@
 - **Task:** P5-72 — Grow the Whispering Forest roster to 8/5/3/1
 - **Branch:** `p5-72-forest-idles` (after `p5-72-forest-roster`, merged in #240)
 - **Status at end:** done
-- **Last commit:** `69eb8fa`
+- **Last commit:** `3bbc4c8`
 
 ## Goal for this session
 
@@ -29,7 +29,8 @@ Give every biome more variety per tier, starting with the forest.
 ## Next steps
 
 1. @victor-aguilars merges PR #241.
-2. Start P5-73 to P5-75 with concept lists that avoid ball shapes and vary types.
+2. Claim P5-73 (Crystal Grotto, suggested as smallest) with `claim-task`, then pitch a concept list: no ball shapes, real animals as a base, varied types. Use whole drawn poses as idle frames.
+3. Try the new forest Modsters in the Code tab; this has not been done.
 
 ## Open questions
 
