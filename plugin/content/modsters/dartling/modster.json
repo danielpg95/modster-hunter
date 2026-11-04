@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "dartling",
+  "name": "Dartling",
+  "description": "A very serious tiny dragon with dragonfly wings. It breathes one small puff of nothing.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 41,
+    "types": ["bug", "dragon"],
+    "category": "Tiny Dragon Modster",
+    "heightM": 0.2,
+    "weightKg": 0.1,
+    "entry": "A Dartling patrols the forest streams as if it owned them. It has practised breathing fire every day of its life, and it is sure this is the day it finally works."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

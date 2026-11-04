@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "dewdle",
+  "name": "Dewdle",
+  "description": "A wobbling drop of morning dew under a leaf hat. It shrinks a little by noon and is back by dawn.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 37,
+    "types": ["water", "fairy"],
+    "category": "Dew Modster",
+    "heightM": 0.2,
+    "weightKg": 0.4,
+    "entry": "A Dewdle forms overnight on the forest floor, with a few pale motes of light drifting inside. It picks its leaf with great care, and it will not leave home without it."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

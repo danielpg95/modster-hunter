@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "fireflit",
+  "name": "Fireflit",
+  "description": "Its tail is a heavy bulb full of sparks. It flickers a message nobody has decoded.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 39,
+    "types": ["bug", "electric"],
+    "category": "Spark Bulb Modster",
+    "heightM": 0.3,
+    "weightKg": 0.2,
+    "entry": "On summer nights a Fireflit hangs low under the weight of its bulb and flashes the same long pattern over and over. Those who have watched it say the pattern changes when you look away."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}
