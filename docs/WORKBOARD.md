@@ -16,12 +16,16 @@ this file lists only tasks someone has claimed.
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
 | P5-64 | @victor-aguilars | in-review | p5-64-desktop-collection-cards | 2026-11-01 | 2026-11-01 | Get the P5-64 PR reviewed; @danielpg95 accepts or reworks 0054, then tick the last item and close the task |
+| P5-72 | @victor-aguilars | in-progress | p5-72-forest-roster | 2026-11-03 | 2026-11-03 | Get the Whispering Forest concept list approved |
 
 ## Up next
 
 Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
+- **P5-73** — Grow the Crystal Grotto roster to 8/5/3/1
+- **P5-74** — Grow the Dustwind Expanse roster to 8/5/3/1
+- **P5-75** — Grow the Saltbreeze Bay roster to 8/5/3/1
 - **P5-01** — Shiny variants
 - **P5-03** — Extended stats and milestones
 - **P4-07** — In-pane field editor
