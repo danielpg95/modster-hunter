@@ -16,7 +16,6 @@ this file lists only tasks someone has claimed.
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
 | P5-64 | @victor-aguilars | in-review | p5-64-desktop-collection-cards | 2026-11-01 | 2026-11-01 | Get the P5-64 PR reviewed; @danielpg95 accepts or reworks 0054, then tick the last item and close the task |
-| P5-72 | @victor-aguilars | in-review | p5-72-forest-idles | 2026-11-03 | 2026-11-03 | @victor-aguilars approves the idle animations in the PR, then the last item is ticked and the task closes |
 
 ## Up next
 

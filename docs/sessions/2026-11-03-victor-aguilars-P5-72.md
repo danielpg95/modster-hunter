@@ -2,7 +2,7 @@
 
 - **Task:** P5-72 — Grow the Whispering Forest roster to 8/5/3/1
 - **Branch:** `p5-72-forest-idles` (after `p5-72-forest-roster`, merged in #240)
-- **Status at end:** in-review
+- **Status at end:** done
 - **Last commit:** `69eb8fa`
 
 ## Goal for this session
@@ -24,11 +24,11 @@ Give every biome more variety per tier, starting with the forest.
 
 - The first idles cut parts and shifted them, and @victor-aguilars rejected that look. Every frame now is a drawn pose from the reference, lined up on the rest pose, so Hushwren, Dartling, Otterfall and Murmurk have no blink.
 - Reducing a sheet to 62 colours with median cut smeared Murmurk's eye; fast octree with k-means keeps it clean.
-- Not yet checked in the Code tab.
+- @victor-aguilars approved the idles in motion from a GIF. Not checked in the Code tab.
 
 ## Next steps
 
-1. @victor-aguilars approves the idle animations in the PR, then the last item is ticked and the task closes.
+1. @victor-aguilars merges PR #241.
 2. Start P5-73 to P5-75 with concept lists that avoid ball shapes and vary types.
 
 ## Open questions
