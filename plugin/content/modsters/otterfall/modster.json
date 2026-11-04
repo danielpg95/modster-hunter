@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "otterfall",
+  "name": "Otterfall",
+  "description": "Its tail is running water that never stops, so a small creek follows it wherever it goes.",
+  "rarity": "uncommon",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 42,
+    "types": ["water", "normal"],
+    "category": "Stream Tail Modster",
+    "heightM": 0.9,
+    "weightKg": 8.5,
+    "entry": "Forest streams that appear overnight are usually an Otterfall out for a walk. It carries its favourite river stones in its paws, and it stacks them wherever it stops to rest."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

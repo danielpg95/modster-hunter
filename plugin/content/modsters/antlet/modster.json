@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "antlet",
+  "name": "Antlet",
+  "description": "An ant with deer antlers far too big for it. It gets stuck between trees all day.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 38,
+    "types": ["bug", "normal"],
+    "category": "Antlered Ant Modster",
+    "heightM": 0.3,
+    "weightKg": 0.5,
+    "entry": "An Antlet can lift fifty times its weight, and its antlers weigh about forty-nine of that. Colonies clear wide paths through the pines just so their young can get home."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

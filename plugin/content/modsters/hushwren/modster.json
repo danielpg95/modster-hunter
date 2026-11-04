@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "hushwren",
+  "name": "Hushwren",
+  "description": "A pale wren that drifts in with the morning mist. Its song arrives after it has left.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 40,
+    "types": ["flying", "ghost"],
+    "category": "Mist Wren Modster",
+    "heightM": 0.1,
+    "weightKg": 0.05,
+    "entry": "No one has seen a Hushwren and heard it at the same moment. The note on its chest is said to be the first one it ever sang, and it is still waiting for the rest of the tune."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}
