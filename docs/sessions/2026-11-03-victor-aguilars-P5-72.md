@@ -3,7 +3,7 @@
 - **Task:** P5-72 — Grow the Whispering Forest roster to 8/5/3/1
 - **Branch:** `p5-72-forest-idles` (after `p5-72-forest-roster`, merged in #240)
 - **Status at end:** in-review
-- **Last commit:** `c86911b`
+- **Last commit:** `69eb8fa`
 
 ## Goal for this session
 
