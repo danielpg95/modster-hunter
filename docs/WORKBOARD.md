@@ -18,6 +18,8 @@ this file lists only tasks someone has claimed.
 | P5-64 | @victor-aguilars | in-review | p5-64-desktop-collection-cards | 2026-11-01 | 2026-11-01 | Get the P5-64 PR reviewed; @danielpg95 accepts or reworks 0054, then tick the last item and close the task |
 | P5-72 | @victor-aguilars | in-review | p5-72-forest-roster | 2026-11-03 | 2026-11-03 | @victor-aguilars approves the seven idle animations in the PR, then the last item is ticked and the task closes |
 | P5-76 | @danielpg95 | in-progress | p5-76-shuffleback-hall | 2026-11-11 | 2026-11-11 | Make the Shuffleback Hall desktop background with `add-biome` and get it approved |
+| P5-77 | @danielpg95 | in-progress | p5-76-shuffleback-hall | 2026-11-13 | 2026-11-13 | Lands with P5-76 in one PR; start after the five commons are approved |
+| P5-78 | @danielpg95 | in-progress | p5-76-shuffleback-hall | 2026-11-13 | 2026-11-13 | Lands with P5-76 in one PR; start after the uncommons are approved |
 
 ## Up next
 

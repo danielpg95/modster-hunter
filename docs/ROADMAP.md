@@ -1140,7 +1140,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 #### [ ] P5-77 — Shuffleback Hall: the uncommons
 - **Depends on:** P5-76
 - **Size:** M
-- **Goal:** Sevenpus, Knitwick, Ninelife and Tallyworm join Shuffleback Hall as uncommons, following P5-76's concepts. Knitwick stays clearly apart from Strungking: soft wool, wide and low, thread trailing along the floor, nursery pastels.
+- **Goal:** Sevenpus, Knitwick, Ninelife and Tallyworm join Shuffleback Hall as uncommons, following P5-76's concepts. Knitwick stays clearly apart from Strungking: soft wool, wide and low, thread trailing along the floor, nursery pastels. Lands in one PR with P5-76 to P5-78: the content check needs a common, an uncommon and a rare in every biome (P2-09), so the hall can't ship one tier at a time (decided by @danielpg95, 2026-11-13).
 - **Done when:**
   - [ ] Each ships a `modster.json` matching its concept and a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @danielpg95 one at a time.
   - [ ] `shuffleback-hall/biome.json` lists all nine, and the odds table is checked.
@@ -1150,7 +1150,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 #### [ ] P5-78 — Shuffleback Hall: the rares and Gigglet
 - **Depends on:** P5-77
 - **Size:** M
-- **Goal:** Boinkjack, Ruffmoth, Strungking and Lonewisp join Shuffleback Hall as rares and Gigglet as its legendary, following P5-76's concepts, so the hall has all 14.
+- **Goal:** Boinkjack, Ruffmoth, Strungking and Lonewisp join Shuffleback Hall as rares and Gigglet as its legendary, following P5-76's concepts, so the hall has all 14. Lands in one PR with P5-76 to P5-78: the content check needs a common, an uncommon and a rare in every biome (P2-09), so the hall can't ship one tier at a time (decided by @danielpg95, 2026-11-13).
 - **Done when:**
   - [ ] Each ships a `modster.json` matching its concept and a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @danielpg95 one at a time.
   - [ ] `shuffleback-hall/biome.json` lists all 14, and the odds table is checked.
