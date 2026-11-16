@@ -16,6 +16,7 @@ this file lists only tasks someone has claimed.
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
 | P5-64 | @victor-aguilars | in-review | p5-64-desktop-collection-cards | 2026-11-01 | 2026-11-01 | Get the P5-64 PR reviewed; @danielpg95 accepts or reworks 0054, then tick the last item and close the task |
+| P5-74 | @victor-aguilars | in-progress | p5-74-dustwind-roster | 2026-11-16 | 2026-11-16 | Pitch a concept list for the 9 new Dustwind Expanse Modsters (body twist + one-action idle, varied types) and get it approved |
 | P5-75 | @victor-aguilars | in-progress | p5-75-bay-roster | 2026-11-16 | 2026-11-16 | Pitch a concept list for the 9 new Saltbreeze Bay Modsters (body twist + one-action idle, varied types) and get it approved |
 | P5-76 | @danielpg95 | in-progress | p5-76-shuffleback-hall | 2026-11-11 | 2026-11-11 | Make the Shuffleback Hall desktop background with `add-biome` and get it approved |
 | P5-77 | @danielpg95 | in-progress | p5-76-shuffleback-hall | 2026-11-13 | 2026-11-13 | Lands with P5-76 in one PR; start after the five commons are approved |
@@ -27,7 +28,6 @@ Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
 - **P5-73** — Grow the Crystal Grotto roster to 8/5/3/1
-- **P5-74** — Grow the Dustwind Expanse roster to 8/5/3/1
 - **P5-01** — Shiny variants
 - **P5-03** — Extended stats and milestones
 - **P4-07** — In-pane field editor
