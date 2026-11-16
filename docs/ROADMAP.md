@@ -1133,7 +1133,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `plugin/content/biomes/shuffleback-hall/` has a `biome.json` and a `desktopBackground` made from a reference with `add-biome`'s background prompt, approved by @danielpg95.
   - [x] The five commons each ship a `modster.json` matching its concept and a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @danielpg95 one at a time. Dex numbers are the next free ones when the PR lands.
   - [x] `shuffleback-hall/biome.json` lists the five, and the odds table is checked.
-  - [ ] `plugin/content/CREDITS.md` has a row for the background and every sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of the scene and every sheet.
+  - [x] `plugin/content/CREDITS.md` has a row for the background and every sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of the scene and every sheet.
   - [ ] Checked in the Code tab: the band, the encounter pane and the Biomes tab for Shuffleback Hall.
   - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
@@ -1144,7 +1144,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Done when:**
   - [x] Each ships a `modster.json` matching its concept and a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @danielpg95 one at a time.
   - [x] `shuffleback-hall/biome.json` lists all nine, and the odds table is checked.
-  - [ ] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
+  - [x] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
   - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
 #### [ ] P5-78 — Shuffleback Hall: the rares and Gigglet
@@ -1154,7 +1154,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Done when:**
   - [x] Each ships a `modster.json` matching its concept and a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @danielpg95 one at a time.
   - [x] `shuffleback-hall/biome.json` lists all 14, and the odds table is checked.
-  - [ ] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
+  - [x] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
   - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
 ---
