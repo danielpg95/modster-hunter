@@ -1076,13 +1076,13 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] New GIFs get new file names, so no one sees a cached old one, and the old ones are removed. The alt texts match the new art.
   - [x] `node tools/check-tracking.mjs` passes.
 
-#### [x] P5-72 — Grow the Whispering Forest roster to 8/5/3/1
+#### [ ] P5-72 — Grow the Whispering Forest roster to 8/5/3/1
 - **Depends on:** P5-70
 - **Size:** L
-- **Goal:** Whispering Forest has 8 common, 5 uncommon, 3 rare and 1 legendary Modster, so each tier has more variety (asked by @victor-aguilars, 2026-11-03). 7 new Modsters join it: 5 common, 2 uncommon. None is a grass type, so the forest gets more variety (asked by @victor-aguilars, 2026-11-03). Existing Modsters keep their id, dex number and rarity.
+- **Goal:** Whispering Forest has 8 common, 5 uncommon, 3 rare and 1 legendary Modster, so each tier has more variety (asked by @victor-aguilars, 2026-11-03). 7 new Modsters join it: 5 common, 2 uncommon. None is a grass type, so the forest gets more variety (asked by @victor-aguilars, 2026-11-03). Existing Modsters keep their id, dex number and rarity. Each idle is a calm loop with one short action that shows the Modster's character, and Murmurk and Dartling get a stronger body twist (asked by @victor-aguilars, 2026-11-16).
 - **Done when:**
   - [x] @victor-aguilars approves a concept list for the biome (name, tier, one-line concept), and each `modster.json` matches it.
-  - [x] Each new Modster ships a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @victor-aguilars one at a time.
+  - [ ] Each new Modster ships a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @victor-aguilars one at a time.
   - [x] `whispering-forest/biome.json` lists all 17, and the odds table is checked.
   - [x] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
   - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
@@ -1117,6 +1117,43 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] @victor-aguilars approves a concept list for the biome (name, tier, one-line concept), and each `modster.json` matches it.
   - [ ] Each new Modster ships a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @victor-aguilars one at a time.
   - [ ] `saltbreeze-bay/biome.json` lists all 17, and the odds table is checked.
+  - [ ] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
+  - [ ] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
+
+#### [ ] P5-76 — Shuffleback Hall: the biome and its commons
+- **Depends on:** —
+- **Size:** M
+- **Goal:** a fifth built-in biome, Shuffleback Hall, with its desktop scene and its five commons (asked by @danielpg95, 2026-11-11). A hall you keep walking through and never get closer to leaving: a creepy-cute fever dream where things try to be cute and fail. Breathing walls, wallpaper eyes that blink out of sync, cartoon squash and stretch; bruised purple, sickly magenta, acid teal and candle gold. Its 14 Modsters each hint lightly at a rank of a deck (2–10, J, Q, K, A, Joker), never as cards; suits appear only as small hints on a few. Roster 5 common, 4 uncommon, 4 rare, 1 legendary, split over P5-76 to P5-78.
+- **Concepts** (approved by @danielpg95, 2026-11-11):
+  - Common: **Twinkettle** (2), two fused teapots pouring you tea, one cup always empty, they swap faces when you blink. **Thribble** (3), a three-headed plush bunny; the heads take turns sleeping, one always watching you. **Rockabye** (4), a pastel rocking horse with peeling paint and a faded diamond on its flank; its open smile shows small human teeth, and its head stays on you, a beat late, while it rocks. **Glovelorn** (5), an empty glove that waves with one joint too many and won't let go of your hand. **Hexjar** (6), a cookie jar happy to see you, six eyes inside, never cookies.
+  - Uncommon: **Sevenpus** (7), long hugs, always seven spade-tipped tentacles, asks to borrow your arm. **Knitwick** (8), a low, eight-legged wool doll in nursery pastels knitting you a scarf that trails toward you. **Ninelife** (9), a shadow cat with eight lives left, looking for one to spare; you seem to have one. **Tallyworm** (10), hums a lullaby counting down the tally marks on its ten segments.
+  - Rare: **Boinkjack** (J), a too-wide grin popping out of boxes it was never in, music winding down too slowly. **Ruffmoth** (Q), a cracked porcelain mask with a painted smile and a ruff collar, heart-shaped eyespots. **Strungking** (K), a tall lacquered-wood puppet king with a paper crown, strings going up into the dark; nobody has seen who holds them. **Lonewisp** (A), one huge unblinking eye in a puff of smoke, a little closer each time you look away; if it gets you, you start over.
+  - Legendary: **Gigglet** (Joker), a child-like jester on a toy box, hat too big, mismatched eyes; the hall is its game and it makes up the rules. It carries a ragdoll that looks a little more like whoever is playing. Its texts never name Strungking.
+- **Done when:**
+  - [ ] `plugin/content/biomes/shuffleback-hall/` has a `biome.json` and a `desktopBackground` made from a reference with `add-biome`'s background prompt, approved by @danielpg95.
+  - [ ] The five commons each ship a `modster.json` matching its concept and a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @danielpg95 one at a time. Dex numbers are the next free ones when the PR lands.
+  - [ ] `shuffleback-hall/biome.json` lists the five, and the odds table is checked.
+  - [ ] `plugin/content/CREDITS.md` has a row for the background and every sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of the scene and every sheet.
+  - [ ] Checked in the Code tab: the band, the encounter pane and the Biomes tab for Shuffleback Hall.
+  - [ ] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
+
+#### [ ] P5-77 — Shuffleback Hall: the uncommons
+- **Depends on:** P5-76
+- **Size:** M
+- **Goal:** Sevenpus, Knitwick, Ninelife and Tallyworm join Shuffleback Hall as uncommons, following P5-76's concepts. Knitwick stays clearly apart from Strungking: soft wool, wide and low, thread trailing along the floor, nursery pastels. Lands in one PR with P5-76 to P5-78: the content check needs a common, an uncommon and a rare in every biome (P2-09), so the hall can't ship one tier at a time (decided by @danielpg95, 2026-11-13).
+- **Done when:**
+  - [ ] Each ships a `modster.json` matching its concept and a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @danielpg95 one at a time.
+  - [ ] `shuffleback-hall/biome.json` lists all nine, and the odds table is checked.
+  - [ ] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
+  - [ ] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
+
+#### [ ] P5-78 — Shuffleback Hall: the rares and Gigglet
+- **Depends on:** P5-77
+- **Size:** M
+- **Goal:** Boinkjack, Ruffmoth, Strungking and Lonewisp join Shuffleback Hall as rares and Gigglet as its legendary, following P5-76's concepts, so the hall has all 14. Lands in one PR with P5-76 to P5-78: the content check needs a common, an uncommon and a rare in every biome (P2-09), so the hall can't ship one tier at a time (decided by @danielpg95, 2026-11-13).
+- **Done when:**
+  - [ ] Each ships a `modster.json` matching its concept and a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @danielpg95 one at a time.
+  - [ ] `shuffleback-hall/biome.json` lists all 14, and the odds table is checked.
   - [ ] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
   - [ ] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
