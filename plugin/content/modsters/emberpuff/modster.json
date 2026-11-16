@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "emberpuff",
+  "name": "Emberpuff",
+  "description": "Its beak is a coal from a beach bonfire. Lost boats follow the glow home.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 44,
+    "types": ["fire", "flying"],
+    "category": "Ember Beak Modster",
+    "heightM": 0.3,
+    "weightKg": 0.5,
+    "entry": "An Emberpuff never lets its beak go out. It yawns all evening, and every yawn sends a spark over the bay that fishers steer by."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

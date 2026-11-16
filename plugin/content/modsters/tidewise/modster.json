@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "tidewise",
+  "name": "Tidewise",
+  "description": "An ancient turtle with a compass on its belly. It always knows the way home.",
+  "rarity": "rare",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 52,
+    "types": ["psychic", "ground"],
+    "category": "Compass Sage Modster",
+    "heightM": 1.2,
+    "weightKg": 90.0,
+    "entry": "A Tidewise has walked the same beach for three hundred years. When a creature is lost, it shuts its eyes, the compass on its belly glows, and it points the way."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}
