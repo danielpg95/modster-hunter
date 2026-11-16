@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "sailsting",
+  "name": "Sailsting",
+  "description": "A man-o'-war with a warship sail. Very proud of it, until the wind drops.",
+  "rarity": "uncommon",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 50,
+    "types": ["poison"],
+    "category": "Sail Float Modster",
+    "heightM": 0.4,
+    "weightKg": 0.6,
+    "entry": "Sailstings drift into the bay in whole fleets, each sure it is the admiral. When the wind dies they sag, then twirl their moustaches as if they meant to stop."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

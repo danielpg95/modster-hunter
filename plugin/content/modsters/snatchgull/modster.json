@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "snatchgull",
+  "name": "Snatchgull",
+  "description": "Half gull, half raccoon, all thief. Put your snack down and it's already gone.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 45,
+    "types": ["dark", "flying"],
+    "category": "Snack Thief Modster",
+    "heightM": 0.5,
+    "weightKg": 1.2,
+    "entry": "Snatchgulls work the beach in pairs: one looks innocent while the other takes the chips. Nobody has caught one with the goods, only with crumbs on its beak."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

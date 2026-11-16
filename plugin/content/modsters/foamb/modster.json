@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "foamb",
+  "name": "Foamb",
+  "description": "A salt-marsh lamb whose fleece is sea foam. Every wave gives it a fresh coat.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 46,
+    "types": ["fairy"],
+    "category": "Sea Foam Modster",
+    "heightM": 0.6,
+    "weightKg": 2.0,
+    "entry": "Foambs graze where the tide meets the marsh. When the wind blows, bubbles drift off their backs, and children chase them along the shore."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "shrimpact",
+  "name": "Shrimpact",
+  "description": "Its punch is so fast it cracks like thunder. It trains in the rock pools at low tide.",
+  "rarity": "uncommon",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 49,
+    "types": ["fighting", "electric"],
+    "category": "Thunder Punch Modster",
+    "heightM": 0.3,
+    "weightKg": 1.4,
+    "entry": "The sharp snap heard from rock pools at low tide is a Shrimpact training. It can crack a shell in one punch, and it always blows on its fist afterwards."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}
