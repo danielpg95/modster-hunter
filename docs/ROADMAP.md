@@ -1101,7 +1101,11 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 #### [ ] P5-74 — Grow the Dustwind Expanse roster to 8/5/3/1
 - **Depends on:** P5-70
 - **Size:** L
-- **Goal:** Dustwind Expanse has 8 common, 5 uncommon, 3 rare and 1 legendary Modster, so each tier has more variety (asked by @victor-aguilars, 2026-11-03). 9 new Modsters join it: 5 common, 3 uncommon, 1 rare. Existing Modsters keep their id, dex number and rarity.
+- **Goal:** Dustwind Expanse has 8 common, 5 uncommon, 3 rare and 1 legendary Modster, so each tier has more variety (asked by @victor-aguilars, 2026-11-03). 9 new Modsters join it: 5 common, 3 uncommon, 1 rare. Existing Modsters keep their id, dex number and rarity. None of the new Modsters is a fire, ground, grass or ghost type, which the desert already has; each has a twist built into its body and an idle with one action (asked by @victor-aguilars, 2026-11-16).
+- **Concepts** (approved by @victor-aguilars, 2026-11-16):
+  - Common: **Nimbeetle** (water/bug), a fog beetle whose shell is a tiny raincloud; it drinks by headstand. **Meerscope** (normal), a meerkat sentry whose eye patches are telescopes. **Geckicle** (ice), a frost-patterned night gecko that licks its eye clean. **Duskit** (dark), a sand cat whose shadow moves on its own. **Fuzzbolt** (electric/flying), a fluffy desert moth charged with sandstorm static.
+  - Uncommon: **Camesa** (rock), a kneeling camel whose humps are sandstone mesas. **Mirafin** (psychic), a mirage fish of heat haze that swims through sand. **Coinadillo** (steel), an armadillo whose bands are old caravan coins.
+  - Rare: **Unoryx** (fairy), a white oryx with one spiral horn, a root of the unicorn legend.
 - **Done when:**
   - [ ] @victor-aguilars approves a concept list for the biome (name, tier, one-line concept), and each `modster.json` matches it.
   - [ ] Each new Modster ships a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @victor-aguilars one at a time.
