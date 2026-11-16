@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "murmurk",
   "name": "Murmurk",
-  "description": "Its wing tips fade into smoke. It repeats the forest's secrets, but only in a whisper.",
+  "description": "Below its feathered head it is only smoke. It repeats the forest's secrets, but only in a whisper.",
   "rarity": "uncommon",
   "maxAttempts": null,
   "catchRate": null,
@@ -13,7 +13,7 @@
     "category": "Whisper Crow Modster",
     "heightM": 0.5,
     "weightKg": 1.1,
-    "entry": "Whatever you say in Whispering Forest, a Murmurk has heard it. It trades secrets with other Murmurks at dusk, and the smoke from its wings is said to be the ones it promised to keep."
+    "entry": "Whatever you say in Whispering Forest, a Murmurk has heard it. It trades secrets with other Murmurks at dusk, and the smoke it is made of is said to be the secrets it promised to keep."
   },
   "desktopSprite": {
     "file": "desktop.png",
