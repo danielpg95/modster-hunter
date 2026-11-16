@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "pearlpod",
+  "name": "Pearlpod",
+  "description": "Its plates are mother-of-pearl from shells the tide left behind. Very shy.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 48,
+    "types": ["bug", "steel"],
+    "category": "Pearl Plate Modster",
+    "heightM": 0.3,
+    "weightKg": 1.5,
+    "entry": "A Pearlpod adds a layer of pearl to its plates each time it eats a shell. Old ones shine like a sunset, and they still curl up when someone says hello."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}
