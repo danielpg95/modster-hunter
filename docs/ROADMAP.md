@@ -1109,7 +1109,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
   - [ ] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
-#### [ ] P5-75 — Grow the Saltbreeze Bay roster to 8/5/3/1
+#### [x] P5-75 — Grow the Saltbreeze Bay roster to 8/5/3/1
 - **Depends on:** P5-70
 - **Size:** L
 - **Goal:** Saltbreeze Bay has 8 common, 5 uncommon, 3 rare and 1 legendary Modster, so each tier has more variety (asked by @victor-aguilars, 2026-11-03). 9 new Modsters join it: 5 common, 3 uncommon, 1 rare. Existing Modsters keep their id, dex number and rarity. None of the new Modsters is a water type, so the bay gets more variety; each has a twist built into its body and an idle with one action (asked by @victor-aguilars, 2026-11-16).
@@ -1118,11 +1118,11 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - Uncommon: **Shrimpact** (fighting/electric), a mantis shrimp whose punch cracks with lightning. **Sailsting** (poison), a pompous man-o'-war whose float is a warship sail. **Coralwyrm** (rock/dragon), a tiny dragon with coral horns and a hermit crab living in one.
   - Rare: **Tidewise** (psychic/ground), an ancient sea turtle whose shell is a glowing compass rose.
 - **Done when:**
-  - [ ] @victor-aguilars approves a concept list for the biome (name, tier, one-line concept), and each `modster.json` matches it.
-  - [ ] Each new Modster ships a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @victor-aguilars one at a time.
-  - [ ] `saltbreeze-bay/biome.json` lists all 17, and the odds table is checked.
-  - [ ] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
-  - [ ] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
+  - [x] @victor-aguilars approves a concept list for the biome (name, tier, one-line concept), and each `modster.json` matches it.
+  - [x] Each new Modster ships a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @victor-aguilars one at a time.
+  - [x] `saltbreeze-bay/biome.json` lists all 17, and the odds table is checked.
+  - [x] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
+  - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
 #### [ ] P5-76 — Shuffleback Hall: the biome and its commons
 - **Depends on:** —
