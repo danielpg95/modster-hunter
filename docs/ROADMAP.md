@@ -1098,7 +1098,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
   - [ ] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
-#### [ ] P5-74 — Grow the Dustwind Expanse roster to 8/5/3/1
+#### [x] P5-74 — Grow the Dustwind Expanse roster to 8/5/3/1
 - **Depends on:** P5-70
 - **Size:** L
 - **Goal:** Dustwind Expanse has 8 common, 5 uncommon, 3 rare and 1 legendary Modster, so each tier has more variety (asked by @victor-aguilars, 2026-11-03). 9 new Modsters join it: 5 common, 3 uncommon, 1 rare. Existing Modsters keep their id, dex number and rarity. None of the new Modsters is a fire, ground, grass or ghost type, which the desert already has; each has a twist built into its body and an idle with one action (asked by @victor-aguilars, 2026-11-16).
@@ -1107,11 +1107,11 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - Uncommon: **Camesa** (rock), a kneeling camel whose humps are sandstone mesas. **Mirafin** (psychic), a mirage fish of heat haze that swims through sand. **Coinadillo** (steel), an armadillo whose bands are old caravan coins.
   - Rare: **Unoryx** (fairy), a white oryx with one spiral horn, a root of the unicorn legend.
 - **Done when:**
-  - [ ] @victor-aguilars approves a concept list for the biome (name, tier, one-line concept), and each `modster.json` matches it.
-  - [ ] Each new Modster ships a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @victor-aguilars one at a time.
-  - [ ] `dustwind-expanse/biome.json` lists all 17, and the odds table is checked.
-  - [ ] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
-  - [ ] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
+  - [x] @victor-aguilars approves a concept list for the biome (name, tier, one-line concept), and each `modster.json` matches it.
+  - [x] Each new Modster ships a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @victor-aguilars one at a time.
+  - [x] `dustwind-expanse/biome.json` lists all 17, and the odds table is checked.
+  - [x] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
+  - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
 #### [x] P5-75 — Grow the Saltbreeze Bay roster to 8/5/3/1
 - **Depends on:** P5-70
