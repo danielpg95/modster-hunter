@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "meerscope",
+  "name": "Meerscope",
+  "description": "Its eyes are telescopes. It watches the dunes so the rest of its family can nap.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 54,
+    "types": ["normal"],
+    "category": "Lookout Modster",
+    "heightM": 0.35,
+    "weightKg": 0.8,
+    "entry": "A Meerscope can spot a beetle three dunes away. It still gasps every time, then waves as if it meant to be seen."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

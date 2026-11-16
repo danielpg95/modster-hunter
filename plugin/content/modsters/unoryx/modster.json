@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "unoryx",
+  "name": "Unoryx",
+  "description": "A white oryx with one spiral horn. Its glowing horn leads the lost to water.",
+  "rarity": "rare",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 61,
+    "types": ["fairy"],
+    "category": "One Horn Modster",
+    "heightM": 1.0,
+    "weightKg": 60.0,
+    "entry": "Travellers lost in the dunes follow the glow of its horn to water. Seen from the side, it is said to be where the first unicorn stories came from."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

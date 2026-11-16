@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "mirafin",
+  "name": "Mirafin",
+  "description": "A fish made of heat haze that swims through the sand. Chase it and it's never there.",
+  "rarity": "uncommon",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 59,
+    "types": ["psychic"],
+    "category": "Mirage Modster",
+    "heightM": 0.6,
+    "weightKg": 0.1,
+    "entry": "Travellers see a Mirafin leap from the dunes on the hottest afternoons. It winks at anyone who follows, and the closer they get, the farther away it swims."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

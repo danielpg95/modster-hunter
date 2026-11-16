@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "duskit",
+  "name": "Duskit",
+  "description": "A tiny sand cat whose shadow has a mind of its own. The cat swears it's innocent.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 56,
+    "types": ["dark"],
+    "category": "Shadow Kit Modster",
+    "heightM": 0.25,
+    "weightKg": 1.5,
+    "entry": "On moonlit nights a Duskit's shadow wanders off to play. The cat sits perfectly still, as if it has no idea what its shadow is doing."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

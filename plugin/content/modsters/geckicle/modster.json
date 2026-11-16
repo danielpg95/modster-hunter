@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "geckicle",
+  "name": "Geckicle",
+  "description": "A gecko made for freezing desert nights. It keeps its eyes clear by licking them.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 55,
+    "types": ["ice"],
+    "category": "Frost Gecko Modster",
+    "heightM": 0.2,
+    "weightKg": 0.3,
+    "entry": "Geckicles come out only when the desert night turns cold. Frost forms on their eyes as they watch the stars, and they lick it off, very pleased with themselves."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}
