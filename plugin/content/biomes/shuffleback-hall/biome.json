@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "shuffleback-hall",
+  "name": "Shuffleback Hall",
+  "description": "The exit is just ahead. It has been just ahead for a while.",
+  "accentColor": "#8e5bb5",
+  "backgroundFps": 3,
+  "desktopBackground": { "file": "desktop.png", "frames": 4 },
+  "desktopParticles": { "file": "particles.png", "frames": 4 },
+  "particles": { "style": "bubble", "color": "#f1b279", "density": 2 },
+  "encounterEverySec": [10, 30],
+  "modsters": [
+    { "id": "afterloons" },
+    { "id": "thribble" },
+    { "id": "rockabye" },
+    { "id": "glovelorn" },
+    { "id": "hexjar" }, { "id": "sevenpus" }, { "id": "knitwick" }, { "id": "ninelife" }, { "id": "tallyworm" }, { "id": "knavelin" }, { "id": "ruffmoth" }, { "id": "strungking" }, { "id": "lonewisp" }, { "id": "gigglet" }
+  ]
+}

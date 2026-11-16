@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "knavelin",
+  "name": "Knavelin",
+  "description": "Knock on its armour and something knocks back, from the inside.",
+  "rarity": "rare",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 53,
+    "types": ["steel", "ghost"],
+    "category": "Throne Guard Modster",
+    "heightM": 1.5,
+    "weightKg": 40,
+    "entry": "It once cracked nuts for the hall's court. Now it guards a throne nobody sits on. Pull its lever and the jaw drops open on two eyes that were already looking at you."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 4
+  }
+}

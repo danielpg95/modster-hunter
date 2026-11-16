@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "strungking",
+  "name": "Strungking",
+  "description": "It rules the hall with great dignity. Something above it decides how.",
+  "rarity": "rare",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 55,
+    "types": ["psychic", "dark"],
+    "category": "Puppet King Modster",
+    "heightM": 1.8,
+    "weightKg": 14,
+    "entry": "Its strings go up into the dark. Some visitors climbed them to see who holds the other end. They came back down on strings of their own."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 4
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "gigglet",
+  "name": "Gigglet",
+  "description": "It just wants someone to play with. It already made a doll of you, in case you say no.",
+  "rarity": "legendary",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 57,
+    "types": ["dark", "fairy"],
+    "category": "Wild Card Modster",
+    "heightM": 1.2,
+    "weightKg": 15,
+    "entry": "Its doll looks a little more like each visitor the longer they stay. Nobody has stayed long enough to see it finished."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 4
+  }
+}

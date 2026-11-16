@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "tallyworm",
+  "name": "Tallyworm",
+  "description": "Each time you pass, it scratches one more tally mark into itself, and hums a little happier.",
+  "rarity": "uncommon",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 52,
+    "types": ["bug", "psychic"],
+    "category": "Pull Toy Modster",
+    "heightM": 1.2,
+    "weightKg": 6,
+    "entry": "It used to be pulled along on a string. Now it follows visitors on its own, humming, and scratches a tally for each one. Its last segment is almost full."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

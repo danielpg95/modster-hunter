@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "lonewisp",
+  "name": "Lonewisp",
+  "description": "If it reaches you, you are back at the hall's entrance. It is waiting there too.",
+  "rarity": "rare",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 56,
+    "types": ["ghost"],
+    "category": "Lone Eye Modster",
+    "heightM": 0.4,
+    "weightKg": 0.1,
+    "entry": "Nobody has seen it move. Visitors it reaches wake up at the entrance with the exit just ahead, and start over. It is always a little closer than last time."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 6,
+    "fps": 6
+  }
+}
