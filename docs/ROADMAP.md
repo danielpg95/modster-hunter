@@ -1115,7 +1115,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Goal:** Saltbreeze Bay has 8 common, 5 uncommon, 3 rare and 1 legendary Modster, so each tier has more variety (asked by @victor-aguilars, 2026-11-03). 9 new Modsters join it: 5 common, 3 uncommon, 1 rare. Existing Modsters keep their id, dex number and rarity.
 - **Done when:**
   - [ ] @victor-aguilars approves a concept list for the biome (name, tier, one-line concept), and each `modster.json` matches it.
-  - [x] Each new Modster ships a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @victor-aguilars one at a time.
+  - [ ] Each new Modster ships a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @victor-aguilars one at a time.
   - [ ] `saltbreeze-bay/biome.json` lists all 17, and the odds table is checked.
   - [ ] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
   - [ ] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
