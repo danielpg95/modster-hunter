@@ -1113,10 +1113,10 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Depends on:** P5-70
 - **Size:** L
 - **Goal:** Saltbreeze Bay has 8 common, 5 uncommon, 3 rare and 1 legendary Modster, so each tier has more variety (asked by @victor-aguilars, 2026-11-03). 9 new Modsters join it: 5 common, 3 uncommon, 1 rare. Existing Modsters keep their id, dex number and rarity. None of the new Modsters is a water type, so the bay gets more variety; each has a twist built into its body and an idle with one action (asked by @victor-aguilars, 2026-11-16).
-- **Concepts** (approved by @victor-aguilars, 2026-11-16):
-  - Common: **Nudiflame** (fire/poison), a frilly sea slug with candle flames along its back. **Sandsnoot** (ground), a burrower of packed wet sand with a sand dollar shell. **Driftpiper** (flying/normal), a sandpiper with driftwood legs and beak. **Barnaclaw** (rock), a crab-like creature whose shell is a living barnacled rock. **Jellamp** (poison/psychic), a jellyfish with a frosted sea-glass bell and a hypnotic light.
-  - Uncommon: **Mantisle** (grass/flying), a gliding manta with a tiny palm island on its back. **Tuskfrost** (ice), a walrus with icicle tusks and whiskers. **Haunemone** (ghost), an anemone whose tentacles are ghostly little hands.
-  - Rare: **Squallbatross** (flying/electric), an albatross whose wings are storm clouds.
+- **Concepts** (approved by @victor-aguilars, 2026-11-16, replacing a first list that was rethought for quality):
+  - Common: **Emberpuff** (fire/flying), a puffin whose striped beak is a glowing bonfire ember. **Snatchgull** (dark/flying), a gull–raccoon snack thief with a bandit mask in its feathers. **Foamb** (fairy), a salt-marsh lamb whose fleece is sea foam. **Fiddlesnap** (normal), a fiddler crab whose big claw is a violin and small claw the bow. **Pearlpod** (bug/steel), a sea slater with mother-of-pearl plates.
+  - Uncommon: **Shrimpact** (fighting/electric), a mantis shrimp whose punch cracks with lightning. **Sailsting** (poison), a pompous man-o'-war whose float is a warship sail. **Coralwyrm** (rock/dragon), a tiny dragon with coral horns and a hermit crab living in one.
+  - Rare: **Tidewise** (psychic/ground), an ancient sea turtle whose shell is a glowing compass rose.
 - **Done when:**
   - [ ] @victor-aguilars approves a concept list for the biome (name, tier, one-line concept), and each `modster.json` matches it.
   - [ ] Each new Modster ships a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @victor-aguilars one at a time.
