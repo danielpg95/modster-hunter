@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "fuzzbolt",
+  "name": "Fuzzbolt",
+  "description": "A fluffy moth that soaks up static from sandstorms. You hear it crackle first.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 57,
+    "types": ["electric", "flying"],
+    "category": "Static Moth Modster",
+    "heightM": 0.3,
+    "weightKg": 0.2,
+    "entry": "After a sandstorm, Fuzzbolts are so charged their fluff stands straight up. Touching one is a bad idea, and they think that is hilarious."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

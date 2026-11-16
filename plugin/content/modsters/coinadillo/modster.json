@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "coinadillo",
+  "name": "Coinadillo",
+  "description": "Its armour is coins from a lost caravan. It bites every new one to make sure.",
+  "rarity": "uncommon",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 60,
+    "types": ["steel"],
+    "category": "Hoarder Modster",
+    "heightM": 0.4,
+    "weightKg": 8.0,
+    "entry": "Every sandstorm uncovers a few more caravan coins, and a Coinadillo finds them all. It polishes its favourite until it shines and will not trade it for anything."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

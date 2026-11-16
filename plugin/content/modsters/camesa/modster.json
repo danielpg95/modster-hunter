@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "camesa",
+  "name": "Camesa",
+  "description": "A kneeling camel whose humps are sandstone mesas. Birds think it's scenery.",
+  "rarity": "uncommon",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 58,
+    "types": ["rock"],
+    "category": "Mesa Camel Modster",
+    "heightM": 1.6,
+    "weightKg": 420.0,
+    "entry": "A Camesa can kneel in one spot for a whole season. Desert birds nest on its humps, and it is far too polite to move."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

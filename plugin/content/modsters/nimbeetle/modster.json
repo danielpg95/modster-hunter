@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "nimbeetle",
+  "name": "Nimbeetle",
+  "description": "Its shell is a tiny raincloud. At dawn it stands on its head to drink from it.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 53,
+    "types": ["water", "bug"],
+    "category": "Fog Drinker Modster",
+    "heightM": 0.2,
+    "weightKg": 0.3,
+    "entry": "Nimbeetles line the dune crests at sunrise, all upside down. Each one waits for a single drop to roll off its cloud, and none of them will share."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}
