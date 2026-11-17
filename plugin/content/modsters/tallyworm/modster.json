@@ -8,7 +8,7 @@
   "catchRate": null,
   "shinyChance": null,
   "dex": {
-    "number": 52,
+    "number": 70,
     "types": ["bug", "psychic"],
     "category": "Pull Toy Modster",
     "heightM": 1.2,

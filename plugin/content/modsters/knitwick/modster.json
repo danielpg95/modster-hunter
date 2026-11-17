@@ -8,7 +8,7 @@
   "catchRate": null,
   "shinyChance": null,
   "dex": {
-    "number": 50,
+    "number": 68,
     "types": ["bug", "fairy"],
     "category": "Darning Modster",
     "heightM": 0.5,

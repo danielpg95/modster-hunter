@@ -8,7 +8,7 @@
   "catchRate": null,
   "shinyChance": null,
   "dex": {
-    "number": 46,
+    "number": 64,
     "types": ["ground", "dark"],
     "category": "Nursery Modster",
     "heightM": 0.8,

@@ -8,7 +8,7 @@
   "catchRate": null,
   "shinyChance": null,
   "dex": {
-    "number": 54,
+    "number": 72,
     "types": ["bug", "fairy"],
     "category": "Masquerade Modster",
     "heightM": 1.6,

@@ -8,7 +8,7 @@
   "catchRate": null,
   "shinyChance": null,
   "dex": {
-    "number": 49,
+    "number": 67,
     "types": ["water", "dark"],
     "category": "Octopus Modster",
     "heightM": 1.1,

@@ -8,7 +8,7 @@
   "catchRate": null,
   "shinyChance": null,
   "dex": {
-    "number": 47,
+    "number": 65,
     "types": ["ghost", "fighting"],
     "category": "Glove Modster",
     "heightM": 0.4,

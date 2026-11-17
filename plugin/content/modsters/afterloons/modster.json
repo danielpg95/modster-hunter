@@ -8,7 +8,7 @@
   "catchRate": null,
   "shinyChance": null,
   "dex": {
-    "number": 44,
+    "number": 62,
     "types": ["flying", "ghost"],
     "category": "Party Modster",
     "heightM": 0.9,

@@ -1,9 +1,9 @@
 # Session — 2026-11-03 — @victor-aguilars — P5-72 Grow the Whispering Forest roster to 8/5/3/1
 
 - **Task:** P5-72 — Grow the Whispering Forest roster to 8/5/3/1
-- **Branch:** `p5-72-forest-roster`
-- **Status at end:** in-review
-- **Last commit:** `c86911b`
+- **Branch:** `p5-72-forest-idles` (after `p5-72-forest-roster`, merged in #240)
+- **Status at end:** done
+- **Last commit:** `3bbc4c8`
 
 ## Goal for this session
 
@@ -22,13 +22,15 @@ Give every biome more variety per tier, starting with the forest.
 
 ## Problems and findings
 
-- Blinks are painted by hand, since most references had no usable blink pose.
-- Not yet checked in the Code tab, and idle animations have not been reviewed in motion by @victor-aguilars.
+- The first idles cut parts and shifted them, and @victor-aguilars rejected that look. Every frame now is a drawn pose from the reference, lined up on the rest pose, so Hushwren, Dartling, Otterfall and Murmurk have no blink.
+- Reducing a sheet to 62 colours with median cut smeared Murmurk's eye; fast octree with k-means keeps it clean.
+- @victor-aguilars approved the idles in motion from a GIF. Not checked in the Code tab.
 
 ## Next steps
 
-1. @victor-aguilars approves the seven idle animations in the PR, then the last item is ticked and the task closes.
-2. Start P5-73 to P5-75 with concept lists that avoid ball shapes and vary types.
+1. @victor-aguilars merges PR #241.
+2. Claim P5-73 (Crystal Grotto, suggested as smallest) with `claim-task`, then pitch a concept list: no ball shapes, real animals as a base, varied types. Use whole drawn poses as idle frames.
+3. Try the new forest Modsters in the Code tab; this has not been done.
 
 ## Open questions
 

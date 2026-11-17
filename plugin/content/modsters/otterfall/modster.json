@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "otterfall",
   "name": "Otterfall",
-  "description": "Its tail is running water that never stops, so a small creek follows it wherever it goes.",
+  "description": "A very polite river creature with a dish of water in its head. Every bow spills a small waterfall.",
   "rarity": "uncommon",
   "maxAttempts": null,
   "catchRate": null,
@@ -10,10 +10,10 @@
   "dex": {
     "number": 42,
     "types": ["water", "normal"],
-    "category": "Stream Tail Modster",
+    "category": "Bowing Stream Modster",
     "heightM": 0.9,
     "weightKg": 8.5,
-    "entry": "Forest streams that appear overnight are usually an Otterfall out for a walk. It carries its favourite river stones in its paws, and it stacks them wherever it stops to rest."
+    "entry": "Forest streams that appear overnight are usually an Otterfall saying hello. It bows to everyone it meets, then sits by the water until its dish is full again."
   },
   "desktopSprite": {
     "file": "desktop.png",

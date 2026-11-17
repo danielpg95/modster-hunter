@@ -8,7 +8,7 @@
   "catchRate": null,
   "shinyChance": null,
   "dex": {
-    "number": 45,
+    "number": 63,
     "types": ["fairy", "dark"],
     "category": "Plush Modster",
     "heightM": 0.45,

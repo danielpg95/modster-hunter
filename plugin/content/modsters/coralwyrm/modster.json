@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "coralwyrm",
+  "name": "Coralwyrm",
+  "description": "A tiny dragon with coral horns. A hermit crab lives in one, and it is not impressed.",
+  "rarity": "uncommon",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 51,
+    "types": ["rock", "dragon"],
+    "category": "Coral Dragon Modster",
+    "heightM": 0.6,
+    "weightKg": 18.0,
+    "entry": "A Coralwyrm practises its roar on the reef at low tide. The roar is still a squeak, and the hermit crab in its horn makes sure it knows."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

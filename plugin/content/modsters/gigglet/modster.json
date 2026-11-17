@@ -8,7 +8,7 @@
   "catchRate": null,
   "shinyChance": null,
   "dex": {
-    "number": 57,
+    "number": 75,
     "types": ["dark", "fairy"],
     "category": "Wild Card Modster",
     "heightM": 1.2,

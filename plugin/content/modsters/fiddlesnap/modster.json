@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "fiddlesnap",
+  "name": "Fiddlesnap",
+  "description": "Its big claw is a violin. It plays to the tide every evening so it will come back.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 47,
+    "types": ["normal"],
+    "category": "Fiddler Modster",
+    "heightM": 0.2,
+    "weightKg": 0.4,
+    "entry": "A Fiddlesnap takes its music very seriously. The tide has come back every evening it has played, and it sees no reason to stop now."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}
