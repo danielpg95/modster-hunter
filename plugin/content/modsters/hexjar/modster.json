@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "hexjar",
+  "name": "Hexjar",
+  "description": "Its lid rattles when you walk past. Something inside is counting to six.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 66,
+    "types": ["poison", "ghost"],
+    "category": "Pantry Modster",
+    "heightM": 0.35,
+    "weightKg": 2.5,
+    "entry": "There is always a trail of crumbs leading to a Hexjar, and none leading away. Whatever lives inside has six eyes and a very sweet tooth."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "afterloons",
+  "name": "Afterloons",
+  "description": "If the room feels stuffy, look up. Two balloons are smiling, a little fuller than before.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 62,
+    "types": ["flying", "ghost"],
+    "category": "Party Modster",
+    "heightM": 0.9,
+    "weightKg": 0.02,
+    "entry": "No one has seen an Afterloon fully deflate. When the soft one starts to sag, the air in the hall gets thin, and by morning both are round again."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

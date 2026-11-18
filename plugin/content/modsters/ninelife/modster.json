@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "ninelife",
+  "name": "Ninelife",
+  "description": "It has eight lives and wants nine. It thinks you won't miss one.",
+  "rarity": "uncommon",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 69,
+    "types": ["dark", "psychic"],
+    "category": "Candle Cat Modster",
+    "heightM": 0.5,
+    "weightKg": 3.5,
+    "entry": "Each of its tails holds a life, lit like a candle. One went out long ago. It curls up next to sleeping visitors, and the snuffed tail sits very close to their face."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

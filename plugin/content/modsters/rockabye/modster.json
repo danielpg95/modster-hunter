@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "rockabye",
+  "name": "Rockabye",
+  "description": "It rocks a little faster when you come near. It would love for you to climb on.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 64,
+    "types": ["ground", "dark"],
+    "category": "Nursery Modster",
+    "heightM": 0.8,
+    "weightKg": 9,
+    "entry": "Toymakers swear they carved it with a painted smile. Nobody knows where the teeth came from, or whose they were."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 4,
+    "fps": 3
+  }
+}

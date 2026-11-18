@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "sevenpus",
+  "name": "Sevenpus",
+  "description": "It counts its arms every night and comes up one short. It is sure you have the spare.",
+  "rarity": "uncommon",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 67,
+    "types": ["water", "dark"],
+    "category": "Octopus Modster",
+    "heightM": 1.1,
+    "weightKg": 12,
+    "entry": "Every night it counts its arms by tapping them on the floor. One, two, ... seven. Then it looks at you and waits for eight."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

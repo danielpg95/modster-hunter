@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "knitwick",
+  "name": "Knitwick",
+  "description": "Hold still. It is almost done with your new face.",
+  "rarity": "uncommon",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 68,
+    "types": ["bug", "fairy"],
+    "category": "Darning Modster",
+    "heightM": 0.5,
+    "weightKg": 1.2,
+    "entry": "It looks up from its sewing only to study you. Each stitch makes the face in its lap look a little more like yours. It would very much like you to try it on."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

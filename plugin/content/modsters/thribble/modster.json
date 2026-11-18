@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "thribble",
+  "name": "Thribble",
+  "description": "Its heads take turns sleeping, so someone is always watching you.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 63,
+    "types": ["fairy", "dark"],
+    "category": "Plush Modster",
+    "heightM": 0.45,
+    "weightKg": 0.6,
+    "entry": "The two sleeping heads whisper about what the waking one saw. Children who keep a Thribble say it tells them everything they did that day."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

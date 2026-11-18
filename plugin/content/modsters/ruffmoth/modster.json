@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "ruffmoth",
+  "name": "Ruffmoth",
+  "description": "Its painted smile never moves. The cracks in it do.",
+  "rarity": "rare",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 72,
+    "types": ["bug", "fairy"],
+    "category": "Masquerade Modster",
+    "heightM": 1.6,
+    "weightKg": 8,
+    "entry": "Nobody knows what is under its mask. Those who lift it find another mask underneath, smiling a little wider."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 6
+  }
+}

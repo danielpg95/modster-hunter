@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "glovelorn",
+  "name": "Glovelorn",
+  "description": "It waves with one joint too many, and it is so happy to see you.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 65,
+    "types": ["ghost", "fighting"],
+    "category": "Glove Modster",
+    "heightM": 0.4,
+    "weightKg": 0.1,
+    "entry": "Every lost-and-found box in the hall has one. Reach in for your own glove and it reaches back, and it never wants to give your hand up again."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}
