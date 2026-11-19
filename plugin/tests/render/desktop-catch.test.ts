@@ -15,6 +15,9 @@ const files = catcherFiles()
 const jar = JSON.parse(files['catchers/jar/catcher.json'] ?? '{}') as Catcher
 const jarSprite = JSON.parse(files['catchers/jar/sprite.sprite.json'] ?? '{}') as Sprite
 const sprite = validSprite() as unknown as Sprite
+const net = JSON.parse(files['catchers/net/catcher.json'] ?? '{}') as Catcher
+const netSprite = JSON.parse(files['catchers/net/sprite.sprite.json'] ?? '{}') as Sprite
+const ropeNet: Catcher = { ...net, desktopSprite: { file: 'desktop.png', frames: 1, rimColor: '#d89953' } }
 const glowJar: Catcher = { ...jar, desktopSprite: { file: 'desktop.png', frames: 2, glowColor: '#FFD54F', lidRows: 8 } }
 
 const count = (svg: string, text: string): number => svg.split(text).length - 1
@@ -88,6 +91,50 @@ describe('catchSvg with desktop sheets', () => {
       expect(svg).toBeDefined()
       expect((svg ?? '').length).toBeLessThan(DESKTOP.svgMaxChars)
     }
+  })
+})
+
+describe('a desktop net’s rope rim (0059)', () => {
+  const modster = { desktop: desktopSheetOf(100, 124, 4) }
+
+  test('the edge is a scalloped rope in rimColor, a dark outline and light twists, shaped once and reused', () => {
+    const art = prepareDesktopCatch(ropeNet, { desktop: desktopSheetOf(40, 40, 1) }, modster, 4)
+    const svg = (art && catchSvg(art, 'missed', 1, { scale: 1 })) ?? ''
+    expect(count(svg, '<path id="rope" d="')).toBe(1)
+    expect(svg).toMatch(/<path id="rope" d="M[^"]*Q[^"]*Q[^"]*Q/)
+    expect(svg).toContain('<use href="#rope" fill="url(#tile)"/>')
+    expect(svg).toContain('stroke="#d89953"')
+    expect(svg).toContain('stroke="#412e19"')
+    expect(svg).toContain('stroke-dasharray')
+    expect(svg).toContain('marker-mid="url(#tie)"')
+    // No flat ring and no plus-shaped knot
+    expect(svg).not.toContain('fill-rule="evenodd"')
+    expect(svg).not.toContain('M0 0h1v1h-1z')
+  })
+
+  test('a catch ties a rope knot on top; a miss never shows one', () => {
+    const art = prepareDesktopCatch(ropeNet, { desktop: desktopSheetOf(40, 40, 1) }, modster, 4)
+    const knot = /<g display="none" transform="[^"]*">(<animate attributeName="display" values="([^"]*)"[^>]*\/>)?<animateTransform[^>]*\/><g shape-rendering="geometricPrecision" stroke-linecap="round" fill="none">/
+    const caught = ((art && catchSvg(art, 'caught', CATCH.rocksToCatch, { scale: 1 })) ?? '').match(knot)
+    expect(caught?.[2]).toContain('inline')
+    const missed = ((art && catchSvg(art, 'missed', 1, { scale: 1 })) ?? '').match(knot)
+    expect(missed?.[2] ?? 'none').not.toContain('inline')
+  })
+
+  test('a terminal net keeps its ring, and a desktop net without rimColor has no edge', () => {
+    const terminal = prepareDesktopCatch(net, { sprite: netSprite }, modster, 4)
+    expect((terminal && catchSvg(terminal, 'missed', 1, { scale: 1 })) ?? '').toContain('fill-rule="evenodd"')
+    const plain = prepareDesktopCatch({ ...net, desktopSprite: { file: 'desktop.png', frames: 1 } }, { desktop: desktopSheetOf(40, 40, 1) }, modster, 4)
+    const svg = (plain && catchSvg(plain, 'missed', 1, { scale: 1 })) ?? ''
+    expect(svg).not.toContain('data-part="rope"')
+    expect(svg).not.toContain('fill-rule="evenodd"')
+  })
+
+  test('the largest Modster under a rope net stays under the Svg limit', () => {
+    const { modster: m, catcher } = CONTENT.desktop
+    const big = desktopSheetOf(m.widthMax, m.heightMax, m.framesMax, {}, m.bytesMax)
+    const art = prepareDesktopCatch(ropeNet, { desktop: desktopSheetOf(catcher.widthMax, catcher.heightMax, 1, {}, catcher.bytesMax) }, { desktop: big }, 8)
+    for (const outcome of ['caught', 'missed'] as const) expect(((art && catchSvg(art, outcome, CATCH.rocksToCatch, { scale: 1 })) ?? 'x'.repeat(DESKTOP.svgMaxChars)).length).toBeLessThan(DESKTOP.svgMaxChars)
   })
 })
 
