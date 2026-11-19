@@ -27,6 +27,7 @@ Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
 - **P5-73** — Grow the Crystal Grotto roster to 8/5/3/1
+- **P5-79** — Choose the biome in settings
 - **P5-01** — Shiny variants
 - **P5-03** — Extended stats and milestones
 - **P4-07** — In-pane field editor
