@@ -1161,7 +1161,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
   - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
-#### [ ] P5-79 — Desktop art for the lantern, net and seed pod catchers
+#### [ ] P5-80 — Desktop art for the lantern, net and seed pod catchers
 - **Depends on:** P5-53
 - **Size:** M
 - **Goal:** every built-in catcher has desktop art: the lantern, the net and the seed pod get desktop sheets in their current designs, so a desktop throw stops falling back to their terminal sprites (asked by @danielpg95, 2026-11-18). The glass jar and the puzzle cube already have theirs; the terminal sprites stay as they are.
