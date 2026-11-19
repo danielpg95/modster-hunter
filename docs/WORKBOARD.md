@@ -20,6 +20,7 @@ this file lists only tasks someone has claimed.
 | P5-76 | @danielpg95 | in-progress | p5-76-shuffleback-hall | 2026-11-11 | 2026-11-16 | Check Shuffleback Hall in the Code tab (band, encounter pane, Biomes tab), then commit and open the one PR for P5-76 to P5-78 |
 | P5-77 | @danielpg95 | in-progress | p5-76-shuffleback-hall | 2026-11-13 | 2026-11-16 | Check Shuffleback Hall in the Code tab (band, encounter pane, Biomes tab), then commit and open the one PR for P5-76 to P5-78 |
 | P5-78 | @danielpg95 | in-progress | p5-76-shuffleback-hall | 2026-11-13 | 2026-11-16 | Check Shuffleback Hall in the Code tab (band, encounter pane, Biomes tab), then commit and open the one PR for P5-76 to P5-78 |
+| P5-79 | @danielpg95 | in-progress | p5-79-biome-selector | 2026-11-19 | 2026-11-19 | Get the decision amending 0006 (biome option) accepted, then build the Settings row |
 
 ## Up next
 
@@ -27,7 +28,6 @@ Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
 - **P5-73** — Grow the Crystal Grotto roster to 8/5/3/1
-- **P5-79** — Choose the biome in settings
 - **P5-01** — Shiny variants
 - **P5-03** — Extended stats and milestones
 - **P4-07** — In-pane field editor
