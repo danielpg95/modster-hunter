@@ -71,3 +71,4 @@ settled questions and avoid making assumptions about open ones.
 | [0055](0055-desktop-caught-hold.md) | On desktop, a caught catcher holds before it fades | Accepted |
 | [0056](0056-desktop-fit-height.md) | On desktop, every Modster's art fits a set height | Accepted (collection size amended by 0057) |
 | [0057](0057-desktop-collection-fit.md) | On desktop, the collection fits every Modster to Kingbolt's height | Accepted |
+| [0058](0058-biome-option.md) | A `biome` option picks random or one fixed biome | Proposed (amends 0006, 0040) |
