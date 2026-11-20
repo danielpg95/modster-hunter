@@ -5,6 +5,7 @@ describe('setting rows (0040)', () => {
   test('lists the options in 0040 point 2\'s order', () => {
     expect(SETTING_SPECS.map((spec) => spec.label)).toEqual([
       'Auto start',
+      'Keep last biome',
       'Show in the band',
       'Encounter pane',
       'Show in the spinner',
@@ -26,6 +27,8 @@ describe('setting rows (0040)', () => {
 
   test('o flips a toggle', () => {
     expect(nextSettingValue('autoStart', true)).toBe(false)
+    expect(SETTING_DEFAULTS.keepBiome).toBe(false)
+    expect(nextSettingValue('keepBiome', false)).toBe(true)
     expect(nextSettingValue('showIdleScene', false)).toBe(true)
   })
 

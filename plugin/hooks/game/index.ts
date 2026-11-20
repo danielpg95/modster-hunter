@@ -13,6 +13,7 @@ export {
 } from './encounter-machine'
 export { catchBeatAt, throwingMs, type CatchBeatAt, type CatchOutcome } from './catch-timeline'
 export { formatOddsTable, oddsTable, type OddsRow } from './odds-table'
+export { chooseBiome } from './choose-biome'
 export { pickBiome } from './pick-biome'
 export { encounterPool, pickEncounter, tierChances, type PoolMember } from './pick-encounter'
 export { pickWeighted } from './pick-weighted'

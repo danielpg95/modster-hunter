@@ -6,6 +6,7 @@ import type { BandLine } from './band-view'
 
 export type SettingField =
   | 'autoStart'
+  | 'keepBiome'
   | 'showInBand'
   | 'encounterPane'
   | 'showInSpinner'
@@ -28,9 +29,10 @@ interface SettingSpec {
   choices?: readonly string[]
 }
 
-/** The rows in 0040 point 2's order. */
+/** The rows in 0040 point 2's order, with 0060's Keep last biome after Auto start. */
 export const SETTING_SPECS: readonly SettingSpec[] = [
   { field: 'autoStart', label: 'Auto start', help: 'Start hunting every session.', kind: 'toggle' },
+  { field: 'keepBiome', label: 'Keep last biome', help: 'Start each session in the last biome you played, not a random one.', kind: 'toggle' },
   { field: 'showInBand', label: 'Show in the band', help: 'Draw the game above the prompt.', kind: 'toggle' },
   { field: 'encounterPane', label: 'Encounter pane', help: 'The bigger encounter pane: never, after /modsters pane, or every session.', kind: 'choice', choices: ['off', 'when-opened', 'always'] },
   { field: 'showInSpinner', label: 'Show in the spinner', help: 'Name the Modster in the spinner while Claude works.', kind: 'toggle' },
@@ -44,6 +46,7 @@ export const SETTING_SPECS: readonly SettingSpec[] = [
 /** Each field's value when the option was never set: the manifest's defaults (0041 for `autoStart`). */
 export const SETTING_DEFAULTS: SettingValues = {
   autoStart: true,
+  keepBiome: false,
   showInBand: true,
   encounterPane: 'when-opened',
   showInSpinner: true,

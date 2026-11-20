@@ -1,6 +1,6 @@
 # 0040 — `/modsters settings` opens a Settings tab where players change every option
 
-- **Status:** Accepted (amends 0023 point 7, 0038 points 6 and 7)
+- **Status:** Accepted (amends 0023 point 7, 0038 points 6 and 7; point 2 amended by 0060)
 - **Date:** 2026-10-22
 - **Decided by:** @danielpg95 (accepted with PR #154; proposed by @victor-aguilars, drafted by Claude)
 
