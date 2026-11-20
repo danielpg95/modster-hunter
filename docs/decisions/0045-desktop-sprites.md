@@ -1,6 +1,6 @@
 # 0045 — Desktop first: new built-in art is hi-res pixel art for the Desktop app
 
-- **Status:** Accepted
+- **Status:** Accepted (amended by 0061: a Collection card embeds frame 0 only)
 - **Date:** 2026-10-28
 - **Decided by:** @danielpg95 (P5-43). First proposed by @victor-aguilars on
   2026-10-27 as an optional 2× or 3× copy of the terminal sprite; reworked

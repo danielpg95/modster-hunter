@@ -82,7 +82,9 @@ import {
   sceneCells,
   settingsLines,
   pixelsToSvg,
+  cardsInBudget,
   desktopSheetSvg,
+  firstFrameSheet,
   sheetFitScale,
   opaqueBounds,
   spriteCells,
@@ -317,6 +319,8 @@ let resetArmed = false
 const stillSvgs = new Map<string, { sprite: Sprite; svg: string }>()
 // Desktop sheets' Svgs by Modster, scale and look (0045 point 9)
 const sheetSvgs = new Map<string, { sheet: DesktopSheet; svg: string }>()
+// A card's sheet cut to frame 0 (0061), made once per sheet
+const firstFrames = new WeakMap<DesktopSheet, DesktopSheet>()
 const catcherPreviewSvgs = new Map<string, { catcher: LoadedCatcher; modster: LoadedModster; preview: CatcherPreview | undefined }>()
 let collectionSite: string | undefined
 let collectionSpriteModster: DrawnModster | undefined
@@ -1421,12 +1425,15 @@ export const register: Register = (on, options) => {
           const entryLoaded = content?.modsters.get(entry.id) ?? content?.off.modsters.get(entry.id)
           return entryLoaded ? cardArt(entryLoaded, entry.record !== undefined, thumbPx, { width: cardColumns * DESKTOP.columnPx, height: thumbRows * DESKTOP.rowPx }) : undefined
         })
-        // A page over the budget drops its sprites rather than have the whole drawing refused
-        const cardChars = arts.reduce((sum, art) => sum + (art?.source.length ?? 0), 0)
-        const drawThumbs = cardChars <= COLLECTION.cardSvgCharsMax
+        // A page over the budget drops the cards that don't fit rather than have the whole drawing refused (0054 point 6)
+        const kept = cardsInBudget(
+          arts.map((art) => art?.source.length),
+          shown.findIndex((entry) => entry.id === selected.id),
+          COLLECTION.cardSvgCharsMax,
+        )
         const cards = shown.map((entry, at) => {
           const isSelected = entry.id === selected.id
-          const art = drawThumbs ? arts[at] : undefined
+          const art = kept[at] ? arts[at] : undefined
           return (
             <Box key={`card-${entry.id}`} flexDirection="column" alignItems="center" width={cardColumns} paddingY={1} {...(isSelected ? { backgroundColor: COLLECTION.cardSelectedColor } : {})}>
               <Box key="thumb" width={cardColumns} height={thumbRows} alignItems="center" justifyContent="center">
@@ -2748,11 +2755,21 @@ function cardArt(loaded: LoadedModster, caught: boolean, thumbPx: number, room: 
   const fit = (width: number, height: number) => Math.min(thumbPx / width, thumbPx / height)
   if (loaded.desktop) {
     const scale = sheetFitScale(loaded.desktop, { artWidth: thumbPx, artHeight: thumbPx, frameWidth: room.width, frameHeight: room.height })
-    return sheetArt(loaded.modster, loaded.desktop, scale, caught ? undefined : COLLECTION.silhouetteColor, true)
+    return sheetArt(loaded.modster, firstFrameOf(loaded.desktop), scale, caught ? undefined : COLLECTION.silhouetteColor, true)
   }
   if (!hasSprite(loaded)) return undefined
   const scale = fit(loaded.sprite.width, loaded.sprite.height)
   return { source: caught ? stillSvgFor(loaded) : silhouetteSvgFor(loaded), width: Math.round(loaded.sprite.width * scale), height: Math.round(loaded.sprite.height * scale) }
+}
+
+/** `sheet` as only its frame 0, which is all a card shows (0061). */
+function firstFrameOf(sheet: DesktopSheet): DesktopSheet {
+  let one = firstFrames.get(sheet)
+  if (!one) {
+    one = firstFrameSheet(sheet)
+    firstFrames.set(sheet, one)
+  }
+  return one
 }
 
 /** A terminal sprite's first frame as an Svg: a caught Modster's card (0054). */

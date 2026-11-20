@@ -1096,7 +1096,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Each new Modster ships a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @victor-aguilars one at a time.
   - [ ] `crystal-grotto/biome.json` lists all 17, and the odds table is checked.
   - [ ] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
-  - [ ] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
+  - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
 #### [ ] P5-74 — Grow the Dustwind Expanse roster to 8/5/3/1
 - **Depends on:** P5-70
@@ -1107,7 +1107,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [ ] Each new Modster ships a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @victor-aguilars one at a time.
   - [ ] `dustwind-expanse/biome.json` lists all 17, and the odds table is checked.
   - [ ] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
-  - [ ] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
+  - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
 #### [x] P5-75 — Grow the Saltbreeze Bay roster to 8/5/3/1
 - **Depends on:** P5-70
@@ -1184,16 +1184,16 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
   - [x] Added on the way (asked by @danielpg95, 2026-11-19): on desktop, a net's `rimColor` draws its edge as a rope, scalloped between tie knots, with a rope knot on a catch, instead of 0043's flat ring and plus (decision 0059). Terminal nets keep the ring; tests cover both and the Svg limit.
 
-#### [ ] P5-81 — Collection cards fit the page budget
+#### [x] P5-81 — Collection cards fit the page budget
 - **Depends on:** P5-64
 - **Size:** S
 - **Goal:** decision 0054 point 6 (amended): the desktop Collection tab shows every card's art, a silhouette or a still sprite, instead of `?` on whole pages. Today each card embeds its Modster's full desktop sheet, every frame, so with 66 sheets every 12-card page passes `cardSvgCharsMax` (171k–380k) and all its thumbnails are dropped (found by @danielpg95, 2026-11-20).
-- **Done when:**
-  - [ ] A card's Svg holds only the frame it shows (frame 0), not the whole sheet; the detail's art still animates.
-  - [ ] A page over the budget drops only the cards that don't fit, not every thumbnail on it.
-  - [ ] Tests under `plugin/tests/` cover a card's one-frame Svg and a page over the budget keeping the cards that fit.
-  - [ ] Checked in the Code tab: every page of the built-in roster shows art on every card, caught and uncaught.
-  - [ ] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
+- **Done when:** (decision 0061: a card embeds a re-encoded PNG of frame 0)
+  - [x] A card's Svg holds only the frame it shows (frame 0), not the whole sheet; the detail's art still animates.
+  - [x] A page over the budget drops only the cards that don't fit, not every thumbnail on it.
+  - [x] Tests under `plugin/tests/` cover a card's one-frame Svg and a page over the budget keeping the cards that fit.
+  - [x] Checked in the Code tab: every page of the built-in roster shows art on every card, caught and uncaught.
+  - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
 ---
 
