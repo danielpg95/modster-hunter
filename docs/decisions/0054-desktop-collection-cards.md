@@ -1,7 +1,7 @@
 # 0054 — On desktop, the collection pane fits the dock: cards, tiles and controls under what they change
 
-- **Status:** Proposed — settled by P5-64 / @victor-aguilars
-- **Date:** 2026-11-01
+- **Status:** Accepted (extends 0040 with Reset to defaults; point 6 amended before acceptance, P5-81)
+- **Date:** 2026-11-01 (accepted 2026-11-20)
 - **Proposed by:** @victor-aguilars, drafted by Claude
 
 ## Context
@@ -56,8 +56,12 @@ Option 2 (@victor-aguilars, 2026-11-01, after trying each in the Code tab):
    selected card has a `cardSelectedColor` background.
 5. **Cards hold still.** A caught card shows its first frame in colour, an
    uncaught one a gray silhouette; only the selected Modster moves.
-6. **A page whose sprites pass `cardSvgCharsMax` (150,000 characters) drops
-   them**, and the cards show `?`, so the pane still draws.
+6. **A card's Svg holds only the frame it shows** (frame 0), not the whole
+   sheet. A page whose sprites still pass `cardSvgCharsMax` (150,000
+   characters) drops only the cards that don't fit, which show `?`, so the
+   pane still draws. (Amended before acceptance, 2026-11-20, by @danielpg95:
+   each card embedded its whole sheet, so with 66 sheets every 12-card page
+   passed the budget and showed `?` on every card. P5-81 does the work.)
 7. **The keys stay:** `k` and `j` move the selection across pages, `o` turns the
    selected Modster off or on (0032).
 8. **A pane at least `gridMinColumns` (70) wide** puts the grid beside the

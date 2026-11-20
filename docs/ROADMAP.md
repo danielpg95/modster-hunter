@@ -989,7 +989,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
   - [x] Checked in the Code tab: the band, the encounter pane and the Collection tab (by @danielpg95 with 0.1.24, 2026-11-02).
 
-#### [ ] P5-64 — Desktop collection pane that fits the dock
+#### [x] P5-64 — Desktop collection pane that fits the dock
 - **Depends on:** P5-38, P5-61
 - **Size:** L
 - **Goal:** decision 0054 (Proposed): on the Desktop app, the collection pane fits the Code tab's ~30-column dock: the Collection tab as a page of cards under the selected Modster, then Stats and Biomes without cut columns or nested scrolling, Turn off and Settings controls placed under what they change, and Reset to defaults (asked by @victor-aguilars, 2026-11-01).
@@ -999,7 +999,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Stats fits the dock with no `…` cuts; Biomes shows its scene, list and odds without a list scrolling inside the pane. Checked in the Code tab.
   - [x] On desktop Turn off sits under the Modster or biome it acts on, named; Settings options are value buttons with a help line; Reset to defaults asks first and writes only what differs (0054 points 11–13). Render tests cover them, and @victor-aguilars checked them in the Code tab.
   - [x] `docs/DEVELOPMENT.md` says how to see local changes in the Code tab and notes the dock width and the drawing size limit.
-  - [ ] 0054 is accepted or reworked; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
+  - [x] 0054 is accepted or reworked; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
 #### [x] P5-65 — Hold the caught catcher before it fades
 - **Depends on:** P5-58
@@ -1187,7 +1187,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 #### [ ] P5-81 — Collection cards fit the page budget
 - **Depends on:** P5-64
 - **Size:** S
-- **Goal:** the desktop Collection tab shows every card's art, a silhouette or a still sprite, instead of `?` on whole pages. Today each card embeds its Modster's full desktop sheet, every frame, so with 66 sheets every 12-card page passes `cardSvgCharsMax` (171k–380k) and all its thumbnails are dropped (found by @danielpg95, 2026-11-20).
+- **Goal:** decision 0054 point 6 (amended): the desktop Collection tab shows every card's art, a silhouette or a still sprite, instead of `?` on whole pages. Today each card embeds its Modster's full desktop sheet, every frame, so with 66 sheets every 12-card page passes `cardSvgCharsMax` (171k–380k) and all its thumbnails are dropped (found by @danielpg95, 2026-11-20).
 - **Done when:**
   - [ ] A card's Svg holds only the frame it shows (frame 0), not the whole sheet; the detail's art still animates.
   - [ ] A page over the budget drops only the cards that don't fit, not every thumbnail on it.
