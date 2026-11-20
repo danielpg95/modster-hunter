@@ -48,6 +48,14 @@ export const CATCH = {
   stretchMarginPx: 2,
   /** Past this share of a `stretch` shape's radius, `rimIndex` draws the edge */
   rimFrom: 0.82,
+  /** A desktop net's rope edge (decision 0059): tie knots about this far apart along the dome */
+  ropeTiePx: 4,
+  /** How far the edge sags inward between ties, as a share of the radius */
+  ropeSag: 0.1,
+  /** The rope's width, its dark outline's width, and its knots' width, in terminal pixels */
+  ropeWidth: 1,
+  ropeOutline: 1.6,
+  ropeKnot: 1.7,
   /** A catch's sparkles: a white center that glints on dark terminals, deep gold arms that show on light ones */
   sparkleCore: '#ffffff',
   sparkleArms: '#e0a800',
