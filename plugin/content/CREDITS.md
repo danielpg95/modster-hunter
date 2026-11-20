@@ -109,7 +109,10 @@ The `.sprite.json` next to each sheet is generated from it with `npm run sprite`
 | `catchers/jar/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Glass jar, the default catcher (decision 0035); P5-29 |
 | `catchers/jar/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | The glass jar's desktop sheet (P5-53, decision 0045), reduced from @danielpg95's reference; its sealed blob glows with the caught Modster |
 | `catchers/pod/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Seed pod catcher (decision 0035); P5-29 |
+| `catchers/pod/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | The seed pod's desktop sheet (P5-80, decision 0045), reduced from @danielpg95's reference; its seam glows with the caught Modster |
 | `catchers/lantern/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Lantern catcher (decision 0035); P5-29 |
+| `catchers/lantern/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | The lantern's desktop sheet (P5-80, decision 0045), reduced from @danielpg95's reference; its flame glows with the caught Modster |
 | `catchers/net/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Net catcher, a rope tile with a rim (decision 0035); P5-29 |
+| `catchers/net/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | The net's desktop tile (P5-80, decision 0045), one seamless repeat cut from @danielpg95's reference; its edge is a rope (decision 0059) |
 | `catchers/puzzle-cube/sprite.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | Puzzle Cube catcher, scrambled until a catch solves it (decision 0036); P5-31 |
 | `catchers/puzzle-cube/desktop.png` | @danielpg95 (drawn with Claude Code) | CC BY 4.0 | The puzzle cube's desktop sheet (P5-47, decision 0045): a 3D-modelled cube with layers mid-turn while it rocks |

@@ -72,3 +72,4 @@ settled questions and avoid making assumptions about open ones.
 | [0056](0056-desktop-fit-height.md) | On desktop, every Modster's art fits a set height | Accepted (collection size amended by 0057) |
 | [0057](0057-desktop-collection-fit.md) | On desktop, the collection fits every Modster to Kingbolt's height | Accepted |
 | [0058](0058-biome-option.md) | A `biome` option picks random or one fixed biome | Accepted (amends 0006, 0040) |
+| [0059](0059-desktop-rope-rim.md) | On desktop, a net's rim is a rope | Accepted (amends 0043 point 5 for desktop sheets) |
