@@ -3,6 +3,8 @@ import type { On, UiPane } from 'claude-code'
 import { collectionForest } from './fixtures/collection-forest'
 import { oneModsterForest } from './fixtures/one-modster-forest'
 import { desktopOnlyForest } from './fixtures/desktop-only-forest'
+import { desktopRoster } from './fixtures/desktop-roster'
+import { decodePng } from '../hooks/vendor/png'
 import { stubContentFs } from './fixtures/stub-content-fs'
 import { sceneForest } from './fixtures/scene-forest'
 import { twoBiomes } from './fixtures/two-biomes'
@@ -702,6 +704,29 @@ describe('register: collection pane', () => {
     expect(detail).toContain('Mon 02')
     // One page holds all three, so there's nowhere to page to
     expect(await pane.find({ type: 'Text', text: 'Page 1/1' })).toBeDefined()
+    await pane.unmount()
+  })
+
+  test("on desktop a card embeds only its sheet's frame 0, caught or not, while the detail keeps the whole sheet (0061)", HUNTING, async ($, on) => {
+    await start($, on, () => [], desktopOnlyForest())
+    const pane = await mountPane($, DOCK, 'desktop')
+    const svgs = await pane.findAll({ type: 'Svg' })
+    const embeddedWidth = (svg: any) => decodePng(Uint8Array.from(atob(/base64,([^"]+)"/.exec(svg.props.source)![1]!), (c) => c.charCodeAt(0)), { maxWidth: 512, maxHeight: 512 }).width
+    // The sheet is two 32-wide frames: the detail carries both, the card one
+    expect(svgs.map(embeddedWidth).sort()).toEqual([32, 64])
+    expect(svgs.every((svg: any) => svg.props.source.includes(`flood-color="${COLLECTION.silhouetteColor}"`))).toBe(true)
+    await pane.unmount()
+  })
+
+  test('on desktop a page over the Svg budget keeps the cards that fit and shows ? on the rest (0054 point 6)', HUNTING, async ($, on) => {
+    await start($, on, () => [], desktopRoster(COLLECTION.cardsPerPageMax))
+    const pane = await mountPane($, DOCK, 'desktop')
+    const cards = (await pane.findAll({ type: 'Svg' })).slice(1)
+    const total = cards.reduce((sum: number, card: any) => sum + card.props.source.length, 0)
+    expect(cards.length).toBeGreaterThan(0)
+    expect(cards.length).toBeLessThan(COLLECTION.cardsPerPageMax)
+    expect(total).toBeLessThanOrEqual(COLLECTION.cardSvgCharsMax)
+    expect((await pane.findAll({ type: 'Text', text: /^\?$/ })).length).toBe(COLLECTION.cardsPerPageMax - cards.length)
     await pane.unmount()
   })
 })

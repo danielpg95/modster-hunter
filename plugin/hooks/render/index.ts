@@ -13,6 +13,8 @@ export { idleTagMarkup, idleTagSize, idleTagSvg, type IdleTag } from './idle-tag
 export { DEFAULT_COLOR, pixelsToCells, type Frame } from './pixels-to-cells'
 export { pixelsToSvg, type SvgOptions } from './pixels-to-svg'
 export { desktopSheetSvg, type DesktopSheetSvgOptions } from './desktop-sheet-svg'
+export { firstFrameSheet } from './first-frame-sheet'
+export { cardsInBudget } from './cards-in-budget'
 export { sheetFitScale, type SheetFitBox } from './sheet-fit'
 export { opaqueBounds, type OpaqueBounds } from './opaque-bounds'
 export { paneHint, type PaneHintInput } from './pane-hint'
