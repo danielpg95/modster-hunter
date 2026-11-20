@@ -2,6 +2,7 @@ import { describe, expect, mock, test } from 'claude-code/testing'
 import type { On, UiPane } from 'claude-code'
 import { oneModsterForest } from './fixtures/one-modster-forest'
 import { stubContentFs } from './fixtures/stub-content-fs'
+import { twoBiomes } from './fixtures/two-biomes'
 
 // The Settings tab (decision 0040): every option as a row, k/j to choose, o to
 // change it through /config, applied at once. The one-Modster forest spawns after
@@ -22,7 +23,7 @@ interface Seen {
 }
 
 /** Starts a session on the one-Modster forest with a fake clock; `config.set` answers as /config would, or refuses. */
-async function start($: any, on: On, init: { denyConfig?: string; panes?: () => UiPane[] } = {}) {
+async function start($: any, on: On, init: { denyConfig?: string; panes?: () => UiPane[]; files?: Record<string, string> } = {}) {
   const seen: Seen = { opens: [], configSets: [], toasts: [], store: structuredClone(WELCOMED), state: {} }
   on('session.start', ($, e) => ({ cwd: e.cwd }))
   on('command.register', ($, e) => ({ value: { command: e.name } }))
@@ -55,7 +56,7 @@ async function start($: any, on: On, init: { denyConfig?: string; panes?: () => 
     const { Box } = $.ui.resolve(e)
     return <Box />
   })
-  const { toasts } = stubContentFs(on, oneModsterForest())
+  const { toasts } = stubContentFs(on, init.files ?? oneModsterForest())
   seen.toasts = toasts
   const clock = mock.clock(on)
   await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' })
@@ -97,10 +98,12 @@ describe('register: Settings tab', () => {
   test('j and k move the selection; o changes the selected row', async ($, on) => {
     const { seen } = await start($, on)
     const pane = await settingsPane($)
+    // Biome sits after Auto start (0058 point 3)
     await pane.press({ key: 'setting-down' })
-    expect(await row(pane, 'showInBand')).toMatch(/^▸ /)
+    expect(await row(pane, 'biome')).toMatch(/^▸ /)
     await pane.press({ key: 'setting-up' })
     expect(await row(pane, 'autoStart')).toMatch(/^▸ /)
+    await pane.press({ key: 'setting-down' })
     await pane.press({ key: 'setting-down' })
     await pane.press({ key: 'setting-change' })
     expect(seen.configSets).toEqual(['modster-hunter.showInBand=false'])
@@ -286,5 +289,60 @@ describe('register: Settings tab', () => {
   test('the session biome is kept in $.state, so a reload plays on in it', async ($, on) => {
     const { seen } = await start($, on)
     expect(seen.state.biomeId).toBe('whispering-forest')
+  })
+  test('the Biome row moves from random through each biome by name, and a fixed one plays at once (0058)', { options: { biome: 'whispering-forest' } }, async ($, on) => {
+    const { seen } = await start($, on, { files: twoBiomes() })
+    expect(seen.state.biomeId).toBe('whispering-forest')
+    const pane = await settingsPane($)
+    expect(await row(pane, 'biome')).toMatch(/^ {2}Biome +Whispering Forest$/)
+    // The last biome by name wraps to random, which keeps the biome being played
+    await change(pane, 'biome')
+    expect(await row(pane, 'biome')).toMatch(/random$/)
+    expect(seen.state.biomeId).toBe('whispering-forest')
+    await change(pane, 'biome')
+    expect(seen.configSets).toEqual(['modster-hunter.biome=random', 'modster-hunter.biome=ash-dunes'])
+    expect(await row(pane, 'biome')).toMatch(/Ash Dunes$/)
+    expect(seen.state.biomeId).toBe('ash-dunes')
+    expect(seen.toasts.at(-1)).toBe('Modster Hunter: now in Ash Dunes')
+    await pane.unmount()
+  })
+
+  test('a fixed biome is played from the session start', { options: { biome: 'ash-dunes' } }, async ($, on) => {
+    const { seen } = await start($, on, { files: twoBiomes() })
+    expect(seen.state.biomeId).toBe('ash-dunes')
+  })
+
+  test('a fixed biome that does not load falls back to a random one and says so (0058 point 5)', { options: { biome: 'marsh' } }, async ($, on) => {
+    const { seen } = await start($, on)
+    expect(seen.state.biomeId).toBe('whispering-forest')
+    expect(seen.toasts).toContain("Modster Hunter: marsh isn't available · playing a random biome")
+    const pane = await settingsPane($)
+    expect(await row(pane, 'biome')).toMatch(/marsh \(unavailable\)$/)
+    // Not a choice, so o moves back to random
+    await change(pane, 'biome')
+    expect(seen.configSets).toEqual(['modster-hunter.biome=random'])
+    await pane.unmount()
+  })
+
+  test('a Biome change during an encounter waits for it to end (0058 point 4)', { options: { biome: 'whispering-forest' } }, async ($, on) => {
+    const { clock, seen } = await start($, on, { files: twoBiomes() })
+    const band = await mountBand($)
+    await $.turn.start({ text: 'go', turnId: 't1' } as any)
+    await clock.advance(WAITING)
+    const pane = await settingsPane($)
+    await change(pane, 'biome')
+    await change(pane, 'biome')
+    expect(seen.configSets.at(-1)).toBe('modster-hunter.biome=ash-dunes')
+    expect(seen.state.biomeId).toBe('whispering-forest')
+    await clock.advance(90_000)
+    await band.redraw()
+    expect(await band.find({ type: 'Text', text: 'Sproutling wandered off.' })).toBeDefined()
+    expect(seen.state.biomeId).toBe('whispering-forest')
+    // Once the departure is over, the encounter has ended and the game moves
+    await clock.advance(4_000)
+    expect(seen.state.biomeId).toBe('ash-dunes')
+    expect(seen.toasts.at(-1)).toBe('Modster Hunter: now in Ash Dunes')
+    await pane.unmount()
+    await band.unmount()
   })
 })

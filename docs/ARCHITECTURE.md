@@ -68,7 +68,7 @@ plugin/
 | Data | Where | Why |
 | --- | --- | --- |
 | Content registry | Module variable | Rebuilt on load; cheap |
-| Current biome | Module variable, kept in `$.state` (`biomeId`) | A `/config` change reloads the mod; `session.start` reads it back so the session keeps its biome (decisions 0006, 0040) |
+| Current biome | Module variable, kept in `$.state` (`biomeId`); the `biome` option in `biomeOption`, a change waiting for the encounter to end in `biomeMovePending` | A `/config` change reloads the mod; `session.start` reads it back so the session keeps its biome, unless the `biome` option fixes another that loads (decisions 0006, 0040, 0058) |
 | Current encounter (machine state) | Module variable in `register.tsx` | Not persisted (decision 0005); the band redraws via `$.ui.invalidate` when a step changes it, and `/clear` (which resets `$.state`) leaves it alone |
 | Whether the game runs (`autoStart`) | `userConfig`, read once per load, kept in a module variable `hunting` | `/modsters hunt` and `stop` write it through `$.config.set` and start or stop the game at once (decision 0038) |
 | Display settings (`showInBand`, `encounterPane`, `showInSpinner`, `showInStatusLine`) | `userConfig`, read once per load | A change in `/config` reloads the module (decision 0023) |

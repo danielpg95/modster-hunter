@@ -1,7 +1,7 @@
 {
   "name": "modster-hunter",
   "displayName": "Modster Hunter",
-  "version": "0.1.39",
+  "version": "0.1.40",
   "description": "Catch Modsters while you wait for Claude.",
   "author": {
     "name": "Daniel Pena"
@@ -16,6 +16,12 @@
       "title": "Auto start",
       "description": "Start hunting every session. /modsters hunt turns it on, /modsters stop turns it off",
       "default": true
+    },
+    "biome": {
+      "type": "string",
+      "title": "Biome",
+      "description": "random picks a biome each session; a biome id (like saltbreeze-bay) always plays that one",
+      "default": "random"
     },
     "includeBuiltins": {
       "type": "boolean",

@@ -82,6 +82,8 @@ export const SETTINGS = {
   idleTimeoutChoicesSec: [30, 60, 90, 180, 300],
   /** Columns a row's label is padded to, so the values line up */
   labelColumns: 24,
+  /** The `biome` option's value for a random pick each session (0058 point 1) */
+  randomBiome: 'random',
 } as const
 
 /** Band layout, decision 0012: the full layout needs sprite + gap + text block in the band's width. */

@@ -1167,11 +1167,11 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Goal:** players can pick which biome they hunt in: a new `biome` option, `random` (the default, today's behavior) or one enabled biome, changed in `/modsters settings` or `/config` (asked by @danielpg95, 2026-11-19). A fixed biome is kept across sessions until the player changes it. This changes 0006 (one random biome per session), so a decision comes first.
 - **Done when:**
   - [x] Decision 0058 (amends 0006 and 0040's settings table) is accepted. It settles: when a change applies (proposed: at once with no encounter, else once the encounter in progress ends, as 0031's reload does); what happens when the chosen biome is turned off, removed or fails to load (proposed: random, with a short toast); and whether `/clear`, `/resume` and `/branch` keep a fixed biome.
-  - [ ] `plugin.json` has a `biome` `userConfig` string, default `random`; `CONTENT_FORMAT.md` documents it.
-  - [ ] The Settings tab has a `Biome` row; `o` cycles `random`, then each enabled biome by name, wrapping, and writes the row through `$.config.set` (0040 points 3–4).
-  - [ ] Pure biome-pick logic has tests under `plugin/tests/` with an injected random source: random, fixed, fixed but turned off or missing, and a change mid-encounter.
+  - [x] `plugin.json` has a `biome` `userConfig` string, default `random`; `CONTENT_FORMAT.md` documents it.
+  - [x] The Settings tab has a `Biome` row; `o` cycles `random`, then each enabled biome by name, wrapping, and writes the row through `$.config.set` (0040 points 3–4).
+  - [x] Pure biome-pick logic has tests under `plugin/tests/` with an injected random source: random, fixed, fixed but turned off or missing, and a change mid-encounter.
   - [ ] Checked in the Code tab: changing the row switches the band's idle line and scene, and a new session starts in the chosen biome.
-  - [ ] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
+  - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
 #### [x] P5-80 — Desktop art for the lantern, net and seed pod catchers
 - **Depends on:** P5-53
