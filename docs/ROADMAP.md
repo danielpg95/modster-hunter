@@ -1124,7 +1124,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
   - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
-#### [ ] P5-76 — Shuffleback Hall: the biome and its commons
+#### [x] P5-76 — Shuffleback Hall: the biome and its commons
 - **Depends on:** —
 - **Size:** M
 - **Goal:** a fifth built-in biome, Shuffleback Hall, with its desktop scene and its five commons (asked by @danielpg95, 2026-11-11). A hall you keep walking through and never get closer to leaving: a creepy-cute fever dream where things try to be cute and fail. Breathing walls, wallpaper eyes that blink out of sync, cartoon squash and stretch; bruised purple, sickly magenta, acid teal and candle gold. Its 14 Modsters each hint lightly at a rank of a deck (2–10, J, Q, K, A, Joker), never as cards; suits appear only as small hints on a few. Roster 5 common, 4 uncommon, 4 rare, 1 legendary, split over P5-76 to P5-78.
@@ -1138,10 +1138,10 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] The five commons each ship a `modster.json` matching its concept and a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @danielpg95 one at a time. Dex numbers are the next free ones when the PR lands.
   - [x] `shuffleback-hall/biome.json` lists the five, and the odds table is checked.
   - [x] `plugin/content/CREDITS.md` has a row for the background and every sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of the scene and every sheet.
-  - [ ] Checked in the Code tab: the band, the encounter pane and the Biomes tab for Shuffleback Hall.
+  - [x] Checked in the Code tab: the band, the encounter pane and the Biomes tab for Shuffleback Hall.
   - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
-#### [ ] P5-77 — Shuffleback Hall: the uncommons
+#### [x] P5-77 — Shuffleback Hall: the uncommons
 - **Depends on:** P5-76
 - **Size:** M
 - **Goal:** Sevenpus, Knitwick, Ninelife and Tallyworm join Shuffleback Hall as uncommons, following P5-76's concepts. Knitwick stays clearly apart from Strungking: a sock doll that sews, with no strings from above (first planned as soft, wide and low; redrawn long-legged and stained by @danielpg95, 2026-11-16). Lands in one PR with P5-76 to P5-78: the content check needs a common, an uncommon and a rare in every biome (P2-09), so the hall can't ship one tier at a time (decided by @danielpg95, 2026-11-13).
@@ -1151,7 +1151,7 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
   - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
-#### [ ] P5-78 — Shuffleback Hall: the rares and Gigglet
+#### [x] P5-78 — Shuffleback Hall: the rares and Gigglet
 - **Depends on:** P5-77
 - **Size:** M
 - **Goal:** Knavelin, Ruffmoth, Strungking and Lonewisp join Shuffleback Hall as rares and Gigglet as its legendary, following P5-76's concepts, so the hall has all 14. Lands in one PR with P5-76 to P5-78: the content check needs a common, an uncommon and a rare in every biome (P2-09), so the hall can't ship one tier at a time (decided by @danielpg95, 2026-11-13).
