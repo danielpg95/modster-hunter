@@ -1,20 +1,13 @@
-import { SETTINGS } from '../constants'
 import { pickBiome } from './pick-biome'
 import type { RandomSource } from './random-source'
 
-/** The biome to play, and whether a fixed choice couldn't be played (decision 0058 point 5). */
-export interface BiomeChoice {
-  id: string | undefined
-  isFallback: boolean
-}
-
 /**
- * Decision 0058: the `biome` option is `random` (a pick as 0006 says) or a
- * biome id. A fixed id that isn't among `ids` (off, removed, invalid or
- * unknown) falls back to a random pick. Draws a number only when picking.
+ * Where a session starts (decision 0060 point 4): with Keep last biome on, the
+ * last biome played when it's among `ids`; otherwise a random one, as 0006 says.
+ * Draws a number only when picking.
  */
-export function chooseBiome(option: string, ids: Iterable<string>, random: RandomSource): BiomeChoice {
+export function chooseBiome(keepLast: boolean, lastId: string | undefined, ids: Iterable<string>, random: RandomSource): string | undefined {
   const playable = [...ids]
-  if (option !== SETTINGS.randomBiome && playable.includes(option)) return { id: option, isFallback: false }
-  return { id: pickBiome(playable, random), isFallback: option !== SETTINGS.randomBiome }
+  if (keepLast && lastId !== undefined && playable.includes(lastId)) return lastId
+  return pickBiome(playable, random)
 }

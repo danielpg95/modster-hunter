@@ -4,23 +4,23 @@ import { scriptedRandom } from '../fixtures/scripted-random'
 
 const ids = ['cave', 'forest', 'shore']
 
-describe('chooseBiome (0058)', () => {
-  test('random picks as 0006 says', () => {
-    expect(chooseBiome('random', ids, scriptedRandom(0.5))).toEqual({ id: 'forest', isFallback: false })
+describe('chooseBiome (0060)', () => {
+  test('with Keep last biome off, a session starts in a random biome', () => {
+    expect(chooseBiome(false, 'shore', ids, scriptedRandom(0.5))).toBe('forest')
   })
 
-  test('a fixed biome that loads is played, without drawing a number', () => {
+  test('with Keep last biome on, it starts in the last biome, without drawing a number', () => {
     const random = scriptedRandom()
-    expect(chooseBiome('shore', ids, random)).toEqual({ id: 'shore', isFallback: false })
+    expect(chooseBiome(true, 'shore', ids, random)).toBe('shore')
     expect(random.remaining()).toBe(0)
   })
 
-  test('a fixed biome that is off, removed or unknown falls back to a random one', () => {
-    expect(chooseBiome('marsh', ids, scriptedRandom(0))).toEqual({ id: 'cave', isFallback: true })
+  test('a last biome that is off or missing, or none stored, starts in a random one', () => {
+    expect(chooseBiome(true, 'marsh', ids, scriptedRandom(0))).toBe('cave')
+    expect(chooseBiome(true, undefined, ids, scriptedRandom(0.9))).toBe('shore')
   })
 
   test('with no biomes there is nothing to play', () => {
-    expect(chooseBiome('random', [], scriptedRandom())).toEqual({ id: undefined, isFallback: false })
-    expect(chooseBiome('cave', [], scriptedRandom())).toEqual({ id: undefined, isFallback: true })
+    expect(chooseBiome(true, 'cave', [], scriptedRandom())).toBeUndefined()
   })
 })

@@ -365,7 +365,7 @@ biome entry naming a disabled Modster is dropped without an issue.
 | Key | Type | Default | What it does |
 | --- | --- | --- | --- |
 | `autoStart` | boolean | `true` | Run the game. Off: nothing draws outside `/modsters`. `/modsters hunt` turns it on, `/modsters stop` turns it off (decisions 0038, 0041) |
-| `biome` | string | `random` | `random` picks a biome each session (0006). A biome id plays that biome every session until changed; one that's off, missing or invalid falls back to a random biome with a toast (decision 0058) |
+| `keepBiome` | boolean | `false` | Start each session in the last biome played (`prefs:lastBiome` in `$.store`), not a random one (0006). A last biome that's off or doesn't load starts a random one. `g: Go here` in the Biomes tab moves the game to a biome (decision 0060) |
 | `includeBuiltins` | boolean | `true` | Load the biomes and Modsters that ship with the mod. Built-in catchers load either way (decision 0035) |
 | `encounterIdleTimeoutSec` | number | `90` | Seconds without a throw before an encounter's Modster wanders off |
 | `showIdleLine` | boolean | `true` | Show the current biome in the band between encounters |

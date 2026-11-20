@@ -27,7 +27,7 @@ Claude is done, the game steps aside and you get back to work.
 
 ## Biomes
 
-Each session drops you into one biome at random, each with its own Modsters:
+Each session drops you into one biome at random, each with its own Modsters. To pick one, press `g` on it in the Biomes tab of `/modsters`; turn on Keep last biome in `/modsters settings` to start there next time.
 
 🌲 **Whispering Forest**: tall pines, soft moss, something rustling.
 
@@ -71,7 +71,7 @@ Claude for anything. `/modsters stop` turns the game off.
 | `1` / `2` | Throw / run while a Modster is up |
 | `/modsters` | Your collection, the biomes, stats, catchers and settings |
 | `/modsters pane` | A bigger encounter pane, for a better view |
-| `/modsters settings` | Every option: Auto start, the biome, where the game shows, and more |
+| `/modsters settings` | Every option: Auto start, Keep last biome, where the game shows, and more |
 | `/modsters reload` | Load your own Modsters after you add or change them |
 | `/modsters help` | Every command |
 

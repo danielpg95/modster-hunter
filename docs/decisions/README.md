@@ -19,7 +19,7 @@ settled questions and avoid making assumptions about open ones.
 | [0003](0003-catch-mechanic.md) | Pure-luck catching for v1; light skill element as a later experiment | Accepted (amended by 0035) |
 | [0004](0004-attempts-and-catch-rate.md) | Attempts and catch rate per Modster, derived from rarity unless overridden | Accepted (point 1 superseded by 0030) |
 | [0005](0005-encounter-lifetime.md) | An encounter lingers after the turn ends, until resolved or idle timeout | Accepted (amended by 0018, 0020, 0031) |
-| [0006](0006-biome-selection.md) | One random biome per session | Accepted (amended by 0031, 0058) |
+| [0006](0006-biome-selection.md) | One random biome per session | Accepted (amended by 0031, 0060) |
 | [0007](0007-content-model.md) | Weights instead of percentages; built-in and user content merged by id | Accepted (point 1 superseded by 0030) |
 | [0008](0008-sprite-pipeline.md) | PNG sprite sheets in, `.sprite.json` at runtime | Superseded by 0016 |
 | [0009](0009-collection-storage.md) | One `$.store` key per Modster | Accepted (amended by 0029) |
@@ -53,7 +53,7 @@ settled questions and avoid making assumptions about open ones.
 | [0037](0037-portable-core-and-hosts.md) | Claude Code users first, then a portable core shared by other hosts | Proposed |
 | [0038](0038-opt-in-hunting.md) | The game runs only while `autoStart` is on; `/modsters hunt` and `stop` flip it | Accepted (default, point 2 and welcome texts superseded by 0041; amended by 0040) |
 | [0039](0039-modsters-runs-immediately.md) | `/modsters` runs at once, even while Claude works | Accepted |
-| [0040](0040-in-game-settings.md) | `/modsters settings` opens a Settings tab where players change every option | Accepted (Reset to defaults added by 0054, Proposed; its `sounds` note is moot: P5-02 is won't do and P5-68 removed the option; point 2 amended by 0058) |
+| [0040](0040-in-game-settings.md) | `/modsters settings` opens a Settings tab where players change every option | Accepted (Reset to defaults added by 0054, Proposed; its `sounds` note is moot: P5-02 is won't do and P5-68 removed the option; point 2 amended by 0060) |
 | [0041](0041-auto-start-on-by-default.md) | Auto start is on by default; one welcome toast says how to stop | Accepted |
 | [0042](0042-desktop-svg-sprites.md) | On the desktop app, sprites are one animated Svg each | Proposed (point 4: the catch animation in 0043, the biome scenes in 0044) |
 | [0043](0043-desktop-vector-catch.md) | On the desktop app, a throw plays as one vector Svg | Proposed |
@@ -71,5 +71,6 @@ settled questions and avoid making assumptions about open ones.
 | [0055](0055-desktop-caught-hold.md) | On desktop, a caught catcher holds before it fades | Accepted |
 | [0056](0056-desktop-fit-height.md) | On desktop, every Modster's art fits a set height | Accepted (collection size amended by 0057) |
 | [0057](0057-desktop-collection-fit.md) | On desktop, the collection fits every Modster to Kingbolt's height | Accepted |
-| [0058](0058-biome-option.md) | A `biome` option picks random or one fixed biome | Accepted (amends 0006, 0040) |
+| [0058](0058-biome-option.md) | A `biome` option picks random or one fixed biome | Superseded by 0060 |
 | [0059](0059-desktop-rope-rim.md) | On desktop, a net's rim is a rope | Accepted (amends 0043 point 5 for desktop sheets) |
+| [0060](0060-go-to-biome.md) | Go to a biome from the Biomes tab; Keep last biome picks where a session starts | Proposed (supersedes 0058; amends 0006, 0040) |

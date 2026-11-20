@@ -1,5 +1,5 @@
 import type { EngineInterface, Register, Timer } from 'claude-code'
-import { BAND, CATCH, COLLECTION, CONTENT, DESKTOP, IDLE_TAG, MOTION, SETTINGS, USER_CONTENT, WELCOME_TOAST_MS } from './constants'
+import { BAND, CATCH, COLLECTION, CONTENT, DESKTOP, IDLE_TAG, MOTION, USER_CONTENT, WELCOME_TOAST_MS } from './constants'
 import type { ControlsProps } from './encounter-controls'
 import {
   cachedSheetLoader,
@@ -23,6 +23,7 @@ import {
 } from './content'
 import {
   chooseBiome,
+  pickBiome,
   startEncounters,
   stepEncounter,
   throwingMs,
@@ -117,7 +118,6 @@ import {
   resetText,
   settingButtonText,
   settingRow,
-  type SettingBiome,
   type SettingField,
   type SettingValue,
   type SettingValues,
@@ -129,6 +129,9 @@ import {
 } from './render'
 import {
   CATCHER_KEY,
+  LAST_BIOME_KEY,
+  lastBiomePref,
+  readLastBiomeId,
   HUNT_PANE_KEY,
   WELCOMED_KEY,
   readWelcomed,
@@ -155,10 +158,10 @@ let content: MergedContent | undefined
 // The session's biome (decision 0006). /clear, /resume and /branch don't start a
 // new process or reload the module, so it survives them as a module variable.
 let biomeId: string | undefined
-// The `biome` option (decision 0058): `random` or the id of the biome to play
-let biomeOption: string = SETTINGS.randomBiome
-// A Biome change made during an encounter waits for it to end (0058 point 4)
-let biomeMovePending = false
+// Keep last biome (decision 0060 point 4): a session starts in the last biome played
+let keepBiome = false
+// Where Go here sends the game once the encounter in progress ends (0060 point 2)
+let pendingBiomeId: string | undefined
 // After a reload that dropped the session's biome, its old copy plays on until the
 // encounter in progress ends; then a new biome is picked (P4-02)
 let retiredBiome: LoadedBiome | undefined
@@ -323,6 +326,8 @@ let isBlittingCollection = false
 // The Biomes tab's scene (0028): the selected biome's, on a timer of its own that
 // runs whenever the tab draws it, apart from the band's (0026 point 5)
 const BIOMES_SCENE_KEY = 'biomes-scene'
+// The Biomes tab's Go here (decision 0060 point 1)
+const GO_HOTKEY = 'g'
 const biomeScenes = new Map<string, IdleScene | undefined>()
 const biomeSheetScenes = new Map<string, IdleScene | undefined>()
 let biomesSceneSite: { requestId: string; biomeId: string; scene: IdleScene; columns: number; particles: Particle[] } | undefined
@@ -336,7 +341,7 @@ export const register: Register = (on, options) => {
   showIdleScene = options.showIdleScene !== false
   includeBuiltins = options.includeBuiltins !== false
   settingValues = readSettingValues(options)
-  biomeOption = String(settingValues.biome)
+  keepBiome = settingValues.keepBiome === true
   builtinsIncluded = includeBuiltins
   display = readDisplaySettings(options)
   // On unless the player turned it off (decision 0041)
@@ -1022,7 +1027,7 @@ export const register: Register = (on, options) => {
                       <Button key={`setting-name-${spec.field}`} label={spec.label} plain onPress={() => select(spec.field)} />
                       <Button
                         key={`setting-value-${spec.field}`}
-                        label={settingButtonText(spec.field, settingValues[spec.field], settingBiomes())}
+                        label={settingButtonText(spec.field, settingValues[spec.field])}
                         {...(isSelected ? { hotkey: TOGGLE_HOTKEY } : {})}
                         onPress={() => {
                           select(spec.field)
@@ -1038,7 +1043,7 @@ export const register: Register = (on, options) => {
               })
             : fields.map((field) => (
                 <Button key={`setting-${field}`} plain onPress={() => select(field)}>
-                  {texts(settingRow(field, settingValues, field === fields[index], settingBiomes()), 'truncate')}
+                  {texts(settingRow(field, settingValues, field === fields[index]), 'truncate')}
                 </Button>
               ))}
           <Box key="settings-reset-row" flexDirection="row">
@@ -1132,6 +1137,8 @@ export const register: Register = (on, options) => {
       const at = (id: string | undefined) => entries.findIndex((entry) => entry.id === id)
       const index = Math.max(0, at(biomesSelected) >= 0 ? at(biomesSelected) : at(biomeId))
       const selected = entries[index]
+      // Go here (0060 point 1): a biome that's on and isn't where the game is going
+      const canGo = selected !== undefined && !selected.isOff && selected.id !== destinationBiome()
       const select = (entry: BiomeEntry | undefined) => {
         if (!entry || entry.id === selected?.id) return
         biomesSelected = entry.id
@@ -1142,7 +1149,10 @@ export const register: Register = (on, options) => {
           <Text bold>{`Biomes ${entries.length}`}</Text>
           <Button key="biome-up" label="Up" hotkey="k" plain dimColor onPress={() => select(entries[index - 1])} />
           <Button key="biome-down" label="Down" hotkey="j" plain dimColor onPress={() => select(entries[index + 1])} />
-          {/* On desktop it sits under the biome it acts on, with its name (0054) */}
+          {/* On desktop these sit under the biome they act on, with its name (0054) */}
+          {selected && canGo && e.surface !== 'desktop' ? (
+            <Button key="biome-go" label="Go here" hotkey={GO_HOTKEY} plain dimColor onPress={() => goToBiome($, selected.id)} />
+          ) : null}
           {selected && e.surface !== 'desktop' ? (
             <Button
               key="biome-toggle"
@@ -1215,15 +1225,18 @@ export const register: Register = (on, options) => {
           ))}
         </Box>
       )
-      // On desktop the button names the biome and sits under its scene (0054)
+      // On desktop the buttons name the biome and sit under its scene (0054, 0060 point 1)
       const desktopToggle =
         e.surface === 'desktop' ? (
-          <Button
-            key="biome-toggle"
-            label={`${toggleLabel(selected)} ${selected.name}`}
-            hotkey={TOGGLE_HOTKEY}
-            onPress={() => toggle($, { kind: 'biome', id: selected.id, off: !selected.isOff }, selected.name, includeBuiltins, idleTimeoutSec)}
-          />
+          <Box key="biome-actions" flexDirection="row" columnGap={COLLECTION.gapColumns}>
+            {canGo ? <Button key="biome-go" label={`Go to ${selected.name}`} hotkey={GO_HOTKEY} onPress={() => goToBiome($, selected.id)} /> : null}
+            <Button
+              key="biome-toggle"
+              label={`${toggleLabel(selected)} ${selected.name}`}
+              hotkey={TOGGLE_HOTKEY}
+              onPress={() => toggle($, { kind: 'biome', id: selected.id, off: !selected.isOff }, selected.name, includeBuiltins, idleTimeoutSec)}
+            />
+          </Box>
         ) : null
       if (e.surface === 'desktop' && plan.split !== 'side') {
         // 0054: in the narrow dock the biomes come first, like tabs, then the selected one's scene and odds
@@ -1578,69 +1591,57 @@ export const register: Register = (on, options) => {
  */
 async function changeSetting($: EngineInterface, field: SettingField): Promise<void> {
   resetArmed = false
-  await applySetting($, field, nextSettingValue(field, settingValues[field], settingBiomes()))
-}
-
-/** Every loaded biome, off ones included, for the Settings tab's Biome row (0058 point 3). */
-function settingBiomes(): SettingBiome[] {
-  if (!content) return []
-  const on = [...content.biomes.values()].map((loaded) => ({ id: loaded.biome.id, name: loaded.biome.name, isOff: false }))
-  const off = [...content.off.biomes.values()].map((loaded) => ({ id: loaded.biome.id, name: loaded.biome.name, isOff: true }))
-  return [...on, ...off]
+  await applySetting($, field, nextSettingValue(field, settingValues[field]))
 }
 
 /**
- * The session's biome at session.start (decisions 0006, 0058 point 2). A biome kept in $.state
- * from before a reload stays, unless the `biome` option fixes another that loads: then that's
- * a Settings change that reloaded the mod, and the game moves to it.
+ * The session's biome at session.start (decisions 0006, 0060 point 4). One kept in $.state from
+ * before a reload stays; otherwise the last biome with Keep last biome on, or a random one.
  */
 async function startInBiome($: EngineInterface, loaded: MergedContent): Promise<void> {
-  const kept = biomeId !== undefined && loaded.biomes.has(biomeId) ? biomeId : undefined
-  const choice = chooseBiome(biomeOption, loaded.biomes.keys(), Math.random)
-  if (kept === undefined || (!choice.isFallback && biomeOption !== SETTINGS.randomBiome)) {
-    biomeId = choice.id
-    if (choice.isFallback) $.ui.toast(`Modster Hunter: ${unavailableText()}`)
-    const now = biomeId === undefined ? undefined : loaded.biomes.get(biomeId)
-    if (kept !== undefined && now && kept !== biomeId) $.ui.toast(`Modster Hunter: now in ${now.biome.name}`)
+  if (biomeId === undefined || !loaded.biomes.has(biomeId)) {
+    const lastId = keepBiome ? readLastBiomeId(await $.store.get(LAST_BIOME_KEY).catch(() => undefined)) : undefined
+    biomeId = chooseBiome(keepBiome, lastId, loaded.biomes.keys(), Math.random)
   }
-  if (biomeId !== undefined) await keepState($, 'biomeId', biomeId)
+  noteBiome($)
 }
 
-/** 0058 point 5's toast, without the `Modster Hunter: ` prefix. */
-function unavailableText(): string {
-  return `${biomeOption} isn't available · playing a random biome`
+/** Keeps the game's biome in $.state for a reload, and as the last biome played (0060 point 3). */
+function noteBiome($: EngineInterface): void {
+  if (biomeId === undefined) return
+  const id = biomeId
+  void keepState($, 'biomeId', id)
+  queueWrite($, (store) => store.set(LAST_BIOME_KEY, lastBiomePref(id)))
+}
+
+/** Where the game is going: Go here's biome while it waits, else the one being played. */
+function destinationBiome(): string | undefined {
+  return pendingBiomeId ?? (retiredBiome ? undefined : biomeId)
 }
 
 /**
- * A Biome change applied in place (0058 point 4): a fixed biome that loads starts now, or once the
- * encounter in progress ends. Random keeps the current biome; an unavailable id only says so.
+ * The Biomes tab's Go here (decision 0060 points 1–2): moves the game at once, or once the
+ * encounter in progress ends. With the game off it's where the game starts when turned on.
  */
-function applyBiomeOption($: EngineInterface): void {
-  if (biomeOption === SETTINGS.randomBiome || !content) {
-    // Random never moves, so a move still waiting is dropped
-    biomeMovePending = false
-    return
-  }
-  if (!content.biomes.has(biomeOption)) {
-    $.ui.toast(`Modster Hunter: ${unavailableText()}`)
-    return
-  }
-  if (biomeOption === biomeId && !retiredBiome) {
-    biomeMovePending = false
-    return
-  }
+function goToBiome($: EngineInterface, id: string): void {
+  const loaded = content?.biomes.get(id)
+  if (!loaded || id === destinationBiome()) return
+  const name = loaded.biome.name
   if (!hunting || !machine) {
-    // The game is off (0038 point 1): only keep the biome for when it starts
-    biomeId = biomeOption
-    void keepState($, 'biomeId', biomeId)
-    return
+    pendingBiomeId = undefined
+    retiredBiome = undefined
+    biomeId = id
+    noteBiome($)
+    $.ui.toast(`Modster Hunter: now in ${name}`)
+  } else if (machine.encounter) {
+    // Going back to the biome being played just stays
+    pendingBiomeId = id === biomeId && !retiredBiome ? undefined : id
+    $.ui.toast(pendingBiomeId ? `Modster Hunter: off to ${name} after this encounter` : `Modster Hunter: staying in ${name}`)
+  } else {
+    const moved = moveToNewBiome($, idleTimeoutSec, id)
+    if (moved) $.ui.toast(`Modster Hunter: now in ${moved.biome.name}`)
   }
-  if (machine.encounter) {
-    biomeMovePending = true
-    return
-  }
-  const loaded = moveToNewBiome($, idleTimeoutSec)
-  if (loaded) $.ui.toast(`Modster Hunter: now in ${loaded.biome.name}`)
+  $.ui.invalidate('ui.render')
 }
 
 /**
@@ -1725,9 +1726,9 @@ async function applySetting($: EngineInterface, field: SettingField, next: Setti
       $.ui.toast((await reloading).reply)
       break
     }
-    case 'biome':
-      biomeOption = String(next)
-      applyBiomeOption($)
+    case 'keepBiome':
+      // Applies from the next session; the game never moves (0060 point 4)
+      keepBiome = next === true
       break
     case 'encounterIdleTimeoutSec':
       idleTimeoutSec = Number(next)
@@ -2070,8 +2071,14 @@ async function advanceMachine($: EngineInterface, action: MachineAction): Promis
   for (const event of step.events) if (event.type === 'caught') refreshCollectionRecord($, event.modsterId)
   // A Stats tab left open counts the encounter that just ended (P5-18)
   if (step.events.some((event) => event.type === 'caught' || event.type === 'fled' || event.type === 'ran')) refreshShownStats($)
-  if ((retiredBiome || biomeMovePending) && !machine.encounter) {
-    const loaded = moveToNewBiome($, machineContext.idleTimeoutMs / 1000)
+  if ((retiredBiome || pendingBiomeId) && !machine.encounter) {
+    // Go here's biome, if it still loads; else a random one only when the old biome was dropped (0031)
+    const target = pendingBiomeId !== undefined && content?.biomes.has(pendingBiomeId) ? pendingBiomeId : undefined
+    if (!target && !retiredBiome) {
+      pendingBiomeId = undefined
+      return
+    }
+    const loaded = moveToNewBiome($, machineContext.idleTimeoutMs / 1000, target)
     $.ui.toast(loaded ? `Modster Hunter: now in ${loaded.biome.name}` : `Modster Hunter: ${noBiomesMessage(builtinsIncluded, USER_FOLDER_LABEL)}`)
   }
 }
@@ -2922,7 +2929,10 @@ async function reloadContent($: EngineInterface, includeBuiltins: boolean, idleT
   let note = ''
   if (!hunting) {
     // The game is off (0038 point 1): only keep a biome for when it starts
-    if (!kept) biomeId = chooseBiome(biomeOption, content.biomes.keys(), Math.random).id
+    if (!kept) {
+      biomeId = pickBiome(content.biomes.keys(), Math.random)
+      noteBiome($)
+    }
   } else if (kept && machine) {
     retiredBiome = undefined
     machineContext = playContext(content, kept, idleTimeoutSec)
@@ -3010,12 +3020,12 @@ async function toggleContent($: EngineInterface, change: ToggleChange, name: str
  * Picks a new biome after the session's stopped loading (P4-02), keeping the
  * machine's turn and agent state; with none left the game stops until a reload.
  */
-function moveToNewBiome($: EngineInterface, idleTimeoutSec: number): LoadedBiome | undefined {
+function moveToNewBiome($: EngineInterface, idleTimeoutSec: number, targetId?: string): LoadedBiome | undefined {
   retiredBiome = undefined
-  biomeMovePending = false
-  // A fixed biome that loads is the one to move to (0058 point 6)
-  biomeId = content ? chooseBiome(biomeOption, content.biomes.keys(), Math.random).id : undefined
-  if (biomeId !== undefined) void keepState($, 'biomeId', biomeId)
+  pendingBiomeId = undefined
+  // Go here names the biome (0060 point 2); a dropped biome moves to a random one (0031)
+  biomeId = targetId ?? (content ? pickBiome(content.biomes.keys(), Math.random) : undefined)
+  noteBiome($)
   const loaded = biomeId === undefined ? undefined : content?.biomes.get(biomeId)
   if (!machine) {
     startMachine($, idleTimeoutSec)

@@ -1,6 +1,6 @@
 # 0058 — A `biome` option picks random or one fixed biome
 
-- **Status:** Accepted (amends 0006, 0040 point 2)
+- **Status:** Superseded by 0060 (the biome is chosen in the Biomes tab; Settings only keeps the last one)
 - **Date:** 2026-11-20
 - **Decided by:** @danielpg95 (accepted 2026-11-20; drafted by Claude)
 

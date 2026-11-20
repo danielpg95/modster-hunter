@@ -1,4 +1,5 @@
 export { addCatch, caughtKey, isCaught, readCaughtRecord, type Catch, type CaughtRecord } from './caught-record'
+export { LAST_BIOME_KEY, lastBiomePref, readLastBiomeId, type LastBiomePref } from './last-biome-pref'
 export { CATCHER_KEY, catcherInUse, catcherPref, readCatcherId, type CatcherPref } from './catcher-pref'
 export { WELCOMED_KEY, readWelcomed, welcomedPref, type WelcomedPref } from './welcome-pref'
 export { HUNT_PANE_KEY, huntPanePref, prefAfterClose, readHuntPaneOpen, type HuntPanePref } from './hunt-pane-pref'

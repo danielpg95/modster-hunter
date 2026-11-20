@@ -5,7 +5,7 @@ describe('setting rows (0040)', () => {
   test('lists the options in 0040 point 2\'s order', () => {
     expect(SETTING_SPECS.map((spec) => spec.label)).toEqual([
       'Auto start',
-      'Biome',
+      'Keep last biome',
       'Show in the band',
       'Encounter pane',
       'Show in the spinner',
@@ -27,6 +27,8 @@ describe('setting rows (0040)', () => {
 
   test('o flips a toggle', () => {
     expect(nextSettingValue('autoStart', true)).toBe(false)
+    expect(SETTING_DEFAULTS.keepBiome).toBe(false)
+    expect(nextSettingValue('keepBiome', false)).toBe(true)
     expect(nextSettingValue('showIdleScene', false)).toBe(true)
   })
 
@@ -68,38 +70,5 @@ describe('setting rows (0040)', () => {
     expect(changedSettings(SETTING_DEFAULTS)).toEqual([])
     expect(changedSettings({ ...SETTING_DEFAULTS, encounterIdleTimeoutSec: 30, showInBand: false })).toEqual(['showInBand', 'encounterIdleTimeoutSec'])
     expect([resetText(1), resetText(3)]).toEqual(['reset 1 setting to its default', 'reset 3 settings to their defaults'])
-  })
-  test('the biome moves from random through the biomes that are on, by name, and wraps (0058 point 3)', () => {
-    const biomes = [
-      { id: 'shore', name: 'Saltbreeze Bay', isOff: false },
-      { id: 'cave', name: 'Crystal Grotto', isOff: false },
-      { id: 'hall', name: 'Shuffleback Hall', isOff: true },
-    ]
-    expect(nextSettingValue('biome', 'random', biomes)).toBe('cave')
-    expect(nextSettingValue('biome', 'cave', biomes)).toBe('shore')
-    expect(nextSettingValue('biome', 'shore', biomes)).toBe('random')
-    expect(nextSettingValue('biome', 'hall', biomes)).toBe('random')
-    expect(nextSettingValue('biome', 'random', [])).toBe('random')
-  })
-
-  test('the biome shows as random, its name, or unavailable (0058 point 5)', () => {
-    const biomes = [
-      { id: 'cave', name: 'Crystal Grotto', isOff: false },
-      { id: 'hall', name: 'Shuffleback Hall', isOff: true },
-    ]
-    expect(SETTING_DEFAULTS.biome).toBe('random')
-    expect(settingText('biome', 'random', biomes)).toBe('random')
-    expect(settingText('biome', 'cave', biomes)).toBe('Crystal Grotto')
-    expect(settingText('biome', 'hall', biomes)).toBe('Shuffleback Hall (unavailable)')
-    expect(settingText('biome', 'marsh', biomes)).toBe('marsh (unavailable)')
-    expect(settingButtonText('biome', 'random', biomes)).toBe('Random')
-    expect(settingButtonText('biome', 'cave', biomes)).toBe('Crystal Grotto')
-  })
-
-  test('the biome option keeps any id it reads, and an empty one is random', () => {
-    expect(readSettingValues({ biome: 'marsh' }).biome).toBe('marsh')
-    expect(readSettingValues({ biome: '  ' }).biome).toBe('random')
-    expect(readSettingValues({ biome: 3 }).biome).toBe('random')
-    expect(changedSettings(readSettingValues({ biome: 'cave' }))).toEqual(['biome'])
   })
 })
