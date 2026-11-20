@@ -1092,11 +1092,11 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
 - **Size:** L
 - **Goal:** Crystal Grotto has 8 common, 5 uncommon, 3 rare and 1 legendary Modster, so each tier has more variety (asked by @victor-aguilars, 2026-11-03). 7 new Modsters join it: 5 common, 2 uncommon. Existing Modsters keep their id, dex number and rarity.
 - **Done when:**
-  - [ ] @victor-aguilars approves a concept list for the biome (name, tier, one-line concept), and each `modster.json` matches it.
-  - [x] Each new Modster ships a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @victor-aguilars one at a time.
+  - [ ] @danielpg95 approves a concept list for the biome (name, tier, one-line concept), and each `modster.json` matches it.
+  - [ ] Each new Modster ships a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @danielpg95 one at a time.
   - [ ] `crystal-grotto/biome.json` lists all 17, and the odds table is checked.
   - [ ] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
-  - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
+  - [ ] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
 #### [ ] P5-74 — Grow the Dustwind Expanse roster to 8/5/3/1
 - **Depends on:** P5-70
