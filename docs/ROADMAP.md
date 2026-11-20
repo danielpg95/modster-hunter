@@ -1161,16 +1161,16 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
   - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
-#### [ ] P5-79 — Go to a biome, and keep the last one
+#### [x] P5-79 — Go to a biome, and keep the last one
 - **Depends on:** —
 - **Size:** M
 - **Goal:** players choose the biome they hunt in from the Biomes tab (`g: Go here`), and a `Keep last biome` setting starts each session where they were, or in a random biome as today (asked by @danielpg95, 2026-11-19; reworked after the hand check, 2026-11-20). Decision 0060, which replaced 0058's Settings-row design.
 - **Done when:**
-  - [ ] Decision 0060 (supersedes 0058; amends 0006 and 0040's settings table) is accepted.
+  - [x] Decision 0060 (supersedes 0058; amends 0006 and 0040's settings table) is accepted.
   - [x] The Biomes tab has `g: Go here` (on desktop, `Go to <name>` under the scene) for a biome that's on and isn't where the game is going; it moves at once, or after the encounter in progress, with 0060 point 2's toasts.
   - [x] `plugin.json` has `keepBiome` (boolean, default off) in place of 0058's `biome`; the Settings tab shows it as `Keep last biome`; `CONTENT_FORMAT.md` documents it and `prefs:lastBiome`.
   - [x] Tests under `plugin/tests/` with an injected random source: Go here with and without an encounter, Keep last biome on and off, and a last biome that's off or missing.
-  - [ ] Checked in the Code tab: Go here moves the band's idle line and scene, and with Keep last biome on a new session starts in the last biome.
+  - [x] Checked in the Code tab: Go here moves the band's idle line and scene, and with Keep last biome on a new session starts in the last biome.
   - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
 #### [x] P5-80 — Desktop art for the lantern, net and seed pod catchers

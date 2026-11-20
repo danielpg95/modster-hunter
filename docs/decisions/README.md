@@ -73,4 +73,4 @@ settled questions and avoid making assumptions about open ones.
 | [0057](0057-desktop-collection-fit.md) | On desktop, the collection fits every Modster to Kingbolt's height | Accepted |
 | [0058](0058-biome-option.md) | A `biome` option picks random or one fixed biome | Superseded by 0060 |
 | [0059](0059-desktop-rope-rim.md) | On desktop, a net's rim is a rope | Accepted (amends 0043 point 5 for desktop sheets) |
-| [0060](0060-go-to-biome.md) | Go to a biome from the Biomes tab; Keep last biome picks where a session starts | Proposed (supersedes 0058; amends 0006, 0040) |
+| [0060](0060-go-to-biome.md) | Go to a biome from the Biomes tab; Keep last biome picks where a session starts | Accepted (supersedes 0058; amends 0006, 0040) |

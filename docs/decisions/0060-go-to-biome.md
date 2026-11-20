@@ -1,8 +1,8 @@
 # 0060 — Go to a biome from the Biomes tab; Keep last biome picks where a session starts
 
-- **Status:** Proposed — settled by P5-79 / @danielpg95 (supersedes 0058; amends 0006 and 0040 point 2)
+- **Status:** Accepted (supersedes 0058; amends 0006 and 0040 point 2)
 - **Date:** 2026-11-20
-- **Proposed by:** @danielpg95 (drafted by Claude)
+- **Decided by:** @danielpg95 (accepted 2026-11-20 after the P5-79 hand check; drafted by Claude)
 - **Supersedes:** 0058
 
 ## Context
