@@ -20,7 +20,6 @@ this file lists only tasks someone has claimed.
 | P5-76 | @danielpg95 | in-progress | p5-76-shuffleback-hall | 2026-11-11 | 2026-11-16 | Check Shuffleback Hall in the Code tab (band, encounter pane, Biomes tab), then commit and open the one PR for P5-76 to P5-78 |
 | P5-77 | @danielpg95 | in-progress | p5-76-shuffleback-hall | 2026-11-13 | 2026-11-16 | Check Shuffleback Hall in the Code tab (band, encounter pane, Biomes tab), then commit and open the one PR for P5-76 to P5-78 |
 | P5-78 | @danielpg95 | in-progress | p5-76-shuffleback-hall | 2026-11-13 | 2026-11-16 | Check Shuffleback Hall in the Code tab (band, encounter pane, Biomes tab), then commit and open the one PR for P5-76 to P5-78 |
-| P5-80 | @danielpg95 | in-progress | p5-80-catcher-desktop-art | 2026-11-18 | 2026-11-18 | Write the lantern's desktop reference prompt for @danielpg95 to generate |
 
 ## Up next
 

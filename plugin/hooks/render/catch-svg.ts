@@ -147,7 +147,7 @@ function anchoredLayer(art: CatchArt, samples: Sample[], timing: Timing, defs: s
 
 /**
  * `stretch` beats: the frame tiled over a dome on the Modster's outline (0043 point 5).
- * The dome is a path SMIL reshapes; `rimIndex` is its outer ring; a tear is two halves moving apart.
+ * The dome is a path SMIL reshapes; `rimIndex` is its outer ring, or on a desktop sheet a rope (0059); a tear is two halves moving apart.
  */
 function stretchLayer(art: CatchArt, samples: Sample[], timing: Timing, defs: string[]): string {
   if (samples.every((s) => !s.stretch)) return ''
@@ -187,16 +187,38 @@ function stretchLayer(art: CatchArt, samples: Sample[], timing: Timing, defs: st
   // The outline down to the bottom row; inside the rim, above the bottom row (catchFrame's edge test)
   const outerD = (m: StretchMotion) => domeD(m, 1, Math.round(m.shape.by) + 1)
   const innerD = (m: StretchMotion) => domeD(m, Math.sqrt(CATCH.rimFrom), Math.min(m.shape.by, Math.round(m.shape.by)))
-  // The rim is a ring (even-odd: the outline less the inside), so the tile's gaps stay see-through
-  const fill = rim
-    ? path(rim, timing.linear(motions.map((m) => outerD(m) + innerD(m))), 'evenodd') + path('url(#tile)', timing.linear(motions.map(innerD)))
-    : path('url(#tile)', timing.linear(motions.map(outerD)))
+  // A desktop sheet's rim is a rope with a scalloped edge (0059); a terminal sprite's is a ring
+  // (even-odd: the outline less the inside), so the tile's gaps stay see-through
+  const rope = rim !== undefined && art.catcher.sheet !== undefined
+  const ties = rope ? ropeTies(full) : 0
+  if (rope) {
+    // Shaped once in defs; the mesh and each stroke of the rope reuse it
+    const d = timing.linear(motions.map((m) => scallopD(m.shape, ties)))
+    const r = num(CATCH.ropeKnot / 2)
+    defs.push(
+      `<path id="rope" d="${d.value}">${d.animate('d')}</path>` +
+        `<marker id="tie" markerUnits="userSpaceOnUse" markerWidth="${CATCH.ropeKnot}" markerHeight="${CATCH.ropeKnot}" refX="${r}" refY="${r}" overflow="visible"><circle cx="${r}" cy="${r}" r="${r}" fill="${ropeShades(rim).dark}"/></marker>`,
+    )
+  }
+  const fill = rope
+    ? `<use href="#rope" fill="url(#tile)"/>` + ropeStrokes(rim)
+    : rim
+      ? path(rim, timing.linear(motions.map((m) => outerD(m) + innerD(m))), 'evenodd') + path('url(#tile)', timing.linear(motions.map(innerD)))
+      : path('url(#tile)', timing.linear(motions.map(outerD)))
   const half = (side: 'l' | 'r') =>
     group(
       { transform: timing.transform(motions.map((m) => `${num(side === 'l' ? -m.spread : m.spread)} ${num(m.fall)}`), 'translate'), 'clip-path': `url(#tear-${side})` },
       group({ 'clip-path': 'url(#show)' }, fill),
     )
-  const knot = rim
+  const knot = rope
+    ? group(
+        {
+          display: timing.discrete(motions.map((m) => shownAs(m.knot))),
+          transform: timing.transform(motions.map((m) => `${num(m.shape.cx)} ${num(m.shape.by - m.shape.ry)}`), 'translate'),
+        },
+        ropeKnot(rim),
+      )
+    : rim
     ? group(
         {
           display: timing.discrete(motions.map((m) => shownAs(m.knot))),
@@ -206,6 +228,72 @@ function stretchLayer(art: CatchArt, samples: Sample[], timing: Timing, defs: st
       )
     : ''
   return group({ display: timing.discrete(samples.map((s) => shownAs(s.stretch !== undefined))) }, half('l') + half('r') + knot)
+}
+
+// ---------- a desktop net's rope edge (0059) ----------
+
+/** How many spans the dome's curved edge has: one tie about every `CATCH.ropeTiePx`. Fixed per throw, so the path animates. */
+function ropeTies({ rx, ry }: StretchMotion['shape']): number {
+  const arc = (Math.PI * (rx + ry)) / 2
+  return Math.max(3, Math.round(arc / CATCH.ropeTiePx))
+}
+
+/** The ties along the dome's curved edge, left to right. */
+function tiePoints({ cx, by, rx, ry }: StretchMotion['shape'], ties: number): [number, number][] {
+  return Array.from({ length: ties + 1 }, (_, i) => {
+    const a = Math.PI * (1 - i / ties)
+    return [cx + rx * Math.cos(a), by - ry * Math.sin(a)]
+  })
+}
+
+/** The edge sagging inward between ties, closed along the bottom row: the mesh fills it and the rope strokes it. */
+function scallopD(shape: StretchMotion['shape'], ties: number): string {
+  const { cx, by, rx, ry } = shape
+  const bottom = Math.round(by) + 0.5
+  const points = tiePoints(shape, ties)
+  const sag = 1 - CATCH.ropeSag
+  let d = `M${n1(cx - rx)} ${n1(bottom)}L${n1(cx - rx)} ${n1(by)}`
+  for (let i = 1; i <= ties; i++) {
+    const a = Math.PI * (1 - (i - 0.5) / ties)
+    const [x, y] = points[i] ?? [cx + rx, by]
+    d += `Q${n1(cx + rx * Math.cos(a) * sag)} ${n1(by - ry * Math.sin(a) * sag)} ${n1(x)} ${n1(y)}`
+  }
+  return `${d}L${n1(cx + rx)} ${n1(bottom)}Z`
+}
+
+/** The rope: a dark outline, the rope colour, short light twists, then a knot on every tie (a marker at each vertex). */
+function ropeStrokes(rim: string): string {
+  const { dark, light } = ropeShades(rim)
+  const stroke = (color: string, width: number, extra = '') =>
+    `<use href="#rope" fill="none" stroke="${color}" stroke-width="${width}" stroke-linejoin="round" stroke-linecap="round"${extra}/>`
+  return (
+    `<g data-part="rope" shape-rendering="geometricPrecision">` +
+    stroke(dark, CATCH.ropeOutline) +
+    stroke(rim, CATCH.ropeWidth) +
+    stroke(light, CATCH.ropeWidth * 0.45, ' stroke-dasharray="0.5 0.9"') +
+    `<use href="#rope" fill="none" stroke="none" marker-start="url(#tie)" marker-mid="url(#tie)"/>` +
+    `</g>`
+  )
+}
+
+/** The knot a catch ties at the top: a loop and two short tails, in the rope's colours. */
+function ropeKnot(rim: string): string {
+  const { dark, light } = ropeShades(rim)
+  const d = 'M-1.6 0.4Q0 -0.6 1.6 0.4M0 -0.6a1 0.9 0 1 1 0.01 0M-0.3 -0.4L-1.4 -2.4M0.3 -0.4L1.3 -2.2'
+  return (
+    `<g shape-rendering="geometricPrecision" stroke-linecap="round" fill="none">` +
+    `<path stroke="${dark}" stroke-width="${CATCH.ropeOutline}" d="${d}"/>` +
+    `<path stroke="${rim}" stroke-width="${CATCH.ropeWidth}" d="${d}"/>` +
+    `<path stroke="${light}" stroke-width="${CATCH.ropeWidth * 0.45}" stroke-dasharray="0.5 0.9" d="${d}"/>` +
+    `</g>`
+  )
+}
+
+/** The rope's outline and twist colours, from its own. */
+function ropeShades(rim: string): { dark: string; light: string } {
+  const rgb = [1, 3, 5].map((i) => parseInt(rim.slice(i, i + 2), 16))
+  const hex = (c: number[]) => `#${c.map((v) => Math.round(v).toString(16).padStart(2, '0')).join('')}`
+  return { dark: hex(rgb.map((v) => v * 0.3)), light: hex(rgb.map((v) => v + (255 - v) * 0.45)) }
 }
 
 /** Five sparkles, each a white core with gold arms, that burst outward and fade (0043 point 6). */
@@ -341,6 +429,8 @@ function colorMatrix(white: number, keep: number): string {
 // `display`, not `visibility`: a child set visible would still show inside a hidden parent
 const shownAs = (shown: boolean): string => (shown ? 'inline' : 'none')
 const num = (n: number): string => String(+n.toFixed(2))
+/** The rope's shape is long and animated, so a tenth of a pixel is enough */
+const n1 = (n: number): string => String(+n.toFixed(1))
 
 /** Fills gaps (undefined) with the nearest value before, or else after, so a hidden layer doesn't blend through garbage. */
 function held<T>(values: (T | undefined)[]): (T | undefined)[] {

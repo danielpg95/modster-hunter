@@ -251,6 +251,7 @@ content issue, and the item still loads with its terminal art.
   glass jar for a catcher.
 - A catcher's `glowColor` and `rimColor` are `#rrggbb` colours from its sheet;
   its `lidRows` counts the sheet's rows; every frame its beats name must be in
-  the sheet.
+  the sheet. On desktop, `rimColor` draws a `cover` catcher's edge as a rope
+  with tie knots.
 - With both, they're the same design, but each has its own frames and fps.
 

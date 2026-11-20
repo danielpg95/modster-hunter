@@ -234,7 +234,7 @@ picks one in `/modsters`; it only changes how a throw looks.
 | `desktopSprite.file` | no | A `.png` sheet in this folder: hi-res art for the Desktop app. See [Desktop art](#desktop-art) |
 | `desktopSprite.frames` | with `desktopSprite` | Integer 1–16. Every beat's frames must be inside it too |
 | `desktopSprite.glowColor` | no | A colour like `"#ffd54f"` from the sheet: `glowIndex` for the desktop, since a PNG has no palette |
-| `desktopSprite.rimColor` | no | A colour from the sheet: `rimIndex` for the desktop |
+| `desktopSprite.rimColor` | no | A colour from the sheet: `rimIndex` for the desktop. It draws the edge as a rope with tie knots, not a ring ([0059](decisions/0059-desktop-rope-rim.md)) |
 | `desktopSprite.lidRows` | no | Integer 1–95: `lidRows` for the desktop, in rows of the sheet. Must be less than its height |
 
 The sprite follows the [`.sprite.json`](#spritejson) rules, but a catcher's is
