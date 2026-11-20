@@ -16,6 +16,7 @@ this file lists only tasks someone has claimed.
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
 | P5-74 | @victor-aguilars | in-progress | p5-74-dustwind-roster | 2026-11-16 | 2026-11-16 | Pitch a concept list for the 9 new Dustwind Expanse Modsters (body twist + one-action idle, varied types) and get it approved |
+| P5-81 | @danielpg95 | in-progress | p5-81-collection-card-budget | 2026-11-20 | 2026-11-20 | Make a card's Svg hold only frame 0 of its sheet, then drop only the cards over the page budget |
 
 ## Up next
 
@@ -23,7 +24,6 @@ Tasks whose dependencies are all done, so they can be claimed now. Update this
 list when you finish a task.
 
 - **P5-73** — Grow the Crystal Grotto roster to 8/5/3/1
-- **P5-81** — Collection cards fit the page budget
 - **P5-01** — Shiny variants
 - **P5-03** — Extended stats and milestones
 - **P4-07** — In-pane field editor
