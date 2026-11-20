@@ -1,6 +1,6 @@
 # 0006 — One random biome per session
 
-- **Status:** Accepted, amended by 0031 (a `/modsters reload` that drops the biome picks a new one)
+- **Status:** Accepted, amended by 0031 (a `/modsters reload` that drops the biome picks a new one) and 0058 (a `biome` option can fix the biome)
 - **Date:** 2026-10-07
 - **Decided by:** @danielpg95
 

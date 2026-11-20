@@ -1,8 +1,8 @@
 # 0058 — A `biome` option picks random or one fixed biome
 
-- **Status:** Proposed — settled by P5-79 / @danielpg95 (amends 0006, 0040 point 2)
-- **Date:** 2026-11-19
-- **Proposed by:** @danielpg95 (drafted by Claude)
+- **Status:** Accepted (amends 0006, 0040 point 2)
+- **Date:** 2026-11-20
+- **Decided by:** @danielpg95 (accepted 2026-11-20; drafted by Claude)
 
 ## Context
 
@@ -63,8 +63,7 @@ Option 1 for both:
 
 ## Consequences
 
-- 0006 and 0040 get "amended by 0058" on their status lines and index rows once
-  this is accepted.
+- 0006 and 0040 say "amended by 0058" on their status lines and index rows.
 - `plugin.json` gains `biome`; CONTENT_FORMAT.md's `userConfig` section and the
   README's settings list document it.
 - The biome pick becomes a pure function of (option, enabled biomes, random
