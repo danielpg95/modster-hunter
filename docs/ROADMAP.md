@@ -1087,19 +1087,19 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
   - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
-#### [ ] P5-73 — Grow the Crystal Grotto roster to 8/5/3/1
+#### [x] P5-73 — Grow the Crystal Grotto roster to 8/5/3/1
 - **Depends on:** P5-70
 - **Size:** L
 - **Goal:** Crystal Grotto has 8 common, 5 uncommon, 3 rare and 1 legendary Modster, so each tier has more variety (asked by @victor-aguilars, 2026-11-03). 7 new Modsters join it: 5 common, 2 uncommon. Existing Modsters keep their id, dex number and rarity. Each has a twist built into its body and an idle with one action; none is rock or psychic, which the grotto already has plenty of.
-- **Concepts** (picked from options and approved by @danielpg95, 2026-11-20):
-  - Common: **Olmpick** (steel/water), a pale blind olm whose tail ends in a pickaxe head; idle taps the ground. **Magmewt** (fire), a newt with a back of molten glass; idle blows a glass bubble. **Stalagmouse** (ice/ground), a cave mouse whose tail is a dripping icicle; idle catches a drip and sips it. **Lumistring** (bug/fire), a slender glowworm whose body segments glow like a string of lanterns; idle lights them one by one from tail to head (redesigned from silk lantern threads by @danielpg95, 2026-11-20). **Puddlefin** (water/fairy), a blind cavefish floating inside its own bubble of cave water; idle blows a bubble that pops.
-  - Uncommon: **Smeltgolin** (fire/steel), a pangolin whose iron-plate scales open like forge vents; idle breathes in and the vents glow. **Prismantis** (bug/fighting), a mantis whose forearms are quartz blades; idle sharpens one blade on the other.
+- **Concepts** (picked from options and approved by @danielpg95, 2026-11-20; the designs changed while drawing, as noted):
+  - Common: **Olmpick** (steel/fire), a charcoal olm plated in riveted copper with ember gills and a pickaxe tail; idle taps the ground twice and grins (was a pale steel/water olm). **Magmewt** (fire), an old newt glassblower with a molten-glass back banded from hot orange to cool teal; idle blows a bubble, inspects it and offers it. **Stalagmouse** (ice/ground), a frost-white mouse hanging from its icicle tail; idle shivers and the icicle grows, lowering it. **Lumistring** (bug/fire), a slender glowworm whose body segments glow like a string of lanterns; idle lights them from tail to head (was silk lantern threads). **Puddlefin** (water/fairy), a blind cavefish in a wobbly blob of cave water; idle blows a new blob and slips into it.
+  - Uncommon: **Smeltgolin** (fire/steel), a blackened-iron pangolin whose scales open like forge vents; idle stretches and the glow runs from shoulders to tail. **Prismantis** (bug/fighting), a jade mantis duelist with clear quartz blades; idle bows and strikes with a rainbow arc.
 - **Done when:**
   - [x] @danielpg95 approves a concept list for the biome (name, tier, one-line concept), and each `modster.json` matches it.
-  - [ ] Each new Modster ships a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @danielpg95 one at a time.
-  - [ ] `crystal-grotto/biome.json` lists all 17, and the odds table is checked.
-  - [ ] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
-  - [ ] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
+  - [x] Each new Modster ships a `desktopSprite` made from a reference with `add-modster`'s desktop prompt, at least 76×80, with a calm idle animation, approved by @danielpg95 one at a time.
+  - [x] `crystal-grotto/biome.json` lists all 17, and the odds table is checked.
+  - [x] `plugin/content/CREDITS.md` has a row for every new sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of every new sheet.
+  - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
 #### [ ] P5-74 — Grow the Dustwind Expanse roster to 8/5/3/1
 - **Depends on:** P5-70
