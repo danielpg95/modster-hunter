@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "lumistring",
+  "name": "Lumistring",
+  "description": "It glows in segments, like a string of lanterns that crawled away.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 79,
+    "types": ["bug", "fire"],
+    "category": "Lantern Modster",
+    "heightM": 0.25,
+    "weightKg": 0.2,
+    "entry": "A whole colony of Lumistrings makes the grotto ceiling look like a night sky. Cave folk who have never seen the stars think this is what they are."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}
