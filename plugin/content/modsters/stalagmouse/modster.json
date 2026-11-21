@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "stalagmouse",
+  "name": "Stalagmouse",
+  "description": "A cave mouse with an icicle for a tail. The colder the night, the longer it grows.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 78,
+    "types": ["ice", "ground"],
+    "category": "Icicle Modster",
+    "heightM": 0.2,
+    "weightKg": 0.4,
+    "entry": "If a Stalagmouse's tail snaps off, it doesn't mind; a new one freezes back overnight. The old ones melt into puddles it likes to splash in."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}
