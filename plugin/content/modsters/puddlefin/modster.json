@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "puddlefin",
+  "name": "Puddlefin",
+  "description": "It floats around in a bubble of cave water. Whatever you do, don't poke it.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 80,
+    "types": ["water", "fairy"],
+    "category": "Cavefish Modster",
+    "heightM": 0.3,
+    "weightKg": 1.5,
+    "entry": "It has no eyes, but it feels every ripple in its bubble. Speak softly near one and it will turn to face you."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

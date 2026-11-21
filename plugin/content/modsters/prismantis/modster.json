@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "prismantis",
+  "name": "Prismantis",
+  "description": "When it strikes, its quartz blades split the light into little rainbows.",
+  "rarity": "uncommon",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 82,
+    "types": ["bug", "fighting"],
+    "category": "Duelist Modster",
+    "heightM": 0.9,
+    "weightKg": 6.0,
+    "entry": "Its blades grow like crystals, a little longer each year. It hones them on the grotto walls, and the scratches it leaves glitter like writing."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

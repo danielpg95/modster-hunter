@@ -15,7 +15,6 @@ this file lists only tasks someone has claimed.
 
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
-| P5-73 | @danielpg95 | in-progress | p5-73-grotto-roster | 2026-11-20 | 2026-11-20 | Pitch a concept list for the 7 new Crystal Grotto Modsters (5 common, 2 uncommon; body twist + one-action idle) and get it approved |
 | P5-74 | @victor-aguilars | in-progress | p5-74-dustwind-roster | 2026-11-16 | 2026-11-16 | Pitch a concept list for the 9 new Dustwind Expanse Modsters (body twist + one-action idle, varied types) and get it approved |
 
 ## Up next

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "magmewt",
+  "name": "Magmewt",
+  "description": "Its back is molten glass. When it's happy, it blows a little bubble and lets it float away.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 77,
+    "types": ["fire"],
+    "category": "Glassblower Modster",
+    "heightM": 0.35,
+    "weightKg": 1.8,
+    "entry": "It blows a glass bubble for anyone it likes. Grotto folk keep them on a string; a house with many bubbles has many friends."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}

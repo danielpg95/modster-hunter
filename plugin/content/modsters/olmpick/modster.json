@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "olmpick",
+  "name": "Olmpick",
+  "description": "Knock knock. That's Olmpick, testing the wall with its tail.",
+  "rarity": "common",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 76,
+    "types": ["steel", "fire"],
+    "category": "Pickaxe Modster",
+    "heightM": 0.3,
+    "weightKg": 0.9,
+    "entry": "Its pickaxe tail grows from iron it licks off the cave walls. An old Olmpick's pick is worn smooth from a lifetime of tapping, and it rings like a bell."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}
