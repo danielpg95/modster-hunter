@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "smeltgolin",
+  "name": "Smeltgolin",
+  "description": "It eats ore and smelts it in its belly. The good bits become new scales.",
+  "rarity": "uncommon",
+  "maxAttempts": null,
+  "catchRate": null,
+  "shinyChance": null,
+  "dex": {
+    "number": 81,
+    "types": ["fire", "steel"],
+    "category": "Smelter Modster",
+    "heightM": 1.1,
+    "weightKg": 70.0,
+    "entry": "It licks ore from the grotto walls and smelts it in its belly. The pure iron becomes new scales, and the slag it coughs up cools into little black pebbles."
+  },
+  "desktopSprite": {
+    "file": "desktop.png",
+    "frames": 8,
+    "fps": 3
+  }
+}
