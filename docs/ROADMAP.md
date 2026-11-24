@@ -1198,6 +1198,17 @@ Goal: users keep or remove built-ins and add, edit, and remove their own biomes 
   - [x] Checked in the Code tab: every page of the built-in roster shows art on every card, caught and uncaught.
   - [x] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
 
+#### [ ] P5-82 — Jesterbox, the Shuffleback Hall catcher
+- **Depends on:** P5-78
+- **Size:** S
+- **Goal:** a sixth built-in catcher that marks Shuffleback Hall (asked by @danielpg95, 2026-11-24): **Jesterbox**, a faded harlequin jack-in-the-box in violet and mustard, with the four suits on its sides. "It plays the song once, slowly. At the last note, pop goes the Modster." Desktop art only (decision 0045). Style `contain`: it arcs in, the lid pops open, the Modster goes in and the lid shuts; three rock frames turn the crank a third each, and a caught frame latches the lid. The four suits are painted in one colour, so all of them light up in the caught Modster's colour (`glowColor`).
+- **Done when:**
+  - [ ] `plugin/content/catchers/jesterbox/` has a `catcher.json` and a `desktopSprite` (closed, three crank rock frames, caught) with `lidRows` and `glowColor` set, approved by @danielpg95.
+  - [ ] It fits every built-in Modster's sprite area, and its throws are checked in the `tools/sprite.mjs --desktop catcher` preview.
+  - [ ] `plugin/content/CREDITS.md` has a row for the sheet; `node tools/check-content.mjs` passes, and the PR shows a desktop preview of the sheet.
+  - [ ] Checked in the Code tab: picked in `/modsters` → Catchers and thrown.
+  - [ ] The plugin version is bumped; `claude plugin test ./plugin`, `claude plugin validate ./plugin --strict` and `node tools/check-tracking.mjs` pass.
+
 ---
 
 ## Phase 6 — Beyond the terminal
