@@ -16,7 +16,6 @@ this file lists only tasks someone has claimed.
 | Task | Owner | Status | Branch | Started | Updated | Next step |
 | --- | --- | --- | --- | --- | --- | --- |
 | P5-74 | @victor-aguilars | in-progress | p5-74-dustwind-roster | 2026-11-16 | 2026-11-16 | Pitch a concept list for the 9 new Dustwind Expanse Modsters (body twist + one-action idle, varied types) and get it approved |
-| P5-82 | @danielpg95 | in-review | p5-82-jesterbox | 2026-11-24 | 2026-11-24 | Check Jesterbox in the Code tab (pick it in /modsters → Catchers, throw, catch), then tick the item and close the task |
 
 ## Up next
 
