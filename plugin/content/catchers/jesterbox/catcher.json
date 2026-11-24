@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "jesterbox",
+  "name": "Jesterbox",
+  "description": "It plays the song once, slowly. At the last note, pop goes the Modster.",
+  "style": "contain",
+  "beats": {
+    "rock": { "frames": [1, 2, 3, 0] },
+    "caught": { "frames": [4] }
+  },
+  "desktopSprite": { "file": "desktop.png", "frames": 5, "glowColor": "#eacb87", "lidRows": 51 }
+}
